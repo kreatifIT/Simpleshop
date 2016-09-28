@@ -60,7 +60,7 @@ class Customer extends \rex_yform_manager_dataset
             ->setValue('created', date('Y-m-d H:i:s'));
         $success = $_this->save();
 
-        if (rex_extension::registerPoint(new \rex_extension_point('Customer.registered', $success, [
+        if (\rex_extension::registerPoint(new \rex_extension_point('Customer.registered', $success, [
             'user'     => $_this,
             'password' => $password,
         ]))
@@ -88,7 +88,7 @@ class Customer extends \rex_yform_manager_dataset
                 // update login timestamp
                 $user->setValue('lastlogin', date('Y-m-d H:i:s'))->save();
 
-                $result = rex_extension::registerPoint(new \rex_extension_point('Customer.logged_in', $user, [
+                $result = \rex_extension::registerPoint(new \rex_extension_point('Customer.logged_in', $user, [
                     'password' => $password,
                 ]));
             }
@@ -98,6 +98,8 @@ class Customer extends \rex_yform_manager_dataset
             // login failed
             self::logout();
         }
+        // cleanup sessions
+        Session::cleanupSessions();
         return $result;
     }
 
