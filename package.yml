@@ -1,0 +1,15 @@
+package: simpleshop
+version: '1.0.0'
+author: FriendsOfREDAXO
+compile: 1
+
+page:
+    title: Simpleshop
+    perm: shop[]
+    pjax: false
+    icon: rex-icon fa-shopping-cart
+
+requires:
+    redaxo: '>=5.2'
+    packages:
+        yform: '>=1.1-beta1'

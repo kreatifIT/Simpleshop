@@ -1,2 +1,2 @@
-# shop
+# Simpleshop
 Shop für Redaxo5
