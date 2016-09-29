@@ -40,19 +40,23 @@ class Session extends \rex_yform_manager_dataset
             $session_id    = session_id();
             $User          = Customer::getCurrentUser();
             $session       = parent::query()->where('session_id', $session_id)->findOne();
-            $user_session  = parent::query()
-                ->where('customer_id', $User->getValue('id'))
-                ->where('session_id', $session_id, '!=')
-                ->findOne();
             self::$session = $session ?: parent::create();
 
-            if ($user_session)
+            if ($User)
             {
-                // merge sessions because we found to sessions for the same user
-                $cart_items = self::getCartItems(TRUE, self::$session) + self::getCartItems(TRUE, $user_session);
-                self::$session->writeSession(['cart_items' => $cart_items]);
-                // remove the previous session
-                $user_session->delete();
+                $user_session = parent::query()
+                    ->where('customer_id', $User->getValue('id'))
+                    ->where('session_id', $session_id, '!=')
+                    ->findOne();
+
+                if ($user_session)
+                {
+                    // merge sessions because we found to sessions for the same user
+                    $cart_items = self::getCartItems(TRUE, self::$session) + self::getCartItems(TRUE, $user_session);
+                    self::$session->writeSession(['cart_items' => $cart_items]);
+                    // remove the previous session
+                    $user_session->delete();
+                }
             }
         }
         return self::$session;
@@ -92,15 +96,9 @@ class Session extends \rex_yform_manager_dataset
             $results = [];
             foreach ($cart_items as $key => $item)
             {
-                list ($product_id, $feature_ids) = explode('|', $key);
-                $_result     = ['key' => $key, 'amount' => $item, 'product' => Product::get($product_id), 'features' => []];
-                $feature_ids = $feature_ids ? explode(',', $feature_ids) : [];
-
-                foreach ($feature_ids as $feature_id)
-                {
-                    $_result['features'][] = Feature::get($feature_id);
-                }
-                $results[] = $_result;
+                $product   = Product::getProductByKey($key);
+                $results[] = $product;
+                $product->setValue('cart_quantity', $item['quantity']);
             }
             $cart_items = $results;
         }
@@ -109,13 +107,14 @@ class Session extends \rex_yform_manager_dataset
 
     public static function getProductKey($product_id, $feature_value_ids = [])
     {
+        $feature_value_ids = !is_array($feature_value_ids) ? [$feature_value_ids] : $feature_value_ids;
         return $product_id . '|' . implode(',', $feature_value_ids);
     }
 
     public static function addProduct($product_key, $quantity = 1)
     {
         $cart_items = self::getCartItems(TRUE);
-        self::setProductQuantity($product_key, $cart_items[$product_key]['amount'] + $quantity);
+        self::setProductQuantity($product_key, $cart_items[$product_key]['quantity'] + $quantity);
     }
 
     public static function setProductQuantity($product_key, $quantity)
@@ -123,7 +122,7 @@ class Session extends \rex_yform_manager_dataset
         $session    = self::getSession();
         $cart_items = self::getCartItems(TRUE);
         // update the quantity
-        $cart_items[$product_key]['amount'] = $quantity;
+        $cart_items[$product_key]['quantity'] = $quantity;
         $session->writeSession(['cart_items' => $cart_items]);
     }
 
