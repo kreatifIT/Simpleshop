@@ -11,4 +11,16 @@
  * file that was distributed with this source code.
  */
 
-echo rex_view::title('Simpleshop');
+namespace FriendsOfREDAXO\Simpleshop;
+
+echo \rex_view::title('Simpleshop');
+
+//Customer::login('a.platter@kreatif.it', '654654');
+//Session::clearCart();
+//Session::addProduct(Session::getProductKey(1,3));
+//Session::addProduct(Session::getProductKey(1,[1,5]));
+$cart_items = Session::getCartItems();
+//pr($cart_items[0]);
+
+//$Product = Product::get(1);
+//pr($Product->getPrice());

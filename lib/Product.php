@@ -35,7 +35,7 @@ class Product extends \rex_yform_manager_dataset
         {
             // get variants
             $feature = Feature::get($feature_id);
-            $variant = parent::query('rex_shop_product_has_feature')
+            $variant = Variant::query()
                 ->where('product_id', $product_id)
                 ->where('feature_value_id', $feature_id)
                 ->findOne();

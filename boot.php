@@ -17,4 +17,6 @@ namespace FriendsOfREDAXO\Simpleshop;
 \rex_yform_manager_dataset::setModelClass('rex_customer', Customer::class);
 \rex_yform_manager_dataset::setModelClass('rex_shop_feature_values', Feature::class);
 \rex_yform_manager_dataset::setModelClass('rex_shop_product', Product::class);
+\rex_yform_manager_dataset::setModelClass('rex_shop_category', Category::class);
 \rex_yform_manager_dataset::setModelClass('rex_shop_session', Session::class);
+\rex_yform_manager_dataset::setModelClass('rex_shop_product_has_feature', Variant::class);
