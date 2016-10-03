@@ -24,9 +24,18 @@ class Product extends \rex_yform_manager_dataset
 
     public static function getProductByKey($key)
     {
-        list ($product_id, $feature_ids) = explode('|', $key);
+        if (!strlen($key))
+        {
+            return false;
+        }
+        list ($product_id, $feature_ids) = explode('|', trim($key, '|'));
 
         $_this = self::get($product_id);
+
+        if (!$_this)
+        {
+            throw new \ErrorException("No product with ID = " . $product_id . " exists", 1);
+        }
         $_this->setValue('key', $key);
         $_this->setValue('cart_quantity', 0);
         $feature_ids = $feature_ids ? explode(',', $feature_ids) : [];
@@ -35,6 +44,10 @@ class Product extends \rex_yform_manager_dataset
         {
             // get variants
             $feature = Feature::get($feature_id);
+            if (!$feature)
+            {
+                throw new \ErrorException("No feature with ID = " . $feature_id . " exists", 2);
+            }
             $variant = Variant::query()
                 ->where('product_id', $product_id)
                 ->where('feature_value_id', $feature_id)
@@ -45,7 +58,7 @@ class Product extends \rex_yform_manager_dataset
                 // the given combination does not exist!
                 $lang_id = \rex_clang::getCurrentId();
                 $vname   = $_this->getValue('name_' . $lang_id) . "' - '" . $feature->getValue('name_' . $lang_id);
-                throw new \ErrorException("The variant '" . $vname . "' doesn't exist", 1);
+                throw new \ErrorException("The variant '" . $vname . "' doesn't exist", 3);
             }
             $_this->applyVariantData($variant->getData());
             $_this->features[] = $feature;
