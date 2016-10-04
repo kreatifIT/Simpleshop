@@ -21,6 +21,14 @@ namespace FriendsOfREDAXO\Simpleshop;
 \rex_yform_manager_dataset::setModelClass('rex_shop_session', Session::class);
 \rex_yform_manager_dataset::setModelClass('rex_shop_product_has_feature', Variant::class);
 
+$include_path  = \rex::isBackend() ? 'functions/backend/*.inc.php' : 'functions/frontend/*.inc.php';
+$include_files = glob($this->getPath($include_path));
+
+foreach ($include_files as $include_file)
+{
+    require_once $include_file;
+}
+
 \rex_extension::register('FE_OUTPUT', function ($params)
 {
     // api endpoint
