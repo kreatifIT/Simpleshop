@@ -15,4 +15,24 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 class Feature extends \rex_yform_manager_dataset
 {
+    private $values = NULL;
+
+    public static function getFeatureByKey($key)
+    {
+        return self::query()->where('key', $key)->findOne();
+    }
+
+    public function getValues()
+    {
+        if ($this->values === NULL)
+        {
+            $_values = strlen($this->getValue('values')) ? explode(',', $this->getValue('values')) : [];
+
+            foreach ($_values as $value)
+            {
+                $this->values[] = FeatureValue::get($value);
+            }
+        }
+        return $this->values;
+    }
 }

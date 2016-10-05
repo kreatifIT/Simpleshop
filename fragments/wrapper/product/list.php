@@ -20,6 +20,7 @@ $offset         = $element_count * (int) rex_request('page', 'int', 0);
 $orderby        = $this->getVar('orderby');
 $order          = $this->getVar('order');
 $order_values   = $this->getVar('order_values');
+$cat_path       = $this->getVar('cat_path');
 
 // prevent malformed queries
 $orderby = in_array($orderby, ['price', 'createdate']) ? $orderby : 'createdate';
@@ -30,8 +31,23 @@ $order   = $order == 'desc' ? $order : 'asc';
 
     <?php if ($this->getVar('has_infobar')): ?>
         <div class="shop-products-info-bar clearfix">
-            <?php if (strlen($this->getVar('infobar.title'))): ?>
-                <span class="label"><?= $this->getVar('infobar.title') ?></span>
+
+            <?php if (count($cat_path)): ?>
+            <div class="breadcrumbs">
+                <ul class="rex-breadcrumb">
+                <?php foreach ($cat_path as $index => $path):
+                    if (isset ($path['label'])):
+                ?>
+                    <li class="rex-lvl<?= $index + 1 ?>">
+                        <?php if (isset($path['url'])): ?><a href="<?= $path['url'] ?>"><?php endif; ?>
+                            <span class="label"><?= $path['label'] ?></span>
+                        <?php if (isset($path['url'])): ?></a><?php endif; ?>
+                    </li>
+                <?php
+                    endif;
+                endforeach; ?>
+                </ul>
+            </div>
             <?php endif; ?>
             <?php if ($order_values): ?>
             <div class="select">
@@ -62,29 +78,23 @@ $order   = $order == 'desc' ? $order : 'asc';
                     $where[] = $column . ' LIKE :wr1';
                 }
                 $query->whereRaw("(" . implode(' OR ', $where) . ")", ['wr1' => $values[1][1]]);
-                continue;
             }
             // CATEGORY ////////////////////////////////////////////////////////////////////
-            else if ($values[0] = 'price_range')
+            else if ($values[0] == 'price_range')
             {
                 $query->whereRaw("price BETWEEN :bt1 AND :bt2", ['bt1' => $values[1][0], 'bt2' => $values[1][1]]);
-                continue;
             }
             // CATEGORY ////////////////////////////////////////////////////////////////////
             else if (in_array($values[0], ['category_id']))
             {
                 // nothing to do - just pass the values
+                $query->where($values[0], $values[1], $values[2] ?: NULL);
             }
             // CALLABLE ////////////////////////////////////////////////////////////////////
             else if (is_callable($values[0]))
             {
                 call_user_func($type, $query);
             }
-            else
-            {
-                continue;
-            }
-            $query->where($values[0], $values[1], $values[2] ?: NULL);
         }
         //        pr($query->getQuery());
         //        exit;

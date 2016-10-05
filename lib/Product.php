@@ -13,20 +13,83 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Url\Rewriter\Yrewrite;
+use Url\Url;
+
 class Product extends \rex_yform_manager_dataset
 {
-    protected $features = [];
+    protected $variants = NULL;
 
-    public function getFeatures()
+    public function getVariants()
     {
-        return $this->features;
+        if ($this->variants === NULL)
+        {
+            $this->variants = $this->_getVariants($feature_key);
+        }
+//        else if ($feature_key && !array_key_exists($feature_key, $this->variants))
+//        {
+//            $_variants = $this->_getVariants($feature_key);
+//            $this->variants[$feature_key] = $_variants[$feature_key];
+//        }
+//        return $feature_key ? $this->variants[$feature_key] : $this->variants;
+        return $this->variants;
+    }
+
+    private function _getVariants($feature_key = NULL)
+    {
+        $variants       = [];
+        $feature_values = [];
+        $_groupped_var  = [];
+        $_variants      = Variant::query()->where('product_id', $this->getValue('id'))->find();
+        $query          = Feature::query();
+
+        if ($feature_key)
+        {
+            $query->where('key', $feature_key);
+        }
+        $features = $query->find();
+
+        if (count($_variants))
+        {
+            foreach ($features as $index => $feature)
+            {
+                $values         = strlen($feature->getValue('values')) ? explode(',', $feature->getValue('values')) : [];
+                $feature_values = $feature_values + array_fill_keys($values, $index);
+            }
+            foreach ($_variants as $_variant)
+            {
+                $feature_value_id = $_variant->getValue('feature_value_id');
+
+                if (array_key_exists($feature_value_id, $feature_values))
+                {
+                    $feature          = FeatureValue::get($feature_value_id);
+                    $variant_data     = $_variant->getData();
+
+                    foreach ($variant_data as $key => $value)
+                    {
+                        if (!in_array ($key, ['id', 'product_id', 'feature_value_id']))
+                        {
+                            $feature->setValue($key, $value);
+                        }
+                    }
+                    $_groupped_var[$feature_values[$feature_value_id]][] = $feature;
+                }
+            }
+            foreach ($_groupped_var as $index => $_variants)
+            {
+                $feature = $features[$index];
+                $feature->setValue('variants', $_variants);
+                $variants[$feature->getValue('key')] = $feature;
+            }
+        }
+        return $variants;
     }
 
     public static function getProductByKey($key)
     {
         if (!strlen($key))
         {
-            return false;
+            return FALSE;
         }
         list ($product_id, $feature_ids) = explode('|', trim($key, '|'));
 
@@ -43,7 +106,7 @@ class Product extends \rex_yform_manager_dataset
         foreach ($feature_ids as $feature_id)
         {
             // get variants
-            $feature = Feature::get($feature_id);
+            $feature = FeatureValue::get($feature_id);
             if (!$feature)
             {
                 throw new \ErrorException("No feature with ID = " . $feature_id . " exists", 2);
@@ -86,9 +149,28 @@ class Product extends \rex_yform_manager_dataset
         $base_price = $this->getValue('price');
         if ($formated)
         {
-            $conf       = localeconv();
-            $base_price = number_format($base_price, 2, $conf['mon_decimal_point'], $conf['mon_thousands_sep']);
+            $base_price = format_price($base_price);
         }
         return $base_price;
     }
+
+    public function getUrl($lang_id = NULL)
+    {
+        return rex_getUrl(NULL, $lang_id, ['product_id' => $this->getValue('id')]);
+    }
+
+    public function generatePath($lang_id, $path = '')
+    {
+        $_paths  = [];
+        $parents = Category::get($this->getValue('category_id'))->getParentTree();
+
+        foreach ($parents as $parent)
+        {
+            $_paths[] = Url::getRewriter()->normalize($parent->getValue('name_' . $lang_id));
+        }
+        $_paths[] = $path;
+        return implode('/', $_paths);
+    }
+
+
 }

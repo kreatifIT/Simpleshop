@@ -18,7 +18,7 @@ $product     = $this->getVar('product');
 $image       = $product->getValue('image');
 $badge       = $product->getValue('badge');
 $price       = $product->getPrice();
-$product_url = '';
+$product_url = $product->getUrl();
 
 if (strlen($image) == 0 && strlen($product->getValue('gallery')))
 {

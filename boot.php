@@ -15,14 +15,15 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 \rex_yform_manager_dataset::setModelClass('rex_shop_category', Category::class);
 \rex_yform_manager_dataset::setModelClass('rex_customer', Customer::class);
-\rex_yform_manager_dataset::setModelClass('rex_shop_feature_values', Feature::class);
+\rex_yform_manager_dataset::setModelClass('rex_shop_feature', Feature::class);
+\rex_yform_manager_dataset::setModelClass('rex_shop_feature_values', FeatureValue::class);
 \rex_yform_manager_dataset::setModelClass('rex_shop_product', Product::class);
 \rex_yform_manager_dataset::setModelClass('rex_shop_category', Category::class);
 \rex_yform_manager_dataset::setModelClass('rex_shop_session', Session::class);
+\rex_yform_manager_dataset::setModelClass('rex_shop_tax', Tax::class);
 \rex_yform_manager_dataset::setModelClass('rex_shop_product_has_feature', Variant::class);
 
-$include_path  = \rex::isBackend() ? 'functions/backend/*.inc.php' : 'functions/frontend/*.inc.php';
-$include_files = glob($this->getPath($include_path));
+$include_files = glob($this->getPath('functions/*.inc.php'));
 
 foreach ($include_files as $include_file)
 {
@@ -48,4 +49,18 @@ foreach ($include_files as $include_file)
         ]);
     }
     return $params->getSubject();
+});
+
+\rex_extension::register('URL_GENERATOR_PATH_CREATED', function ($params)
+{
+    $path    = $params->getSubject();
+    $data    = $params->getParam('data');
+    $lang_id = $params->getParam('clang_id');
+
+    switch ($params->getParam('table')->name)
+    {
+        case 'rex_shop_category': $path = Category::get($data['id'])->generatePath($lang_id); break;
+        case 'rex_shop_product': $path = Product::get($data['id'])->generatePath($lang_id, $path); break;
+    }
+    return $path;
 });

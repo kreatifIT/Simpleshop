@@ -16,13 +16,14 @@ namespace FriendsOfREDAXO\Simpleshop;
 class Utils extends \rex_yform_manager_dataset
 {
 
-    public static function getImageTag($file, $type, $params = [])
+    public static function getImageTag($file, $type, $params = [], $callback = NULL)
     {
         $imageTag = '<img src="' . \rex_url::media($file) . '" />';
         return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.getImageTag', $imageTag, [
-            'file'   => $file,
-            'type'   => $type,
-            'params' => $params,
+            'file'     => $file,
+            'type'     => $type,
+            'params'   => $params,
+            'callback' => $callback,
         ]));
     }
 
@@ -33,7 +34,7 @@ class Utils extends \rex_yform_manager_dataset
             'pager_elements_count' => 8,
             'use_request_uri'      => FALSE,
             'show_first_link'      => TRUE,
-            'show_last_link'        => TRUE,
+            'show_last_link'       => TRUE,
             'show_prev_link'       => TRUE,
             'show_next_link'       => TRUE,
         ], $_params);
@@ -57,7 +58,7 @@ class Utils extends \rex_yform_manager_dataset
                 $pagination[] = [
                     "type"  => "first",
                     "class" => "pagination-first",
-                    "text" => "",
+                    "text"  => "",
                     "url"   => $paging_url . self::getParamString(array_merge($gets, [$params['get_name'] => 0])),
                 ];
             }
@@ -66,7 +67,7 @@ class Utils extends \rex_yform_manager_dataset
                 $pagination[] = [
                     "type"  => "prev",
                     "class" => "pagination-previous",
-                    "text" => "",
+                    "text"  => "",
                     "url"   => $paging_url . self::getParamString(array_merge($gets, [$params['get_name'] => $currentPage - 1])),
                 ];
             }
@@ -79,7 +80,7 @@ class Utils extends \rex_yform_manager_dataset
                     $pagination[] = [
                         "type"  => "ellipsis",
                         "class" => "pagination-ellipsis",
-                        "text" => "",
+                        "text"  => "",
                         "url"   => $paging_url . self::getParamString(array_merge($gets, [$params['get_name'] => $i - 1])),
                     ];
                 }
@@ -89,7 +90,7 @@ class Utils extends \rex_yform_manager_dataset
                     $pagination[] = [
                         "type"  => "ellipsis",
                         "class" => "pagination-ellipsis",
-                        "text" => "",
+                        "text"  => "",
                         "url"   => $paging_url . self::getParamString(array_merge($gets, [$params['get_name'] => $i - 1])),
                     ];
                     break; //stops iteration
@@ -121,7 +122,7 @@ class Utils extends \rex_yform_manager_dataset
                 $pagination[] = [
                     "type"  => "next",
                     "class" => "pagination-next",
-                    "text" => "",
+                    "text"  => "",
                     "url"   => $paging_url . self::getParamString(array_merge($gets, [$params['get_name'] => $currentPage + 1])),
                 ];
             }
@@ -130,7 +131,7 @@ class Utils extends \rex_yform_manager_dataset
                 $pagination[] = [
                     "type"  => "last",
                     "class" => "pagination-last",
-                    "text" => "",
+                    "text"  => "",
                     "url"   => $paging_url . self::getParamString(array_merge($gets, [$params['get_name'] => ((int) ceil($totalElements / $elementsPerPage) - 1)])),
                 ];
             }
