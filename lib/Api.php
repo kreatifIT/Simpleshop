@@ -54,7 +54,20 @@ class rex_api_simpleshop_api extends rex_api_function
         \FriendsOfREDAXO\Simpleshop\Session::addProduct($product_key, $quantity);
         $this->api__session__getcarthtml();
     }
-    
+
+    private function api__session__setproductquantity()
+    {
+        $product_key = rex_post('product_key', 'string', NULL);
+        $quantity    = rex_post('quantity', 'int');
+
+        if (!$product_key || $quantity < 1)
+        {
+            throw new rex_api_exception("Invalid request arguments");
+        }
+        \FriendsOfREDAXO\Simpleshop\Session::setProductQuantity($product_key, $quantity);
+        $this->api__session__getcarthtml();
+    }
+
     private function api__session__removeproduct()
     {
         $product_key = rex_post('product_key', 'string', NULL);

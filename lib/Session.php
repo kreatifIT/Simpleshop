@@ -96,11 +96,10 @@ class Session extends \rex_yform_manager_dataset
             $results = [];
             foreach ($cart_items as $key => $item)
             {
-                $product = Product::getProductByKey($key);
+                $product = Product::getProductByKey($key, $item['quantity']);
                 if ($product)
                 {
                     $results[] = $product;
-                    $product->setValue('cart_quantity', $item['quantity']);
                 }
             }
             $cart_items = $results;

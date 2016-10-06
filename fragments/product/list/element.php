@@ -17,7 +17,8 @@ $lang_id     = \rex_clang::getCurrentId();
 $product     = $this->getVar('product');
 $image       = $product->getValue('image');
 $badge       = $product->getValue('badge');
-$price       = $product->getPrice();
+$price       = $product->getValue('price');
+$offer_price = $product->getValue('reduced_price');
 $product_url = $product->getUrl();
 
 if (strlen($image) == 0 && strlen($product->getValue('gallery')))
@@ -26,7 +27,7 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
     $image   = $gallery[0];
 }
 
-$rand_num = rand(1, 5); ?>
+?>
 <div class="column">
     <div class="shop-product-item" itemscope="" itemtype="http://schema.org/Product">
         <?php if (strlen($badge)) : ?>
@@ -34,27 +35,29 @@ $rand_num = rand(1, 5); ?>
                 <?= Utils::getImageTag($badge, '') ?>
             </div>
         <?php endif; ?>
-        <?php if ($rand_num == 2) : // TODO: angebot einbauen ?>
-            <div class="ribbon"><span>###label.offer###</span></div>
+        <?php if ($offer_price > 0): ?>
+            <div class="ribbon"><span><?= $this->i18n('label.offer'); ?></span></div>
         <?php endif; ?>
 
         <a href="<?= $product_url ?>"><?= Utils::getImageTag($image, 'product-list-element-main') ?></a>
         <h3><a href="<?= $product_url ?>"><?= $product->getValue('name_' . $lang_id) ?></a></h3>
         <div class="product-price">
-            <?php // TODO: Angebotspreis eintragen
-            ?>
-            <span class="price-was">&euro; <?= $price ?></span>
-            <span class="price">&euro; <?= $price ?></span>
+            <?php if ($offer_price > 0): ?>
+                <span class="price-was">&euro; <?= format_price($price) ?></span>
+            <?php endif; ?>
+            <span class="price">&euro; <?= format_price($offer_price > 0 ? $offer_price : $price) ?></span>
         </div>
 
-        <a class="add-to-cart fbox" href="#proceed-to-cart-<?= $i ?>">
-            <i class="fa fa-cart-plus" aria-hidden="true"></i>
-            <span>###action.add_to_cart###</span>
-        </a>
+        <?php
+        $this->setVar('button-cart-counter', $i);
+        $this->setVar('has_quantity_control', FALSE);
+        $this->setVar('has_add_to_cart_button', TRUE);
+        echo $this->subfragment('product/general/cart/button.php');
+        ?>
     </div>
 
     <!-- Popup -->
     <?php
-        $this->subfragment('general/cart_popup.php');
+    $this->subfragment('product/general/cart/popup.php');
     ?>
 </div>

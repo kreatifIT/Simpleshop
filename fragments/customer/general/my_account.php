@@ -13,6 +13,17 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+//Customer::logout();
+//Customer::login('a.platter@kreatif.it', '654654');
+//Session::clearCart();
+//Session::addProduct(Session::getProductKey(2));
+//Session::addProduct(Session::getProductKey(1));
+//Session::addProduct(Session::getProductKey(1,[1,5]));
+//$cart_items = Session::getCartItems();
+//pr($cart_items[0]);
+
+pr(Session::getCartItems(TRUE));
+
 ?>
 <div class="<?= $this->getVar('class') ?>">
     <div class="large-3 medium-5 columns">

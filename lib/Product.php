@@ -62,12 +62,12 @@ class Product extends \rex_yform_manager_dataset
 
                 if (array_key_exists($feature_value_id, $feature_values))
                 {
-                    $feature          = FeatureValue::get($feature_value_id);
-                    $variant_data     = $_variant->getData();
+                    $feature      = FeatureValue::query()->where('id', $feature_value_id)->findOne();
+                    $variant_data = $_variant->getData();
 
                     foreach ($variant_data as $key => $value)
                     {
-                        if (!in_array ($key, ['id', 'product_id', 'feature_value_id']))
+                        if (!in_array($key, ['id', 'product_id', 'feature_value_id']))
                         {
                             $feature->setValue($key, $value);
                         }
@@ -85,7 +85,7 @@ class Product extends \rex_yform_manager_dataset
         return $variants;
     }
 
-    public static function getProductByKey($key)
+    public static function getProductByKey($key, $cart_quantity = NULL)
     {
         if (!strlen($key))
         {
@@ -93,23 +93,24 @@ class Product extends \rex_yform_manager_dataset
         }
         list ($product_id, $feature_ids) = explode('|', trim($key, '|'));
 
-        $_this = self::get($product_id);
+        $_this = self::query()->where('id', $product_id)->findOne();
 
         if (!$_this)
         {
-            throw new \ErrorException("No product with ID = " . $product_id . " exists", 1);
+            throw new ProductException("No product with ID = " . $product_id . " exists --key:{$key}", 1);
         }
+        $features = [];
         $_this->setValue('key', $key);
-        $_this->setValue('cart_quantity', 0);
+        $_this->setValue('cart_quantity', $cart_quantity);
         $feature_ids = $feature_ids ? explode(',', $feature_ids) : [];
 
         foreach ($feature_ids as $feature_id)
         {
             // get variants
-            $feature = FeatureValue::get($feature_id);
+            $feature = FeatureValue::query()->where('id', $feature_id)->findOne();
             if (!$feature)
             {
-                throw new \ErrorException("No feature with ID = " . $feature_id . " exists", 2);
+                throw new ProductException("No feature with ID = " . $feature_id . " exists --key:{$key}", 2);
             }
             $variant = Variant::query()
                 ->where('product_id', $product_id)
@@ -121,11 +122,22 @@ class Product extends \rex_yform_manager_dataset
                 // the given combination does not exist!
                 $lang_id = \rex_clang::getCurrentId();
                 $vname   = $_this->getValue('name_' . $lang_id) . "' - '" . $feature->getValue('name_' . $lang_id);
-                throw new \ErrorException("The variant '" . $vname . "' doesn't exist", 3);
+                throw new ProductException("The variant '" . $vname . "' doesn't exist --key:{$key}", 3);
             }
             $_this->applyVariantData($variant->getData());
-            $_this->features[] = $feature;
+
+            // make some availabilty checks
+            if ($_this->getValue('amount') <= 0)
+            {
+                throw new ProductException("Product not available any more --key:{$key}", 4);
+            }
+            else if ($_this->getValue('inventory') == 'F' && $_this->getValue('amount') < $_this->getValue('cart_quantity'))
+            {
+                throw new ProductException("Amount of product is lower than cart quantity --key:{$key}", 5);
+            }
+            $features[] = $feature;
         }
+        $_this->features = $features;
         return $_this;
     }
 
@@ -136,22 +148,13 @@ class Product extends \rex_yform_manager_dataset
             if ($key == 'surcharge' && (float) $value > 0)
             {
                 $this->setValue('price', $this->getValue('price') + (float) $value);
+                $this->setValue('reduced_price', $this->getValue('reduced_price') + (float) $value);
             }
             if ($value != '' && !in_array($key, ['id', 'product_id', 'feature_value_id', 'surcharge']))
             {
                 $this->setValue($key, $value);
             }
         }
-    }
-
-    public function getPrice($formated = TRUE)
-    {
-        $base_price = $this->getValue('price');
-        if ($formated)
-        {
-            $base_price = format_price($base_price);
-        }
-        return $base_price;
     }
 
     public function getUrl($lang_id = NULL)
@@ -171,6 +174,6 @@ class Product extends \rex_yform_manager_dataset
         $_paths[] = $path;
         return implode('/', $_paths);
     }
-
-
 }
+
+class ProductException extends \Exception {}

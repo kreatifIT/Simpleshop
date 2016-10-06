@@ -6,11 +6,20 @@ label.login_text = Ich bin bereits Kunde und verfüge Zugangsdaten mit denen ich
 label.buy_as_guest = Als Gast fortfahren
 label.my_account = Mein Konto
 label.newest_first = Neueste zuerst
+label.price = Preis
 label.price_asc = Preis aufsteigend
-
+label.offer = Angebot
+label.amount = Menge
+label.total = Gesamt
+label.vat_in_addition = zzgl. {{tax}}% MwSt.
+label.description = Beschreibung
+label.application = Anwendung von {{product_name}}
+label.preview = Vorschau
+label.product = Produkt
 
 
 action.login = Anmelden
 action.buy_as_guest = Als Gast fortfahren
+action.add_to_cart = In den Warenkorb
 
 error.login_failed = Die Anmeldung ist fehlgeschlagen
