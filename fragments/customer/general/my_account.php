@@ -15,9 +15,10 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 //Customer::logout();
 //Customer::login('a.platter@kreatif.it', '654654');
-//Session::clearCart();
-//Session::addProduct(Session::getProductKey(2));
-//Session::addProduct(Session::getProductKey(1));
+Session::clearCart();
+Session::addProduct(Session::getProductKey(2));
+Session::addProduct(Session::getProductKey(1,[1]), 7);
+Session::addProduct(Session::getProductKey(1,[3]), 10);
 //Session::addProduct(Session::getProductKey(1,[1,5]));
 //$cart_items = Session::getCartItems();
 //pr($cart_items[0]);

@@ -21,7 +21,7 @@ namespace FriendsOfREDAXO\Simpleshop;
         <form action="" method="post">
             <input type="text" placeholder="<?= $this->i18n('label.firstname'); ?>">
             <input type="text" placeholder="<?= $this->i18n('label.lastname'); ?>">
-            <input type="text" placeholder="<?= $this->i18n('label.email_address'); ?>">
+            <input type="text" placeholder="<?= $this->i18n('label.email'); ?>">
             <button type="submit" class="button"><?= $this->i18n('action.register'); ?></button>
         </form>
     </div>

@@ -93,7 +93,7 @@ class Product extends \rex_yform_manager_dataset
         }
         list ($product_id, $feature_ids) = explode('|', trim($key, '|'));
 
-        $_this = self::query()->where('id', $product_id)->findOne();
+        $_this = self::query()->where('id', $product_id)->where('status', 1)->findOne();
 
         if (!$_this)
         {
@@ -107,7 +107,7 @@ class Product extends \rex_yform_manager_dataset
         foreach ($feature_ids as $feature_id)
         {
             // get variants
-            $feature = FeatureValue::query()->where('id', $feature_id)->findOne();
+            $feature = FeatureValue::query()->where('id', $feature_id)->where('status', 1)->findOne();
             if (!$feature)
             {
                 throw new ProductException("No feature with ID = " . $feature_id . " exists --key:{$key}", 2);
@@ -133,7 +133,7 @@ class Product extends \rex_yform_manager_dataset
             }
             else if ($_this->getValue('inventory') == 'F' && $_this->getValue('amount') < $_this->getValue('cart_quantity'))
             {
-                throw new ProductException("Amount of product is lower than cart quantity --key:{$key}", 5);
+                throw new ProductException("Amount of product is lower than cart quantity --key:{$key}&{$product_id}|{$feature_id}", 5);
             }
             $features[] = $feature;
         }
@@ -150,7 +150,14 @@ class Product extends \rex_yform_manager_dataset
                 $this->setValue('price', $this->getValue('price') + (float) $value);
                 $this->setValue('reduced_price', $this->getValue('reduced_price') + (float) $value);
             }
-            if ($value != '' && !in_array($key, ['id', 'product_id', 'feature_value_id', 'surcharge']))
+            elseif ($key == 'amount')
+            {
+                if ($this->getValue('inventory') == 'F')
+                {
+                    $this->setValue($key, $value);
+                }
+            }
+            elseif ($value != '' && !in_array($key, ['id', 'product_id', 'feature_value_id', 'surcharge']))
             {
                 $this->setValue($key, $value);
             }
