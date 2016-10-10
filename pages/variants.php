@@ -46,18 +46,15 @@ if ($_FUNC == 'save')
 
     foreach ($data as $key => $values)
     {
-        if ($values['type'] != 'NE')
-        {
-            $variant = Variant::create();
-            $variant->setValue('variant_key', $key);
-            $variant->setValue('product_id', $product_id);
+        $variant = Variant::create();
+        $variant->setValue('variant_key', $key);
+        $variant->setValue('product_id', $product_id);
 
-            foreach ($values as $name => $value)
-            {
-                $variant->setValue($name, $value);
-            }
-            $variant->save();
+        foreach ($values as $name => $value)
+        {
+            $variant->setValue($name, $value);
         }
+        $variant->save();
     }
 }
 
