@@ -13,6 +13,8 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Leafo\ScssPhp\Util;
+
 $lang_id     = \rex_clang::getCurrentId();
 $product     = $this->getVar('product');
 $cat_path    = $this->getVar('cat_path');
@@ -22,7 +24,7 @@ $offer_price = $product->getValue('reduced_price');
 $tax         = Tax::get($product->getValue('tax'))->getValue('tax');
 $gallery     = strlen($product->getValue('gallery')) ? explode(',', $product->getValue('gallery')) : [];
 $image       = $product->getValue('image');
-$variants    = $product->getVariants();
+$variants    = $product->getFeatureVariants();
 $description = $product->getValue('description_' . $lang_id);
 $application = $product->getValue('application_' . $lang_id);
 
@@ -80,23 +82,18 @@ if (strlen($image) == 0 && isset($gallery[0]))
                 <h3><?= $variants['color']->getValue('name_' . $lang_id) ?></h3>
                 <div class="select margin-small-bottom">
                     <select name="color" id="color">
-                        <?php foreach ($variants['color']->variants as $variant):
-                            $amount = $variant->getValue('amount');
-                            $surcharge = $variant->getValue('surcharge');
+                        <?php foreach ($variants['color']->values as $feature_value):
+                            $amount = $feature_value->getValue('min_amount');
                             ?>
-                            <option value="<?= $variant->getValue('id') ?>" <?php if ($amount <= 0)
+                            <option value="<?= $feature_value->getValue('id') ?>" <?php if ($amount <= 0)
                             {
                                 echo 'disabled';
                             } ?>>
-                                <?= $variant->getValue('name_' . $lang_id) ?>
+                                <?= $feature_value->getValue('name_' . $lang_id) ?>
                                 <?php
                                 if ($amount <= 0)
                                 {
                                     echo '- nicht verfügbar';
-                                }
-                                else if ($surcharge > 0)
-                                {
-                                    echo "(+" . format_price($surcharge) . " &euro;)";
                                 }
                                 ?>
                             </option>
@@ -109,11 +106,15 @@ if (strlen($image) == 0 && isset($gallery[0]))
                 <h3><?= $variants['packaging']->getValue('name_' . $lang_id) ?></h3>
                 <div class="packaging clearfix">
 
-                    <?php foreach ($variants['packaging']->variants as $variant): ?>
+                    <?php foreach ($variants['packaging']->values as $variant):
+                        $icon = $variant->getValue('icon');
+                    ?>
                         <a>
+                            <?php if (strlen($icon)): ?>
                             <div class="small">
-                                <img src="<?= \rex_url::base('resources/img/seed.svg') ?>" alt=""/>
+                                <?= Utils::getImageTag($icon, '') ?>
                             </div>
+                            <?php endif; ?>
                             <span class="weight"><?= $variant->getValue('name_' . $lang_id) ?></span>
                         </a>
                     <?php endforeach; ?>
@@ -125,18 +126,18 @@ if (strlen($image) == 0 && isset($gallery[0]))
                     <!--                            </div>-->
                     <!--                            <span class="weight">5 Kg</span>-->
                     <!--                        </a>-->
-                    <a href="#" class="active">
-                        <div class="large">
-                            <img src="<?= \rex_url::base('resources/img/seed.svg') ?>" alt=""/>
-                        </div>
-                        <span class="weight">10 Kg</span>
-                    </a>
-                    <a href="#">
-                        <div class="xlarge">
-                            <img src="<?= \rex_url::base('resources/img/seed.svg') ?>" alt=""/>
-                        </div>
-                        <span class="weight">20 Kg</span>
-                    </a>
+<!--                    <a href="#" class="active">-->
+<!--                        <div class="large">-->
+<!--                            <img src="--><?//= \rex_url::base('resources/img/seed.svg') ?><!--" alt=""/>-->
+<!--                        </div>-->
+<!--                        <span class="weight">10 Kg</span>-->
+<!--                    </a>-->
+<!--                    <a href="#">-->
+<!--                        <div class="xlarge">-->
+<!--                            <img src="--><?//= \rex_url::base('resources/img/seed.svg') ?><!--" alt=""/>-->
+<!--                        </div>-->
+<!--                        <span class="weight">20 Kg</span>-->
+<!--                    </a>-->
                 </div>
             <?php endif; ?>
 
@@ -163,7 +164,10 @@ if (strlen($image) == 0 && isset($gallery[0]))
 
 <div class="row column margin-top">
 
-    <?php if (strlen($before_content)) echo $before_content; ?>
+    <?php if (strlen($before_content))
+    {
+        echo $before_content;
+    } ?>
 
     <?php if (strlen($description)): ?>
         <h2><?= $this->i18n('label.description'); ?></h2>
@@ -171,8 +175,8 @@ if (strlen($image) == 0 && isset($gallery[0]))
     <?php endif; ?>
 
     <?php if (strlen($application)): ?>
-    <h2><?= strtr($this->i18n('label.application'), ['{{product_name}}' => $product->getValue('name_'. $lang_id)]); ?></h2>
-    <?= $application ?>
+        <h2><?= strtr($this->i18n('label.application'), ['{{product_name}}' => $product->getValue('name_' . $lang_id)]); ?></h2>
+        <?= $application ?>
     <?php endif; ?>
 </div>
 

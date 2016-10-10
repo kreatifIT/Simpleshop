@@ -1,3 +1,16 @@
+label.name = Bezeichnung
+label.variants = Varianten
+
+action.manage_variants = Varianten verwalten
+action.edit_product = Produkt bearbeiten
+
+error.no_product_choosen = Kein Produkt ausgewählt
+error.product_has_attribute = Das Produkt hat keine Eigenschaften zugewiesen. Klicken Sie {{link}}hier{{/link}} und weisen sie Eigenschaften zu.
+
+
+
+
+
 label.email = E-Mail
 label.password = Passwort
 label.password_forgotten = Passwort vergessen?
@@ -20,6 +33,7 @@ label.description = Beschreibung
 label.application = Anwendung von {{product_name}}
 label.preview = Vorschau
 label.product = Produkt
+
 label.no_product_in_cart = Der Warenkorb ist leer
 label.buy_as_guest_text = Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolor error mollitia quaerat quod repellat saepe tempore voluptas.
 
@@ -27,6 +41,7 @@ action.login = Anmelden
 action.register = Registrieren
 action.buy_as_guest = Als Gast fortfahren
 action.add_to_cart = In den Warenkorb
+
 
 
 error.login_failed = Die Anmeldung ist fehlgeschlagen

@@ -59,8 +59,31 @@ foreach ($include_files as $include_file)
 
     switch ($params->getParam('table')->name)
     {
-        case 'rex_shop_category': $path = Category::get($data['id'])->generatePath($lang_id); break;
-        case 'rex_shop_product': $path = Product::get($data['id'])->generatePath($lang_id, $path); break;
+        case 'rex_shop_category':
+            $path = Category::get($data['id'])->generatePath($lang_id);
+            break;
+        case 'rex_shop_product':
+            $path = Product::get($data['id'])->generatePath($lang_id, $path);
+            break;
     }
     return $path;
+});
+
+\rex_extension::register('YFORM_DATA_LIST', function ($params)
+{
+    $list        = $params->getSubject();
+    $list_params = $list->getParams();
+
+    if ($list_params['table_name'] == 'rex_shop_product')
+    {
+        $list->addColumn('variants', $this->i18n('action.manage_variants'), count($list->getColumnNames()) - 2);
+        $list->setColumnLabel('variants', $this->i18n('label.variants'));
+        $list->setColumnParams('variants', [
+            'page'       => 'simpleshop/variants',
+            'func'       => 'edit',
+            'data_id'    => '###id###',
+            'table_name' => 'rex_shop_product_has_feature',
+        ]);
+    }
+    return $list;
 });

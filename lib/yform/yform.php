@@ -13,8 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-if (\rex_be_controller::getCurrentPage() != 'simpleshop/variants')
+class yform extends rex_api_function
 {
-    echo \rex_view::title('Simpleshop');
 }
-\rex_be_controller::includeCurrentPageSubPath();

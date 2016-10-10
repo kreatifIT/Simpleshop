@@ -13,8 +13,19 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-if (\rex_be_controller::getCurrentPage() != 'simpleshop/variants')
-{
-    echo \rex_view::title('Simpleshop');
-}
-\rex_be_controller::includeCurrentPageSubPath();
+$name   = $this->getVar('name');
+$fields = $this->getVar('fields');
+
+?>
+<tr>
+    <td>
+    <span
+        style="white-space:nowrap;">- <?= implode('<br/></span><span style="white-space:nowrap;">- ', $name) ?></span>
+    </td>
+    <?php foreach ($fields as $field): ?>
+        <td><?= $field ?></td>
+    <?php endforeach; ?>
+</tr>
+
+
+

@@ -8,6 +8,14 @@ page:
     perm: shop[]
     pjax: false
     icon: rex-icon fa-shopping-cart
+    subpages:
+        settings:
+            title: translate:settings
+            perm: shop[settings]
+        variants:
+            title: translate:label.variants
+            hidden: true
+
 
 requires:
     redaxo: '>=5.2'
