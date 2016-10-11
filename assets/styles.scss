@@ -11,3 +11,31 @@
         margin-bottom:0;
     }
 }
+.lang-tab-content {
+    background:#fff;
+    border-left:1px solid #dfe3e9;
+    border-right:1px solid #dfe3e9;
+    border-bottom:2px solid #c1c9d4;
+    padding:20px 12px 12px 12px;
+}
+.redactor-editor {
+    background: #F7F6FB;
+    border: 1px solid #c1c9d4;
+    color: #324050;
+    padding-left:12px;
+}
+.redactor-air, .redactor-toolbar {
+    border: 1px solid #c1c9d4;
+    border-bottom:none;
+}
+fieldset {
+    margin-top:20px;
+    display: block;
+    legend {
+        background-color: #dfe3e9;
+        font-weight: normal;
+        line-height:40px;
+        padding:0 12px;
+        margin-bottom:15px;
+    }
+}
