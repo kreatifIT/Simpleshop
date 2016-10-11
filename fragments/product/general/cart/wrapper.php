@@ -70,10 +70,9 @@ do
 
             case 5:
                 // not enough products
-                list ($original_key, $variant_key) = explode('&', $key);
-                $product = Product::getProductByKey($variant_key, 0);
+                $product = Product::getProductByKey($key, 0);
                 // update cart
-                Session::setProductQuantity($original_key, $product->getValue('amount'));
+                Session::setProductQuantity($key, $product->getValue('amount'));
                 $label    = strtr($Addon->i18n('error.cart_product_not_enough_amount'), [
                     '{{replace}}' => $product->getValue('name_' . $lang_id),
                     '{{count}}'   => $product->getValue('amount'),

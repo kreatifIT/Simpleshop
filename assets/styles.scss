@@ -1,0 +1,13 @@
+.table.variants
+{
+    label {
+        display:none;
+    }
+    select {
+        min-width: 120px;
+    }
+    small,
+    .form-group {
+        margin-bottom:0;
+    }
+}

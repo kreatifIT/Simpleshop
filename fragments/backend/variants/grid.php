@@ -18,7 +18,7 @@ $labels = $this->getVar('labels');
 $rows   = $this->getVar('rows');
 
 ?>
-<table class="table">
+<table class="table variants">
     <tr>
         <th><?= $this->i18n('label.name') ?></th>
         <?php foreach ($labels as $label): ?>

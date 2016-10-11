@@ -76,7 +76,10 @@ class Product extends \rex_yform_manager_dataset
             $min_amount   = NULL;
             $feature_ids  = [];
             $feature_keys = [];
-            $_variants    = Variant::query()->where('product_id', $this->getValue('id'))->find();
+            $_variants    = Variant::query()
+                ->where('product_id', $this->getValue('id'))
+                ->where('type', 'NE', '!=')
+                ->find();
 
             foreach ($_variants as $variant)
             {
@@ -186,7 +189,7 @@ class Product extends \rex_yform_manager_dataset
         {
             return FALSE;
         }
-        list ($product_id, $feature_ids) = explode('|', trim($key, '|'));
+        list ($product_id, $variant_key) = explode('|', trim($key, '|'));
 
         $_this = self::query()->where('id', $product_id)->where('status', 1)->findOne();
 
@@ -197,7 +200,23 @@ class Product extends \rex_yform_manager_dataset
         $features = [];
         $_this->setValue('key', $key);
         $_this->setValue('cart_quantity', $cart_quantity);
-        $feature_ids = $feature_ids ? explode(',', $feature_ids) : [];
+        $feature_ids = $variant_key ? explode(',', $variant_key) : [];
+
+        if (count($feature_ids))
+        {
+            $variant = Variant::query()
+                ->where('product_id', $product_id)
+                ->where('type', 'NE', '!=')
+                ->where('variant_key', $variant_key)
+                ->findOne();
+
+            if (!$variant)
+            {
+                // the given combination does not exist!
+                throw new ProductException("The variant doesn't exist --key:{$key}", 3);
+            }
+            $_this->applyVariantData($variant->getData());
+        }
 
         foreach ($feature_ids as $feature_id)
         {
@@ -207,28 +226,14 @@ class Product extends \rex_yform_manager_dataset
             {
                 throw new ProductException("No feature with ID = " . $feature_id . " exists --key:{$key}", 2);
             }
-            $variant = Variant::query()
-                ->where('product_id', $product_id)
-                ->where('feature_value_id', $feature_id)
-                ->findOne();
-
-            if (!$variant)
+            else if ($_this->getValue('amount') <= 0)
             {
-                // the given combination does not exist!
-                $lang_id = \rex_clang::getCurrentId();
-                $vname   = $_this->getValue('name_' . $lang_id) . "' - '" . $feature->getValue('name_' . $lang_id);
-                throw new ProductException("The variant '" . $vname . "' doesn't exist --key:{$key}", 3);
-            }
-            $_this->applyVariantData($variant->getData());
-
-            // make some availabilty checks
-            if ($_this->getValue('amount') <= 0)
-            {
+                // make some availabilty checks
                 throw new ProductException("Product not available any more --key:{$key}", 4);
             }
             else if ($_this->getValue('inventory') == 'F' && $_this->getValue('amount') < $_this->getValue('cart_quantity'))
             {
-                throw new ProductException("Amount of product is lower than cart quantity --key:{$key}&{$product_id}|{$feature_id}", 5);
+                throw new ProductException("Amount of product is lower than cart quantity --key:{$key}", 5);
             }
             $features[] = $feature;
         }
@@ -240,22 +245,35 @@ class Product extends \rex_yform_manager_dataset
     {
         foreach ($variant_data as $key => $value)
         {
-            if ($key == 'surcharge' && (float) $value > 0)
+            if (in_array($key, ['price', 'reduced_price', 'width', 'height', 'weight', 'length']))
             {
-                $this->setValue('price', $this->getValue('price') + (float) $value);
-                $this->setValue('reduced_price', $this->getValue('reduced_price') + (float) $value);
+                if ((float) $value > 0)
+                {
+                    $this->setValue($key, (float) $value);
+                }
             }
             elseif ($key == 'amount')
             {
-                if ($this->getValue('inventory') == 'F')
+                if ($this->getValue('inventory') == 'F' && $value != '')
                 {
                     $this->setValue($key, $value);
                 }
             }
-            elseif ($value != '' && !in_array($key, ['id', 'product_id', 'feature_value_id', 'surcharge']))
+            elseif ($value != '' && !in_array($key, ['id', 'product_id', 'type']))
             {
                 $this->setValue($key, $value);
             }
+        }
+        if ($variant_data['type'] == 'FREE')
+        {
+            // if variant is free set price to zero
+            $this->setValue('price', 0);
+            $this->setValue('reduced_price', 0);
+        }
+        else if ((float) $variant_data['price'] > 0 && (float) $variant_data['reduced_price'] <= 0)
+        {
+            // if variant has a price
+            $this->setValue('reduced_price', 0);
         }
     }
 

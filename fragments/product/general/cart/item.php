@@ -30,7 +30,7 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
     $gallery = explode(',', $product->getValue('gallery'));
     $image   = $gallery[0];
 }
-$price = $offer_price ? $offer_price : $price;
+$price = $offer_price > 0 ? $offer_price : $price;
 $price = $price + ($price * $tax * 0.01);
 
 ?>
