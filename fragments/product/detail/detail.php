@@ -88,7 +88,7 @@ if (strlen($image) == 0 && isset($gallery[0]))
                             <option value="<?= $feature_value->getValue('id') ?>" <?php if ($amount <= 0)
                             {
                                 echo 'disabled';
-                            } ?>>
+                            } ?> data-packaging-ids="">
                                 <?= $feature_value->getValue('name_' . $lang_id) ?>
                                 <?php
                                 if ($amount <= 0)
@@ -109,7 +109,7 @@ if (strlen($image) == 0 && isset($gallery[0]))
                     <?php foreach ($variants['packaging']->values as $variant):
                         $icon = $variant->getValue('icon');
                     ?>
-                        <a>
+                        <a data-price="" data-reduced-price="" data-img-src="">
                             <?php if (strlen($icon)): ?>
                             <div class="small">
                                 <?= Utils::getImageTag($icon, '') ?>

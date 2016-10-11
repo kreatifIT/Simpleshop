@@ -96,8 +96,8 @@ $order   = $order == 'desc' ? $order : 'asc';
                 call_user_func($type, $query);
             }
         }
-        //        pr($query->getQuery());
-        //        exit;
+//        pr($query->getQuery());
+//        exit;
         if ($has_pagination)
         {
             $total = $query->count();
