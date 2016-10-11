@@ -55,9 +55,4 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
         echo $this->subfragment('product/general/cart/button.php');
         ?>
     </div>
-
-    <!-- Popup -->
-    <?php
-    $this->subfragment('product/general/cart/popup.php');
-    ?>
 </div>

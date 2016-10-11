@@ -13,7 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$i = $this->getVar('button-cart-counter');
 $quantity = $this->getVar('cart-quantity');
 
 if (!$quantity)
@@ -33,7 +32,7 @@ if (!$quantity)
         </div>
     <?php endif; ?>
     <?php if ($this->getVar('has_add_to_cart_button')): ?>
-    <a class="add-to-cart fbox" href="#proceed-to-cart-<?= $i ?>">
+    <a class="add-to-cart fbox" href="#proceed-to-cart" data-product_key="352523" data-quantity="<?= $quantity ?>">
         <i class="fa fa-cart-plus" aria-hidden="true"></i>
         <span><?= $this->i18n('action.add_to_cart'); ?></span>
     </a>
