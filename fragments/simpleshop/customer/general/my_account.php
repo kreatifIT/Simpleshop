@@ -30,7 +30,7 @@ pr(Session::getCartItems(TRUE));
     <div class="large-3 medium-5 columns">
         <?php
 //        $this->setVar('class', 'large-6 columns margin-bottom');
-//        echo $this->subfragment('customer/auth/login.php');
+//        echo $this->subfragment('simpleshop/customer/auth/login.php');
         ?>
         <div class="shop-accordion-menu margin-bottom">
             <ul data-accordion-menu>

@@ -167,13 +167,13 @@ foreach ($variants as $variant_key)
     $fragment->setVar('fields', $_fields, FALSE);
     $fragment->setVar('name', $_name);
     $fragment->setVar('type', $type);
-    $rows[] = $fragment->parse('backend/variants/row_item.php');
+    $rows[] = $fragment->parse('simpleshop/backend/variants/row_item.php');
 }
 
 $fragment = new \rex_fragment();
 $fragment->setVar('labels', $labels);
 $fragment->setVar('rows', $rows, FALSE);
-$content = $fragment->parse('backend/variants/grid.php');
+$content = $fragment->parse('simpleshop/backend/variants/grid.php');
 
 $formElements = [
     ['field' => '<a class="btn btn-abort" href="' . \rex_url::backendPage('yform/manager/data_edit', ['table_name' => Product::TABLE]) . '">' . \rex_i18n::msg('form_abort') . '</a>',],

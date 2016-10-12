@@ -48,12 +48,12 @@ if ($_FUNC == 'login')
 
     <?php
     $this->setVar('class', $sub_class);
-    echo $this->subfragment('customer/auth/login.php');
+    echo $this->subfragment('simpleshop/customer/auth/login.php');
     ?>
 
     <?php
     $this->setVar('class', $sub_class);
-    echo $this->subfragment('customer/auth/registration.php');
+    echo $this->subfragment('simpleshop/customer/auth/registration.php');
     ?>
 
     <?= $after ?>

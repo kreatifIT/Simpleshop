@@ -154,7 +154,7 @@ if (strlen($image) == 0 && isset($gallery[0]))
                 $this->setVar('button-cart-counter', 1);
                 $this->setVar('has_quantity_control', TRUE);
                 $this->setVar('has_add_to_cart_button', TRUE);
-                echo $this->subfragment('product/general/cart/button.php');
+                echo $this->subfragment('simpleshop/product/general/cart/button.php');
                 ?>
             </div>
         </div>

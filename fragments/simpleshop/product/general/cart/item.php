@@ -53,7 +53,7 @@ $price = $price + ($price * $tax * 0.01);
         $this->setVar('has_refresh_button', TRUE);
         $this->setVar('cart-quantity', $quantity);
         $this->setVar('product_key', $key);
-        echo $this->subfragment('product/general/cart/button.php');
+        echo $this->subfragment('simpleshop/product/general/cart/button.php');
         ?>
     </td>
     <td>&euro; <?= format_price($price * $quantity) ?></td>

@@ -63,7 +63,7 @@ $order   = $order == 'desc' ? $order : 'asc';
 
     <!-- Popup -->
     <?php
-    $this->subfragment('product/general/cart/popup.php');
+    $this->subfragment('simpleshop/product/general/cart/popup.php');
     ?>
     
     <div class="shop-products-grid <?= $this->getVar('grid-class') ?>">
@@ -122,14 +122,14 @@ $order   = $order == 'desc' ? $order : 'asc';
         {
             $this->setVar('class', 'info', FALSE);
             $this->setVar('product', $product);
-            $this->subfragment('product/list/element.php');
+            $this->subfragment('simpleshop/product/list/element.php');
         }
         ?>
     </div>
     <?php
     if ($has_pagination)
     {
-        $this->subfragment('product/list/pagination.php');
+        $this->subfragment('simpleshop/product/list/pagination.php');
     }
     ?>
 </div>

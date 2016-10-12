@@ -115,7 +115,7 @@ endif; ?>
         foreach ($products as $product)
         {
             $this->setVar('product', $product);
-            echo $this->subfragment('product/general/cart/item.php');
+            echo $this->subfragment('simpleshop/product/general/cart/item.php');
         }
         ?>
         </tbody>
