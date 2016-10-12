@@ -35,7 +35,7 @@ class Tax extends \rex_yform_manager_dataset
 
             foreach ($products as $product)
             {
-                $links[] = $product->getValue('tax') .' -
+                $links[] = $product->getValue(sprogfield('name')) .' -
                     <a href="'. \rex_url::backendPage('yform/manager/data_edit', ['data_id' => $product->getValue('id'), 'table_name' => Product::TABLE, 'func' => 'edit',]) .'" target="_blank">'. $Addon->i18n('action.edit_product') .'</a> |
                     <a href="'. $product->getUrl() .'" target="_blank">'. $Addon->i18n('action.show_in_frontend') .'</a>
                 ';
