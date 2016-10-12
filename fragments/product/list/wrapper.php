@@ -61,6 +61,11 @@ $order   = $order == 'desc' ? $order : 'asc';
         </div>
     <?php endif; ?>
 
+    <!-- Popup -->
+    <?php
+    $this->subfragment('product/general/cart/popup.php');
+    ?>
+    
     <div class="shop-products-grid <?= $this->getVar('grid-class') ?>">
         <?php
         $query = \FriendsOfREDAXO\Simpleshop\Product::query()
