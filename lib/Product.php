@@ -35,26 +35,30 @@ class Product extends \rex_yform_manager_dataset
 
     public function _getFeatures($feature_val_ids)
     {
-        $result           = [];
-        $feature_ids      = [];
-        $feature_values   = [];
-        // get feature values
-        foreach ($feature_val_ids as $feature_id)
-        {
-            $_value                 = FeatureValue::get($feature_id);
-            $_id                    = $_value->getValue('feature_id');
-            $feature_ids[]          = $_id;
-            $feature_values[$_id][] = $_value;
-        }
-        // get features
-        $_features = Feature::query()->where('id', $feature_ids)->find();
+        $result = [];
 
-        foreach ($_features as $feature)
+        if (count($feature_val_ids))
         {
-            // assign feature values to the feature
-            $feature->values = $feature_values[$feature->getValue('id')];
-            //
-            $result[$feature->getValue('key')] = $feature;
+            $feature_ids    = [];
+            $feature_values = [];
+            // get feature values
+            foreach ($feature_val_ids as $feature_id)
+            {
+                $_value                 = FeatureValue::get($feature_id);
+                $_id                    = $_value->getValue('feature_id');
+                $feature_ids[]          = $_id;
+                $feature_values[$_id][] = $_value;
+            }
+            // get features
+            $_features = Feature::query()->where('id', $feature_ids)->find();
+
+            foreach ($_features as $feature)
+            {
+                // assign feature values to the feature
+                $feature->values = $feature_values[$feature->getValue('id')];
+                //
+                $result[$feature->getValue('key')] = $feature;
+            }
         }
         return $result;
     }
@@ -287,6 +291,21 @@ class Product extends \rex_yform_manager_dataset
             $_paths[] = $path;
         }
         return implode('/', $_paths);
+    }
+
+    public static function ext_yform_data_delete($params)
+    {
+        $result = $params->getSubject();
+
+        if ($result !== FALSE)
+        {
+            // remove all related variants
+            $obj_id = $params->getParam('data_id');
+            $query  = "DELETE FROM " . Variant::TABLE . " WHERE product_id = {$obj_id}";
+            $sql    = \rex_sql::factory();
+            $sql->setQuery($query);
+        }
+        return $result;
     }
 }
 
