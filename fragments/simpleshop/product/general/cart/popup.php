@@ -13,12 +13,21 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+$product = $this->getVar('product');
+$image   = $product->getValue('image');
+
+if (strlen($image) == 0 && strlen($product->getValue('gallery')))
+{
+    $gallery = explode(',', $product->getValue('gallery'));
+    $image   = $gallery[0];
+}
+
 ?>
-<div class="shop-modal" id="proceed-to-cart">
+<div class="shop-modal">
     <div class="row">
         <div class="small-4 columns">
             <div class="image">
-                <img src="" alt="">
+                <?= Utils::getImageTag($image, 'cart-list-element-main') ?>
             </div>
         </div>
         <div class="small-8 columns">

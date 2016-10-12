@@ -18,6 +18,7 @@ use Url\Url;
 class Product extends \rex_yform_manager_dataset
 {
     const TABLE = 'rex_shop_product';
+    protected $__price        = NULL;
     protected $__feature_data = NULL;
     protected $__variants     = NULL;
     protected $__features     = NULL;
@@ -31,6 +32,24 @@ class Product extends \rex_yform_manager_dataset
             $this->__features = strlen($feature_val_ids) ? $this->_getFeatures(explode(',', $feature_val_ids)) : [];
         }
         return $this->__features;
+    }
+
+    public function getPrice($includeTax = FALSE)
+    {
+        if ($this->__price === NULL)
+        {
+            $reduced = $this->getValue('reduced_price');
+            $price   = $this->getValue('price');
+            $price   = $reduced > 0 ? $reduced : $price;
+
+            if ($includeTax)
+            {
+                $tax   = Tax::get($this->getValue('tax'))->getValue('tax');
+                $price = $price + ($price * $tax * 0.01);
+            }
+            $this->__price = $price;
+        }
+        return $this->__price;
     }
 
     public function _getFeatures($feature_val_ids)

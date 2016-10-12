@@ -15,10 +15,8 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 $label_name  = sprogfield('name');
 $product     = $this->getVar('product');
-$tax         = Tax::get($product->getValue('tax'))->getValue('tax');
 $image       = $product->getValue('image');
-$price       = $product->getValue('price');
-$offer_price = $product->getValue('reduced_price');
+$price       = $product->getPrice(TRUE);
 $features    = $product->getValue('features');
 $quantity    = $product->getValue('cart_quantity');
 $key         = $product->getValue('key');
@@ -30,9 +28,6 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
     $gallery = explode(',', $product->getValue('gallery'));
     $image   = $gallery[0];
 }
-$price = $offer_price > 0 ? $offer_price : $price;
-$price = $price + ($price * $tax * 0.01);
-
 ?>
 <tr class="cart-item">
     <td>

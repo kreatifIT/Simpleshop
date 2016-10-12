@@ -94,7 +94,8 @@ if (count($errors)):
             <p><?= isset($error['replace']) ? strtr($error['label'], ['{{replace}}' => $error['replace']]) : $error['label'] ?></p>
         </div>
     <?php endforeach;
-endif; ?>
+endif;
+?>
 
 <?php if (count($products)): ?>
     <form action="" method="post">
