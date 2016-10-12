@@ -13,10 +13,10 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$errors  = [];
-$Addon   = \rex_addon::get('simpleshop');
-$lang_id = \rex_clang::getCurrentId();
-$_FUNC   = rex_request('func', 'string');
+$errors     = [];
+$Addon      = \rex_addon::get('simpleshop');
+$label_name = sprogfield('name');
+$_FUNC      = rex_request('func', 'string');
 
 if ($_FUNC == 'update')
 {
@@ -64,7 +64,7 @@ do
                 Session::removeProduct($key);
                 list ($product_id, $feature_ids) = explode('|', trim($key, '|'));
                 $product  = Product::get($product_id);
-                $label    = strtr($Addon->i18n('error.cart_product_not_available'), ['{{replace}}' => $product->getValue('name_' . $lang_id)]);
+                $label    = strtr($Addon->i18n('error.cart_product_not_available'), ['{{replace}}' => $product->getValue($label_name)]);
                 $errors[] = ['label' => $label];
                 break;
 
@@ -74,7 +74,7 @@ do
                 // update cart
                 Session::setProductQuantity($key, $product->getValue('amount'));
                 $label    = strtr($Addon->i18n('error.cart_product_not_enough_amount'), [
-                    '{{replace}}' => $product->getValue('name_' . $lang_id),
+                    '{{replace}}' => $product->getValue($label_name),
                     '{{count}}'   => $product->getValue('amount'),
                 ]);
                 $errors[] = ['label' => $label];
@@ -97,30 +97,30 @@ if (count($errors)):
 endif; ?>
 
 <?php if (count($products)): ?>
-<form action="" method="post">
-    <table class="cart-content stack">
-        <thead>
-        <tr class="cart-header">
-            <th><?= $Addon->i18n('label.preview'); ?></th>
-            <th><?= $Addon->i18n('label.product'); ?></th>
-            <th><?= $Addon->i18n('label.price'); ?></th>
-            <th><?= $Addon->i18n('label.amount'); ?></th>
-            <th><?= $Addon->i18n('label.total'); ?></th>
-            <th>&nbsp;</th>
-        </tr>
-        </thead>
-        <tbody>
+    <form action="" method="post">
+        <table class="cart-content stack">
+            <thead>
+            <tr class="cart-header">
+                <th><?= $Addon->i18n('label.preview'); ?></th>
+                <th><?= $Addon->i18n('label.product'); ?></th>
+                <th><?= $Addon->i18n('label.price'); ?></th>
+                <th><?= $Addon->i18n('label.amount'); ?></th>
+                <th><?= $Addon->i18n('label.total'); ?></th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
 
-        <?php
-        foreach ($products as $product)
-        {
-            $this->setVar('product', $product);
-            echo $this->subfragment('simpleshop/product/general/cart/item.php');
-        }
-        ?>
-        </tbody>
-    </table>
-</form>
+            <?php
+            foreach ($products as $product)
+            {
+                $this->setVar('product', $product);
+                echo $this->subfragment('simpleshop/product/general/cart/item.php');
+            }
+            ?>
+            </tbody>
+        </table>
+    </form>
 <?php else: ?>
     <p class="text-center margin"><?= $Addon->i18n('label.no_product_in_cart') ?></p>
 <?php endif; ?>

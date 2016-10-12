@@ -270,9 +270,10 @@ class Product extends \rex_yform_manager_dataset
         }
     }
 
-    public function getUrl($lang_id = NULL)
+    public function getUrl($lang_id = NULL, $params = [])
     {
-        return rex_getUrl(NULL, $lang_id, ['product_id' => $this->getValue('id')]);
+        $params = array_merge($params, ['product_id' => $this->getValue('id')]);
+        return rex_getUrl(NULL, $lang_id, $params);
     }
 
     public function generatePath($lang_id, $path = '')

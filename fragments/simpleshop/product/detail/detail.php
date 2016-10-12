@@ -13,7 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$lang_id     = \rex_clang::getCurrentId();
+$lable_name  = sprogfield('name');
 $product     = $this->getVar('product');
 $cat_path    = $this->getVar('cat_path');
 $badge       = $product->getValue('badge');
@@ -23,8 +23,8 @@ $tax         = Tax::get($product->getValue('tax'))->getValue('tax');
 $gallery     = strlen($product->getValue('gallery')) ? explode(',', $product->getValue('gallery')) : [];
 $image       = $product->getValue('image');
 $variants    = $product->getFeatureVariants();
-$description = $product->getValue('description_' . $lang_id);
-$application = $product->getValue('application_' . $lang_id);
+$description = $product->getValue(sprogfield('description'));
+$application = $product->getValue(sprogfield('application'));
 
 $before_content = $this->getVar('before_content');
 $after_content  = $this->getVar('after_content');
@@ -77,7 +77,7 @@ if (strlen($image) == 0 && isset($gallery[0]))
             <?php endif; ?>
 
             <?php if (isset($variants['features']['color'])): ?>
-                <h3><?= $variants['features']['color']->getValue('name_' . $lang_id) ?></h3>
+                <h3><?= $variants['features']['color']->getValue($lable_name) ?></h3>
                 <div class="select margin-small-bottom">
                     <select name="color" id="color">
                         <?php foreach ($variants['features']['color']->values as $feature_value):
@@ -88,7 +88,7 @@ if (strlen($image) == 0 && isset($gallery[0]))
                             {
                                 echo 'disabled';
                             } ?> data-variant-ids="<?= implode(',', $variant_ids) ?>">
-                                <?= $feature_value->getValue('name_' . $lang_id) ?>
+                                <?= $feature_value->getValue($lable_name) ?>
                                 <?php
                                 if ($amount <= 0)
                                 {
@@ -102,7 +102,7 @@ if (strlen($image) == 0 && isset($gallery[0]))
             <?php endif; ?>
 
             <?php if (isset($variants['features']['packaging'])): ?>
-                <h3><?= $variants['features']['packaging']->getValue('name_' . $lang_id) ?></h3>
+                <h3><?= $variants['features']['packaging']->getValue($lable_name) ?></h3>
                 <div class="packaging clearfix">
 
                     <?php foreach ($variants['features']['packaging']->values as $feature_value):
@@ -114,7 +114,7 @@ if (strlen($image) == 0 && isset($gallery[0]))
                                     <?= Utils::getImageTag($icon, '') ?>
                                 </div>
                             <?php endif; ?>
-                            <span class="weight"><?= $feature_value->getValue('name_' . $lang_id) ?></span>
+                            <span class="weight"><?= $feature_value->getValue($lable_name) ?></span>
                         </a>
                     <?php endforeach; ?>
 
@@ -176,7 +176,7 @@ if (strlen($image) == 0 && isset($gallery[0]))
     <?php endif; ?>
 
     <?php if (strlen($application)): ?>
-        <h2><?= strtr($this->i18n('label.application'), ['{{product_name}}' => $product->getValue('name_' . $lang_id)]); ?></h2>
+        <h2><?= strtr($this->i18n('label.application'), ['{{product_name}}' => $product->getValue($lable_name)]); ?></h2>
         <?= $application ?>
     <?php endif; ?>
 </div>

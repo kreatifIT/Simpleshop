@@ -13,7 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$lang_id     = \rex_clang::getCurrentId();
+$label_name  = sprogfield('name');
 $product     = $this->getVar('product');
 $tax         = Tax::get($product->getValue('tax'))->getValue('tax');
 $image       = $product->getValue('image');
@@ -39,11 +39,11 @@ $price = $price + ($price * $tax * 0.01);
         <a href="<?= $product_url ?>"><?= Utils::getImageTag($image, 'cart-list-element-main') ?></a>
     </td>
     <td>
-        <h3><?= $product->getValue('name_'. $lang_id) ?></h3>
-        <p><?= $Category->getValue('name_'. $lang_id) ?></p>
+        <h3><?= $product->getValue($label_name) ?></h3>
+        <p><?= $Category->getValue($label_name) ?></p>
 
         <?php foreach ($features as $feature): ?>
-            <div><i class="medium-bold"><?= $feature->getValue('name_'. $lang_id) ?></i></div>
+            <div><i class="medium-bold"><?= $feature->getValue($label_name) ?></i></div>
         <?php endforeach; ?>
     </td>
     <td>&euro; <?= format_price($price) ?></td>

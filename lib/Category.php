@@ -54,9 +54,10 @@ class Category extends \rex_yform_manager_dataset
         return $this->parents;
     }
 
-    public function getUrl($lang_id = NULL)
+    public function getUrl($lang_id = NULL, $params = [])
     {
-        return rex_getUrl(NULL, $lang_id, ['category_id' => $this->getValue('id')]);
+        $params = array_merge($params, ['category_id' => $this->getValue('id')]);
+        return rex_getUrl(NULL, $lang_id, $params);
     }
 
     public function generatePath($lang_id, $path = '')

@@ -13,7 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$lang_id     = \rex_clang::getCurrentId();
 $product     = $this->getVar('product');
 $image       = $product->getValue('image');
 $badge       = $product->getValue('badge');
@@ -40,7 +39,7 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
         <?php endif; ?>
 
         <a href="<?= $product_url ?>"><?= Utils::getImageTag($image, 'product-list-element-main') ?></a>
-        <h3><a href="<?= $product_url ?>"><?= $product->getValue('name_' . $lang_id) ?></a></h3>
+        <h3><a href="<?= $product_url ?>"><?= $product->getValue(sprogfield('name')) ?></a></h3>
         <div class="product-price">
             <?php if ($offer_price > 0): ?>
                 <span class="price-was">&euro; <?= format_price($price) ?></span>
