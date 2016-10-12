@@ -9,6 +9,7 @@ action.show_in_frontend = Im Frontend anzeigen
 error.cannot_delete_category = Die Kategorie "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind
 error.cannot_delete_tax = Der Steuersatz "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind
 error.cannot_delete_feature = Die Eigenschaft "{{name}}" kann nicht gelöscht werden da folgende Werte noch verlinkt sind
+error.cannot_delete_value = Der Wert "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind
 error.no_product_choosen = Kein Produkt ausgewählt
 error.product_has_attribute = Das Produkt hat keine Eigenschaften zugewiesen. Klicken Sie {{link}}hier{{/link}} und weisen sie Eigenschaften zu.
 

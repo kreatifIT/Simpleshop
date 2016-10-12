@@ -297,7 +297,7 @@ class Product extends \rex_yform_manager_dataset
     {
         $result = $params->getSubject();
 
-        if ($result !== FALSE)
+        if ($result !== FALSE && $params->getParam('table')->getTableName() == self::TABLE)
         {
             // remove all related variants
             $obj_id = $params->getParam('data_id');

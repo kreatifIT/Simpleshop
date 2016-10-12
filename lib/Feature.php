@@ -39,7 +39,7 @@ class Feature extends \rex_yform_manager_dataset
     {
         $result = $params->getSubject();
 
-        if ($result !== FALSE)
+        if ($result !== FALSE && $params->getParam('table')->getTableName() == self::TABLE)
         {
             $Addon  = \rex_addon::get('simpleshop');
             $links  = [];
