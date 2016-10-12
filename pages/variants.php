@@ -56,6 +56,10 @@ if ($_FUNC == 'save')
             $variant->setValue('variant_key', $key);
             $variant->setValue('product_id', $product_id);
         }
+        else
+        {
+            $variant->setValue('updatedate', date('Y-m-d H:i:s'));
+        }
         foreach ($values as $name => $value)
         {
             $variant->setValue($name, $value);
@@ -82,7 +86,7 @@ foreach ($columns as $column)
     $type = $column->getTypeName();
     $name = $column->getName();
 
-    if ($name == 'variant_key' || in_array($type, ['be_manager_relation']))
+    if ($name == 'variant_key' || in_array($type, ['be_manager_relation', 'datestamp']))
     {
         continue;
     }
