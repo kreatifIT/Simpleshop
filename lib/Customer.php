@@ -15,6 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 class Customer extends \rex_yform_manager_dataset
 {
+    const TABLE = 'rex_customer';
     const MIN_PASSWORD_LENGTH = 6;
 
     public static function getUserByEmail($email)
@@ -123,6 +124,10 @@ class Customer extends \rex_yform_manager_dataset
 
     public static function getPasswordHash($password, $func = 'sha1')
     {
+        $yform = yform::factory();
+        $yform->
+        pr($yform->getFieldValue('password_hash'));
+        exit;
         return hash($func, $password . 'UYD7FFtMLdqr4ZujqwED');
     }
 

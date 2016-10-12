@@ -17,6 +17,7 @@ use Url\Url;
 
 class Product extends \rex_yform_manager_dataset
 {
+    const TABLE = 'rex_shop_product';
     protected $__feature_data = NULL;
     protected $__variants     = NULL;
     protected $__features     = NULL;

@@ -20,7 +20,7 @@ $product_id  = rex_get('data_id', 'int');
 $product     = \FriendsOfREDAXO\Simpleshop\Product::get($product_id);
 $features    = $product->getFeatures();
 $product_url = \rex_url::backendPage('yform/manager/data_edit', [
-    'table_name' => 'rex_shop_product',
+    'table_name' => Product::TABLE,
     'data_id'    => $product_id,
     'func'       => 'edit',
 ]);
@@ -68,7 +68,7 @@ if ($_FUNC == 'save')
 }
 
 // load all columns from yform
-$columns     = \rex_yform_manager_table::get('rex_shop_product_has_feature')->getFields();
+$columns     = \rex_yform_manager_table::get(Variant::TABLE)->getFields();
 $params      = ['this' => \rex_yform::factory()];
 $fields      = [];
 $labels      = [];
@@ -176,7 +176,7 @@ $fragment->setVar('rows', $rows, FALSE);
 $content = $fragment->parse('backend/variants/grid.php');
 
 $formElements = [
-    ['field' => '<a class="btn btn-abort" href="' . \rex_url::backendPage('yform/manager/data_edit', ['table_name' => 'rex_shop_product']) . '">' . \rex_i18n::msg('form_abort') . '</a>',],
+    ['field' => '<a class="btn btn-abort" href="' . \rex_url::backendPage('yform/manager/data_edit', ['table_name' => Product::TABLE]) . '">' . \rex_i18n::msg('form_abort') . '</a>',],
     ['field' => '<a class="btn btn-abort btn-apply" href="' . $product_url . '">' . $this->i18n('action.edit_product') . '</a>',],
     ['field' => '<button class="btn btn-apply rex-form-aligned" type="submit" name="func" value="save">' . \rex_i18n::msg('form_save') . '</button>',],
 ];

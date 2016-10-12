@@ -13,15 +13,15 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-\rex_yform_manager_dataset::setModelClass('rex_shop_category', Category::class);
-\rex_yform_manager_dataset::setModelClass('rex_customer', Customer::class);
-\rex_yform_manager_dataset::setModelClass('rex_shop_feature', Feature::class);
-\rex_yform_manager_dataset::setModelClass('rex_shop_feature_values', FeatureValue::class);
-\rex_yform_manager_dataset::setModelClass('rex_shop_product', Product::class);
-\rex_yform_manager_dataset::setModelClass('rex_shop_category', Category::class);
-\rex_yform_manager_dataset::setModelClass('rex_shop_session', Session::class);
-\rex_yform_manager_dataset::setModelClass('rex_shop_tax', Tax::class);
-\rex_yform_manager_dataset::setModelClass('rex_shop_product_has_feature', Variant::class);
+\rex_yform_manager_dataset::setModelClass(Category::TABLE, Category::class);
+\rex_yform_manager_dataset::setModelClass(Customer::TABLE, Customer::class);
+\rex_yform_manager_dataset::setModelClass(Feature::TABLE, Feature::class);
+\rex_yform_manager_dataset::setModelClass(FeatureValue::TABLE, FeatureValue::class);
+\rex_yform_manager_dataset::setModelClass(Product::TABLE, Product::class);
+\rex_yform_manager_dataset::setModelClass(Category::TABLE, Category::class);
+\rex_yform_manager_dataset::setModelClass(Session::TABLE, Session::class);
+\rex_yform_manager_dataset::setModelClass(Tax::TABLE, Tax::class);
+\rex_yform_manager_dataset::setModelClass(Variant::TABLE, Variant::class);
 
 $include_files = glob($this->getPath('functions/*.inc.php'));
 
@@ -59,10 +59,10 @@ foreach ($include_files as $include_file)
 
     switch ($params->getParam('table')->name)
     {
-        case 'rex_shop_category':
+        case Category::TABLE:
             $path = Category::get($data['id'])->generatePath($lang_id);
             break;
-        case 'rex_shop_product':
+        case Product::TABLE:
             $path = Product::get($data['id'])->generatePath($lang_id, $path);
             break;
     }
@@ -74,7 +74,7 @@ foreach ($include_files as $include_file)
     $list        = $params->getSubject();
     $list_params = $list->getParams();
 
-    if ($list_params['table_name'] == 'rex_shop_product')
+    if ($list_params['table_name'] == Product::TABLE)
     {
         $list->addColumn('variants', $this->i18n('action.manage_variants'), count($list->getColumnNames()) - 2);
         $list->setColumnLabel('variants', $this->i18n('label.variants'));
@@ -82,7 +82,7 @@ foreach ($include_files as $include_file)
             'page'       => 'simpleshop/variants',
             'func'       => 'edit',
             'data_id'    => '###id###',
-            'table_name' => 'rex_shop_product_has_feature',
+            'table_name' => Variant::TABLE,
         ]);
     }
     return $list;

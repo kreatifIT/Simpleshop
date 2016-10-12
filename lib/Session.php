@@ -15,6 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 class Session extends \rex_yform_manager_dataset
 {
+    const TABLE = 'rex_shop_session';
     protected static $session = NULL;
 
     public static function cleanupSessions()

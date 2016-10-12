@@ -15,6 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 class Feature extends \rex_yform_manager_dataset
 {
+    const TABLE = 'rex_shop_feature';
     private $values = NULL;
 
     public static function getFeatureByKey($key)

@@ -13,6 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-class yform extends rex_api_function
+class yform extends \rex_yform
 {
 }

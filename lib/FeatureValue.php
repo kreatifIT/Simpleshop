@@ -15,4 +15,5 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 class FeatureValue extends \rex_yform_manager_dataset
 {
+    const TABLE = 'rex_shop_feature_values';
 }

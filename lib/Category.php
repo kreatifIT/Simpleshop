@@ -18,6 +18,8 @@ use Url\Url;
 
 class Category extends \rex_yform_manager_dataset
 {
+    const TABLE = 'rex_shop_category';
+    
     private $parents = NULL;
 
     public static function getTree($parent_id = '', $ignoreOffline = TRUE)
