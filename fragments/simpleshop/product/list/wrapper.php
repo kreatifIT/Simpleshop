@@ -87,7 +87,7 @@ $order   = $order == 'desc' ? $order : 'asc';
             // CATEGORY ////////////////////////////////////////////////////////////////////
             else if ($values[0] == 'price_range')
             {
-                $query->whereRaw("price BETWEEN :bt1 AND :bt2", ['bt1' => $values[1][0], 'bt2' => $values[1][1]]);
+                $query->whereRaw("price BETWEEN :bt1 AND :bt2 OR reduced_price BETWEEN :bt1 AND :bt2", ['bt1' => $values[1][0], 'bt2' => $values[1][1]]);
             }
             // CATEGORY ////////////////////////////////////////////////////////////////////
             else if (in_array($values[0], ['category_id']))
