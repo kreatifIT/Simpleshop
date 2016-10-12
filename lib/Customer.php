@@ -124,10 +124,10 @@ class Customer extends \rex_yform_manager_dataset
 
     public static function getPasswordHash($password, $func = 'sha1')
     {
-        $yform = yform::factory();
-        $yform->
-        pr($yform->getFieldValue('password_hash'));
-        exit;
+//        $yform = yform::factory();
+//        $yform->
+//        pr($yform->getFieldValue('password_hash'));
+//        exit;
         return hash($func, $password . 'UYD7FFtMLdqr4ZujqwED');
     }
 
