@@ -25,6 +25,7 @@ $image       = $product->getValue('image');
 $variants    = $product->getFeatureVariants();
 $description = $product->getValue(sprogfield('description'));
 $application = $product->getValue(sprogfield('application'));
+//pr($variants);
 
 $before_content = $this->getVar('before_content');
 $after_content  = $this->getVar('after_content');
@@ -84,10 +85,11 @@ if (strlen($image) == 0 && isset($gallery[0]))
                             $value_id = $feature_value->getValue('id');
                             $amount = $variants['mapping'][$value_id]['min_amount'];
                             ?>
-                            <option value="<?= $value_id ?>" <?php if ($amount <= 0)
-                            {
-                                echo 'disabled';
-                            } ?> data-variant-ids="<?= implode(',', $variant_ids) ?>">
+                            <option
+                                value="<?= $value_id ?>"
+                                <?php if ($amount <= 0) echo 'disabled'; ?>
+                                data-variant-ids="<?= implode(',', array_keys($variants['mapping'][$value_id]['variants'])) ?>"
+                            >
                                 <?= $feature_value->getValue($lable_name) ?>
                                 <?php
                                 if ($amount <= 0)
@@ -107,8 +109,10 @@ if (strlen($image) == 0 && isset($gallery[0]))
 
                     <?php foreach ($variants['features']['packaging']->values as $feature_value):
                         $icon = $feature_value->getValue('icon');
+                        $value_id = $feature_value->getValue('id');
+                        $amount = $variants['mapping'][$value_id]['min_amount'];
                         ?>
-                        <a data-price="" data-reduced-price="" data-img-src="">
+                        <a data-value="<?= $value_id ?>" class="<?php if ($amount <= 0) echo 'disabled'; ?>">
                             <?php if (strlen($icon)): ?>
                                 <div class="small">
                                     <?= Utils::getImageTag($icon, '') ?>
@@ -180,4 +184,15 @@ if (strlen($image) == 0 && isset($gallery[0]))
         <?= $application ?>
     <?php endif; ?>
 </div>
+<?php
+$variant_data = [];
 
+foreach ($variants['variants'] as $key => $variant)
+{
+    $variant_data[$key] = $variant->getData();
+}
+?>
+<script>
+    var FeatureValueMapping = <?= json_encode($variants['mapping']) ?>;
+    var Variants = <?= json_encode($variant_data) ?>;
+</script>
