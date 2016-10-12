@@ -15,9 +15,10 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 $name   = $this->getVar('name');
 $fields = $this->getVar('fields');
+$type   = $this->getVar('type');
 
 ?>
-<tr>
+<tr class="type-<?= $type ?>">
     <td>
     <span
         style="white-space:nowrap;">- <?= implode('<br/></span><span style="white-space:nowrap;">- ', $name) ?></span>

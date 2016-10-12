@@ -13,8 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-use Leafo\ScssPhp\Util;
-
 $lang_id     = \rex_clang::getCurrentId();
 $product     = $this->getVar('product');
 $cat_path    = $this->getVar('cat_path');
@@ -78,17 +76,18 @@ if (strlen($image) == 0 && isset($gallery[0]))
                 </div>
             <?php endif; ?>
 
-            <?php if (isset($variants['color'])): ?>
-                <h3><?= $variants['color']->getValue('name_' . $lang_id) ?></h3>
+            <?php if (isset($variants['features']['color'])): ?>
+                <h3><?= $variants['features']['color']->getValue('name_' . $lang_id) ?></h3>
                 <div class="select margin-small-bottom">
                     <select name="color" id="color">
-                        <?php foreach ($variants['color']->values as $feature_value):
-                            $amount = $feature_value->getValue('min_amount');
+                        <?php foreach ($variants['features']['color']->values as $feature_value):
+                            $value_id = $feature_value->getValue('id');
+                            $amount = $variants['mapping'][$value_id]['min_amount'];
                             ?>
-                            <option value="<?= $feature_value->getValue('id') ?>" <?php if ($amount <= 0)
+                            <option value="<?= $value_id ?>" <?php if ($amount <= 0)
                             {
                                 echo 'disabled';
-                            } ?> data-packaging-ids="">
+                            } ?> data-variant-ids="<?= implode(',', $variant_ids) ?>">
                                 <?= $feature_value->getValue('name_' . $lang_id) ?>
                                 <?php
                                 if ($amount <= 0)
@@ -102,20 +101,20 @@ if (strlen($image) == 0 && isset($gallery[0]))
                 </div>
             <?php endif; ?>
 
-            <?php if (isset($variants['packaging'])): ?>
-                <h3><?= $variants['packaging']->getValue('name_' . $lang_id) ?></h3>
+            <?php if (isset($variants['features']['packaging'])): ?>
+                <h3><?= $variants['features']['packaging']->getValue('name_' . $lang_id) ?></h3>
                 <div class="packaging clearfix">
 
-                    <?php foreach ($variants['packaging']->values as $variant):
-                        $icon = $variant->getValue('icon');
-                    ?>
+                    <?php foreach ($variants['features']['packaging']->values as $feature_value):
+                        $icon = $feature_value->getValue('icon');
+                        ?>
                         <a data-price="" data-reduced-price="" data-img-src="">
                             <?php if (strlen($icon)): ?>
-                            <div class="small">
-                                <?= Utils::getImageTag($icon, '') ?>
-                            </div>
+                                <div class="small">
+                                    <?= Utils::getImageTag($icon, '') ?>
+                                </div>
                             <?php endif; ?>
-                            <span class="weight"><?= $variant->getValue('name_' . $lang_id) ?></span>
+                            <span class="weight"><?= $feature_value->getValue('name_' . $lang_id) ?></span>
                         </a>
                     <?php endforeach; ?>
 
@@ -126,18 +125,20 @@ if (strlen($image) == 0 && isset($gallery[0]))
                     <!--                            </div>-->
                     <!--                            <span class="weight">5 Kg</span>-->
                     <!--                        </a>-->
-<!--                    <a href="#" class="active">-->
-<!--                        <div class="large">-->
-<!--                            <img src="--><?//= \rex_url::base('resources/img/seed.svg') ?><!--" alt=""/>-->
-<!--                        </div>-->
-<!--                        <span class="weight">10 Kg</span>-->
-<!--                    </a>-->
-<!--                    <a href="#">-->
-<!--                        <div class="xlarge">-->
-<!--                            <img src="--><?//= \rex_url::base('resources/img/seed.svg') ?><!--" alt=""/>-->
-<!--                        </div>-->
-<!--                        <span class="weight">20 Kg</span>-->
-<!--                    </a>-->
+                    <!--                    <a href="#" class="active">-->
+                    <!--                        <div class="large">-->
+                    <!--                            <img src="-->
+                    <? //= \rex_url::base('resources/img/seed.svg') ?><!--" alt=""/>-->
+                    <!--                        </div>-->
+                    <!--                        <span class="weight">10 Kg</span>-->
+                    <!--                    </a>-->
+                    <!--                    <a href="#">-->
+                    <!--                        <div class="xlarge">-->
+                    <!--                            <img src="-->
+                    <? //= \rex_url::base('resources/img/seed.svg') ?><!--" alt=""/>-->
+                    <!--                        </div>-->
+                    <!--                        <span class="weight">20 Kg</span>-->
+                    <!--                    </a>-->
                 </div>
             <?php endif; ?>
 

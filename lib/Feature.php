@@ -22,16 +22,14 @@ class Feature extends \rex_yform_manager_dataset
         return self::query()->where('key', $key)->findOne();
     }
 
-    public function getValues()
+    public function getValues($ignore_offline = TRUE)
     {
         if ($this->values === NULL)
         {
-            $_values = strlen($this->getValue('values')) ? explode(',', $this->getValue('values')) : [];
-
-            foreach ($_values as $value)
-            {
-                $this->values[] = FeatureValue::get($value);
-            }
+            $this->values = FeatureValue::query()
+                ->where('feature_id', $this->getValue('id'))
+                ->where('status', (int) $ignore_offline)
+                ->find();
         }
         return $this->values;
     }

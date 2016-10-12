@@ -33,29 +33,38 @@ if (!$product)
 else if (!$features)
 {
     echo \rex_view::info(strtr($this->i18n('error.product_has_attribute'), [
-            '{{link}}' => '<a href="' . $product_url . '" class="btn btn-info btn-sm">',
+        '{{link}}'  => '<a href="' . $product_url . '" class="btn btn-info btn-sm">',
         '{{/link}}' => '</a>',
     ]));
     return;
 }
 if ($_FUNC == 'save')
 {
-    // remove previously saved variants
-    \rex_sql::factory()->setQuery("DELETE FROM ". Variant::TABLE ." WHERE product_id = ?", [$product_id]);
-    $data = rex_post('FORM', 'array');
+    $saved_keys = [];
+    $data       = rex_post('FORM', 'array');
 
     foreach ($data as $key => $values)
     {
-        $variant = Variant::create();
-        $variant->setValue('variant_key', $key);
-        $variant->setValue('product_id', $product_id);
+        $variant = Variant::query()
+            ->where('variant_key', $key)
+            ->where('product_id', $product_id)
+            ->findOne();
 
+        if (!$variant)
+        {
+            $variant = Variant::create();
+            $variant->setValue('variant_key', $key);
+            $variant->setValue('product_id', $product_id);
+        }
         foreach ($values as $name => $value)
         {
             $variant->setValue($name, $value);
         }
         $variant->save();
+        $saved_keys[] = $key;
     }
+    // remove previously saved variants
+    \rex_sql::factory()->setQuery("DELETE FROM " . Variant::TABLE . " WHERE product_id = ? AND variant_key NOT IN(". implode(',', $saved_keys) .")", [$product_id]);
 }
 
 // load all columns from yform
@@ -104,7 +113,7 @@ foreach ($columns as $column)
 // calculate the possible variants
 foreach ($features as $feature)
 {
-    $values    = $feature->getValue('values');
+    $values    = $feature->values;
     $_variants = $variants;
     $variants  = [];
 
@@ -127,6 +136,7 @@ foreach ($features as $feature)
 foreach ($variants as $variant_key)
 {
     $_ids    = explode(',', $variant_key);
+    $type    = '';
     $_name   = [];
     $_fields = [];
     $variant = Variant::query()
@@ -147,10 +157,16 @@ foreach ($variants as $variant_key)
         $field->setValue($variant ? $variant->getValue($field->name) : NULL);
         $field->enterObject();
         $_fields[] = $field->params['form_output'][$field->getId()];
+
+        if ($field->name == 'type')
+        {
+            $type = $field->getValue();
+        }
     }
     $fragment = new \rex_fragment();
     $fragment->setVar('fields', $_fields, FALSE);
     $fragment->setVar('name', $_name);
+    $fragment->setVar('type', $type);
     $rows[] = $fragment->parse('backend/variants/row_item.php');
 }
 

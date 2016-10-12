@@ -1,14 +1,23 @@
 .table.variants
 {
-    label {
-        display:none;
-    }
-    select {
-        min-width: 120px;
-    }
-    small,
-    .form-group {
-        margin-bottom:0;
+    tr
+    {
+        &:not(.type-NE) {
+            background:rgb(204, 236, 227);
+        }
+        &:first-child {
+            background: #fff;
+        }
+        label {
+            display:none;
+        }
+        select {
+            min-width: 120px;
+        }
+        small,
+        .form-group {
+            margin-bottom:0;
+        }
     }
 }
 .lang-tab-content {

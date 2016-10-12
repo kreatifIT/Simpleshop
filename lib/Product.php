@@ -17,170 +17,158 @@ use Url\Url;
 
 class Product extends \rex_yform_manager_dataset
 {
-    protected $__feature_variants = NULL;
-    protected $__variants         = NULL;
-    protected $__features         = NULL;
+    protected $__feature_data = NULL;
+    protected $__variants     = NULL;
+    protected $__features     = NULL;
 
 
     public function getFeatures()
     {
         if ($this->__features === NULL)
         {
-            $features         = trim($this->getValue('features'));
-            $this->__features = strlen($features) ? $this->_getFeatures(explode(',', $features)) : [];
+            $feature_val_ids  = trim($this->getValue('features'));
+            $this->__features = strlen($feature_val_ids) ? $this->_getFeatures(explode(',', $feature_val_ids)) : [];
         }
         return $this->__features;
     }
 
-    private function _getFeatures($feature_ids)
+    public function _getFeatures($feature_val_ids)
     {
-        $result         = [];
-        $feature_values = [];
-        $all_features   = Feature::getAll();
-
-        foreach ($all_features as $feature)
+        $result           = [];
+        $feature_ids      = [];
+        $feature_values   = [];
+        // get feature values
+        foreach ($feature_val_ids as $feature_id)
         {
-            $values         = strlen($feature->getValue('values')) ? explode(',', $feature->getValue('values')) : [];
-            $feature_values = $feature_values + array_fill_keys($values, $feature->getValue('id'));
+            $_value                 = FeatureValue::get($feature_id);
+            $_id                    = $_value->getValue('feature_id');
+            $feature_ids[]          = $_id;
+            $feature_values[$_id][] = $_value;
         }
-        foreach ($feature_ids as $feature_value_id)
-        {
-            if (array_key_exists($feature_value_id, $feature_values))
-            {
-                if (!isset ($result[$feature_values[$feature_value_id]]))
-                {
-                    $_feature = Feature::get($feature_values[$feature_value_id]);
-                    $_feature->setValue('values', []);
-                    $result[$feature_values[$feature_value_id]] = $_feature;
-                }
-                $_feature = $result[$feature_values[$feature_value_id]];
-                $values   = $_feature->getValue('values');
-                $values[] = FeatureValue::get($feature_value_id);
-                $_feature->setValue('values', $values);
-            }
-        }
-        $_result = $result;
-        $result  = [];
+        // get features
+        $_features = Feature::query()->where('id', $feature_ids)->find();
 
-        foreach ($_result as $r)
+        foreach ($_features as $feature)
         {
-            $result[$r->getValue('key')] = $r;
+            // assign feature values to the feature
+            $feature->values = $feature_values[$feature->getValue('id')];
+            //
+            $result[$feature->getValue('key')] = $feature;
         }
         return $result;
     }
 
+    public function getVariant($variant_key)
+    {
+        $product_id = $this->getValue('id');
+        $variant    = Variant::query()
+            ->where('product_id', $product_id)
+            ->where('variant_key', $variant_key)
+            ->where('type', 'NE', '!=')
+            ->findOne();
+
+        if (!$variant)
+        {
+            throw new ProductException("The variant doesn't exist --key:{$product_id}|{$variant_key}", 3);
+        }
+        // apply default values from variant
+        $this->applyVariantData($variant->getData());
+        return $this;
+    }
+
     public function getFeatureVariants()
     {
-        if ($this->__feature_variants === NULL)
+        if ($this->__feature_data === NULL)
         {
-            $min_amount   = NULL;
-            $feature_ids  = [];
-            $feature_keys = [];
-            $_variants    = Variant::query()
+            $_variants = Variant::query()
+                ->resetSelect()
+                ->select('id')
+                ->select('variant_key')
                 ->where('product_id', $this->getValue('id'))
                 ->where('type', 'NE', '!=')
                 ->find();
+
+            $this->__feature_data = [
+                'mapping'  => [],
+                'features' => [],
+                'variants' => [],
+            ];
 
             foreach ($_variants as $variant)
             {
                 $key  = $variant->getValue('variant_key');
                 $_ids = explode(',', $key);
-                $variant->applyProductData($this);
-                $amount     = $variant->getValue('amount');
-                $min_amount = $min_amount === NULL || $amount > 0 && $amount < $min_amount ? $amount : $min_amount;
+                // apply default values from product
+                $clone   = clone $this;
+                $variant = $clone->getVariant($key);
+                // set the min amount number to know if available or not
+                $amount = $clone->getValue('amount');
+                // set variants
+                $this->__feature_data['variants'][$key] = $variant;
 
+                // create the mapping
                 foreach ($_ids as $id)
                 {
-                    $feature_keys[$id][$key] = $variant;
-                    $feature_ids[]           = $id;
-                }
-            }
-            $feature_ids = array_unique($feature_ids);
-            $features    = $this->_getFeatures($feature_ids);
-
-            foreach ($features as $feature)
-            {
-                foreach ($feature->values as $value)
-                {
-                    $min_amount      = NULL;
-                    $value->variants = $feature_keys[$value->getValue('id')];
-
-                    foreach ($value->variants as $variant)
+                    if (!isset($this->__feature_data['mapping'][$id]['min_amount']))
                     {
-                        $amount     = $variant->getValue('amount');
-                        $min_amount = $min_amount === NULL || $amount > 0 && $amount < $min_amount ? $amount : $min_amount;
+                        $this->__feature_data['mapping'][$id]['min_amount'] = 0;
                     }
-                    $value->setValue('min_amount', (int) $min_amount);
+                    foreach ($_ids as $__id)
+                    {
+                        if ($id != $__id)
+                        {
+                            if ($amount > 0 && ($amount < $this->__feature_data['mapping'][$id]['min_amount'] || $this->__feature_data['mapping'][$id]['min_amount'] == 0))
+                            {
+                                $this->__feature_data['mapping'][$id]['min_amount'] = $amount;
+                            }
+                            $this->__feature_data['mapping'][$id]['variants'][$__id] = $key;
+                        }
+                    }
                 }
             }
-            $this->__feature_variants = $features;
-            $this->setValue('min_amount', $min_amount);
+            // get all linked features
+            $this->__feature_data['features'] = $this->_getFeatures(array_keys($this->__feature_data['mapping']));
         }
-        return $this->__feature_variants;
+        return $this->__feature_data;
     }
 
-    public function getVariants()
+    public function getAllVariants()
     {
-//        if ($this->__variants === NULL)
-//        {
-//            $variants    = [];
-//            $feature_ids = [];
-//            $_variants   = Variant::query()->where('product_id', $this->getValue('id'))->find();
-//
-//            foreach ($_variants as $variant)
-//            {
-//                $feature_ids = array_merge($feature_ids, explode(',', $variant->getValue('variant_key')));
-//            }
-//            $feature_ids = array_unique($feature_ids);
-//            $features    = $this->_getFeatures($feature_ids);
-//
-//            if ($features)
-//            {
-//                foreach ($_variants as $variant)
-//                {
-//                    $key            = $variant->getValue('variant_key');
-//                    $variants[$key] = $variant;
-//                }
-//            }
-//            pr($variants);
-//            exit;
-//
-//            if (count($features))
-//            {
-//                foreach ($features as $index => $feature)
-//                {
-//                    $values         = strlen($feature->getValue('values')) ? explode(',', $feature->getValue('values')) : [];
-//                    $feature_values = $feature_values + array_fill_keys($values, $index);
-//                }
-//                foreach ($_variants as $_variant)
-//                {
-//                    $feature_value_id = $_variant->getValue('feature_value_id');
-//
-//                    if (array_key_exists($feature_value_id, $feature_values))
-//                    {
-//                        $feature      = FeatureValue::query()->where('id', $feature_value_id)->findOne();
-//                        $variant_data = $_variant->getData();
-//
-//                        foreach ($variant_data as $key => $value)
-//                        {
-//                            if (!in_array($key, ['id', 'product_id', 'feature_value_id']))
-//                            {
-//                                $feature->setValue($key, $value);
-//                            }
-//                        }
-//                        $_groupped_var[$feature_values[$feature_value_id]][] = $feature;
-//                    }
-//                }
-//                foreach ($_groupped_var as $index => $_variants)
-//                {
-//                    $feature = $features[$index];
-//                    $feature->setValue('variants', $_variants);
-//                    $variants[$feature->getValue('key')] = $feature;
-//                }
-//            }
-//            $this->__variants = $variants;
-//        }
-//        return $this->__variants;
+        if ($this->__variants === NULL)
+        {
+            $_variants = Variant::query()
+                ->resetSelect()
+                ->select('id')
+                ->select('variant_key')
+                ->where('product_id', $this->getValue('id'))
+                ->where('type', 'NE', '!=')
+                ->find();
+
+            $this->__feature_data = [
+                'features' => [],
+                'variants' => [],
+            ];
+
+            foreach ($_variants as $variant)
+            {
+                $key  = $variant->getValue('variant_key');
+                $_ids = explode(',', $key);
+                // apply default values from product
+                $clone   = clone $this;
+                $variant = $clone->getVariant($key);
+                // set variants
+                $this->__variants['variants'][$key] = $variant;
+                // create the mapping
+                foreach ($_ids as $id)
+                {
+                    if (!isset ($this->__variants['features'][$id]))
+                    {
+                        $this->__variants['features'][$id] = FeatureValue::get($id);
+                    }
+                }
+            }
+        }
+        return $this->__variants;
     }
 
     public static function getProductByKey($key, $cart_quantity = NULL)
@@ -284,14 +272,19 @@ class Product extends \rex_yform_manager_dataset
 
     public function generatePath($lang_id, $path = '')
     {
-        $_paths  = [];
-        $parents = Category::get($this->getValue('category_id'))->getParentTree();
+        $_paths   = [];
+        $category = Category::get($this->getValue('category_id'));
 
-        foreach ($parents as $parent)
+        if ($category)
         {
-            $_paths[] = Url::getRewriter()->normalize($parent->getValue('name_' . $lang_id));
+            $parents = $category->getParentTree();
+
+            foreach ($parents as $parent)
+            {
+                $_paths[] = Url::getRewriter()->normalize($parent->getValue('name_' . $lang_id));
+            }
+            $_paths[] = $path;
         }
-        $_paths[] = $path;
         return implode('/', $_paths);
     }
 }
