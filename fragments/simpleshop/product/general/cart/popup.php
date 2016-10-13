@@ -14,6 +14,10 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $product = $this->getVar('product');
+// Todo: remove these two lines
+if (!$product)
+    return;
+
 $image   = $product->getValue('image');
 
 if (strlen($image) == 0 && strlen($product->getValue('gallery')))
