@@ -86,8 +86,25 @@ foreach ($include_files as $include_file)
             'table_name' => Variant::TABLE,
         ]);
     }
+
     return $list;
 });
+
+\rex_extension::register('YFORM_DATA_LIST_SQL', function ($params)
+{
+    $sql        = $params->getSubject();
+    $table = $params->getParams()['table'];
+
+    if ($table->getTableName() == Category::TABLE)
+    {
+        if (stripos($sql, 'where') === false) {
+            $sql = preg_replace('/ORDER\sBY/i', 'where `parent_id` = \'\' ORDER BY', $sql);
+        }
+    }
+    return $sql;
+});
+
+
 
 if (\rex::isBackend())
 {
