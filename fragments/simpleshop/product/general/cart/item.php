@@ -15,6 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 $label_name  = sprogfield('name');
 $product     = $this->getVar('product');
+$class       = $this->getVar('class');
 $image       = $product->getValue('image');
 $price       = $product->getPrice(TRUE);
 $features    = $product->getValue('features');
@@ -29,20 +30,20 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
     $image   = $gallery[0];
 }
 ?>
-<tr class="cart-item">
-    <td>
+<tr class="cart-item <?= $class ?>">
+    <td class="product-image">
         <a href="<?= $product_url ?>"><?= Utils::getImageTag($image, 'cart-list-element-main') ?></a>
     </td>
-    <td>
+    <td class="description">
         <h3><?= $product->getValue($label_name) ?></h3>
         <p><?= $Category->getValue($label_name) ?></p>
 
         <?php foreach ($features as $feature): ?>
-            <div><i class="medium-bold"><?= $feature->getValue($label_name) ?></i></div>
+            <div class="feature"><?= $feature->getValue($label_name) ?></div>
         <?php endforeach; ?>
     </td>
-    <td>&euro; <?= format_price($price) ?></td>
-    <td>
+    <td class="price-single">&euro; <?= format_price($price) ?></td>
+    <td class="amount">
         <?php
         $this->setVar('has_quantity_control', TRUE);
         $this->setVar('has_refresh_button', TRUE);
@@ -51,8 +52,8 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
         echo $this->subfragment('simpleshop/product/general/cart/button.php');
         ?>
     </td>
-    <td>&euro; <?= format_price($price * $quantity) ?></td>
+    <td class="price-total">&euro; <?= format_price($price * $quantity) ?></td>
     <td>
-        <a href="<?= rex_getUrl(null, null, ['func' => 'remove', 'key' => $key]) ?>" class="remove text-center">X</a>
+        <a href="<?= rex_getUrl(null, null, ['func' => 'remove', 'key' => $key]) ?>" class="remove">X</a>
     </td>
 </tr>

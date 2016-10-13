@@ -13,25 +13,24 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$lable_name  = sprogfield('name');
-$product     = $this->getVar('product');
-$cat_path    = $this->getVar('cat_path');
-$badge       = $product->getValue('badge');
-$price       = $product->getValue('price');
+$lable_name = sprogfield('name');
+$product = $this->getVar('product');
+$cat_path = $this->getVar('cat_path');
+$badge = $product->getValue('badge');
+$price = $product->getValue('price');
 $offer_price = $product->getValue('reduced_price');
-$tax         = Tax::get($product->getValue('tax'))->getValue('tax');
-$gallery     = strlen($product->getValue('gallery')) ? explode(',', $product->getValue('gallery')) : [];
-$image       = $product->getValue('image');
-$variants    = $product->getFeatureVariants();
+$tax = Tax::get($product->getValue('tax'))->getValue('tax');
+$gallery = strlen($product->getValue('gallery')) ? explode(',', $product->getValue('gallery')) : [];
+$image = $product->getValue('image');
+$variants = $product->getFeatureVariants();
 $description = $product->getValue(sprogfield('description'));
 $application = $product->getValue(sprogfield('application'));
 //pr($variants);
 
 $before_content = $this->getVar('before_content');
-$after_content  = $this->getVar('after_content');
+$after_content = $this->getVar('after_content');
 
-if (strlen($image) == 0 && isset($gallery[0]))
-{
+if (strlen($image) == 0 && isset($gallery[0])) {
     $image = $gallery[0];
 }
 
@@ -63,8 +62,7 @@ if (strlen($image) == 0 && isset($gallery[0]))
             <?php if ($offer_price > 0): ?>
                 <div class="ribbon"><span><?= $this->i18n('label.offer'); ?></span></div>
             <?php endif; ?>
-            <a href="<?= Utils::getImageTag($image, 'fbox', [], function ($params)
-            {
+            <a href="<?= Utils::getImageTag($image, 'fbox', [], function ($params) {
                 return $params['attributes']['src'];
             }) ?>" class="fbox"><?= Utils::getImageTag($image, 'product-detail-main') ?></a>
         </div>
@@ -79,8 +77,8 @@ if (strlen($image) == 0 && isset($gallery[0]))
 
             <?php if (isset($variants['features']['color'])): ?>
                 <h3><?= $variants['features']['color']->getValue($lable_name) ?></h3>
-                <div class="select margin-small-bottom">
-                    <select name="color" id="color">
+                <div class="variant-select-container">
+                    <select name="variant" class="variant-select">
                         <?php foreach ($variants['features']['color']->values as $feature_value):
                             $value_id = $feature_value->getValue('id');
                             $amount = $variants['mapping'][$value_id]['min_amount'];
@@ -92,8 +90,7 @@ if (strlen($image) == 0 && isset($gallery[0]))
                             >
                                 <?= $feature_value->getValue($lable_name) ?>
                                 <?php
-                                if ($amount <= 0)
-                                {
+                                if ($amount <= 0) {
                                     echo '- nicht verfügbar';
                                 }
                                 ?>
@@ -121,28 +118,6 @@ if (strlen($image) == 0 && isset($gallery[0]))
                             <span class="weight"><?= $feature_value->getValue($lable_name) ?></span>
                         </a>
                     <?php endforeach; ?>
-
-                    <!--                        <a href="#">-->
-                    <!--                            <div class="medium">-->
-                    <!--                                <img src="-->
-                    <? //= \rex_url::base('resources/img/seed.svg') ?><!--" alt=""/>-->
-                    <!--                            </div>-->
-                    <!--                            <span class="weight">5 Kg</span>-->
-                    <!--                        </a>-->
-                    <!--                    <a href="#" class="active">-->
-                    <!--                        <div class="large">-->
-                    <!--                            <img src="-->
-                    <? //= \rex_url::base('resources/img/seed.svg') ?><!--" alt=""/>-->
-                    <!--                        </div>-->
-                    <!--                        <span class="weight">10 Kg</span>-->
-                    <!--                    </a>-->
-                    <!--                    <a href="#">-->
-                    <!--                        <div class="xlarge">-->
-                    <!--                            <img src="-->
-                    <? //= \rex_url::base('resources/img/seed.svg') ?><!--" alt=""/>-->
-                    <!--                        </div>-->
-                    <!--                        <span class="weight">20 Kg</span>-->
-                    <!--                    </a>-->
                 </div>
             <?php endif; ?>
 
@@ -169,8 +144,7 @@ if (strlen($image) == 0 && isset($gallery[0]))
 
 <div class="row column margin-top">
 
-    <?php if (strlen($before_content))
-    {
+    <?php if (strlen($before_content)) {
         echo $before_content;
     } ?>
 
@@ -187,8 +161,7 @@ if (strlen($image) == 0 && isset($gallery[0]))
 <?php
 $variant_data = [];
 
-foreach ($variants['variants'] as $key => $variant)
-{
+foreach ($variants['variants'] as $key => $variant) {
     $variant_data[$key] = $variant->getData();
 }
 ?>

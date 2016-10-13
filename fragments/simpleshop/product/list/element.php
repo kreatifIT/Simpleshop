@@ -46,9 +46,8 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
             <?php endif; ?>
             <span class="price">&euro; <?= format_price($offer_price > 0 ? $offer_price : $price) ?></span>
         </div>
-
         <?php
-        $this->setVar('button-cart-counter', $i);
+        $this->setVar('product_key', $product->getValue('id').'|');
         $this->setVar('has_quantity_control', FALSE);
         $this->setVar('has_add_to_cart_button', TRUE);
         echo $this->subfragment('simpleshop/product/general/cart/button.php');
