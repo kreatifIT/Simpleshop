@@ -68,6 +68,10 @@ if (strlen($image) == 0 && isset($gallery[0])) {
         </div>
     </div>
     <div class="large-6 columns">
+        <!-- Popup -->
+        <?php
+        $this->subfragment('simpleshop/product/general/cart/popup-wrapper.php');
+        ?>
         <div class="product-info-panel">
             <?php if (strlen($badge)) : ?>
                 <div class="badge">
@@ -109,14 +113,14 @@ if (strlen($image) == 0 && isset($gallery[0])) {
                         $value_id = $feature_value->getValue('id');
                         $amount = $variants['mapping'][$value_id]['min_amount'];
                         ?>
-                        <a data-value="<?= $value_id ?>" class="<?php if ($amount <= 0) echo 'disabled'; ?>">
+                        <button data-value="<?= $value_id ?>" class="<?php if ($amount <= 0) echo 'disabled'; ?>">
                             <?php if (strlen($icon)): ?>
                                 <div class="small">
                                     <?= Utils::getImageTag($icon, '') ?>
                                 </div>
                             <?php endif; ?>
                             <span class="weight"><?= $feature_value->getValue($lable_name) ?></span>
-                        </a>
+                        </button>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -133,6 +137,7 @@ if (strlen($image) == 0 && isset($gallery[0])) {
                 $this->setVar('button-cart-counter', 1);
                 $this->setVar('has_quantity_control', TRUE);
                 $this->setVar('has_add_to_cart_button', TRUE);
+                $this->setVar('product_key', $product->getValue('id').'|');
                 echo $this->subfragment('simpleshop/product/general/cart/button.php');
                 ?>
             </div>

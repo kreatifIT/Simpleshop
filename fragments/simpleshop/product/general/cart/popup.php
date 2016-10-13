@@ -35,5 +35,9 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery'))) {
     </div>
 </div>
 <div class="small-8 columns">
-    <div class="description">Product ID <?= $product->getValue('name_1'); ?> added to Cart</div>
+    <div class="description">
+        ###label.the_product###
+        <strong><?= $product->getValue('name_1'); ?></strong>
+        ###label.successfully_added_to_cart###
+    </div>
 </div>

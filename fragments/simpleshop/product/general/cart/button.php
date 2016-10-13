@@ -21,7 +21,7 @@ if (!$quantity)
     $quantity = 1;
 }
 ?>
-<div>
+<div class="clearfix">
     <?php if ($this->getVar('has_quantity_control')): ?>
         <div class="amount-increment clearfix">
             <button class="button minus">-</button>
