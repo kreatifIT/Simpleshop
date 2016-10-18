@@ -87,7 +87,7 @@ $order   = $order == 'desc' ? $order : 'asc';
             // CATEGORY ////////////////////////////////////////////////////////////////////
             else if ($values[0] == 'price_range')
             {
-                $query->whereRaw("price BETWEEN :bt1 AND :bt2 OR reduced_price BETWEEN :bt1 AND :bt2", ['bt1' => $values[1][0], 'bt2' => $values[1][1]]);
+                $query->whereRaw("(price BETWEEN :bt1 AND :bt2 OR reduced_price BETWEEN :bt1 AND :bt2)", ['bt1' => $values[1][0], 'bt2' => $values[1][1]]);
             }
             // CATEGORY ////////////////////////////////////////////////////////////////////
             else if (in_array($values[0], ['category_id']))
@@ -98,7 +98,7 @@ $order   = $order == 'desc' ? $order : 'asc';
             // CALLABLE ////////////////////////////////////////////////////////////////////
             else if (is_callable($values[0]))
             {
-                call_user_func($type, $query);
+                call_user_func_array($values[0], [$query]);
             }
         }
 //        pr($query->getQuery());
@@ -124,7 +124,14 @@ $order   = $order == 'desc' ? $order : 'asc';
             $this->setVar('product', $product);
             $this->subfragment('simpleshop/product/list/element.php');
         }
+
+        if (count($products) == 0):
         ?>
+            <div class="text-center margin-top">
+                <p>###shop.no_products_available###</p>
+                <a href="?action=filter">###action.reset_filter###</a>
+            </div>
+        <?php endif; ?>
     </div>
     <?php
     if ($has_pagination)
