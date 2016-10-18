@@ -37,7 +37,6 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
     <td class="description">
         <h3><?= $product->getValue($label_name) ?></h3>
         <p><?= $Category->getValue($label_name) ?></p>
-
         <?php foreach ($features as $feature): ?>
             <div class="feature"><?= $feature->getValue($label_name) ?></div>
         <?php endforeach; ?>
@@ -53,7 +52,7 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
         ?>
     </td>
     <td class="price-total">&euro; <?= format_price($price * $quantity) ?></td>
-    <td>
+    <td class="remove-product">
         <a href="<?= rex_getUrl(null, null, ['func' => 'remove', 'key' => $key]) ?>" class="remove">X</a>
     </td>
 </tr>
