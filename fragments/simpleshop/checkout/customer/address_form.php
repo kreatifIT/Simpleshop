@@ -52,12 +52,20 @@ $yform->setValueField('text', [
     'default' => $addresses[0]->getValue('firstname'),
     'required' => true
 ]);
+$yform->setValidateField('empty', [
+    'customer_address.0.firstname',
+    strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.firstname###'])
+]);
 
 $yform->setValueField('text', [
     'name' => 'customer_address.0.lastname',
     'label' => '###label.lastname###',
     'default' => $addresses[0]->getValue('lastname'),
     'required' => true
+]);
+$yform->setValidateField('empty', [
+    'customer_address.0.lastname',
+    strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.lastname###'])
 ]);
 
 $yform->setValueField('text', [
@@ -72,6 +80,11 @@ $yform->setValueField('text', [
     'default' => $addresses[0]->getValue('street'),
     'required' => true
 ]);
+$yform->setValidateField('empty', [
+    'customer_address.0.street',
+    strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.street###'])
+]);
+
 
 $yform->setValueField('text', [
     'name' => 'customer_address.0.location',
@@ -79,12 +92,20 @@ $yform->setValueField('text', [
     'default' => $addresses[0]->getValue('location'),
     'required' => true
 ]);
+$yform->setValidateField('empty', [
+    'customer_address.0.location',
+    strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.location###'])
+]);
 
 $yform->setValueField('text', [
     'name' => 'customer_address.0.zip',
     'label' => '###label.postal###',
     'default' => $addresses[0]->getValue('zip'),
     'required' => true
+]);
+$yform->setValidateField('empty', [
+    'customer_address.0.zip',
+    strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.postal###'])
 ]);
 
 // TODO: add country select
@@ -98,10 +119,14 @@ $yform->setValueField('select', [
 */
 
 $yform->setValueField('text', [
-    'customer_address.0.phone',
+    'name' => 'customer_address.0.phone',
     'label' => '###label.phone###',
     'default' => $addresses[0]->getValue('phone'),
     'required' => true
+]);
+$yform->setValidateField('empty', [
+    'customer_address.0.phone',
+    strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.phone###'])
 ]);
 
 $yform->setValueField('radio', [
@@ -207,9 +232,6 @@ $yform->setValueField('html', ['closing_tag', '</div>']);
 
 $yform->setFieldValue('send', !empty ($_POST), '', 'send');
 $yform->setHiddenField('customer_id', $user_id);
-
-// TODO: add validations
-$yform->setValidateField('empty', array("customer_address.0.firstname","Bitte tragen Sie den Vornamen ein"));
 $yform->setActionField('callback', ['\FriendsOfREDAXO\Simpleshop\CustomerAddress::action__save_checkout_address']);
 
 echo $yform->getForm();
