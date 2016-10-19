@@ -43,12 +43,16 @@ class Customer extends \rex_yform_manager_dataset
         // verify if a user with the given email already exist
         if ($User)
         {
-            throw new \ErrorException("User with given email already exist", 1);
+            throw new CustomerException("User with given email already exist", 1);
         }
         // verify the password length
         else if (self::MIN_PASSWORD_LENGTH > strlen($password))
         {
-            throw new \ErrorException("Password must have at least " . self::MIN_PASSWORD_LENGTH . " characters", 2);
+            throw new CustomerException("Password must have at least " . self::MIN_PASSWORD_LENGTH . " characters", 2);
+        }
+        else if (filter_var($email, FILTER_VALIDATE_EMAIL) === FALSE)
+        {
+            throw new CustomerException("Email not valid", 3);
         }
         $_this = parent::create();
 
@@ -61,8 +65,13 @@ class Customer extends \rex_yform_manager_dataset
             ->setValue('password', $password)
             ->setValue('status', 1)
             ->setValue('created', date('Y-m-d H:i:s'));
-        $success = $_this->save();
+        $success  = $_this->save();
+        $messages = $_this->getMessages();
 
+        if (count($messages))
+        {
+            throw new CustomerException(implode('||', $messages), 99);
+        }
         if (\rex_extension::registerPoint(new \rex_extension_point('Customer.registered', $success, [
             'user'     => $_this,
             'password' => $password,
@@ -151,4 +160,8 @@ class Customer extends \rex_yform_manager_dataset
         }
         return $string;
     }
+}
+
+class CustomerException extends \Exception
+{
 }

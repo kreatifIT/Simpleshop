@@ -13,16 +13,25 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+$errors = $this->getVar('registration_errors');
+
 ?>
 <div class="<?= $this->getVar('class') ?>">
     <div>
-        <h3><?= $this->i18n('label.new_customer') ?></h3>
-        <p><?= $this->i18n('label.new_customer_text') ?></p>
+        <h3>###label.new_customer###</h3>
+        <p>###label.new_customer_text###</p>
+    
+        <?php if (count($errors)): ?>
+            <?php foreach ($errors as $error): ?>
+                <p class="callout alert"><?= $error ?></p>
+            <?php endforeach; ?>
+        <?php endif; ?>
+
         <form action="" method="post">
-            <input type="text" placeholder="<?= $this->i18n('label.firstname'); ?>">
-            <input type="text" placeholder="<?= $this->i18n('label.lastname'); ?>">
-            <input type="text" placeholder="<?= $this->i18n('label.email'); ?>">
-            <button type="submit" class="button"><?= $this->i18n('action.register'); ?></button>
+            <input type="text" placeholder="###label.firstname###" name="firstname" value=""/>
+            <input type="text" placeholder="###label.lastname###" name="lastname" value=""/>
+            <input type="text" placeholder="###label.email###" name="email" value=""/>
+            <button type="submit" class="button" name="action" value="registration">###action.register###</button>
         </form>
     </div>
 </div>

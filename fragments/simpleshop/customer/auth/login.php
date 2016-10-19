@@ -18,18 +18,18 @@ $login_errors = $this->getVar('login_errors');
 ?>
 <div class="<?= $this->getVar('class') ?>">
     <div>
-        <h3><?= $this->i18n('label.login') ?></h3>
-        <p><?= $this->i18n('label.login_text') ?></p>
+        <h3>###label.login###</h3>
+        <p>###label.login_text###</p>
         <?php if (count($login_errors)): ?>
             <?php foreach ($login_errors as $error): ?>
                 <p class="error red"><?= $error ?></p>
             <?php endforeach; ?>
         <?php endif; ?>
         <form action="" method="post">
-            <input type="text" name="email" placeholder="<?= $this->i18n('label.email') ?>" value="<?= rex_post('email', 'string'); ?>">
-            <input type="password" name="password" placeholder="<?= $this->i18n('label.password') ?>" value="" autocomplete="off">
-            <a href="#" class="lost-password"><?= $this->i18n('label.password_forgotten'); ?></a>
-            <button type="submit" class="button" name="action" value="login"><?= $this->i18n('action.login'); ?></button>
+            <input type="text" name="email" placeholder="###label.email###" value="<?= rex_post('email', 'string'); ?>">
+            <input type="password" name="password" placeholder="###label.password###" value="" autocomplete="off">
+            <a href="#" class="lost-password">###label.password_forgotten###</a>
+            <button type="submit" class="button" name="action" value="login">###action.login###</button>
         </form>
     </div>
 </div>
