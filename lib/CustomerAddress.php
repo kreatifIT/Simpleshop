@@ -19,11 +19,12 @@ class CustomerAddress extends \rex_yform_manager_dataset
 
     public static function action__save_checkout_address($action)
     {
-        $addresses = [];
-        $extras    = [];
-        $values    = $action->getParam('value_pool');
-        $hidden    = $action->getParam('form_hiddenfields');
-        $user_id   = $hidden['customer_id'] ?: 0;
+        $addresses  = [];
+        $CAddresses = [];
+        $extras     = [];
+        $values     = $action->getParam('value_pool');
+        $hidden     = $action->getParam('form_hiddenfields');
+        $user_id    = $hidden['customer_id'] ?: 0;
 
         foreach ($values['sql'] as $name => $value)
         {
@@ -58,13 +59,13 @@ class CustomerAddress extends \rex_yform_manager_dataset
                     'user_id' => $user_id,
                 ]));
                 $_this->save();
+                $CAddresses[] = $_this;
             }
         }
-        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.CustomerAddress.addresses_saved', $_this, [
+        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.CustomerAddress.addresses_saved', $CAddresses, [
             'hidden'    => $hidden,
             'values'    => $values,
             'extras'    => $extras,
-            'addresses' => $addresses,
             'user_id'   => $user_id,
         ]));
     }
