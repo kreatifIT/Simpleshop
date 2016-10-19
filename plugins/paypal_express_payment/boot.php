@@ -13,4 +13,4 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-Payment::registerPayment(PayPalExpress::class, 'paypal_express_payment');
+Payment::register(PayPalExpress::class, 'paypal_express_payment');

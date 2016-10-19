@@ -19,6 +19,7 @@ class Product extends \rex_yform_manager_dataset
 {
     const TABLE = 'rex_shop_product';
     protected $__price        = NULL;
+    protected $__tax          = NULL;
     protected $__feature_data = NULL;
     protected $__variants     = NULL;
     protected $__features     = NULL;
@@ -36,7 +37,7 @@ class Product extends \rex_yform_manager_dataset
 
     public function getPrice($includeTax = FALSE)
     {
-        if ($this->__price === NULL)
+        if ($this->__price === NULL || ($includeTax && $this->__tax === NULL))
         {
             $reduced = $this->getValue('reduced_price');
             $price   = $this->getValue('price');
@@ -44,12 +45,22 @@ class Product extends \rex_yform_manager_dataset
 
             if ($includeTax)
             {
-                $tax   = Tax::get($this->getValue('tax'))->getValue('tax');
-                $price = $price + ($price * $tax * 0.01);
+                $tax         = Tax::get($this->getValue('tax'))->getValue('tax');
+                $this->__tax = $price * $tax * 0.01;
+                $price       = $price + $this->__tax;
             }
             $this->__price = $price;
         }
         return $this->__price;
+    }
+
+    public function getTax()
+    {
+        if ($this->__tax === NULL)
+        {
+            $this->getPrice(TRUE);
+        }
+        return $this->__tax;
     }
 
     public function _getFeatures($feature_val_ids)

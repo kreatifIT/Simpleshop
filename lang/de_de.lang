@@ -51,6 +51,3 @@ action.add_to_cart = In den Warenkorb
 
 
 error.login_failed = Die Anmeldung ist fehlgeschlagen
-error.cart_product_not_exists = {{replace}} Produkt/e existieren nicht mehr und wurde/n deshalb aus dem Warenkorb entfernt
-error.cart_product_not_available = {{replace}} ist zur Zeit nicht verfügbar und wurde deshalb aus dem Warenkorb entfernt
-error.cart_product_not_enough_amount = {{replace}} sind nur noch {{count}} Stück verfügbar, deshalb wurde die Anzahl im Warenkorb reduziert

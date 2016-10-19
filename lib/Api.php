@@ -48,7 +48,7 @@ class rex_api_simpleshop_api extends rex_api_function
 
     private function api__cart_getcartcontent()
     {
-        $products = \FriendsOfREDAXO\Simpleshop\Session::getCartItems();
+        $products = \FriendsOfREDAXO\Simpleshop\Session::getCartItems(FALSE, FALSE);
         $result = [
             'totale' => 0,
             'html' => '',

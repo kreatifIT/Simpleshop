@@ -18,7 +18,7 @@ $payments  = Payment::getAll();
 
 if ($_SESSION['checkout']['Order'])
 {
-    $this->setVar('shipment', $_SESSION['checkout']['Order']->getValue('shipment'));
+    $this->setVar('shipping', $_SESSION['checkout']['Order']->getValue('shipping'));
     $this->setVar('payment', $_SESSION['checkout']['Order']->getValue('payment'));
 }
 
@@ -30,6 +30,8 @@ if ($_SESSION['checkout']['Order'])
 
         <fieldset class="row">
             <?php
+            $this->setVar('class', 'medium-6 columns margin-bottom');
+            
             foreach ($shippings as $shipping)
             {
                 $this->setVar('name', $shipping->getName());

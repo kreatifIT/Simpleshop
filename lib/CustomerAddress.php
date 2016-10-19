@@ -40,33 +40,34 @@ class CustomerAddress extends \rex_yform_manager_dataset
             }
         }
 
-        if ($user_id)
+        foreach ($addresses as $index => $address)
         {
-            foreach ($addresses as $address)
-            {
-                $_this = (int) $address['id'] ? self::get($address['id']) : self::create();
-                $_this->setValue('customer_id', $user_id);
+            $_this = (int) $hidden['id_' . $index] ? self::get($hidden['id_' . $index]) : self::create();
+            $_this->setValue('customer_id', $user_id);
 
-                foreach ($address as $name => $value)
-                {
-                    $_this->setValue($name, $value);
-                }
-                $_this = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.CustomerAddress.preSaveAddress', $_this, [
-                    'hidden'  => $hidden,
-                    'values'  => $values,
-                    'extras'  => $extras,
-                    'address' => $address,
-                    'user_id' => $user_id,
-                ]));
-                $_this->save();
-                $CAddresses[] = $_this;
+            foreach ($address as $name => $value)
+            {
+                $_this->setValue($name, $value);
             }
+            $_this = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.CustomerAddress.preSaveAddress', $_this, [
+                'hidden'  => $hidden,
+                'values'  => $values,
+                'extras'  => $extras,
+                'address' => $address,
+                'user_id' => $user_id,
+            ]));
+            if ($user_id)
+            {
+                // just save for registered user
+                $_this->save();
+            }
+            $CAddresses[$index] = $_this;
         }
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.CustomerAddress.addresses_saved', $CAddresses, [
-            'hidden'    => $hidden,
-            'values'    => $values,
-            'extras'    => $extras,
-            'user_id'   => $user_id,
+            'hidden'  => $hidden,
+            'values'  => $values,
+            'extras'  => $extras,
+            'user_id' => $user_id,
         ]));
     }
 }

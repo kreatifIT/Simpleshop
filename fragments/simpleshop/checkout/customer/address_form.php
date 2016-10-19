@@ -14,13 +14,21 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $addresses  = [];
-$User       = Customer::getCurrentUser();
-$user_id    = $User->getValue('id');
+$user_id    = NULL;
 
-$_addresses = CustomerAddress::query()
-    ->where('customer_id', $user_id)
-    ->find();
-
+if (Customer::isLoggedIn())
+{
+    $User       = Customer::getCurrentUser();
+    $user_id    = $User->getValue('id');
+    $_addresses = CustomerAddress::query()
+        ->where('customer_id', $user_id)
+        ->find();
+}
+else if (isset($_SESSION['checkout']['Order']))
+{
+    $_addresses[0] = $_SESSION['checkout']['Order']->getValue('address_1');
+    $_addresses[1] = $_SESSION['checkout']['Order']->getValue('address_2');
+}
 $addresses[0] = isset($_addresses[0]) ? $_addresses[0] : CustomerAddress::create();
 $addresses[1] = isset($_addresses[1]) ? $_addresses[1] : CustomerAddress::create();
 
@@ -39,7 +47,7 @@ $yform->setObjectparams('form_showformafterupdate', TRUE);
  * Guest checkout
  */
 $yform->setValueField('radio', [
-    'name' => 'customer_address.0.salutation',
+    'name' => 'customer_address.1.salutation',
     'label' => '###label.gender###',
     'options' => '###label.female###=Miss,###label.male###=Mr',
     'default' => $addresses[0]->getValue('salutation') ?: 'Miss',
@@ -47,64 +55,64 @@ $yform->setValueField('radio', [
 ]);
 
 $yform->setValueField('text', [
-    'name' => 'customer_address.0.firstname',
+    'name' => 'customer_address.1.firstname',
     'label' => '###label.firstname###',
     'default' => $addresses[0]->getValue('firstname'),
     'required' => true
 ]);
 $yform->setValidateField('empty', [
-    'customer_address.0.firstname',
+    'customer_address.1.firstname',
     strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.firstname###'])
 ]);
 
 $yform->setValueField('text', [
-    'name' => 'customer_address.0.lastname',
+    'name' => 'customer_address.1.lastname',
     'label' => '###label.lastname###',
     'default' => $addresses[0]->getValue('lastname'),
     'required' => true
 ]);
 $yform->setValidateField('empty', [
-    'customer_address.0.lastname',
+    'customer_address.1.lastname',
     strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.lastname###'])
 ]);
 
 $yform->setValueField('text', [
-    'name' => 'customer_address.0.additional',
+    'name' => 'customer_address.1.additional',
     'label' => '###label.addition###',
     'default' => $addresses[0]->getValue('additional'),
 ]);
 
 $yform->setValueField('text', [
-    'name' => 'customer_address.0.street',
+    'name' => 'customer_address.1.street',
     'label' => '###label.street###',
     'default' => $addresses[0]->getValue('street'),
     'required' => true
 ]);
 $yform->setValidateField('empty', [
-    'customer_address.0.street',
+    'customer_address.1.street',
     strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.street###'])
 ]);
 
 
 $yform->setValueField('text', [
-    'name' => 'customer_address.0.location',
+    'name' => 'customer_address.1.location',
     'label' => '###label.location###',
     'default' => $addresses[0]->getValue('location'),
     'required' => true
 ]);
 $yform->setValidateField('empty', [
-    'customer_address.0.location',
+    'customer_address.1.location',
     strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.location###'])
 ]);
 
 $yform->setValueField('text', [
-    'name' => 'customer_address.0.zip',
+    'name' => 'customer_address.1.zip',
     'label' => '###label.postal###',
     'default' => $addresses[0]->getValue('zip'),
     'required' => true
 ]);
 $yform->setValidateField('empty', [
-    'customer_address.0.zip',
+    'customer_address.1.zip',
     strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.postal###'])
 ]);
 
@@ -119,18 +127,18 @@ $yform->setValueField('select', [
 */
 
 $yform->setValueField('text', [
-    'name' => 'customer_address.0.phone',
+    'name' => 'customer_address.1.phone',
     'label' => '###label.phone###',
     'default' => $addresses[0]->getValue('phone'),
     'required' => true
 ]);
 $yform->setValidateField('empty', [
-    'customer_address.0.phone',
+    'customer_address.1.phone',
     strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.phone###'])
 ]);
 
 $yform->setValueField('radio', [
-    'name' => 'customer_address.0.type',
+    'name' => 'customer_address.1.type',
     'label' => '###shop.client_typ###',
     'options' => '###label.private_customer###=P,###label.company###=C',
     'default' => $addresses[0]->getValue('type') ?: 'P',
@@ -140,24 +148,25 @@ $yform->setValueField('radio', [
 ]);
 
 $yform->setValueField('text', [
-    'name' => 'customer_address.0.vat_num',
+    'name' => 'customer_address.1.vat_num',
     'label' => '###label.vat_short###',
     'default' => $addresses[0]->getValue('vat_num'),
     'strong' => true
 ]);
 
 $yform->setValueField('text', [
-    'name' => 'customer_address.0.fiscal_code',
+    'name' => 'customer_address.1.fiscal_code',
     'label' => '###label.fiscal_code###',
     'default' => $addresses[0]->getValue('fiscal_code'),
     'required' => true,
     'strong' => true
 ]);
 
-$yform->setValueField('hidden', [
-    'name' => 'customer_address.0.id',
-    'value' => $addresses[0]->getValue('id')
-]);
+//$yform->setValueField('hidden', [
+//    'name' => 'customer_address.1.id',
+//    'value' => $addresses[0]->getValue('id'),
+//]);
+$yform->setHiddenField('id_1', $addresses[0]->getValue('id'));
 
 $yform->setValueField('checkbox', [
     'name' => 'use_shipping_address',
@@ -172,45 +181,43 @@ $yform->setValueField('checkbox', [
 
 $yform->setValueField('html', ['opening_tag', '<div id="alternative-shipping-address" style="display: none;">']);
 $yform->setValueField('text', [
-    'name' => 'customer_address.1.firstname',
+    'name' => 'customer_address.2.firstname',
     'label' => '###label.firstname###',
     'default' => $addresses[1]->getValue('firstname')
 ]);
 
 $yform->setValueField('text', [
-    'name' => 'customer_address.1.lastname',
+    'name' => 'customer_address.2.lastname',
     'label' => '###label.lastname###',
     'default' => $addresses[1]->getValue('lastname')
 ]);
 
 $yform->setValueField('text', [
-    'name' => 'customer_address.1.additional',
+    'name' => 'customer_address.2.additional',
     'label' => '###label.addition###',
     'default' => $addresses[1]->getValue('additional')
 ]);
 
 $yform->setValueField('text', [
-    'name' => 'customer_address.1.street',
+    'name' => 'customer_address.2.street',
     'label' => '###label.street###',
     'default' => $addresses[1]->getValue('street')
 ]);
 
 $yform->setValueField('text', [
-    'name' => 'customer_address.1.location',
+    'name' => 'customer_address.2.location',
     'label' => '###label.location###',
     'default' => $addresses[1]->getValue('location')
 ]);
 
 $yform->setValueField('text', [
-    'name' => 'customer_address.1.zip',
+    'name' => 'customer_address.2.zip',
     'label' => '###label.postal###',
     'default' => $addresses[1]->getValue('zip')
 ]);
 
-$yform->setValueField('hidden', [
-    'name' => 'customer_address.1.id',
-    'value' => $addresses[1]->getValue('id')
-]);
+$yform->setHiddenField('id_2', $addresses[1]->getValue('id'));
+
 $yform->setValueField('html', ['closing_tag', '</div>']);
 
 /**

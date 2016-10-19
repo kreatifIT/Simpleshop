@@ -22,7 +22,9 @@ $features    = $product->getValue('features');
 $quantity    = $product->getValue('cart_quantity');
 $key         = $product->getValue('key');
 $product_url = $product->getUrl();
-$Category    = Category::get($product->getValue('category_id'));
+$has_rm_btn  = $this->getVar('has_remove_button', TRUE);
+
+$Category = Category::get($product->getValue('category_id'));
 
 if (strlen($image) == 0 && strlen($product->getValue('gallery')))
 {
@@ -44,15 +46,17 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
     <td class="price-single">&euro; <?= format_price($price) ?></td>
     <td class="amount">
         <?php
-        $this->setVar('has_quantity_control', TRUE);
-        $this->setVar('has_refresh_button', TRUE);
+        $this->setVar('has_quantity_control', $this->getVar('has_quantity_control', TRUE));
+        $this->setVar('has_refresh_button', $this->getVar('has_refresh_button', TRUE));
         $this->setVar('cart-quantity', $quantity);
         $this->setVar('product_key', $key);
         echo $this->subfragment('simpleshop/product/general/cart/button.php');
         ?>
     </td>
     <td class="price-total">&euro; <?= format_price($price * $quantity) ?></td>
+    <?php if ($has_rm_btn): ?>
     <td class="remove-product">
-        <a href="<?= rex_getUrl(null, null, ['func' => 'remove', 'key' => $key]) ?>" class="remove">X</a>
+        <a href="<?= rex_getUrl(NULL, NULL, ['func' => 'remove', 'key' => $key]) ?>" class="remove">X</a>
     </td>
+    <?php endif; ?>
 </tr>

@@ -13,4 +13,4 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-Shipping::registerShipping(PickUp::class, 'pick_up_shipping');
+Shipping::register(PickUp::class, 'pick_up_shipping');

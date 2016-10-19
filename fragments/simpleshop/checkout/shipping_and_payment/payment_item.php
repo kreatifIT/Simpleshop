@@ -13,14 +13,18 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+$class     = $this->getVar('class');
+$before    = $this->getVar('before');
+$after     = $this->getVar('after');
 $name      = $this->getVar('name');
 $plugin    = $this->getVar('plugin_name');
 $payment   = $this->getVar('payment');
 $is_active = is_object($payment) && $payment->getPluginName() == $plugin;
 
 ?>
-<div class="medium-6 columns margin-bottom">
-    <label class="radio-panel <?php if ($is_active) echo 'selected'; ?>">
+<div class="<?= $class ?>">
+    <div class="radio-panel <?php if ($is_active) echo 'selected'; ?>">
+        <?= $before ?>
         <div>
             <?= $this->subfragment('simpleshop/payment/' . $plugin . '/icon.svg') ?>
         </div>
@@ -31,5 +35,6 @@ $is_active = is_object($payment) && $payment->getPluginName() == $plugin;
                 <span class="radio"></span>
             </label>
         </div>
-    </label>
+        <?= $after ?>
+    </div>
 </div>

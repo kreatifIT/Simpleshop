@@ -13,4 +13,4 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-Payment::registerPayment(BankTransfer::class, 'bank_transfer_payment');
+Payment::register(BankTransfer::class, 'bank_transfer_payment');

@@ -13,10 +13,13 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Sprog\Wildcard;
+
 class Session extends \rex_yform_manager_dataset
 {
     const TABLE = 'rex_shop_session';
     protected static $session = NULL;
+    public static $errors  = [];
 
     public static function cleanupSessions()
     {
@@ -53,7 +56,7 @@ class Session extends \rex_yform_manager_dataset
                 if ($user_session)
                 {
                     // merge sessions because we found to sessions for the same user
-                    $cart_items = self::getCartItems(TRUE, self::$session) + self::getCartItems(TRUE, $user_session);
+                    $cart_items = self::_getCartItems(TRUE, self::$session) + self::_getCartItems(TRUE, $user_session);
                     self::$session->writeSession(['cart_items' => $cart_items]);
                     // remove the previous session
                     $user_session->delete();
@@ -87,9 +90,9 @@ class Session extends \rex_yform_manager_dataset
         $this->save();
     }
 
-    public static function getCartItems($raw = FALSE, $session = NULL)
+    private static function _getCartItems($raw = FALSE, $throwErrors = TRUE)
     {
-        $session    = $session ?: self::getSession();
+        $session    = self::getSession();
         $cart_items = (array) json_decode($session->getValue('cart_items'), TRUE);
 
         if (!$raw)
@@ -97,7 +100,17 @@ class Session extends \rex_yform_manager_dataset
             $results = [];
             foreach ($cart_items as $key => $item)
             {
-                $product = Product::getProductByKey($key, $item['quantity']);
+                try
+                {
+                    $product = Product::getProductByKey($key, $item['quantity']);
+                }
+                catch (ProductException $ex)
+                {
+                    if ($throwErrors)
+                    {
+                        throw new ProductException($ex->getMessage(), $ex->getCode());
+                    }
+                }
                 if ($product)
                 {
                     $results[] = $product;
@@ -108,6 +121,73 @@ class Session extends \rex_yform_manager_dataset
         return $cart_items;
     }
 
+    public static function getCartItems($raw = FALSE, $throwErrors = TRUE)
+    {
+        $label_name   = sprogfield('name');
+        self::$errors = [];
+
+        do
+        {
+            try
+            {
+                $products = self::_getCartItems($raw, $throwErrors);
+                $retry    = FALSE;
+            }
+            catch (ProductException $ex)
+            {
+                $retry = TRUE;
+                $msg   = $ex->getMessage();
+                $key   = substr($msg, strrpos($msg, '--key:') + 6);
+
+                switch ($ex->getCode())
+                {
+                    case 1:
+                        // product does not exist any more
+                    case 2:
+                        // feature does not exist any more
+                    case 3:
+                        // variant-combination does not exist
+                        Session::removeProduct($key);
+                        self::$errors['cart_product_not_exists']['label'] = Wildcard::get('simpleshop.error.cart_product_not_exists');
+                        self::$errors['cart_product_not_exists']['replace'] += 1;
+                        break;
+
+                    case 4:
+                        // product availability is null
+                        Session::removeProduct($key);
+                        list ($product_id, $feature_ids) = explode('|', trim($key, '|'));
+                        $product        = Product::get($product_id);
+                        $label          = strtr(Wildcard::get('simpleshop.error.cart_product_not_available'), ['{{replace}}' => $product->getValue($label_name)]);
+                        self::$errors[] = ['label' => $label];
+                        break;
+
+                    case 5:
+                        // not enough products
+                        $product = Product::getProductByKey($key, 0);
+                        // update cart
+                        Session::setProductQuantity($key, $product->getValue('amount'));
+                        $label = strtr(Wildcard::get('simpleshop.error.cart_product_not_enough_amount'), [
+                            '{{replace}}' => $product->getValue($label_name),
+                            '{{count}}'   => $product->getValue('amount'),
+                        ]);
+                        self::$errors[] = ['label' => $label];
+                        break;
+
+                    default:
+                        throw new ProductException($msg, $ex->getCode());
+                        break;
+                }
+            }
+        }
+        while ($retry);
+
+        if (count(self::$errors))
+        {
+            throw new CartException('Product errors', 1);
+        }
+        return $products;
+    }
+
     public static function getProductKey($product_id, $feature_value_ids = [])
     {
         $feature_value_ids = !is_array($feature_value_ids) ? [$feature_value_ids] : $feature_value_ids;
@@ -116,14 +196,14 @@ class Session extends \rex_yform_manager_dataset
 
     public static function addProduct($product_key, $quantity = 1)
     {
-        $cart_items = self::getCartItems(TRUE);
+        $cart_items = self::_getCartItems(TRUE);
         self::setProductQuantity($product_key, $cart_items[$product_key]['quantity'] + $quantity);
     }
 
     public static function setProductQuantity($product_key, $quantity)
     {
         $session    = self::getSession();
-        $cart_items = self::getCartItems(TRUE);
+        $cart_items = self::_getCartItems(TRUE);
         // update the quantity
         $cart_items[$product_key]['quantity'] = $quantity;
         $session->writeSession(['cart_items' => $cart_items]);
@@ -132,7 +212,7 @@ class Session extends \rex_yform_manager_dataset
     public static function removeProduct($product_key)
     {
         $session    = self::getSession();
-        $cart_items = self::getCartItems(TRUE);
+        $cart_items = self::_getCartItems(TRUE);
         unset($cart_items[$product_key]);
         $session->writeSession(['cart_items' => $cart_items]);
     }
@@ -142,4 +222,9 @@ class Session extends \rex_yform_manager_dataset
         $session = self::getSession();
         $session->writeSession(['cart_items' => []]);
     }
+}
+
+
+class CartException extends \Exception
+{
 }

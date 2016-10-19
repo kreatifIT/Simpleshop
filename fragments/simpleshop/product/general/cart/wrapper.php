@@ -13,10 +13,8 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$errors     = [];
-$Addon      = \rex_addon::get('simpleshop');
-$label_name = sprogfield('name');
-$_FUNC      = rex_request('func', 'string');
+$_FUNC     = rex_request('func', 'string');
+$checkCart = $this->getVar('check_cart', TRUE);
 
 if ($_FUNC == 'update')
 {
@@ -33,60 +31,18 @@ else if ($_FUNC == 'remove')
     exit();
 }
 
-do
+try
 {
-    try
+    $products = Session::getCartItems(FALSE, $checkCart);
+}
+catch (CartException $ex)
+{
+    if ($ex->getCode() == 1)
     {
-        $products = \FriendsOfREDAXO\Simpleshop\Session::getCartItems();
-        $retry    = FALSE;
-    }
-    catch (ProductException $ex)
-    {
-        $retry = TRUE;
-        $msg   = $ex->getMessage();
-        $key   = substr($msg, strrpos($msg, '--key:') + 6);
-
-        switch ($ex->getCode())
-        {
-            case 1:
-                // product does not exist any more
-            case 2:
-                // feature does not exist any more
-            case 3:
-                // variant-combination does not exist
-                Session::removeProduct($key);
-                $errors['error.cart_product_not_exists']['label'] = $Addon->i18n('error.cart_product_not_exists');
-                $errors['error.cart_product_not_exists']['replace'] += 1;
-                break;
-
-            case 4:
-                // product availability is null
-                Session::removeProduct($key);
-                list ($product_id, $feature_ids) = explode('|', trim($key, '|'));
-                $product  = Product::get($product_id);
-                $label    = strtr($Addon->i18n('error.cart_product_not_available'), ['{{replace}}' => $product->getValue($label_name)]);
-                $errors[] = ['label' => $label];
-                break;
-
-            case 5:
-                // not enough products
-                $product = Product::getProductByKey($key, 0);
-                // update cart
-                Session::setProductQuantity($key, $product->getValue('amount'));
-                $label    = strtr($Addon->i18n('error.cart_product_not_enough_amount'), [
-                    '{{replace}}' => $product->getValue($label_name),
-                    '{{count}}'   => $product->getValue('amount'),
-                ]);
-                $errors[] = ['label' => $label];
-                break;
-
-            default:
-                throw new ProductException($msg, $ex->getCode());
-                break;
-        }
+        $errors   = Session::$errors;
+        $products = Session::getCartItems();
     }
 }
-while ($retry);
 
 if (count($errors)):
     foreach ($errors as $error): ?>
@@ -102,11 +58,11 @@ endif;
         <table class="cart-content stack">
             <thead>
             <tr class="cart-header">
-                <th><?= $Addon->i18n('label.preview'); ?></th>
-                <th><?= $Addon->i18n('label.product'); ?></th>
-                <th><?= $Addon->i18n('label.price'); ?></th>
-                <th><?= $Addon->i18n('label.amount'); ?></th>
-                <th><?= $Addon->i18n('label.total'); ?></th>
+                <th>###label.preview###</th>
+                <th>###label.product###</th>
+                <th>###label.price###</th>
+                <th>###label.amount###</th>
+                <th>###label.total###</th>
                 <th>&nbsp;</th>
             </tr>
             </thead>
@@ -123,5 +79,5 @@ endif;
         </table>
     </form>
 <?php else: ?>
-    <p class="text-center margin"><?= $Addon->i18n('label.no_product_in_cart') ?></p>
+    <p class="text-center margin">###label.no_product_in_cart###</p>
 <?php endif; ?>

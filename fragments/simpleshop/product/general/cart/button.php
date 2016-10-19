@@ -22,7 +22,7 @@ if (!$quantity)
 }
 ?>
 <div class="clearfix">
-    <?php if ($this->getVar('has_quantity_control')): ?>
+    <?php if ($this->getVar('has_quantity_control', FALSE)): ?>
         <div class="amount-increment clearfix">
             <button class="button minus">-</button>
             <input type="text" value="<?= $quantity ?>" name="quantity[<?= $product_key ?>]" readonly>
@@ -31,6 +31,8 @@ if (!$quantity)
                 <button class="button refresh" type="submit" name="func" value="update"><i class="fa fa-refresh" aria-hidden="true"></i></button>
             <?php endif; ?>
         </div>
+    <?php elseif ($this->getVar('has_quantity', FALSE)):  ?>
+        <?= $quantity ?>
     <?php endif; ?>
     <?php if ($this->getVar('has_add_to_cart_button')): ?>
     <a class="add-to-cart fbox" href="#shop-modal" data-product_key="<?= $product_key ?>" data-quantity="<?= $quantity ?>">
