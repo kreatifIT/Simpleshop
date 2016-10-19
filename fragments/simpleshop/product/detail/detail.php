@@ -122,6 +122,15 @@ if (strlen($image) == 0 && isset($gallery[0])) {
                         if (!$default_packaging_id) {
                             $default_packaging_id = $value_id;
                         }
+                        $weight = $feature_value->getValue('key');
+                        $icon_sizes = \Kreatif\Project\Settings::$PACKAGING_SIZES;
+                        $icon_size = $icon_sizes[0];
+                        foreach ($icon_sizes as $key => $value) {
+                            if ($weight <= $value) {
+                                $icon_size = $key;
+                                break;
+                            }
+                        }
                         ?>
                         <button data-value="<?= $value_id ?>" class="
                         <?php
@@ -133,8 +142,8 @@ if (strlen($image) == 0 && isset($gallery[0])) {
                         }
                         ?>">
                             <?php if (strlen($icon)): ?>
-                                <div class="small">
-                                    <?= Utils::getImageTag($icon, '') ?>
+                                <div class="<?= $icon_size ?>">
+                                    <?= file_get_contents(\rex_path::base('resources/img/' . $icon)) ?>
                                 </div>
                             <?php endif; ?>
                             <span class="weight"><?= $feature_value->getValue($lable_name) ?></span>

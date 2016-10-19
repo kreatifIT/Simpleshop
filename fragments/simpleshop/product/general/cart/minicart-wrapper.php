@@ -8,4 +8,5 @@
             <a href="<?= rex_getUrl(\Kreatif\Project\Settings::CHECKOUT_PAGE_ID) ?>" class="button button-checkout">###action.go_to_checkout###</a>
         </div>
     </div>
+    <div class="no-products">###shop.no_products_in_cart###</div>
 </div>
