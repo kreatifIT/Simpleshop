@@ -26,6 +26,8 @@ $variants = $product->getFeatureVariants();
 $description = $product->getValue(sprogfield('description'));
 $application = $product->getValue(sprogfield('application'));
 //pr($variants);
+$default_color_id = 0;
+$default_packaging_id = 0;
 
 $before_content = $this->getVar('before_content');
 $after_content = $this->getVar('after_content');
@@ -86,6 +88,9 @@ if (strlen($image) == 0 && isset($gallery[0])) {
                         <?php foreach ($variants['features']['color']->values as $feature_value):
                             $value_id = $feature_value->getValue('id');
                             $amount = $variants['mapping'][$value_id]['min_amount'];
+                            if (!$default_color_id) {
+                                $default_color_id = $value_id;
+                            }
                             ?>
                             <option
                                 value="<?= $value_id ?>"
@@ -108,12 +113,25 @@ if (strlen($image) == 0 && isset($gallery[0])) {
                 <h3><?= $variants['features']['packaging']->getValue($lable_name) ?></h3>
                 <div class="packaging clearfix">
 
-                    <?php foreach ($variants['features']['packaging']->values as $feature_value):
+                    <?php
+                    $selected = false;
+                    foreach ($variants['features']['packaging']->values as $feature_value):
                         $icon = $feature_value->getValue('icon');
                         $value_id = $feature_value->getValue('id');
                         $amount = $variants['mapping'][$value_id]['min_amount'];
+                        if (!$default_packaging_id) {
+                            $default_packaging_id = $value_id;
+                        }
                         ?>
-                        <button data-value="<?= $value_id ?>" class="<?php if ($amount <= 0) echo 'disabled'; ?>">
+                        <button data-value="<?= $value_id ?>" class="
+                        <?php
+                        if ($amount <= 0) {
+                            echo 'disabled';
+                        } elseif (!$selected) {
+                            echo 'selected';
+                            $selected = true;
+                        }
+                        ?>">
                             <?php if (strlen($icon)): ?>
                                 <div class="small">
                                     <?= Utils::getImageTag($icon, '') ?>
@@ -134,10 +152,11 @@ if (strlen($image) == 0 && isset($gallery[0])) {
             </div>
             <div class="checkout">
                 <?php
+                $product_variant = $default_color_id . ',' . $default_packaging_id;
                 $this->setVar('button-cart-counter', 1);
                 $this->setVar('has_quantity_control', TRUE);
                 $this->setVar('has_add_to_cart_button', TRUE);
-                $this->setVar('product_key', $product->getValue('id').'|');
+                $this->setVar('product_key', $product->getValue('id') . '|' . $product_variant);
                 echo $this->subfragment('simpleshop/product/general/cart/button.php');
                 ?>
             </div>
