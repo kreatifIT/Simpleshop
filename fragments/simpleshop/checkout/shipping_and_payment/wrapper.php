@@ -57,31 +57,6 @@ if ($_SESSION['checkout']['Order'])
             }
             ?>
 
-
-            <div class="medium-6 columns margin-bottom">
-                <div class="radio-panel">
-                    <i class="fa fa-university" aria-hidden="true"></i>
-                    <div class="custom-radio">
-                        <label for="bank">
-                            ###label.payment_bank###
-                            <input type="radio" name="payment" value="Bank" id="bank" required>
-                            <span class="radio"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="medium-6 columns margin-bottom">
-                <div class="radio-panel">
-                    <i class="fa fa-cc-paypal" aria-hidden="true"></i>
-                    <div class="custom-radio">
-                        <label for="paypal">
-                            ###label.payment_paypal###
-                            <input type="radio" name="payment" value="Paypal" id="paypal" required>
-                            <span class="radio"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
         </fieldset>
     </div>
     <div class="row buttons-checkout margin-bottom">
