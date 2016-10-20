@@ -15,7 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use FriendsOfREDAXO\Simpleshop\yform\manager\table;
 
-class Customer extends \rex_yform_manager_dataset
+class Customer extends Model
 {
     const TABLE               = 'rex_shop_customer';
     const MIN_PASSWORD_LENGTH = 6;

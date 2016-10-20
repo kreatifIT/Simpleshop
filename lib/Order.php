@@ -13,59 +13,51 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-class Order extends \rex_yform_manager_dataset
+class Order extends Model
 {
     const TABLE = 'rex_shop_order';
-    private $object_data = [
-        'address_1',
-        'address_2',
-        'shipping',
-        'payment',
-    ];
 
     public static function create($table = NULL)
     {
-        $_this             = parent::create($table);
-        $_this->createdate = date('Y-m-d H:i:s');
+        $_this = parent::create($table);
 
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.getObjectData', $_this->object_data));
 
         return $_this;
     }
 
-    public function getValue($key, $process = TRUE)
-    {
-        $value = parent::getValue($key);
-
-        if ($process && in_array($key, $this->object_data) && is_string($value))
-        {
-            $_data  = json_decode($value);
-            $Object = call_user_func([$_data->class, 'create']);
-            $data   = (array) $_data->data;
-
-            foreach ($data as $name => $value)
-            {
-                $Object->setValue($name, $value);
-            }
-            $value = $Object;
-        }
-        return $value;
-    }
 
     public function save()
     {
-        foreach ($this->object_data as $name)
-        {
-            $object = $this->getValue($name, FALSE);
-            if (is_object($object))
-            {
-                $class_name = get_class($object);
-                $this->setValue($name, json_encode(['class' => $class_name, 'data' => $object->getData()]));
-            }
-        }
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this));
 
-        return parent::save();
+        $result = parent::save();
+
+        if ($result)
+        {
+            $order_id = $this->getValue('id');
+            $products = Session::getCartItems(FALSE, FALSE);
+
+            // clear all products first
+            \rex_sql::factory()->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$order_id}");
+
+            // set order products
+            foreach ($products as $product)
+            {
+                $prod_data = Model::prepare($product);
+
+                foreach ($prod_data as $name => $value)
+                {
+                    $product->setValue($name, $value);
+                }
+                OrderProduct::create()
+                    ->setValue('order_id', $order_id)
+                    ->setValue('product_id', $product->getValue('id'))
+                    ->setValue('data', $product)
+                    ->save(TRUE);
+            }
+        }
+        return $result;
     }
 
     public function calculateDocument()

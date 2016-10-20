@@ -13,7 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-class Variant extends \rex_yform_manager_dataset
+class Variant extends Model
 {
     const TABLE = "rex_shop_product_has_feature";
 

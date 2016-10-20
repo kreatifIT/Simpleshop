@@ -15,7 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Url\Url;
 
-class Product extends \rex_yform_manager_dataset
+class Product extends Model
 {
     const TABLE = 'rex_shop_product';
     protected $__price        = NULL;

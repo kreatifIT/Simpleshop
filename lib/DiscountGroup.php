@@ -13,7 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-class DiscountGroup extends \rex_yform_manager_dataset
+class DiscountGroup extends Model
 {
     const TABLE = 'rex_shop_discount_group';
 }

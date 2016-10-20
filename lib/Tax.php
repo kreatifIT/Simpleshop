@@ -13,7 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-class Tax extends \rex_yform_manager_dataset
+class Tax extends Model
 {
     const TABLE = 'rex_shop_tax';
 

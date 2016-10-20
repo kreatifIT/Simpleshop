@@ -13,8 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-use Symfony\Component\Yaml\Exception\RuntimeException;
-
 class Shipping extends Plugin
 {
     protected static $type = 'shipping';

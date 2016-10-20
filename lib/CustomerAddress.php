@@ -13,7 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-class CustomerAddress extends \rex_yform_manager_dataset
+class CustomerAddress extends Model
 {
     const TABLE = 'rex_shop_customer_address';
 

@@ -13,8 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-use Symfony\Component\Yaml\Exception\RuntimeException;
-
 class Payment extends Plugin
 {
     protected static $type = 'payment';

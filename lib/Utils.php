@@ -13,7 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-class Utils extends \rex_yform_manager_dataset
+class Utils
 {
 
     public static function getImageTag($file, $type, $params = [], $callback = NULL)

@@ -16,7 +16,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 use Url\Generator;
 use Url\Url;
 
-class Category extends \rex_yform_manager_dataset
+class Category extends Model
 {
     const TABLE = 'rex_shop_category';
 

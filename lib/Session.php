@@ -15,7 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Sprog\Wildcard;
 
-class Session extends \rex_yform_manager_dataset
+class Session extends Model
 {
     const TABLE = 'rex_shop_session';
     protected static $session = NULL;
