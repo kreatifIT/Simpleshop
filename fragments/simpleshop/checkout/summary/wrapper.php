@@ -19,6 +19,9 @@ $address_1 = $Order->getValue('address_1');
 $address_2 = $Order->getValue('address_2');
 $shipping  = $Order->getValue('shipping');
 $payment   = $Order->getValue('payment');
+$extras    = $Order->getValue('address_extras');
+
+//pr($Order); exit;
 
 if (count($errors)): ?>
     <div class="row column">
@@ -43,7 +46,14 @@ if (count($errors)): ?>
     <?php
     $this->setVar('title', '###shop.shipping_address###');
     $this->setVar('url', rex_getUrl(NULL, NULL, ['step' => 2]));
-    $this->setVar('address', $address_2);
+    if ($extras['use_shipping_address'])
+    {
+        $this->setVar('address', $address_2);
+    }
+    else
+    {
+        $this->setVar('address', $address_1);
+    }
     $this->subfragment('simpleshop/checkout/summary/address_item.php');
     ?>
 

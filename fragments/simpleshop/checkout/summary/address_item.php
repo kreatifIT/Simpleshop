@@ -13,6 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+$has_el  = $this->getVar('has_edit_link', TRUE);
 $title   = $this->getVar('title');
 $url     = $this->getVar('url');
 $address = $this->getVar('address');
@@ -20,13 +21,16 @@ $address = $this->getVar('address');
 ?>
 <div class="medium-6 columns margin-bottom">
     <div class="address-panel">
-        <a href="<?= $url ?>" class="edit">
-            <i class="fa fa-pencil hide-for-large" aria-hidden="true"></i>
-            <span class="show-for-large">###action.edit###</span>
-        </a>
+        <?php if ($has_el): ?>
+            <a href="<?= $url ?>" class="edit">
+                <i class="fa fa-pencil hide-for-large" aria-hidden="true"></i>
+                <span class="show-for-large">###action.edit###</span>
+            </a>
+        <?php endif; ?>
         <h4><?= $title ?></h4>
         <p>
-            <?= $address->getValue('firstname') ?> <?= $address->getValue('lastname') ?><?php if (strlen($address->getValue('additional'))) echo ' - '. $address->getValue('additional') ?><br/>
+            <?= $address->getValue('firstname') ?> <?= $address->getValue('lastname') ?><?php if (strlen($address->getValue('additional'))) echo ' - ' . $address->getValue('additional') ?>
+            <br/>
             <?= $address->getValue('street') ?><br>
             <?= $address->getValue('zip') ?> <?= $address->getValue('location') ?> - <br>
             <br>

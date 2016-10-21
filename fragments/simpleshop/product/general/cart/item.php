@@ -16,26 +16,29 @@ namespace FriendsOfREDAXO\Simpleshop;
 $label_name  = sprogfield('name');
 $product     = $this->getVar('product');
 $class       = $this->getVar('class');
+$has_rm_btn  = $this->getVar('has_remove_button', TRUE);
+$has_image   = $this->getVar('has_image', TRUE);
 $image       = $product->getValue('image');
 $price       = $product->getPrice(TRUE);
 $features    = $product->getValue('features');
 $quantity    = $product->getValue('cart_quantity');
 $key         = $product->getValue('key');
 $product_url = $product->getUrl();
-$has_rm_btn  = $this->getVar('has_remove_button', TRUE);
 
 $Category = Category::get($product->getValue('category_id'));
 
-if (strlen($image) == 0 && strlen($product->getValue('gallery')))
+if ($has_image && strlen($image) == 0 && strlen($product->getValue('gallery')))
 {
     $gallery = explode(',', $product->getValue('gallery'));
     $image   = $gallery[0];
 }
 ?>
 <tr class="cart-item <?= $class ?>">
+    <?php if ($has_image): ?>
     <td class="product-image">
         <a href="<?= $product_url ?>"><?= Utils::getImageTag($image, 'cart-list-element-main') ?></a>
     </td>
+    <?php endif; ?>
     <td class="description">
         <h3><?= $product->getValue($label_name) ?></h3>
         <p><?= $Category->getValue($label_name) ?></p>

@@ -13,20 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-class BankTransfer extends PaymentAbstract
-{
-    public function getPrice()
-    {
-        // TODO: Implement getPrice() method.
-    }
+?>
 
-    public function getName()
-    {
-        return '###shop.bank_transfer###';
-    }
-
-    public function getPaymentInfo()
-    {
-        return '###shop.bank_transfer_payment_info###';
-    }
-}
+COMPLETE

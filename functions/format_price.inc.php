@@ -16,3 +16,21 @@ function format_price($price)
     $conf = localeconv();
     return number_format($price, 2, $conf['mon_decimal_point'], $conf['mon_thousands_sep']);
 }
+
+function format_date($datetime)
+{
+    return format_timestamp(strtotime($datetime));
+}
+
+function format_timestamp($timestamp, $withTime = TRUE, $id = NULL)
+{
+    $locale    = setlocale(LC_ALL, 0);
+    $datetype  = IntlDateFormatter::LONG;
+    $timetype  = $withTime ? IntlDateFormatter::SHORT : IntlDateFormatter::NONE;
+
+    rex_extension::registerPoint(new rex_extension_point('format_timestamp.datetype', $datetype, ['id' => $id]));
+    rex_extension::registerPoint(new rex_extension_point('format_timestamp.timetype', $timetype, ['id' => $id]));
+
+    $formatter = new IntlDateFormatter($locale, $datetype, $timetype);
+    return $formatter->format($timestamp);
+}

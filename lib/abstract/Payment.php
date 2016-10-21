@@ -25,6 +25,7 @@ abstract class PaymentAbstract extends PluginAbstract
 
     public abstract function getPrice();
     public abstract function getName();
+    public abstract function getPaymentInfo();
 
     public static function get()
     {

@@ -31,7 +31,7 @@ class Order extends Model
     {
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this));
 
-        $result = parent::save();
+        $result = parent::save(TRUE);
 
         if ($result)
         {
@@ -85,7 +85,6 @@ class Order extends Model
             $this->tax += (float) $product->getTax() * $quantity;
         }
         $this->shipping_costs = (float) $this->shipping ? $this->shipping->getPrice() : 0;
-        $this->status         = 'OP';
         $this->updatedate     = date('Y-m-d H:i:s');
         $this->ip_address     = rex_server('REMOTE_ADDR', 'string', 'notset');
         $this->total          = $this->subtotal + $this->shipping_costs - $this->discount;

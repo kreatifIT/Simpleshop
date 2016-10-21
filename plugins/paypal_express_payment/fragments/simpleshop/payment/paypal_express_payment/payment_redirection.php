@@ -13,20 +13,16 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-class BankTransfer extends PaymentAbstract
+$action   = rex_get('payment_action', 'string');
+$Order    = $this->getVar('order');
+$Payment  = $Order->getValue('payment');
+$order_id = $Order->getValue('id');
+
+if ($action == 'complete')
 {
-    public function getPrice()
-    {
-        // TODO: Implement getPrice() method.
-    }
 
-    public function getName()
-    {
-        return '###shop.bank_transfer###';
-    }
-
-    public function getPaymentInfo()
-    {
-        return '###shop.bank_transfer_payment_info###';
-    }
+}
+else
+{
+    $Payment->initPayment($order_id, $Order->getValue('total'), 'Order #' . $order_id);
 }

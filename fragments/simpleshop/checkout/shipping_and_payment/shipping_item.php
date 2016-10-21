@@ -31,7 +31,7 @@ $is_active = is_object($shipment) && $shipment->getPluginName() == $plugin;
         <div class="custom-radio">
             <label>
                 <?= $name ?>
-                <input type="radio" name="shipment" value="<?= $plugin ?>" <?php if ($is_active) echo 'checked="checked"'; ?> required/>
+                <input type="radio" name="shipment" value="<?= $plugin ?>" <?php if ($is_active) echo 'checked="checked"'; ?>/>
                 <span class="radio"></span>
             </label>
         </div>

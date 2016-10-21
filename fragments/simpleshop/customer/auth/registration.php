@@ -19,7 +19,7 @@ $errors = $this->getVar('registration_errors');
 <div class="<?= $this->getVar('class') ?>">
     <div>
         <h3>###label.new_customer###</h3>
-        <p>###label.new_customer_text###</p>
+        <p>###shop.new_customer_text###</p>
     
         <?php if (count($errors)): ?>
             <?php foreach ($errors as $error): ?>
@@ -28,9 +28,9 @@ $errors = $this->getVar('registration_errors');
         <?php endif; ?>
 
         <form action="" method="post">
-            <input type="text" placeholder="###label.firstname###" name="firstname" value=""/>
-            <input type="text" placeholder="###label.lastname###" name="lastname" value=""/>
-            <input type="text" placeholder="###label.email###" name="email" value=""/>
+            <input type="text" placeholder="###label.firstname###" name="firstname" value="<?= rex_post('firstname', 'string'); ?>"/>
+            <input type="text" placeholder="###label.lastname###" name="lastname" value="<?= rex_post('lastname', 'string'); ?>"/>
+            <input type="text" placeholder="###label.email###" name="email" value="<?= rex_post('email', 'string'); ?>"/>
             <button type="submit" class="button" name="action" value="registration">###action.register###</button>
         </form>
     </div>

@@ -15,6 +15,12 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 class PayPalExpress extends PaymentAbstract
 {
+    const API_VERSION          = '124.0';
+    const SANDBOX_BASE_URL     = 'https://api-3t.sandbox.paypal.com/nvp/';
+    const LIVE_BASE_URL        = 'https://api-3t.paypal.com/nvp/';
+    const LIVE_REDIRECT_URL    = 'https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=';
+    const SANDBOX_REDIRECT_URL = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=';
+
     public function getPrice()
     {
         // TODO: Implement getPrice() method.
@@ -24,4 +30,126 @@ class PayPalExpress extends PaymentAbstract
     {
         return '###label.paypal_express###';
     }
+
+    public function getPaymentInfo()
+    {
+        return '';
+    }
+
+    public function initPayment($order_id, $total_amount, $order_descr, $show_cc = FALSE)
+    {
+        $use_sandbox = \rex::getProperty('use_paypal_sandbox');
+        $key         = $use_sandbox ? 'paypal_credentials_sandbox' : 'paypal_credentials_live';
+        $url         = $use_sandbox ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
+        $credentials = \rex::getProperty($key);
+
+        if (!$credentials || empty ($credentials['signature']))
+        {
+            $msg = '
+                The property "' . $key . '" is not set or not correct! It should contain your paypal credentials. Please define them in your Project-Addon like: 
+                rex::setProperty(\'' . $key . '\', [
+                    \'user\'      => \'XXXX\',
+                    \'pwd\'       => \'XXXXXX\',
+                    \'signature\' => \'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\',
+                ]);
+            ';
+            throw new PaypalException($msg);
+        }
+
+        $data = [
+            'METHOD'  => 'SetExpressCheckout',
+            'VERSION' => self::API_VERSION,
+
+            'USER'      => $credentials['user'],
+            'PWD'       => $credentials['pwd'],
+            'SIGNATURE' => $credentials['signature'],
+
+            'returnUrl' => rex_getUrl(NULL, NULL, ['action' => 'pay', 'payment_action' => 'complete']),
+            'cancelUrl' => rex_getUrl(NULL, NULL, ['action' => 'cancelled']),
+
+            'PAYMENTREQUEST_0_PAYMENTREQUESTID' => $order_id,
+            'PAYMENTREQUEST_0_AMT'              => $total_amount, // total payment (including tax + shipping)
+            'PAYMENTREQUEST_0_CURRENCYCODE'     => 'EUR',
+            'L_PAYMENTREQUEST_0_NAME0'          => $order_descr,
+            'L_PAYMENTREQUEST_0_AMT0'           => $total_amount,
+            'NOSHIPPING'                        => 1,
+            'ALLOWNOTE'                         => 0,
+            'L_PAYMENTTYPE0'                    => 'InstantOnly',
+
+            'HDRIMG'          => '', // URL: image on the top; max: 750x90px
+            'LOGOIMG'         => '', // HTTPS-URL: logo; max: 190x60px
+            'CARTBORDERCOLOR' => '',
+
+            'EMAIL'       => '', // customer email prefilled
+            'LANDINGPAGE' => $show_cc ? 'Billing' : 'Login', // shows either credit card form OR Paypal Login page
+        ];
+
+        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Paypal.initPaymentData', $data));
+
+        $sdata     = html_entity_decode(urldecode(http_build_query($data)));
+        $Connector = new WSConnector($url);
+        $Connector->setRespFormat('text/html');
+        $response = $Connector->request('', $sdata, 'post', 'PAYPAL-Express');
+
+        parse_str(urldecode($response['response']), $__response);
+
+        if ($__response['ACK'] != 'Success')
+        {
+            $msg = "{$__response['L_LONGMESSAGE0']}\nData: " . print_r($data, TRUE) . "\nResponse: " . print_r($__response, TRUE) . "\n";
+            Utils::log('Paypal.initPayment', $msg, 'ERROR', TRUE);
+            throw new \ErrorException($__response['L_LONGMESSAGE0']);
+        }
+        // redirect to paypal
+        $url = $use_sandbox ? self::SANDBOX_REDIRECT_URL : self::LIVE_REDIRECT_URL;
+        header('Location: ' . $url . $__response['TOKEN']);
+        exit();
+    }
+
+    public function processPayment($token, $payer_id, $total_amount)
+    {
+        $credentials = \rex::getProperty($key);
+        $use_sandbox = \rex::getProperty('use_paypal_sandbox');
+        $url         = $use_sandbox ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
+
+        $data = [
+            'METHOD'   => 'DoExpressCheckoutPayment',
+            'VERSION'  => self::API_VERSION,
+            'TOKEN'    => $token,
+            'PAYERID'  => $payer_id,
+            'MSGSUBID' => $payer_id,
+
+            'USER'      => $credentials['user'],
+            'PWD'       => $credentials['pwd'],
+            'SIGNATURE' => $credentials['signature'],
+
+            'PAYMENTREQUEST_0_AMT'          => $total_amount,
+            'PAYMENTREQUEST_0_CURRENCYCODE' => 'EUR',
+        ];
+
+        $sdata     = html_entity_decode(urldecode(http_build_query($data)));
+        $Connector = new WSConnector($url);
+        $Connector->setRespFormat('text/html');
+        $response = $Connector->request('', $sdata, 'post', 'PAYPAL-Express');
+
+        parse_str(urldecode($response), $__response);
+
+        if ($__response['ACK'] != 'Success')
+        {
+            $msg = "{$__response['L_LONGMESSAGE0']}\nData: " . print_r($data, TRUE) . "\nResponse: " . print_r($__response, TRUE) . "\n";
+            Utils::log('Paypal.initPayment', $msg, 'ERROR', TRUE);
+            throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
+        }
+        if ($__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Completed')
+        {
+            $msg = "The Payment with Transaction-ID = {$__response['PAYMENTINFO_0_TRANSACTIONID']} "
+                . "has status = '{$__response['PAYMENTINFO_0_PAYMENTSTATUS']}'\n";
+            Utils::log('Paypal.initPayment', $msg, 'ERROR', TRUE);
+            throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
+        }
+        return $__response['PAYMENTINFO_0_TRANSACTIONID'];
+    }
+}
+
+class PaypalException extends \Exception
+{
 }

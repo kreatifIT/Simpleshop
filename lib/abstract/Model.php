@@ -25,9 +25,9 @@ abstract class Model extends \rex_yform_manager_dataset
             if (is_array($value))
             {
                 $_values = [];
-                foreach ($value as $val)
+                foreach ($value as $name => $val)
                 {
-                    $_values[] = $this->unprepare($val);
+                    $_values[$name] = $this->unprepare($val);
                 }
                 $value = $_values;
             }
@@ -79,10 +79,17 @@ abstract class Model extends \rex_yform_manager_dataset
             if (is_array($value))
             {
                 $_values = [];
-                foreach ($value as $val)
+                foreach ($value as $name => $val)
                 {
-                    $class_name = get_class($val);
-                    $_values[]  = json_encode(['class' => $class_name, 'data' => self::prepare($val)]);
+                    if (is_object($val))
+                    {
+                        $class_name     = get_class($val);
+                        $_values[$name] = json_encode(['class' => $class_name, 'data' => self::prepare($val)]);
+                    }
+                    else
+                    {
+                        $_values[$name] = $val;
+                    }
                 }
                 $value = $_values;
             }

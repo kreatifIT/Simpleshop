@@ -13,9 +13,17 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+$extras     = [];
 $addresses  = [];
 $user_id    = NULL;
 
+
+if (isset($_SESSION['checkout']['Order']))
+{
+    $_addresses[0] = $_SESSION['checkout']['Order']->getValue('address_1');
+    $_addresses[1] = $_SESSION['checkout']['Order']->getValue('address_2');
+    $extras        = $_SESSION['checkout']['Order']->getValue('address_extras');
+}
 if (Customer::isLoggedIn())
 {
     $User       = Customer::getCurrentUser();
@@ -24,13 +32,8 @@ if (Customer::isLoggedIn())
         ->where('customer_id', $user_id)
         ->find();
 }
-else if (isset($_SESSION['checkout']['Order']))
-{
-    $_addresses[0] = $_SESSION['checkout']['Order']->getValue('address_1');
-    $_addresses[1] = $_SESSION['checkout']['Order']->getValue('address_2');
-}
-$addresses[0] = isset($_addresses[0]) ? $_addresses[0] : CustomerAddress::create();
-$addresses[1] = isset($_addresses[1]) ? $_addresses[1] : CustomerAddress::create();
+$addresses[0] = isset($_addresses[0]) && !empty($_addresses[0]) ? $_addresses[0] : CustomerAddress::create();
+$addresses[1] = isset($_addresses[1]) && !empty($_addresses[1]) ? $_addresses[1] : CustomerAddress::create();
 
 $yform = new \rex_yform();
 $yform->addTemplatePath(\rex_path::addon('project') . 'templates');
@@ -43,8 +46,30 @@ $yform->setObjectparams('form_class', 'row column');
 $yform->setObjectparams('form_showformafterupdate', TRUE);
 
 
+if ($_SESSION['checkout']['as_guest'])
+{
+    /**
+     * Guest checkout
+     */
+    $yform->setValueField('text', [
+        'name' => 'email',
+        'label' => '###label.email###',
+        'default' => $extras['email'],
+        'required' => true
+    ]);
+    $yform->setValidateField('empty', [
+        'email',
+        strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.email###'])
+    ]);
+    $yform->setValidateField('email', [
+        'email',
+        '###error.email_not_valid###'
+    ]);
+}
+
+
 /**
- * Guest checkout
+ * Invoice address
  */
 $yform->setValueField('radio', [
     'name' => 'customer_address.1.salutation',
@@ -137,22 +162,22 @@ $yform->setValidateField('empty', [
     strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.phone###'])
 ]);
 
-$yform->setValueField('radio', [
-    'name' => 'customer_address.1.type',
-    'label' => '###shop.client_typ###',
-    'options' => '###label.private_customer###=P,###label.company###=C',
-    'default' => $addresses[0]->getValue('type') ?: 'P',
-    'inline' => true,
-    'required' => true,
-    'strong' => true
-]);
-
-$yform->setValueField('text', [
-    'name' => 'customer_address.1.vat_num',
-    'label' => '###label.vat_short###',
-    'default' => $addresses[0]->getValue('vat_num'),
-    'strong' => true
-]);
+//$yform->setValueField('radio', [
+//    'name' => 'customer_address.1.type',
+//    'label' => '###shop.client_typ###',
+//    'options' => '###label.private_customer###=P,###label.company###=C',
+//    'default' => $addresses[0]->getValue('type') ?: 'P',
+//    'inline' => true,
+//    'required' => true,
+//    'strong' => true
+//]);
+//
+//$yform->setValueField('text', [
+//    'name' => 'customer_address.1.vat_num',
+//    'label' => '###label.vat_short###',
+//    'default' => $addresses[0]->getValue('vat_num'),
+//    'strong' => true
+//]);
 
 $yform->setValueField('text', [
     'name' => 'customer_address.1.fiscal_code',
@@ -172,6 +197,7 @@ $yform->setValueField('checkbox', [
     'name' => 'use_shipping_address',
     'label' => '###shop.use_alternative_shipping_address###',
     'alternative_label' => '###shop.shipping_address###',
+    'default' => $extras['use_shipping_address'],
     'strong' => true
 ]);
 
@@ -179,7 +205,8 @@ $yform->setValueField('checkbox', [
  * Alternative shipping address
  */
 
-$yform->setValueField('html', ['opening_tag', '<div id="alternative-shipping-address" style="display: none;">']);
+$visibility_class =  $extras['use_shipping_address'] ?: 'style="display: none;"';
+$yform->setValueField('html', ['opening_tag', '<div id="alternative-shipping-address" '. $visibility_class .'>']);
 $yform->setValueField('text', [
     'name' => 'customer_address.2.firstname',
     'label' => '###label.firstname###',

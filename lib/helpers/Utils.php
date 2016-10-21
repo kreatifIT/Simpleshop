@@ -15,6 +15,31 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 class Utils
 {
+    public static function log($code, $msg, $type, $send_mail = FALSE)
+    {
+        $email    = \rex_addon::get('simpleshop')->getProperty('debug_email');
+        $log_path = \rex_path::addonData('simpleshop', 'log/');
+        $log_file = $log_path . date('d') . '.log';
+        $msg      = "{$code}: {$msg}\n";
+
+        if (!file_exists($log_path))
+        {
+            \rex_dir::create($log_path, TRUE);
+        }
+        // save to log file
+        $append = (int) date('d') == (int) date('d', @filemtime($log_file)) ? FILE_APPEND : NULL;
+        file_put_contents($log_file, "[" . date('Y-m-d H:i:s') . "] {$type} - ". $msg, $append);
+
+        if ($email && $send_mail)
+        {
+            $Mail = new \rex_mailer();
+            $Mail->addAddress($email);
+            $Mail->isHTML(TRUE);
+            $Mail->Subject = "Simpleshop Notice [{$type}]";
+            $Mail->Body    = '<div style="font-family:courier;font-size:12px;line-height:14px;width:760px;">' . str_replace("    ", "&nbsp;&nbsp;", nl2br($msg)) . '</div>';
+            $Mail->send();
+        }
+    }
 
     public static function getImageTag($file, $type, $params = [], $callback = NULL)
     {

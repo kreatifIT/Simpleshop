@@ -13,8 +13,10 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+$errors    = [];
 $_FUNC     = rex_request('func', 'string');
 $checkCart = $this->getVar('check_cart', TRUE);
+$products  = $this->getVar('products', NULL);
 
 if ($_FUNC == 'update')
 {
@@ -31,16 +33,19 @@ else if ($_FUNC == 'remove')
     exit();
 }
 
-try
+if ($products === NULL)
 {
-    $products = Session::getCartItems(FALSE, $checkCart);
-}
-catch (CartException $ex)
-{
-    if ($ex->getCode() == 1)
+    try
     {
-        $errors   = Session::$errors;
-        $products = Session::getCartItems();
+        $products = Session::getCartItems(FALSE, $checkCart);
+    }
+    catch (CartException $ex)
+    {
+        if ($ex->getCode() == 1)
+        {
+            $errors   = Session::$errors;
+            $products = Session::getCartItems();
+        }
     }
 }
 
