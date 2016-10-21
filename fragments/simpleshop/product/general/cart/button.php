@@ -28,13 +28,11 @@ if (!$quantity)
 <div class="clearfix">
     <?php if ($has_quantity_ctrl): ?>
         <div class="amount-increment clearfix">
-            <button class="button minus">-</button>
+            <span class="button minus">-</span>
             <input type="text" value="<?= $quantity ?>" name="quantity[<?= $product_key ?>]" readonly>
-            <button class="button plus">+</button>
+            <span class="button plus">+</span>
             <?php if ($has_refresh_button): ?>
-                <button class="button refresh" type="submit" name="func" value="update"><i class="fa fa-refresh"
-                                                                                           aria-hidden="true"></i>
-                </button>
+                <button class="button refresh" type="submit" name="func" value="update"><i class="fa fa-refresh" aria-hidden="true"></i></button>
             <?php endif; ?>
         </div>
     <?php elseif ($has_quantity): ?>

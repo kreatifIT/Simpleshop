@@ -31,7 +31,7 @@ $errors = $this->getVar('registration_errors');
             <input type="text" placeholder="###label.firstname###" name="firstname" value="<?= rex_post('firstname', 'string'); ?>"/>
             <input type="text" placeholder="###label.lastname###" name="lastname" value="<?= rex_post('lastname', 'string'); ?>"/>
             <input type="text" placeholder="###label.email###" name="email" value="<?= rex_post('email', 'string'); ?>"/>
-            <button type="submit" class="button" name="action" value="registration">###action.register###</button>
+            <button type="submit" class="button expanded" name="action" value="registration">###action.register###</button>
         </form>
     </div>
 </div>
