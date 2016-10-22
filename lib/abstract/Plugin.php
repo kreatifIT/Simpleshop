@@ -77,8 +77,18 @@ abstract class PluginAbstract
         return static::get();
     }
 
+    public function setValue($key, $value)
+    {
+        $this->$key = $value;
+    }
+
     public function getPluginName()
     {
         return $this->plugin_name;
+    }
+
+    public function getData()
+    {
+        return get_object_vars($this);
     }
 }

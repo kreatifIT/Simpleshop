@@ -21,6 +21,7 @@ class Utils
         $log_path = \rex_path::addonData('simpleshop', 'log/');
         $log_file = $log_path . date('d') . '.log';
         $msg      = "{$code}: {$msg}\n";
+        $type     = strtoupper($type);
 
         if (!file_exists($log_path))
         {

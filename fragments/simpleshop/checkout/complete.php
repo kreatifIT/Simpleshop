@@ -13,6 +13,21 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+$Order   = $this->getVar('order');
+$Payment = $Order->getValue('payment');
+$Shiping = $Order->getValue('shipping');
+
 ?>
 
-COMPLETE
+    <div class="row column">
+        <h2 class="text-center margin-small-bottom">###shop.order_placed###</h2>
+    </div>
+
+<?php
+
+$this->subfragment('simpleshop/payment/' . $Payment->plugin_name . '/order_complete.php');
+$this->subfragment('simpleshop/shipping/' . $Shiping->plugin_name . '/order_complete.php');
+
+// CLEAR THE SESSION
+Session::clearCheckout();
+Session::clearCart();

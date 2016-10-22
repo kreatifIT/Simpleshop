@@ -75,7 +75,7 @@ foreach ($_products as $product)
     </div>
 </div>
 
-<table class="table scroll">
+<table class="table">
     <thead>
     <tr>
         <th>###shop.produt_code###</th>

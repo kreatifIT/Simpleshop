@@ -15,34 +15,10 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Sprog\Wildcard;
 
-$User      = Customer::getCurrentUser();
-$user_id   = $User->getValue('id');
-$order_id  = rex_get('order_id', 'int');
-$show_list = TRUE;
+$orders = $this->getVar('orders');
 
-if ($order_id)
-{
-    $Order = Order::get($order_id);
-    // prove the user is associated to the order
-    if ($Order && $Order->getValue('customer_id') == $user_id)
-    {
-        $show_list = FALSE;
-        $this->setVar('order', $Order);
-        $this->subfragment('simpleshop/customer/customer_area/order/detail.php');
-    }
-}
-
-// ORDER LIST
-if ($show_list):
-
-    $orders = Order::query()
-        ->where('customer_id', $user_id)
-        ->find();
-
-    ?>
-
-    <?php if (count($orders)): ?>
-    <table class="table scroll">
+ if (count($orders)): ?>
+    <table class="table">
         <thead>
         <tr>
             <th>###shop.order_num###</th>
@@ -59,9 +35,11 @@ if ($show_list):
                 <td><?= $order->getValue('id') ?></td>
                 <td><?= format_date($order->getValue('updatedate')) ?></td>
                 <td>&euro; <?= $order->getValue('total') ?></td>
-                <td><?= Wildcard::get('shop.order_status_'. $order->getValue('status')) ?></td>
+                <td><?= Wildcard::get('shop.order_status_' . $order->getValue('status')) ?></td>
                 <td>
-                    <a href="<?= rex_getUrl(NULL, NULL, ['order_id' => $order->getValue('id')]) ?>">###label.details###</a>
+                    <a href="<?= rex_getUrl(NULL, NULL, ['ctrl'     => 'order.detail',
+                                                         'order_id' => $order->getValue('id'),
+                    ]) ?>">###label.details###</a>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -72,4 +50,3 @@ if ($show_list):
     ###label.no_orders###
 <?php endif; ?>
 
-<?php endif; ?>

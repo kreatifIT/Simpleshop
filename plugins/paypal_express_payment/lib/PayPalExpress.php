@@ -21,6 +21,8 @@ class PayPalExpress extends PaymentAbstract
     const LIVE_REDIRECT_URL    = 'https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=';
     const SANDBOX_REDIRECT_URL = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=';
 
+    protected $responses = [];
+
     public function getPrice()
     {
         // TODO: Implement getPrice() method.
@@ -56,6 +58,14 @@ class PayPalExpress extends PaymentAbstract
             throw new PaypalException($msg);
         }
 
+        if (count(\rex_yrewrite::getDomains()) > 1)
+        {
+            $base_url = \rex_yrewrite::getFullPath();
+        }
+        else
+        {
+            $base_url = '';
+        }
         $data = [
             'METHOD'  => 'SetExpressCheckout',
             'VERSION' => self::API_VERSION,
@@ -64,8 +74,8 @@ class PayPalExpress extends PaymentAbstract
             'PWD'       => $credentials['pwd'],
             'SIGNATURE' => $credentials['signature'],
 
-            'returnUrl' => rex_getUrl(NULL, NULL, ['action' => 'pay', 'payment_action' => 'complete']),
-            'cancelUrl' => rex_getUrl(NULL, NULL, ['action' => 'cancelled']),
+            'returnUrl' => $base_url . ltrim(rex_getUrl(NULL, NULL, ['action' => 'pay_process']), '/'),
+            'cancelUrl' => $base_url . ltrim(rex_getUrl(NULL, NULL, ['action' => 'cancelled']), '/'),
 
             'PAYMENTREQUEST_0_PAYMENTREQUESTID' => $order_id,
             'PAYMENTREQUEST_0_AMT'              => $total_amount, // total payment (including tax + shipping)
@@ -89,26 +99,36 @@ class PayPalExpress extends PaymentAbstract
         $sdata     = html_entity_decode(urldecode(http_build_query($data)));
         $Connector = new WSConnector($url);
         $Connector->setRespFormat('text/html');
-        $response = $Connector->request('', $sdata, 'post', 'PAYPAL-Express');
+        $response = $Connector->request('', $sdata, 'post', 'Paypal.initPayment');
 
         parse_str(urldecode($response['response']), $__response);
 
+        $logMsg = "
+            {$__response['L_LONGMESSAGE0']}
+            Data: " . print_r($data, TRUE) . "
+            Response: " . print_r($__response, TRUE) . "
+        ";
         if ($__response['ACK'] != 'Success')
         {
-            $msg = "{$__response['L_LONGMESSAGE0']}\nData: " . print_r($data, TRUE) . "\nResponse: " . print_r($__response, TRUE) . "\n";
-            Utils::log('Paypal.initPayment', $msg, 'ERROR', TRUE);
-            throw new \ErrorException($__response['L_LONGMESSAGE0']);
+            Utils::log('Paypal.initPayment.response', $logMsg, 'ERROR', TRUE);
+            throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
+        }
+        else
+        {
+            Utils::log('Paypal.initPayment.response', $logMsg, 'INFO');
+            $this->responses['initPayment'] = $__response;
+            $Order = Session::getCurrentOrder();
+            $Order->setValue('payment', $this);
         }
         // redirect to paypal
-        $url = $use_sandbox ? self::SANDBOX_REDIRECT_URL : self::LIVE_REDIRECT_URL;
-        header('Location: ' . $url . $__response['TOKEN']);
-        exit();
+        return ($use_sandbox ? self::SANDBOX_REDIRECT_URL : self::LIVE_REDIRECT_URL) .  $__response['TOKEN'];
     }
 
     public function processPayment($token, $payer_id, $total_amount)
     {
-        $credentials = \rex::getProperty($key);
         $use_sandbox = \rex::getProperty('use_paypal_sandbox');
+        $key         = $use_sandbox ? 'paypal_credentials_sandbox' : 'paypal_credentials_live';
+        $credentials = \rex::getProperty($key);
         $url         = $use_sandbox ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
 
         $data = [
@@ -129,24 +149,42 @@ class PayPalExpress extends PaymentAbstract
         $sdata     = html_entity_decode(urldecode(http_build_query($data)));
         $Connector = new WSConnector($url);
         $Connector->setRespFormat('text/html');
-        $response = $Connector->request('', $sdata, 'post', 'PAYPAL-Express');
+        $response = $Connector->request('', $sdata, 'post', 'Paypal.processPayment');
 
-        parse_str(urldecode($response), $__response);
+        parse_str(urldecode($response['response']), $__response);
+
+        $logMsg = "
+            {$__response['L_LONGMESSAGE0']}
+            Data: " . print_r($data, TRUE) . "
+            Response: " . print_r($__response, TRUE) . "
+        ";
 
         if ($__response['ACK'] != 'Success')
         {
-            $msg = "{$__response['L_LONGMESSAGE0']}\nData: " . print_r($data, TRUE) . "\nResponse: " . print_r($__response, TRUE) . "\n";
-            Utils::log('Paypal.initPayment', $msg, 'ERROR', TRUE);
+
+            Utils::log('Paypal.processPayment.response', $logMsg, 'ERROR', TRUE);
             throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
         }
         if ($__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Completed')
         {
-            $msg = "The Payment with Transaction-ID = {$__response['PAYMENTINFO_0_TRANSACTIONID']} "
-                . "has status = '{$__response['PAYMENTINFO_0_PAYMENTSTATUS']}'\n";
-            Utils::log('Paypal.initPayment', $msg, 'ERROR', TRUE);
+            $logMsg = "
+                The Payment with Transaction-ID = {$__response['PAYMENTINFO_0_TRANSACTIONID']} "
+                . "has status = '{$__response['PAYMENTINFO_0_PAYMENTSTATUS']}'
+            ";
+            Utils::log('Paypal.processPayment.response', $logMsg, 'ERROR', TRUE);
             throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
         }
-        return $__response['PAYMENTINFO_0_TRANSACTIONID'];
+        else
+        {
+            // log successful payment
+            Utils::log('Paypal.processPayment.response', $logMsg, 'INFO');
+            $this->responses['processPayment'] = $__response;
+            $Order = Session::getCurrentOrder();
+            $Order->setValue('payment', $this);
+            // update status
+            $Order->setValue('status', 'IP');
+        }
+        return $__response;
     }
 }
 

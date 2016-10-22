@@ -37,6 +37,38 @@ class Session extends Model
         $sql->setQuery("DELETE FROM " . $_this->getTableName() . " WHERE session_id NOT IN('" . implode("', '", $sessions) . "')");
     }
 
+    public static function getCheckoutData($key = NULL, $default = NULL)
+    {
+        if ($key)
+        {
+            return array_key_exists($key, $_SESSION['checkout']) && $_SESSION['checkout'][$key] !== NULL ? $_SESSION['checkout'][$key] : $default;
+        }
+        else
+        {
+
+            return $_SESSION['checkout'];
+        }
+    }
+
+    public static function setCheckoutData($key, $value)
+    {
+        return $_SESSION['checkout'][$key] = $value;
+    }
+
+    public static function getCurrentOrder()
+    {
+        if (!isset ($_SESSION['checkout']['Order']))
+        {
+            $_SESSION['checkout']['Order'] = Order::create();
+        }
+        return $_SESSION['checkout']['Order'];
+    }
+
+    public static function clearCheckout()
+    {
+        $_SESSION['checkout'] = [];
+    }
+
     public static function getSession()
     {
         if (self::$session === NULL)

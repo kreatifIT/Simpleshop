@@ -16,10 +16,11 @@ namespace FriendsOfREDAXO\Simpleshop;
 $shippings = Shipping::getAll();
 $payments  = Payment::getAll();
 
-if ($_SESSION['checkout']['Order'])
+if (Session::getCheckoutData('Order'))
 {
-    $this->setVar('shipping', $_SESSION['checkout']['Order']->getValue('shipping'));
-    $this->setVar('payment', $_SESSION['checkout']['Order']->getValue('payment'));
+    $Order = Session::getCurrentOrder();
+    $this->setVar('shipping', $Order->getValue('shipping'));
+    $this->setVar('payment', $Order->getValue('payment'));
 }
 
 ?>

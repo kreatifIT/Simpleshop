@@ -11,16 +11,10 @@
  * file that was distributed with this source code.
  */
 
-namespace FriendsOfREDAXO\Simpleshop;
-
-class PickUp extends ShippingAbstract
+function checkstr($string, $default = '')
 {
-    public function getPrice()
-    {
+    if (strlen(trim($string)) == '') {
+        $string = $default;
     }
-
-    public function getName()
-    {
-        return '###label.shipping_pickup_point###';
-    }
+    return $string;
 }

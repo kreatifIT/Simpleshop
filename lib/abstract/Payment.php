@@ -31,9 +31,4 @@ abstract class PaymentAbstract extends PluginAbstract
     {
         return Payment::getByClass(get_called_class());
     }
-
-    public function getData()
-    {
-
-    }
 }

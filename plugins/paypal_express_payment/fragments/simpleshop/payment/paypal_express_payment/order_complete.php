@@ -13,14 +13,5 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-class PickUp extends ShippingAbstract
-{
-    public function getPrice()
-    {
-    }
-
-    public function getName()
-    {
-        return '###label.shipping_pickup_point###';
-    }
-}
+?>
+<div class="row margin-bottom"></div>

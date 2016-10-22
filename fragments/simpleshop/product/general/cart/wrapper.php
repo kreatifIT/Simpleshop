@@ -20,8 +20,8 @@ $products  = $this->getVar('products', NULL);
 
 if ($_FUNC == 'update')
 {
-    $products = rex_post('quantity', 'array', []);
-    foreach ($products as $key => $quantity)
+    $__products = rex_post('quantity', 'array', []);
+    foreach ($__products as $key => $quantity)
     {
         Session::setProductQuantity($key, $quantity);
     }
@@ -48,6 +48,7 @@ if ($products === NULL)
         }
     }
 }
+
 
 if (count($errors)):
     foreach ($errors as $error): ?>
@@ -84,5 +85,7 @@ endif;
         </table>
     </form>
 <?php else: ?>
-    <p class="text-center margin">###label.no_product_in_cart###</p>
+    <div class="margin-bottom margin-top">
+        <p class="text-center padding-bottom">###shop.no_products_in_cart###</p>
+    </div>
 <?php endif; ?>

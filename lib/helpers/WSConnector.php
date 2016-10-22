@@ -185,20 +185,20 @@ class WSConnector
             {
                 $message = "Service did not respond within " . self::CURL_TIMEOUT . " milliseconds";
                 $this->log('Request.timeout', $message, 'ERROR');
-                throw new \ErrorException($message, 1);
+                throw new WSConnectorException($message, 1);
             }
             else
             {
                 $message = "The Server is not reachable";
                 $this->log('Server.not-reachable', $message, 'ERROR');
-                throw new \ErrorException($message, 2);
+                throw new WSConnectorException($message, 2);
             }
         }
         else if ($__resp_status < 200 || $__resp_status > 299)
         {
             $message = "Response is a {$__resp_status} message";
             $this->log('Response.invalid-status', $message, 'ERROR');
-            throw new \ErrorException($message, 3);
+            throw new WSConnectorException($message, 3);
         }
 
         // everything fine - parse response
@@ -213,3 +213,6 @@ class WSConnector
         return $this->response;
     }
 }
+
+
+class WSConnectorException extends \Exception {}

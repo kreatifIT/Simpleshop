@@ -13,7 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$Order     = $_SESSION['checkout']['Order'];
+$Order     = $this->getVar('order');
 $errors    = $Order->calculateDocument();
 $address_1 = $Order->getValue('address_1');
 $address_2 = $Order->getValue('address_2');
@@ -21,7 +21,6 @@ $shipping  = $Order->getValue('shipping');
 $payment   = $Order->getValue('payment');
 $extras    = $Order->getValue('address_extras');
 
-//pr($Order); exit;
 
 if (count($errors)): ?>
     <div class="row column">
@@ -40,6 +39,10 @@ if (count($errors)): ?>
     $this->setVar('title', '###shop.invoice_address###');
     $this->setVar('url', rex_getUrl(NULL, NULL, ['step' => 2]));
     $this->setVar('address', $address_1);
+    if (Session::getCheckoutData('as_guest'))
+    {
+        $this->setVar('email', $extras['email']);
+    }
     $this->subfragment('simpleshop/checkout/summary/address_item.php');
     ?>
 

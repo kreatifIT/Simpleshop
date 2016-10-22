@@ -30,9 +30,4 @@ abstract class ShippingAbstract extends PluginAbstract
     {
         return Shipping::getByClass(get_called_class());
     }
-
-    public function getData()
-    {
-
-    }
 }

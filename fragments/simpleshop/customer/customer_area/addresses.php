@@ -13,14 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-class PickUp extends ShippingAbstract
-{
-    public function getPrice()
-    {
-    }
-
-    public function getName()
-    {
-        return '###label.shipping_pickup_point###';
-    }
-}
+$this->setVar('show_address_as_list', TRUE);
+$this->setVar('show_back_and_ahead_btn', FALSE);
+$this->subfragment('simpleshop/checkout/customer/address_form.php');

@@ -22,7 +22,7 @@ $login_errors = $this->getVar('login_errors');
         <p>###shop.login_text###</p>
         <?php if (count($login_errors)): ?>
             <?php foreach ($login_errors as $error): ?>
-                <p class="error red"><?= $error ?></p>
+                <div class="callout alert"><?= $error ?></div>
             <?php endforeach; ?>
         <?php endif; ?>
         <form action="" method="post">
