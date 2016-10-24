@@ -161,11 +161,19 @@ if (strlen($image) == 0 && isset($gallery[0])) {
             </div>
             <div class="checkout">
                 <?php
-                $product_variant = $default_color_id . ',' . $default_packaging_id;
+                if(count($variants['mapping']))
+                {
+                    $variant_key = array_keys($variants['variants']);
+                }
+                else
+                {
+                    $variant_key = [''];
+                }
                 $this->setVar('button-cart-counter', 1);
                 $this->setVar('has_quantity_control', TRUE);
                 $this->setVar('has_add_to_cart_button', TRUE);
-                $this->setVar('product_key', $product->getValue('id') . '|' . $product_variant);
+                $this->setVar('is_disabled', $product->getValue('amount') <= 0);
+                $this->setVar('product_key', $product->getValue('id') . '|' . $variant_key[0]);
                 echo $this->subfragment('simpleshop/product/general/cart/button.php');
                 ?>
             </div>

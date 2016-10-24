@@ -241,15 +241,31 @@ class Product extends Model
             $_this->applyVariantData($variant->getData());
         }
 
-        foreach ($feature_ids as $feature_id)
+        if (count($feature_ids))
         {
-            // get variants
-            $feature = FeatureValue::query()->where('id', $feature_id)->where('status', 1)->findOne();
-            if (!$feature)
+            foreach ($feature_ids as $feature_id)
             {
-                throw new ProductException("No feature with ID = " . $feature_id . " exists --key:{$key}", 2);
+                // get variants
+                $feature = FeatureValue::query()->where('id', $feature_id)->where('status', 1)->findOne();
+                if (!$feature)
+                {
+                    throw new ProductException("No feature with ID = " . $feature_id . " exists --key:{$key}", 2);
+                }
+                else if ($_this->getValue('amount') <= 0)
+                {
+                    // make some availabilty checks
+                    throw new ProductException("Product not available any more --key:{$key}", 4);
+                }
+                else if ($_this->getValue('inventory') == 'F' && $_this->getValue('amount') < $_this->getValue('cart_quantity'))
+                {
+                    throw new ProductException("Amount of product is lower than cart quantity --key:{$key}", 5);
+                }
+                $features[] = $feature;
             }
-            else if ($_this->getValue('amount') <= 0)
+        }
+        else
+        {
+            if ($_this->getValue('amount') <= 0)
             {
                 // make some availabilty checks
                 throw new ProductException("Product not available any more --key:{$key}", 4);
@@ -258,7 +274,6 @@ class Product extends Model
             {
                 throw new ProductException("Amount of product is lower than cart quantity --key:{$key}", 5);
             }
-            $features[] = $feature;
         }
         $_this->features = $features;
         return $_this;

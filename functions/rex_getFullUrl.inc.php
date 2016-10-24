@@ -11,7 +11,7 @@
  * file that was distributed with this source code.
  */
 
-if (!function_exists('pr'))
+if (!function_exists('rex_getFullUrl'))
 {
     function rex_getFullUrl($id = NULL, $clang_id = NULL, $params = [])
     {

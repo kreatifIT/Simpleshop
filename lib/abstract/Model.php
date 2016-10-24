@@ -55,17 +55,40 @@ abstract class Model extends \rex_yform_manager_dataset
 
     public static function unprepare($value)
     {
-        if (is_string($value) && substr($value, 0, 10) == '{"class":"')
+        if (is_string($value))
         {
-            $_data  = json_decode($value);
-            $Object = call_user_func([$_data->class, 'create']);
-            $data   = (array) $_data->data;
+            $decoded_json = json_decode($value, TRUE);
 
-            foreach ($data as $name => $value)
+            if (json_last_error() == JSON_ERROR_NONE)
             {
-                $Object->setValue($name, $value);
+                $value  = $decoded_json;
+
+                if (isset ($value['class']))
+                {
+                    if (class_exists($value['class']))
+                    {
+                        $Object = call_user_func([$value['class'], 'create']);
+                    }
+                    else
+                    {
+                        $Object = Std::create();
+                    }
+                    $data   = (array) $value['data'];
+
+                    foreach ($data as $name => $value)
+                    {
+                        $Object->setValue($name, $value);
+                    }
+                    $value = $Object;
+                }
+                else if (is_array ($value))
+                {
+                    foreach ($value as $name => &$val)
+                    {
+                        $val = self::unprepare($val);
+                    }
+                }
             }
-            $value = $Object;
         }
         return $value;
     }
@@ -91,7 +114,7 @@ abstract class Model extends \rex_yform_manager_dataset
                         $_values[$name] = $val;
                     }
                 }
-                $value = $_values;
+                $value = json_encode($_values);
             }
             else if (is_object($value))
             {

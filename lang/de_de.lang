@@ -14,6 +14,9 @@ error.cannot_delete_value = Der Wert "{{name}}" kann nicht gelöscht werden da f
 error.no_product_choosen = Kein Produkt ausgewählt
 error.product_has_attribute = Das Produkt hat keine Eigenschaften zugewiesen. Klicken Sie {{link}}hier{{/link}} und weisen sie Eigenschaften zu.
 
+settings.order_settings = Bestellungs-Einstellungen
+settings.order_notification_email = Email für neue Bestellungen
+
 
 
 

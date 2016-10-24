@@ -15,13 +15,16 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 class Omest extends ShippingAbstract
 {
+    protected $price = 5;
+    protected $name  = '###shop.standard_shipping###';
+
     public function getPrice()
     {
-        return 5.60;
+        return $this->price;
     }
 
     public function getName()
     {
-        return '###label.standard_shipping###';
+        return $this->name;
     }
 }

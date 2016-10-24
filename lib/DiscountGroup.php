@@ -31,7 +31,7 @@ class DiscountGroup extends Model
             $price  = $discount->getValue('price');
             $amount = $discount->getValue('amount');
 
-            if ($price > $order_total || $amount > $order_quantity)
+            if ($order_total > $price || $order_quantity > $amount)
             {
                 $discount_id = $discount->getValue('id');
                 $_this       = self::get($discount_id)->applyToOrder($Order);
@@ -46,24 +46,25 @@ class DiscountGroup extends Model
 
     public function applyToOrder($Order)
     {
-
         if ($this->getValue('free_shipping'))
         {
             $Order->setValue('shipping_costs', 0);
         }
         else if ($this->getValue('discount_value') > 0)
         {
-            $difference = $this->getValue('discount_value');
-            $Order->setValue('total', $Order->getValue('total') - $difference);
-            $this->setValue('difference', $difference);
+            $_discount = $this->getValue('discount_value');
+            $Order->setValue('total', $Order->getValue('total') - $_discount);
+            $this->setValue('discount', $_discount);
         }
         else if ($this->getValue('discount_percent') > 0)
         {
-            $subtotal   = $Order->getValue('subtotal');
-            $difference = $subtotal / 100 * $this->getValue('discount_percent');
-            $Order->setValue('total', $Order->getValue('total') - $difference);
-            $this->setValue('difference', $difference);
+            $subtotal = $Order->getValue('subtotal');
+            $_discount = $subtotal / 100 * $this->getValue('discount_percent');
+            $Order->setValue('total', $Order->getValue('total') - $_discount);
+            $this->setValue('discount', $_discount);
         }
+        $Order->setValue('discount', $Order->getValue('discount') + $_discount);
+        
         return $this;
     }
 }

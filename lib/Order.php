@@ -27,16 +27,18 @@ class Order extends Model
     }
 
 
-    public function save()
+    public function save($create_order = FALSE)
     {
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this));
 
-        $result = parent::save(TRUE);
+        $create_order = $create_order && !$this->getValue('id');
+        $result       = parent::save(TRUE);
 
         if ($result)
         {
             $order_id = $this->getValue('id');
             $products = Session::getCartItems(FALSE, FALSE);
+            $this->setValue('createdate', date('Y-m-d H:i:s'));
 
             // clear all products first
             \rex_sql::factory()->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$order_id}");
@@ -45,16 +47,33 @@ class Order extends Model
             foreach ($products as $product)
             {
                 $prod_data = Model::prepare($product);
+                $quantity  = $product->getValue('cart_quantity');
+
 
                 foreach ($prod_data as $name => $value)
                 {
                     $product->setValue($name, $value);
                 }
+                if ($create_order && $product->getValue('inventory') == 'F')
+                {
+                    // update inventory
+                    if ($product->getValue('variant_key'))
+                    {
+                        $Variant = Variant::getByVariantKey($product->getValue('key'));
+                        $Variant->setValue('amount', $Variant->getValue('amount') - $quantity);
+                        $Variant->save();
+                    }
+                    else
+                    {
+                        $product->setValue('amount', $product->getValue('amount') - $quantity);
+                        $product->save();
+                    }
+                }
                 OrderProduct::create()
                     ->setValue('order_id', $order_id)
                     ->setValue('product_id', $product->getValue('id'))
                     ->setValue('code', $product->getValue('code'))
-                    ->setValue('quantity', $product->getValue('cart_quantity'))
+                    ->setValue('quantity', $quantity)
                     ->setValue('data', $product)
                     ->save(TRUE);
             }
@@ -64,10 +83,12 @@ class Order extends Model
 
     public function calculateDocument()
     {
-        $errors         = [];
-        $this->tax      = 0;
-        $this->subtotal = 0;
-        $this->quantity = 0;
+        $errors           = [];
+        $this->tax        = 0;
+        $this->subtotal   = 0;
+        $this->quantity   = 0;
+        $this->discount   = 0;
+        $this->promotions = [];
 
         try
         {
@@ -98,5 +119,34 @@ class Order extends Model
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.calculateDocument', $this));
 
         return $errors;
+    }
+
+    public static function ext_yform_saved($params)
+    {
+        $result = $params->getSubject();
+
+        if ($result !== FALSE && $params->getParam('table') == self::TABLE)
+        {
+            $dataset = $params->getParam('form')->getParam('manager_dataset');
+            if (!$dataset)
+            {
+                $dataset = rex_yform_manager_dataset::getRaw($params->getParam('id'), $table->getTableName());
+            }
+        }
+    }
+
+    public static function ext_yform_data_delete($params)
+    {
+        $result = $params->getSubject();
+
+        if ($result !== FALSE && $params->getParam('table')->getTableName() == self::TABLE)
+        {
+            // remove all related order products
+            $obj_id = $params->getParam('data_id');
+            $query  = "DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$obj_id}";
+            $sql    = \rex_sql::factory();
+            $sql->setQuery($query);
+        }
+        return $result;
     }
 }

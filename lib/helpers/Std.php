@@ -13,11 +13,12 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-class BankTransfer extends PaymentAbstract
+class Std extends PluginAbstract
 {
-    protected $price = 0;
-    protected $name  = '###shop.bank_transfer###';
-    protected $info  = '###shop.bank_transfer_payment_info###';
+    public static function get()
+    {
+        return new self();
+    }
 
     public function getPrice()
     {
@@ -29,3 +30,4 @@ class BankTransfer extends PaymentAbstract
         return $this->name;
     }
 }
+

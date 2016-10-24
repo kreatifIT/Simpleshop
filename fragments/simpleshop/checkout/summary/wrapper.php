@@ -110,16 +110,19 @@ if (count($errors)): ?>
     <h3>###shop.promotions###</h3>
     <p>###shop.applied_promotion_text###</p>
     <?php
-    foreach ($promotions as $promotion)
+    if ($promotions)
     {
-        if ($promotion->getValue('difference'))
+        foreach ($promotions as $promotion)
         {
-            $discounts[] = ['name'  => $promotion->getValue(sprogfield('name')),
-                            'value' => $promotion->getValue('difference'),
-            ];
+            if ($promotion->getValue('discount'))
+            {
+                $discounts[] = ['name'  => $promotion->getValue(sprogfield('name')),
+                                'value' => $promotion->getValue('discount'),
+                ];
+            }
+            $this->setVar('promotion', $promotion);
+            $this->subfragment('simpleshop/checkout/summary/discount_item.php');
         }
-        $this->setVar('promotion', $promotion);
-        $this->subfragment('simpleshop/checkout/summary/discount_item.php');
     }
     ?>
 </div>
@@ -137,32 +140,11 @@ if (count($errors)): ?>
 </div>
 
 <!-- Summe -->
-<div class="row column">
-    <div class="order-total">
-        <div class="subtotal">
-            <span>&euro; <?= format_price($Order->getValue('tax')) ?></span>
-            <span>###label.tax_included###</span>
-        </div>
-        <div class="subtotal">
-            <span>&euro; <?= format_price($Order->getValue('subtotal')) ?></span>
-            <span>###label.subtotal###</span>
-        </div>
-        <div class="subtotal ">
-            <span>&euro; <?= format_price($Order->getValue('shipping_costs')) ?></span>
-            <span>###label.shipment_cost###</span>
-        </div>
-        <?php foreach ($discounts as $discount): ?>
-            <div class="subtotal ">
-                <span>&euro; -<?= format_price($discount['value']) ?></span>
-                <span><?= $discount['name'] ?></span>
-            </div>
-        <?php endforeach; ?>
-        <div class="subtotal total">
-            <span>&euro; <?= format_price($Order->getValue('total')) ?></span>
-            <span>###label.total_sum###</span>
-        </div>
-    </div>
-</div>
+<?php
+$this->setVar('discounts', $discounts);
+$this->subfragment('simpleshop/checkout/summary/conclusion.php');
+?>
+
 
 <form action="" method="post">
     <!-- AGB -->

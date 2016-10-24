@@ -13,4 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+
+
 rex_redirect(null, null, ['action' => 'complete']);

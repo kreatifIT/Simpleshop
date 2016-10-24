@@ -35,7 +35,7 @@ class Customer extends Model
         return $result;
     }
 
-    public static function register($email, $password, $attributes = [])
+    public static function register($email, $password, $attributes = [], $send_email = TRUE)
     {
         $result = NULL;
         $User   = self::getUserByEmail($email);
@@ -78,6 +78,24 @@ class Customer extends Model
         ]))
         )
         {
+            $Mail          = new Mail();
+            $Mail->Subject = '###shop.email.user_registration_subject###';
+            $Mail->setFragmentPath('customer/registration');
+
+            // add vars
+            $Mail->setVar('email', $email);
+            $Mail->setVar('password', $password);
+            $Mail->AddAddress($email);
+
+            if (\rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.sendRegistrationEmail', TRUE, [
+                'Mail'     => $Mail,
+                'User'     => $_this,
+                'password' => $password,
+            ]))
+            )
+            {
+                $Mail->send();
+            }
             $result = $_this;
         }
         return $result;
@@ -124,6 +142,25 @@ class Customer extends Model
         {
             $password = self::generateRandomString(self::MIN_PASSWORD_LENGTH);
             $User->setValue('password', $password)->save();
+
+            $Mail          = new Mail();
+            $Mail->Subject = '###shop.email.user_password_reset###';
+            $Mail->setFragmentPath('customer/password_reset');
+
+            // add vars
+            $Mail->setVar('password', $password);
+            $Mail->setVar('User', $User);
+            $Mail->AddAddress($email);
+
+            if (\rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.resetPasswordEmail', TRUE, [
+                'Mail'     => $Mail,
+                'User'     => $User,
+                'password' => $password,
+            ]))
+            )
+            {
+                $Mail->send();
+            }
         }
         return $password;
     }

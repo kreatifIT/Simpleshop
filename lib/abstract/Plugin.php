@@ -71,10 +71,22 @@ abstract class PluginAbstract
     public $plugin_name;
 
     public abstract static function get();
+    public abstract function getName();
 
     public static function create()
     {
         return static::get();
+    }
+
+    public function getValue($key)
+    {
+        $value = NULL;
+
+        if (property_exists($this, $key))
+        {
+            $value = $this->$key;
+        }
+        return $value;
     }
 
     public function setValue($key, $value)

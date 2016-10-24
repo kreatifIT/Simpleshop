@@ -13,35 +13,20 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$sql   = \rex_sql::factory();
-$_FUNC = rex_request('func', 'string');
-pr($_FUNC);
+$_FUNC = rex_post('func', 'string');
+
+if($_FUNC == 'save')
+{
+    unset($_POST['func']);
+    \rex::setConfig('simpleshop.Settings', $_POST);
+}
 
 $sections = '';
-//$content  = '
-//        <h3>' . $this->i18n('settings') . '</h3>
-//        <p>' . $this->i18n('setup_column_creating_text') . '</p>
-//        <div class="row">
-//            <div class="col-sm-12">
-//                <div class="rex-select-style">
-//                    ' . \rex_var_linklist::getWidget(1, 'test', '') . '
-//                </div>
-//            </div>
-//        </div>
-//';
-$content  = '
-    <fieldset>
-        <legend>' . $this->i18n('url_settings') . '</legend>
-        <p>' . $this->i18n('setup_column_creating_text') . '</p>
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="rex-select-style">
-                    ' . \rex_var_linklist::getWidget(1, 'test', '') . '
-                </div>
-            </div>
-        </div>
-    </fieldset>
-';
+$fragment = new \rex_fragment();
+$fragment->setVar('Addon', $this);
+$fragment->setVar('Settings', \rex::getConfig('simpleshop.Settings'));
+$content  = $fragment->parse('simpleshop/backend/settings.php');
+
 $fragment = new \rex_fragment();
 $fragment->setVar('body', $content, FALSE);
 $fragment->setVar('class', 'edit', FALSE);

@@ -18,6 +18,7 @@ $image       = $product->getValue('image');
 $badge       = $product->getValue('badge');
 $price       = $product->getValue('price');
 $offer_price = $product->getValue('reduced_price');
+$variants    = $product->getFeatureVariants();
 $product_url = $product->getUrl();
 
 if (strlen($image) == 0 && strlen($product->getValue('gallery')))
@@ -47,8 +48,18 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
             <span class="price">&euro; <?= format_price($offer_price > 0 ? $offer_price : $price) ?></span>
         </div>
         <?php
-        $this->setVar('product_key', $product->getValue('id').'|');
+        if(count($variants['mapping']))
+        {
+            $variant_key = array_keys($variants['variants']);
+        }
+        else
+        {
+            $variant_key = [''];
+        }
+        $this->setVar('is_disabled', $product->getValue('amount') <= 0);
+        $this->setVar('product_key', $product->getValue('id').'|'. $variant_key[0]);
         $this->setVar('has_quantity_control', FALSE);
+        $this->setVar('has_quantity', FALSE);
         $this->setVar('has_add_to_cart_button', TRUE);
         echo $this->subfragment('simpleshop/product/general/cart/button.php');
         ?>

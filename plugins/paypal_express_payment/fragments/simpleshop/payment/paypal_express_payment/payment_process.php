@@ -15,6 +15,9 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Sprog\Wildcard;
 
+// set local for paypal
+setlocale(LC_ALL, 'en_US');
+
 $errors = [];
 $Order    = $this->getVar('order');
 $Payment  = $Order->getValue('payment');

@@ -14,13 +14,14 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-$order     = $this->getVar('order');
-$order_id  = $order->getValue('id');
-$address_1 = $order->getValue('address_1');
-$address_2 = $order->getValue('address_2');
-$shipping  = $order->getValue('shipping');
-$payment   = $order->getValue('payment');
-$extras    = $order->getValue('address_extras');
+$order      = $this->getVar('order');
+$order_id   = $order->getValue('id');
+$address_1  = $order->getValue('address_1');
+$address_2  = $order->getValue('address_2');
+$shipping   = $order->getValue('shipping');
+$payment    = $order->getValue('payment');
+$promotions = $order->getValue('promotions');
+$extras     = $order->getValue('address_extras');
 
 $products  = [];
 $_products = OrderProduct::query()->where('order_id', $order_id)->find();
@@ -71,7 +72,7 @@ foreach ($_products as $product)
 
     <div class="medium-6 columns margin-bottom">
         <h3>###label.payment###</h3>
-        <p><?= $payment->getName() ?><br/><?= $payment->getPaymentInfo() ?></p>
+        <p><?= $payment->getName() ?><br/><?= $payment->getValue('info') ?></p>
     </div>
 </div>
 
@@ -101,23 +102,24 @@ foreach ($_products as $product)
 </table>
 
 <!-- Summe -->
-<div class="row column">
-    <div class="order-total">
-        <div class="subtotal">
-            <span>&euro; <?= format_price($order->getValue('tax')) ?></span>
-            <span>###label.tax_included###</span>
-        </div>
-        <div class="subtotal">
-            <span>&euro; <?= format_price($order->getValue('subtotal')) ?></span>
-            <span>###label.subtotal###</span>
-        </div>
-        <div class="subtotal ">
-            <span>&euro; <?= format_price($order->getValue('shipping_costs')) ?></span>
-            <span>###label.shipment_cost###</span>
-        </div>
-        <div class="subtotal total">
-            <span>&euro; <?= format_price($order->getValue('total')) ?></span>
-            <span>###label.total_sum###</span>
-        </div>
-    </div>
-</div>
+<?php
+
+$discounts = [];
+
+if ($promotions)
+{
+    foreach ($promotions as $promotion)
+    {
+        if ($promotion->getValue('discount'))
+        {
+            $discounts[] = [
+                'name'  => $promotion->getValue(sprogfield('name')),
+                'value' => $promotion->getValue('discount'),
+            ];
+        }
+    }
+}
+$this->setVar('discounts', $discounts);
+$this->subfragment('simpleshop/checkout/summary/conclusion.php');
+?>
+

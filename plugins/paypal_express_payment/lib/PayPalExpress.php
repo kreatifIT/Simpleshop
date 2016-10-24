@@ -22,20 +22,17 @@ class PayPalExpress extends PaymentAbstract
     const SANDBOX_REDIRECT_URL = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=';
 
     protected $responses = [];
+    protected $price = 0;
+    protected $name  = '###shop.paypal_express###';
 
     public function getPrice()
     {
-        return 0;
+        return $this->price;
     }
 
     public function getName()
     {
-        return '###label.paypal_express###';
-    }
-
-    public function getPaymentInfo()
-    {
-        return '';
+        return $this->name;
     }
 
     public function initPayment($order_id, $total_amount, $order_descr, $show_cc = FALSE)

@@ -13,6 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+$is_disabled            = $this->getVar('is_disabled', FALSE);
 $quantity               = $this->getVar('cart-quantity');
 $product_key            = $this->getVar('product_key');
 $has_quantity           = $this->getVar('has_quantity', TRUE);
@@ -39,10 +40,17 @@ if (!$quantity)
         <?= $quantity ?>
     <?php endif; ?>
     <?php if ($has_add_to_cart_button): ?>
+        <?php if ($is_disabled): ?>
+        <a class="add-to-cart disabled">
+            <i class="fa fa-exclamation" aria-hidden="true"></i>
+            <span>###shop.product_not_available###</span>
+        </a>
+        <?php else: ?>
         <a class="add-to-cart fbox" href="#shop-modal" data-product_key="<?= $product_key ?>"
            data-quantity="<?= $quantity ?>">
             <i class="fa fa-cart-plus" aria-hidden="true"></i>
-            <span><?= $this->i18n('action.add_to_cart'); ?></span>
+            <span>###action.add_to_cart###</span>
         </a>
+        <?php endif; ?>
     <?php endif; ?>
 </div>

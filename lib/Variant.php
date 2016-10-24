@@ -17,6 +17,15 @@ class Variant extends Model
 {
     const TABLE = "rex_shop_product_has_feature";
 
+    public static function getByVariantKey($key)
+    {
+        list ($product_id, $variant_key) = explode('|', $key);
+        return self::query()
+            ->where('product_id', $product_id)
+            ->where('variant_key', $variant_key)
+            ->findOne();
+    }
+
     public function applyProductData($product)
     {
         $variant_data = $this->getData();

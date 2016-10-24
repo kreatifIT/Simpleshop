@@ -14,10 +14,15 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $login_errors = $this->getVar('login_errors');
+$action       = rex_post('action');
 
 ?>
 <div class="<?= $this->getVar('class') ?>">
-    <div id="login">
+
+    <div id="login" <?php if ($action != '' && $action != 'login')
+    {
+        echo 'style="display: none;"';
+    } ?>>
         <h3>###label.login###</h3>
         <p>###shop.login_text###</p>
         <?php if (count($login_errors)): ?>
@@ -33,18 +38,23 @@ $login_errors = $this->getVar('login_errors');
         </form>
     </div>
 
-    <div id="lost-password" style="display: none;">
+    <div id="lost-password" <?php if ($action != 'password-reset')
+    {
+        echo 'style="display: none;"';
+    } ?>>
         <h3>###label.password_forgotten###</h3>
         <p>###label.pwd_reset_msg###</p>
-        <form action="" method="post">
-            <input type="text" name="email" placeholder="###label.email###" value="<?= rex_post('email', 'string'); ?>">
+        <?php if ($this->getVar('success')): ?>
+            <div class="callout secondary">###notif.password_reset_msg###</div>
             <span class="back-to-login-button button button-gray expanded">###action.back_to_login###</span>
-            <button type="submit" class="button expanded" name="action" value="login">###action.send###</button>
-        </form>
-        <!-- popup -->
-        <div id="login-modal" class="login-modal" style="display: none;">
-            <div class="row shop-modal-content">###notif.password_reset_msg###</div>
-            <span class="button expanded">###general.ok###</span>
-        </div>
+        <?php else: ?>
+            <form action="" method="post">
+                <input type="text" name="email" placeholder="###label.email###"
+                       value="<?= rex_post('email', 'string'); ?>">
+                <span class="back-to-login-button button button-gray expanded">###action.back_to_login###</span>
+                <button type="submit" class="button expanded" name="action" value="password-reset">###action.send###
+                </button>
+            </form>
+        <?php endif ?>
     </div>
 </div>

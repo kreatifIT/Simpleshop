@@ -27,6 +27,7 @@ if ($_FUNC == 'login')
     $redirect = from_array($_SESSION, 'redirect', rex_server('HTTP_REFERER', 'string'));
     $User     = \FriendsOfREDAXO\Simpleshop\Customer::login($email, $pwd);
 
+
     if (!isset($_SESSION['redirect']))
     {
         $_SESSION['redirect'] = $redirect;
@@ -42,6 +43,11 @@ if ($_FUNC == 'login')
         header('Location: ' . $redirect);
         exit;
     }
+}
+else if ($_FUNC == 'password-reset')
+{
+    $email = rex_post('email', 'string');
+    $this->setVar('success', Customer::resetPassword($email));
 }
 else if ($_FUNC == 'registration')
 {

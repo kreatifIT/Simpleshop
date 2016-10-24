@@ -13,19 +13,13 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-class BankTransfer extends PaymentAbstract
-{
-    protected $price = 0;
-    protected $name  = '###shop.bank_transfer###';
-    protected $info  = '###shop.bank_transfer_payment_info###';
+$password = $this->getVar('password');
+$User     = $this->getVar('User');
 
-    public function getPrice()
-    {
-        return $this->price;
-    }
+?>
+<p>###shop.email.password_reset_text###</p>
 
-    public function getName()
-    {
-        return $this->name;
-    }
-}
+<p>
+    ###label.email###: <?= $User->getValue('email') ?><br/>
+    ###label.password###: <?= $password ?>
+</p>

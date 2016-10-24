@@ -64,11 +64,6 @@ class Session extends Model
         return $_SESSION['checkout']['Order'];
     }
 
-    public static function clearCheckout()
-    {
-        $_SESSION['checkout'] = [];
-    }
-
     public static function getSession()
     {
         if (self::$session === NULL)
@@ -125,7 +120,7 @@ class Session extends Model
     private static function _getCartItems($raw = FALSE, $throwErrors = TRUE)
     {
         $session    = self::getSession();
-        $cart_items = (array) json_decode($session->getValue('cart_items'), TRUE);
+        $cart_items = (array) $session->getValue('cart_items');
 
         if (!$raw)
         {
@@ -253,6 +248,11 @@ class Session extends Model
     {
         $session = self::getSession();
         $session->writeSession(['cart_items' => []]);
+    }
+
+    public static function clearCheckout()
+    {
+        $_SESSION['checkout'] = [];
     }
 }
 
