@@ -13,23 +13,25 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$Order     = $this->getVar('order');
-$errors    = $Order->calculateDocument();
-$address_1 = $Order->getValue('address_1');
-$address_2 = $Order->getValue('address_2');
-$shipping  = $Order->getValue('shipping');
-$payment   = $Order->getValue('payment');
-$extras    = $Order->getValue('address_extras');
+$discounts  = [];
+$Order      = $this->getVar('order');
+$errors     = $Order->calculateDocument();
+$address_1  = $Order->getValue('address_1');
+$address_2  = $Order->getValue('address_2');
+$shipping   = $Order->getValue('shipping');
+$payment    = $Order->getValue('payment');
+$promotions = $Order->getValue('promotions');
+$extras     = $Order->getValue('address_extras');
 
 
 if (count($errors)): ?>
     <div class="row column">
-    <?php foreach ($errors as $error): ?>
-        <div class="callout alert margin-bottom">
-            <p><?= isset($error['replace']) ? strtr($error['label'], ['{{replace}}' => $error['replace']]) : $error['label'] ?></p>
-        </div>
-    <?php endforeach; ?>
-        </div>
+        <?php foreach ($errors as $error): ?>
+            <div class="callout alert margin-bottom">
+                <p><?= isset($error['replace']) ? strtr($error['label'], ['{{replace}}' => $error['replace']]) : $error['label'] ?></p>
+            </div>
+        <?php endforeach; ?>
+    </div>
 <?php endif; ?>
 <!-- Adressen -->
 <div class="row address-panels">
@@ -102,6 +104,26 @@ if (count($errors)): ?>
 
     </div>
 </div>
+
+<!-- Warenkorb -->
+<div class="discounts row column margin-bottom">
+    <h3>###shop.promotions###</h3>
+    <p>###shop.applied_promotion_text###</p>
+    <?php
+    foreach ($promotions as $promotion)
+    {
+        if ($promotion->getValue('difference'))
+        {
+            $discounts[] = ['name'  => $promotion->getValue(sprogfield('name')),
+                            'value' => $promotion->getValue('difference'),
+            ];
+        }
+        $this->setVar('promotion', $promotion);
+        $this->subfragment('simpleshop/checkout/summary/discount_item.php');
+    }
+    ?>
+</div>
+
 <!-- Warenkorb -->
 <div class="shop row column">
 
@@ -129,6 +151,12 @@ if (count($errors)): ?>
             <span>&euro; <?= format_price($Order->getValue('shipping_costs')) ?></span>
             <span>###label.shipment_cost###</span>
         </div>
+        <?php foreach ($discounts as $discount): ?>
+            <div class="subtotal ">
+                <span>&euro; -<?= format_price($discount['value']) ?></span>
+                <span><?= $discount['name'] ?></span>
+            </div>
+        <?php endforeach; ?>
         <div class="subtotal total">
             <span>&euro; <?= format_price($Order->getValue('total')) ?></span>
             <span>###label.total_sum###</span>

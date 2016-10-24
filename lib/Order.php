@@ -53,6 +53,8 @@ class Order extends Model
                 OrderProduct::create()
                     ->setValue('order_id', $order_id)
                     ->setValue('product_id', $product->getValue('id'))
+                    ->setValue('code', $product->getValue('code'))
+                    ->setValue('quantity', $product->getValue('cart_quantity'))
                     ->setValue('data', $product)
                     ->save(TRUE);
             }
@@ -65,6 +67,7 @@ class Order extends Model
         $errors         = [];
         $this->tax      = 0;
         $this->subtotal = 0;
+        $this->quantity = 0;
 
         try
         {
@@ -78,12 +81,15 @@ class Order extends Model
                 $products = Session::getCartItems();
             }
         }
+        // calculate total
         foreach ($products as $product)
         {
             $quantity = $product->getValue('cart_quantity');
             $this->subtotal += (float) $product->getPrice(TRUE) * $quantity;
             $this->tax += (float) $product->getTax() * $quantity;
+            $this->quantity += $quantity;
         }
+        // get shipping costs
         $this->shipping_costs = (float) $this->shipping ? $this->shipping->getPrice() : 0;
         $this->updatedate     = date('Y-m-d H:i:s');
         $this->ip_address     = rex_server('REMOTE_ADDR', 'string', 'notset');

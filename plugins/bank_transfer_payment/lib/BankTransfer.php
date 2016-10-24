@@ -17,7 +17,7 @@ class BankTransfer extends PaymentAbstract
 {
     public function getPrice()
     {
-        // TODO: Implement getPrice() method.
+        return 0;
     }
 
     public function getName()

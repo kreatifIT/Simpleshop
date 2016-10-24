@@ -25,7 +25,7 @@ class PayPalExpress extends PaymentAbstract
 
     public function getPrice()
     {
-        // TODO: Implement getPrice() method.
+        return 0;
     }
 
     public function getName()
@@ -58,14 +58,6 @@ class PayPalExpress extends PaymentAbstract
             throw new PaypalException($msg);
         }
 
-        if (count(\rex_yrewrite::getDomains()) > 1)
-        {
-            $base_url = \rex_yrewrite::getFullPath();
-        }
-        else
-        {
-            $base_url = '';
-        }
         $data = [
             'METHOD'  => 'SetExpressCheckout',
             'VERSION' => self::API_VERSION,
@@ -74,8 +66,8 @@ class PayPalExpress extends PaymentAbstract
             'PWD'       => $credentials['pwd'],
             'SIGNATURE' => $credentials['signature'],
 
-            'returnUrl' => $base_url . ltrim(rex_getUrl(NULL, NULL, ['action' => 'pay_process']), '/'),
-            'cancelUrl' => $base_url . ltrim(rex_getUrl(NULL, NULL, ['action' => 'cancelled']), '/'),
+            'returnUrl' => rex_getFullUrl(NULL, NULL, ['action' => 'pay_process']),
+            'cancelUrl' => rex_getFullUrl(NULL, NULL, ['action' => 'cancelled']),
 
             'PAYMENTREQUEST_0_PAYMENTREQUESTID' => $order_id,
             'PAYMENTREQUEST_0_AMT'              => $total_amount, // total payment (including tax + shipping)

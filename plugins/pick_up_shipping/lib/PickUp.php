@@ -17,6 +17,7 @@ class PickUp extends ShippingAbstract
 {
     public function getPrice()
     {
+        return 0;
     }
 
     public function getName()

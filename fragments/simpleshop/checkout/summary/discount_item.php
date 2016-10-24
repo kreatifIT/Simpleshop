@@ -13,15 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-class Omest extends ShippingAbstract
-{
-    public function getPrice()
-    {
-        return 5.60;
-    }
+$promotion = $this->getVar('promotion');
 
-    public function getName()
-    {
-        return '###label.standard_shipping###';
-    }
-}
+?>
+<div class="callout promotion-item secondary"><?= $promotion->getValue(sprogfield('name')) ?></div>
