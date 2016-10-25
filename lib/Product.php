@@ -146,7 +146,7 @@ class Product extends Model
                 {
                     if (!isset($this->__feature_data['mapping'][$id]['min_amount']))
                     {
-                        $this->__feature_data['mapping'][$id]['min_amount'] = 0;
+                        $this->__feature_data['mapping'][$id]['min_amount'] = $amount > 0 ? $amount : 0;
                     }
                     foreach ($_ids as $__id)
                     {
@@ -292,7 +292,8 @@ class Product extends Model
             }
             elseif ($key == 'amount')
             {
-                if ($this->getValue('inventory') == 'F' && $value != '')
+//                if ($this->getValue('inventory') == 'F' && $value != '')
+                if ($value != '')
                 {
                     $this->setValue($key, $value);
                 }

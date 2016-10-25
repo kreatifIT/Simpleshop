@@ -13,19 +13,21 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$lable_name = sprogfield('name');
-$product = $this->getVar('product');
-$cat_path = $this->getVar('cat_path');
-$badge = $product->getValue('badge');
-$price = $product->getValue('price');
+use Kreatif\Resource;
+
+$lable_name  = sprogfield('name');
+$product     = $this->getVar('product');
+$cat_path    = $this->getVar('cat_path');
+$badge       = $product->getValue('badge');
+$price       = $product->getValue('price');
 $offer_price = $product->getValue('reduced_price');
-$tax = Tax::get($product->getValue('tax'))->getValue('tax');
-$gallery = strlen($product->getValue('gallery')) ? explode(',', $product->getValue('gallery')) : [];
-$image = $product->getValue('image');
-$variants = $product->getFeatureVariants();
+$tax         = Tax::get($product->getValue('tax'))->getValue('tax');
+$gallery     = strlen($product->getValue('gallery')) ? explode(',', $product->getValue('gallery')) : [];
+$image       = $product->getValue('image');
+$variants    = $product->getFeatureVariants();
 $description = $product->getValue(sprogfield('description'));
 $application = $product->getValue(sprogfield('application'));
-//pr($variants);
+//pr($variants['mapping']);
 $default_color_id = 0;
 $default_packaging_id = 0;
 
@@ -204,6 +206,13 @@ $variant_data = [];
 
 foreach ($variants['variants'] as $key => $variant) {
     $variant_data[$key] = $variant->getData();
+    $variant_data[$key]['price_formated'] = format_price($variant->getPrice());
+    $variant_data[$key]['image_big_full'] = Utils::getImageTag($variant_data[$key]['image'], 'fbox', [], function ($params) {
+        return $params['attributes']['src'];
+    });
+    $variant_data[$key]['image_full'] = Utils::getImageTag($variant_data[$key]['image'], 'product-detail-main', [], function ($params) {
+        return $params['attributes']['src'];
+    });
 }
 ?>
 <script>

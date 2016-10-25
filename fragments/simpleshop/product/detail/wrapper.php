@@ -29,13 +29,13 @@ $sidebar    = $this->getVar('sidebar_content');
     <div class="large-9 columns product-detail">
         <!-- Product Detail -->
         <?php
+        $this->setVar('product', $product);
+        $this->setVar('has_infobar', TRUE);
 
         ob_start();
         @$this->subfragment('simpleshop/product/detail/before_content.php');
         $before_content = ob_get_clean();
 
-        $this->setVar('product', $product);
-        $this->setVar('has_infobar', TRUE);
         $this->setVar('before_content', $before_content, FALSE);
         echo $this->subfragment('simpleshop/product/detail/detail.php');
         ?>
