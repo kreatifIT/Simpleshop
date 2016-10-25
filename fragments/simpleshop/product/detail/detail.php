@@ -14,6 +14,7 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 use Kreatif\Resource;
+use Sprog\Wildcard;
 
 $lable_name  = sprogfield('name');
 $product     = $this->getVar('product');
@@ -64,7 +65,7 @@ if (strlen($image) == 0 && isset($gallery[0])) {
     <div class="large-6 columns">
         <div class="product-image-detail">
             <?php if ($offer_price > 0): ?>
-                <div class="ribbon"><span><?= $this->i18n('label.offer'); ?></span></div>
+                <div class="ribbon"><span>###label.offer###</span></div>
             <?php endif; ?>
             <a href="<?= Utils::getImageTag($image, 'fbox', [], function ($params) {
                 return $params['attributes']['src'];
@@ -159,7 +160,7 @@ if (strlen($image) == 0 && isset($gallery[0])) {
                     <span class="price-was">&euro; <?= format_price($price) ?></span>
                 <?php endif; ?>
                 <span class="price">&euro; <?= format_price($offer_price > 0 ? $offer_price : $price) ?></span>
-                <span class="vat"><?= strtr($this->i18n('label.vat_in_addition'), ['{{tax}}' => $tax]); ?></span>
+                <span class="vat"><?= strtr(Wildcard::get('shop.vat_in_addition'), ['{{tax}}' => $tax]); ?></span>
             </div>
             <div class="checkout">
                 <?php
@@ -192,12 +193,12 @@ if (strlen($image) == 0 && isset($gallery[0])) {
     } ?>
 
     <?php if (strlen($description)): ?>
-        <h2><?= $this->i18n('label.description'); ?></h2>
+        <h2>###label.description###</h2>
         <?= $description ?>
     <?php endif; ?>
 
     <?php if (strlen($application)): ?>
-        <h2><?= strtr($this->i18n('label.application'), ['{{product_name}}' => $product->getValue($lable_name)]); ?></h2>
+        <h2><?= strtr(Wildcard::get('label.application'), ['{{product_name}}' => $product->getValue($lable_name)]); ?></h2>
         <?= $application ?>
     <?php endif; ?>
 </div>

@@ -14,11 +14,11 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 ?>
-<div class="<?= $this->getVar('class') ?>">
+<div class="large-4 columns margin-bottom box-checkout">
     <div>
-        <h3><?= $this->i18n('label.buy_as_guest') ?></h3>
-        <p><?= $this->i18n('label.buy_as_guest_text') ?></p>
-        <a href="#" class="button"><?= $this->i18n('action.buy_as_guest'); ?></a>
+        <h3>###action.shop_as_guest###</h3>
+        <p>###shop.buy_as_guest_text###</p>
+        <a href="<?= rex_getUrl(NULL, NULL, ['action' => 'guest-checkout']) ?>" class="button">###action.continue_as_guest###</a>
     </div>
 </div>
 

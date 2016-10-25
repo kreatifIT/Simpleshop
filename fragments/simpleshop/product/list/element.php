@@ -36,7 +36,7 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
             </div>
         <?php endif; ?>
         <?php if ($offer_price > 0): ?>
-            <div class="ribbon"><span><?= $this->i18n('label.offer'); ?></span></div>
+            <div class="ribbon"><span>###label.offer###</span></div>
         <?php endif; ?>
 
         <a href="<?= $product_url ?>"><?= Utils::getImageTag($image, 'product-list-element-main') ?></a>
