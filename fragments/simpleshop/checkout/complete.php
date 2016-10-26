@@ -23,9 +23,13 @@ $Shiping = $Order->getValue('shipping');
         <h2 class="text-center margin-small-bottom">###shop.order_placed###</h2>
     </div>
 
+
 <?php
 
-$this->subfragment('simpleshop/payment/' . $Payment->plugin_name . '/order_complete.php');
+if ($Order->getValue('total') > 0)
+{
+    $this->subfragment('simpleshop/payment/' . $Payment->plugin_name . '/order_complete.php');
+}
 $this->subfragment('simpleshop/shipping/' . $Shiping->plugin_name . '/order_complete.php');
 
 // CLEAR THE SESSION

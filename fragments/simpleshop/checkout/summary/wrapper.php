@@ -105,27 +105,29 @@ if (count($errors)): ?>
     </div>
 </div>
 
-<!-- Warenkorb -->
-<div class="discounts row column margin-bottom">
-    <h3>###shop.promotions###</h3>
-    <p>###shop.applied_promotion_text###</p>
-    <?php
-    if ($promotions)
-    {
+<?php
+// coupons
+$this->subfragment('simpleshop/checkout/summary/coupon.php');
+?>
+
+<?php if ($promotions): ?>
+    <div class="discounts row column margin-bottom">
+
+        <h3>###shop.promotions###</h3>
+        <p>###shop.applied_promotion_text###</p>
+        <?php
         foreach ($promotions as $promotion)
         {
             if ($promotion->getValue('discount'))
             {
-                $discounts[] = ['name'  => $promotion->getValue(sprogfield('name')),
-                                'value' => $promotion->getValue('discount'),
-                ];
+                $discounts[] = ['name' => $promotion->getValue(sprogfield('name')), 'value' => $promotion->getValue('discount'),];
             }
             $this->setVar('promotion', $promotion);
             $this->subfragment('simpleshop/checkout/summary/discount_item.php');
         }
-    }
-    ?>
-</div>
+        ?>
+    </div>
+<?php endif; ?>
 
 <!-- Warenkorb -->
 <div class="shop row column">

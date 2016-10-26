@@ -14,6 +14,7 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 \rex_yform_manager_dataset::setModelClass(Category::TABLE, Category::class);
+\rex_yform_manager_dataset::setModelClass(Coupon::TABLE, Coupon::class);
 \rex_yform_manager_dataset::setModelClass(Customer::TABLE, Customer::class);
 \rex_yform_manager_dataset::setModelClass(CustomerAddress::TABLE, CustomerAddress::class);
 \rex_yform_manager_dataset::setModelClass(DiscountGroup::TABLE, DiscountGroup::class);

@@ -31,14 +31,27 @@ class Order extends Model
     {
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this));
 
-        $create_order = $create_order && !$this->getValue('id');
-        $result       = parent::save(TRUE);
+        $result = parent::save(TRUE);
 
         if ($result)
         {
-            $order_id = $this->getValue('id');
-            $products = Session::getCartItems(FALSE, FALSE);
+            $order_id   = $this->getValue('id');
+            $promotions = $this->getValue('promotions');
+            $products   = Session::getCartItems(FALSE, FALSE);
             $this->setValue('createdate', date('Y-m-d H:i:s'));
+
+            if ($create_order && isset ($promotions['coupon']))
+            {
+                // relate coupon
+                $coupon   = $promotions['coupon'];
+                $orders   = strlen($coupon->getValue('orders')) ? explode(',', $coupon->getValue('orders')) : [];
+                $orders[] = $order_id;
+
+                $coupon->setValue('given_away', 1);
+                $coupon->setValue('count', $coupon->getValue('count') - 1);
+                $coupon->setValue('orders', $orders);
+                $coupon->save();
+            }
 
             // clear all products first
             \rex_sql::factory()->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$order_id}");
@@ -83,12 +96,11 @@ class Order extends Model
 
     public function calculateDocument()
     {
-        $errors           = [];
-        $this->tax        = 0;
-        $this->subtotal   = 0;
-        $this->quantity   = 0;
-        $this->discount   = 0;
-        $this->promotions = [];
+        $errors         = [];
+        $this->tax      = 0;
+        $this->subtotal = 0;
+        $this->quantity = 0;
+        $this->discount = 0;
 
         try
         {
@@ -118,6 +130,36 @@ class Order extends Model
 
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.calculateDocument', $this));
 
+        // add promotions
+        $promotions  = [];
+        $_promotions = $this->getValue('promotions');
+
+        if ($_promotions)
+        {
+            foreach ($_promotions as $name => $_promotion)
+            {
+                $promotion = NULL;
+                try
+                {
+                    $promotion = $_promotion->applyToOrder($this);
+                }
+                catch (\Exception $ex)
+                {
+                    $errors[] = ['label' => $ex->getLabelByCode()];
+                }
+                if ($promotion)
+                {
+                    $promotions[$name] = $promotion;
+                }
+            }
+        }
+        $this->setValue('promotions', $promotions);
+
+        // re-check order totals
+        if ($this->total < 0)
+        {
+            $this->total = 0;
+        }
         return $errors;
     }
 

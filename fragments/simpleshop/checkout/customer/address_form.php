@@ -61,7 +61,7 @@ if (Session::getCheckoutData('as_guest') || !Customer::isLoggedIn())
     /**
      * Guest checkout
      */
-    $yform->setValueField('text', [
+    $yform->setValueField('email', [
         'name'     => 'email',
         'label'    => '###label.email###',
         'default'  => $extras['email'],
@@ -151,15 +151,17 @@ $yform->setValidateField('empty', [
     strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.postal###']),
 ]);
 
-// TODO: add country select
-/*
-$yform->setValueField('select', [
-    'name' => 'country',
-    'label' => '###label.country###',
-    'options' => '1,2,3,4,5,6,7,8,9,10',
-    'required' => true
+$yform->setValueField('text', [
+    'name'     => 'customer_address.1.country',
+    'label'    => '###label.country###',
+    'default'  => $addresses[0]->getValue('country'),
+    'required' => TRUE,
 ]);
-*/
+$yform->setValidateField('empty', [
+    'customer_address.1.country',
+    strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.country###']),
+]);
+
 
 $yform->setValueField('text', [
     'name'     => 'customer_address.1.phone',
@@ -266,6 +268,12 @@ $yform->setValueField('text', [
     'name'    => 'customer_address.2.zip',
     'label'   => '###label.postal###',
     'default' => $addresses[1]->getValue('zip'),
+]);
+
+$yform->setValueField('text', [
+    'name'     => 'customer_address.2.country',
+    'label'    => '###label.country###',
+    'default'  => $addresses[1]->getValue('country'),
 ]);
 
 $yform->setHiddenField('id_2', $addresses[1]->getValue('id'));

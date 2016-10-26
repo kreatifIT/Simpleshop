@@ -16,16 +16,13 @@ namespace FriendsOfREDAXO\Simpleshop;
 use Kreatif\Settings;
 
 $product = $this->getVar('product');
-// Todo: remove these two lines
-if (!$product)
-    return;
-
-$image = $product->getValue('image');
+$image   = $product->getValue('image');
 
 
-if (strlen($image) == 0 && strlen($product->getValue('gallery'))) {
+if (strlen($image) == 0 && strlen($product->getValue('gallery')))
+{
     $gallery = explode(',', $product->getValue('gallery'));
-    $image = $gallery[0];
+    $image   = $gallery[0];
 }
 
 ?>

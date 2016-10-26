@@ -15,6 +15,92 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 abstract class Model extends \rex_yform_manager_dataset
 {
+    protected $adddional_fields = [];
+    protected $excluded_fields  = [];
+    protected $field_data       = [];
+
+    public function getFields()
+    {
+        $fields  = [];
+        $_fields = parent::getFields();
+
+        foreach ($_fields as $field)
+        {
+            $typen = $field->getTypeName();
+            $type  = $field->getType();
+            $name  = $field->getName();
+            $key   = $name . '_' . $type . '_' . $typen;
+
+
+//            if (static::TABLE == Customer::TABLE)
+//            {
+//                pr($key);
+//            }
+//            if ($key == 'email_validate_empty')
+//            {
+//                pr($field);
+//            }
+
+            if (!in_array($name, $this->excluded_fields))
+            {
+                if (!\rex::isBackend())
+                {
+                    $field['notice'] = '';
+                }
+                if (isset ($this->field_data[$key]))
+                {
+                    foreach ($this->field_data[$key] as $value_name => $value)
+                    {
+                        $field[$value_name] = $value;
+                    }
+                }
+                $fields[] = $field;
+            }
+        }
+        // add additional fields
+        foreach ($this->adddional_fields as $field)
+        {
+            $_nfield = new \rex_yform_manager_field($field['values']);
+
+            if ($field['values'] !== NULL)
+            {
+                array_splice($fields, $field['position'], 0, [$_nfield]);
+            }
+            else
+            {
+                $fields[] = $_nfield;
+            }
+        }
+        return $fields;
+    }
+
+    public function addExcludedField($fieldnames)
+    {
+        if (!is_array($fieldnames))
+        {
+            $fieldnames = [$fieldnames];
+        }
+        $this->excluded_fields = array_unique(array_merge($this->excluded_fields, $fieldnames));
+    }
+
+    public function setFieldData($name, $data)
+    {
+        $this->field_data[$name] = $data;
+    }
+
+    public function addAdditionalField($type, $field_type, $position, $values)
+    {
+        $values = array_merge([
+            'type_id'   => $type,
+            'type_name' => $field_type,
+        ], $values);
+
+        $this->adddional_fields[] = [
+            'values'   => $values,
+            'position' => $position,
+        ];
+    }
+
 
     public function getValue($key, $process = TRUE)
     {
@@ -61,19 +147,27 @@ abstract class Model extends \rex_yform_manager_dataset
 
             if (json_last_error() == JSON_ERROR_NONE)
             {
-                $value  = $decoded_json;
+                $value = $decoded_json;
 
                 if (isset ($value['class']))
                 {
+                    $data = (array) $value['data'];
+
                     if (class_exists($value['class']))
                     {
-                        $Object = call_user_func([$value['class'], 'create']);
+                        if (isset ($data['id']))
+                        {
+                            $Object = call_user_func_array([$value['class'], 'get'], [$data['id']]);
+                        }
+                        else
+                        {
+                            $Object = call_user_func([$value['class'], 'create']);
+                        }
                     }
                     else
                     {
                         $Object = Std::create();
                     }
-                    $data   = (array) $value['data'];
 
                     foreach ($data as $name => $value)
                     {
@@ -81,7 +175,7 @@ abstract class Model extends \rex_yform_manager_dataset
                     }
                     $value = $Object;
                 }
-                else if (is_array ($value))
+                else if (is_array($value))
                 {
                     foreach ($value as $name => &$val)
                     {

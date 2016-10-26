@@ -13,12 +13,12 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-use FriendsOfREDAXO\Simpleshop\yform\manager\table;
 
 class Customer extends Model
 {
     const TABLE               = 'rex_shop_customer';
     const MIN_PASSWORD_LENGTH = 6;
+
 
     public static function getUserByEmail($email)
     {
@@ -140,7 +140,7 @@ class Customer extends Model
 
         if ($User)
         {
-            $password = self::generateRandomString(self::MIN_PASSWORD_LENGTH);
+            $password = random_string(self::MIN_PASSWORD_LENGTH);
             $User->setValue('password', $password)->save();
 
             $Mail          = new Mail();
@@ -186,16 +186,6 @@ class Customer extends Model
     public function isActive()
     {
         return $this->getValue('status') == 1;
-    }
-
-    public static function generateRandomString($length, &$__string = '')
-    {
-        $string = $__string . substr(str_shuffle('abcefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'), 0, 1);
-        if (strlen($string) < $length)
-        {
-            $string = self::generateRandomString($length, $string);
-        }
-        return $string;
     }
 }
 

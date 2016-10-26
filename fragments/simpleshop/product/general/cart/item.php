@@ -25,6 +25,7 @@ $quantity    = $product->getValue('cart_quantity');
 $key         = $product->getValue('key');
 $product_url = $product->getUrl();
 
+
 $Category = Category::get($product->getValue('category_id'));
 
 if ($has_image && strlen($image) == 0 && strlen($product->getValue('gallery')))
@@ -42,9 +43,11 @@ if ($has_image && strlen($image) == 0 && strlen($product->getValue('gallery')))
     <td class="description">
         <h3><?= $product->getValue($label_name) ?></h3>
         <p><?= $Category->getValue($label_name) ?></p>
+        <?php if (count($features)): ?>
         <?php foreach ($features as $feature): ?>
             <div class="feature"><?= $feature->getValue($label_name) ?></div>
         <?php endforeach; ?>
+        <?php endif; ?>
     </td>
     <td class="price-single">&euro; <?= format_price($price) ?></td>
     <td class="amount">

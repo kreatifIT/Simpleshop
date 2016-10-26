@@ -29,7 +29,10 @@ $_products = OrderProduct::query()->where('order_id', $order_id)->find();
 
 foreach ($_products as $product)
 {
-    $products[] = $product->getValue('data');
+    $_product = $product->getValue('data');
+    $_product->setValue('cart_quantity', $product->getValue('quantity'));
+    $_product->setValue('code', $product->getValue('code'));
+    $products[] = $_product;
 }
 
 ?>
