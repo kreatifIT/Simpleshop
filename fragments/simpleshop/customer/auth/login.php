@@ -19,7 +19,7 @@ $action       = rex_post('action');
 ?>
 <div class="<?= $this->getVar('class') ?>">
 
-    <div id="login" <?php if ($action != '' && $action != 'login')
+    <div id="login" <?php if ($action == 'password-reset')
     {
         echo 'style="display: none;"';
     } ?>>

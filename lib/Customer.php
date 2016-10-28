@@ -14,6 +14,8 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
+use Sprog\Wildcard;
+
 class Customer extends Model
 {
     const TABLE               = 'rex_shop_customer';
@@ -35,7 +37,7 @@ class Customer extends Model
         return $result;
     }
 
-    public static function register($email, $password, $attributes = [], $send_email = TRUE)
+    public static function register($email, $password, $attributes = [])
     {
         $result = NULL;
         $User   = self::getUserByEmail($email);
@@ -72,13 +74,16 @@ class Customer extends Model
         {
             throw new CustomerException(implode('||', $messages), 99);
         }
-        if (\rex_extension::registerPoint(new \rex_extension_point('Customer.registered', $success, [
+
+        \rex_extension::registerPoint(new \rex_extension_point('Customer.registered', $success, [
             'user'     => $_this,
             'password' => $password,
-        ]))
-        )
+        ]));
+
+        if($success)
         {
             $Mail          = new Mail();
+            $do_send       = TRUE;
             $Mail->Subject = '###shop.email.user_registration_subject###';
             $Mail->setFragmentPath('customer/registration');
 
@@ -87,12 +92,13 @@ class Customer extends Model
             $Mail->setVar('password', $password);
             $Mail->AddAddress($email);
 
-            if (\rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.sendRegistrationEmail', TRUE, [
+            \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.sendRegistrationEmail', $do_send, [
                 'Mail'     => $Mail,
                 'User'     => $_this,
                 'password' => $password,
-            ]))
-            )
+            ]));
+
+            if ($do_send)
             {
                 $Mail->send();
             }
@@ -144,6 +150,7 @@ class Customer extends Model
             $User->setValue('password', $password)->save();
 
             $Mail          = new Mail();
+            $do_send       = TRUE;
             $Mail->Subject = '###shop.email.user_password_reset###';
             $Mail->setFragmentPath('customer/password_reset');
 
@@ -152,12 +159,13 @@ class Customer extends Model
             $Mail->setVar('User', $User);
             $Mail->AddAddress($email);
 
-            if (\rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.resetPasswordEmail', TRUE, [
+            \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.resetPasswordEmail', $do_send, [
                 'Mail'     => $Mail,
                 'User'     => $User,
                 'password' => $password,
-            ]))
-            )
+            ]));
+
+            if ($do_send)
             {
                 $Mail->send();
             }
@@ -191,4 +199,26 @@ class Customer extends Model
 
 class CustomerException extends \Exception
 {
+    public function getLabelByCode()
+    {
+        switch ($this->getCode())
+        {
+            case 1:
+                $errors = ['###error.user_already_exist###'];
+                break;
+            case 2:
+                $errors = [strtr(Wildcard::get('error.password_to_short'), ['%d' => Customer::MIN_PASSWORD_LENGTH])];
+                break;
+            case 3:
+                $errors = ['###error.email_not_valid###'];
+                break;
+            case 99:
+                $errors = explode('||', $this->getMessage());
+                break;
+            default:
+                $errors = [$this->getMessage()];
+                break;
+        }
+        return $errors;
+    }
 }

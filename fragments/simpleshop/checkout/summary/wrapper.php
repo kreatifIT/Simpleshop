@@ -21,7 +21,7 @@ $address_2  = $Order->getValue('address_2');
 $shipping   = $Order->getValue('shipping');
 $payment    = $Order->getValue('payment');
 $promotions = $Order->getValue('promotions');
-$extras     = $Order->getValue('address_extras');
+$extras     = $Order->getValue('extras');
 
 
 if (count($errors)): ?>
@@ -43,7 +43,7 @@ if (count($errors)): ?>
     $this->setVar('address', $address_1);
     if (Session::getCheckoutData('as_guest'))
     {
-        $this->setVar('email', $extras['email']);
+        $this->setVar('email', $extras['address_extras']['email']);
     }
     $this->subfragment('simpleshop/checkout/summary/address_item.php');
     ?>
@@ -51,7 +51,7 @@ if (count($errors)): ?>
     <?php
     $this->setVar('title', '###shop.shipping_address###');
     $this->setVar('url', rex_getUrl(NULL, NULL, ['step' => 2]));
-    if ($extras['use_shipping_address'])
+    if ($extras['address_extras']['use_shipping_address'])
     {
         $this->setVar('address', $address_2);
     }

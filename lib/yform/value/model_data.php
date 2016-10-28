@@ -43,6 +43,10 @@ class rex_yform_value_model_data extends rex_yform_value_textarea
         {
             foreach ($Object as $key => $val)
             {
+                if (in_array ($key, ['submit']))
+                {
+                    continue;
+                }
                 $content[] = '<tr><td>' . $key . '</td><td>' . implode('', $this->unprepare($val)) . '</td></tr>';
             }
         }
@@ -52,6 +56,10 @@ class rex_yform_value_model_data extends rex_yform_value_textarea
 
             foreach ($columns as $column)
             {
+                if (in_array($column->getType(), ['validate']) || in_array($column->getTypeName(), ['php', 'html']))
+                {
+                    continue;
+                }
                 $value = $Object->getValue($column->getName());
 
                 if (is_array($value))

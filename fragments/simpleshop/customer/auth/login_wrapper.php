@@ -52,7 +52,7 @@ else if ($_FUNC == 'password-reset')
 else if ($_FUNC == 'registration')
 {
     $email    = rex_post('email', 'string');
-    $pwd      = Customer::generateRandomString(Customer::MIN_PASSWORD_LENGTH);
+    $pwd      = random_string(Customer::MIN_PASSWORD_LENGTH);
     $redirect = from_array($_SESSION, 'redirect', rex_server('HTTP_REFERER', 'string'));
 
     try
@@ -64,45 +64,31 @@ else if ($_FUNC == 'registration')
     }
     catch (CustomerException $ex)
     {
-        switch ($ex->getCode())
-        {
-            case 1:
-                $errors = ['###error.user_already_exist###'];
-                break;
-            case 2:
-                $errors = [strtr(Wildcard::get('error.password_to_short'), ['%d' => Customer::MIN_PASSWORD_LENGTH])];
-                break;
-            case 3:
-                $errors = ['###error.email_not_valid###'];
-                break;
-            case 99:
-                $errors = explode('||', $ex->getMessage());
-                break;
-            default:
-                $errors = [$ex->getMessage()];
-                break;
-        }
+        $errors = $ex->getLabelByCode();
         $this->setVar('registration_errors', $errors);
     }
 
-    if (!isset($_SESSION['redirect']))
+    if (!isset($errors))
     {
-        $_SESSION['redirect'] = $redirect;
-    }
-    if (!$User)
-    {
-        $this->setVar('registration_errors', ['###error.registration_failed###']);
-    }
-    else
-    {
-        $User = \FriendsOfREDAXO\Simpleshop\Customer::login($email, $pwd);
-
-        if ($User && $_SESSION['redirect'])
+        if (!isset($_SESSION['redirect']))
         {
-            $redirect = $_SESSION['redirect'];
-            unset($_SESSION['redirect']);
-            header('Location: ' . $redirect);
-            exit;
+            $_SESSION['redirect'] = $redirect;
+        }
+        if (!$User)
+        {
+            $this->setVar('registration_errors', ['###error.registration_failed###']);
+        }
+        else
+        {
+            $User = \FriendsOfREDAXO\Simpleshop\Customer::login($email, $pwd);
+
+            if ($User && $_SESSION['redirect'])
+            {
+                $redirect = $_SESSION['redirect'];
+                unset($_SESSION['redirect']);
+                header('Location: ' . $redirect);
+                exit;
+            }
         }
     }
 }

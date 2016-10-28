@@ -21,7 +21,7 @@ $address_2  = $order->getValue('address_2');
 $shipping   = $order->getValue('shipping');
 $payment    = $order->getValue('payment');
 $promotions = $order->getValue('promotions');
-$extras     = $order->getValue('address_extras');
+$extras     = $order->getValue('extras');
 
 $products  = [];
 $_products = OrderProduct::query()->where('order_id', $order_id)->find();
@@ -53,7 +53,7 @@ foreach ($_products as $product)
     ?>
 
     <?php
-    if ($extras['use_shipping_address'])
+    if ($extras['address_extras']['use_shipping_address'])
     {
         $this->setVar('address', $address_2);
     }

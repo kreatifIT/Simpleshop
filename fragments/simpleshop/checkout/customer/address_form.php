@@ -25,7 +25,7 @@ if (Session::getCheckoutData('Order'))
     $Order         = Session::getCurrentOrder();
     $_addresses[0] = $Order->getValue('address_1');
     $_addresses[1] = $Order->getValue('address_2');
-    $extras        = $Order->getValue('address_extras');
+    $extras        = $Order->getValue('extras');
 }
 if (Customer::isLoggedIn())
 {
@@ -64,7 +64,7 @@ if (Session::getCheckoutData('as_guest') || !Customer::isLoggedIn())
     $yform->setValueField('email', [
         'name'     => 'email',
         'label'    => '###label.email###',
-        'default'  => $extras['email'],
+        'default'  => $extras['address_extras']['email'],
         'required' => TRUE,
     ]);
     $yform->setValidateField('empty', [
@@ -226,11 +226,11 @@ else
         'name'              => 'use_shipping_address',
         'label'             => '###shop.use_alternative_shipping_address###',
         'alternative_label' => '###shop.shipping_address###',
-        'default'           => $extras['use_shipping_address'],
+        'default'           => $extras['address_extras']['use_shipping_address'],
         'strong'            => TRUE,
     ]);
 
-    $visibility_class = $extras['use_shipping_address'] ?: 'style="display: none;"';
+    $visibility_class = $extras['address_extras']['use_shipping_address'] ?: 'style="display: none;"';
     $yform->setValueField('html', ['opening_tag', '<div id="alternative-shipping-address" ' . $visibility_class . '>']);
 }
 
