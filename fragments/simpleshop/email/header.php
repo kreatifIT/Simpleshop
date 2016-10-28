@@ -14,7 +14,7 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 ?>
-<!-- rule -->
+<!-- spacer -->
 <table class="row"
        style="border-collapse:collapse;border-spacing:0;display:table;padding:0;position:relative;text-align:left;vertical-align:top;width:100%">
     <tbody>
@@ -34,6 +34,63 @@ namespace FriendsOfREDAXO\Simpleshop;
                             </tr>
                             </tbody>
                         </table>
+                    </th>
+                    <th class="expander"
+                        style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0!important;text-align:left;visibility:hidden;width:0"></th>
+                </tr>
+            </table>
+        </th>
+    </tr>
+    </tbody>
+</table>
+<!-- logo -->
+<table class="row"
+       style="border-collapse:collapse;border-spacing:0;display:table;padding:0;position:relative;text-align:left;vertical-align:top;width:100%">
+    <tbody>
+    <tr style="padding:0;text-align:left;vertical-align:top">
+        <th class="small-6 large-4 columns first"
+            style="Margin:0 auto;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0 auto;padding:0;padding-bottom:16px;padding-left:16px;padding-right:8px;text-align:left;width:177.33px">
+            <table style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%">
+                <tr style="padding:0;text-align:left;vertical-align:top">
+                    <th style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left">
+                        <?php
+                        $url = \Kreatif\Resource::getImageTag('resources/img/logo-rasenfix.png', null, [], function($params) {
+                            return $params['attributes']['src'];
+                        });
+                        ?>
+                        <img src="<?= $url ?>" alt="###company.name###" style="-ms-interpolation-mode:bicubic;clear:both;display:block;max-width:100%;outline:0;text-decoration:none;width:auto">
+                    </th>
+                </tr>
+            </table>
+        </th>
+        <th class="small-6 large-8 columns last"
+            style="Margin:0 auto;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0 auto;padding:0;padding-bottom:16px;padding-left:8px;padding-right:16px;text-align:left;width:370.67px">
+            <table style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%">
+                <tr style="padding:0;text-align:left;vertical-align:top">
+                    <th style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left">
+                        <p class="text-right header-address"
+                           style="Margin:0;Margin-bottom:10px;color:#8a8a8a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:700;line-height:1.6;margin:0;margin-bottom:10px;padding:0;text-align:right">
+                            ###company.street###<br>
+                            ###company.postal### ###company.location###<br>
+                            ###company.region### ###company.province###<br>
+                        </p>
+                    </th>
+                </tr>
+            </table>
+        </th>
+    </tr>
+    </tbody>
+</table>
+<!-- rule -->
+<table class="row"
+       style="border-collapse:collapse;border-spacing:0;display:table;padding:0;position:relative;text-align:left;vertical-align:top;width:100%">
+    <tbody>
+    <tr style="padding:0;text-align:left;vertical-align:top">
+        <th class="small-12 large-12 columns first last"
+            style="Margin:0 auto;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0 auto;padding:0;padding-bottom:16px;padding-left:16px;padding-right:16px;text-align:left;width:564px">
+            <table style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%">
+                <tr style="padding:0;text-align:left;vertical-align:top">
+                    <th style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left">
                         <hr>
                     </th>
                     <th class="expander"
@@ -44,46 +101,5 @@ namespace FriendsOfREDAXO\Simpleshop;
     </tr>
     </tbody>
 </table>
-<!-- footer -->
-<table class="row"
-       style="border-collapse:collapse;border-spacing:0;display:table;padding:0;position:relative;text-align:left;vertical-align:top;width:100%">
-    <tbody>
-    <tr style="padding:0;text-align:left;vertical-align:top">
-        <th class="small-12 large-4 columns first"
-            style="Margin:0 auto;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0 auto;padding:0;padding-bottom:16px;padding-left:16px;padding-right:8px;text-align:left;width:177.33px">
-            <table style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%">
-                <tr style="padding:0;text-align:left;vertical-align:top">
-                    <th style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left">
-                        ###company.name###<br>
-                        ###company.street###<br>
-                        ###company.postal### ###company.location###<br>
-                        ###company.region### ###company.province###<br>
-                    </th>
-                </tr>
-            </table>
-        </th>
-        <th class="small-12 large-8 columns last"
-            style="Margin:0 auto;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0 auto;padding:0;padding-bottom:16px;padding-left:8px;padding-right:16px;text-align:left;width:370.67px">
-            <table style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%">
-                <tr style="padding:0;text-align:left;vertical-align:top">
-                    <th style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left">
-                        ###label.phone### & ###label.fax###:
-                        <a href="tel:###company.phone###" style="Margin:0;color:#00913e;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none">
-                            ###company.phone###</a>
-                        <br>
-                        ###label.website###:
-                        <a href="http://###company.website###" target="_blank" style="Margin:0;color:#00913e;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none">
-                            ###company.website###</a>
-                        <br>
-                        ###label.email###:
-                        <a href="mailto:###company.email###" style="Margin:0;color:#00913e;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none">
-                            ###company.email###
-                        </a>
-                        <br>
-                    </th>
-                </tr>
-            </table>
-        </th>
-    </tr>
-    </tbody>
-</table>
+
+
