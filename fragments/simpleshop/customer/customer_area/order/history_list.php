@@ -18,7 +18,7 @@ use Sprog\Wildcard;
 $orders = $this->getVar('orders');
 
  if (count($orders)): ?>
-    <table class="table">
+    <table class="table stack">
         <thead>
         <tr>
             <th>###shop.order_num###</th>

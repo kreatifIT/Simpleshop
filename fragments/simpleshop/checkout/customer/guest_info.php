@@ -18,8 +18,6 @@ namespace FriendsOfREDAXO\Simpleshop;
     <div>
         <h3>###action.shop_as_guest###</h3>
         <p>###shop.buy_as_guest_text###</p>
-        <a href="<?= rex_getUrl(NULL, NULL, ['action' => 'guest-checkout']) ?>" class="button">###action.continue_as_guest###</a>
+        <a href="<?= rex_getUrl(NULL, NULL, ['action' => 'guest-checkout']) ?>" class="button expanded">###action.continue_as_guest###</a>
     </div>
 </div>
-
-

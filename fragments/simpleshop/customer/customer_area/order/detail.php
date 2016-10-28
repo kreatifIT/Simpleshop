@@ -79,7 +79,7 @@ foreach ($_products as $product)
     </div>
 </div>
 
-<table class="table">
+<table class="table stack">
     <thead>
     <tr>
         <th>###shop.produt_code###</th>
