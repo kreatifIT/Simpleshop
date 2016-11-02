@@ -41,7 +41,7 @@ if (strlen($image) == 0 && isset($gallery[0])) {
 
 ?>
 <?php if ($this->getVar('has_infobar') && count($cat_path)): ?>
-    <div class="shop-products-info-bar">
+    <div class="shop-products-info-bar clearfix">
         <div class="breadcrumbs">
             <ul class="rex-breadcrumb">
                 <?php foreach ($cat_path as $index => $path):
