@@ -54,11 +54,16 @@ namespace FriendsOfREDAXO\Simpleshop;
                 <tr style="padding:0;text-align:left;vertical-align:top">
                     <th style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left">
                         <?php
-                        $url = \Kreatif\Resource::getImageTag('resources/img/logo-rasenfix.png', null, [], function($params) {
-                            return $params['attributes']['src'];
-                        });
-                        ?>
-                        <img src="<?= $url ?>" alt="###company.name###" style="-ms-interpolation-mode:bicubic;clear:both;display:block;max-width:100%;outline:0;text-decoration:none;width:auto">
+                        $logo_path = $this->getVar('logo_path', '');
+                        if (strlen($logo_path)):
+                            $url = \Kreatif\Resource::getImageTag($logo_path, null, [], function($params) {
+                                return $params['attributes']['src'];
+                            });
+                            ?>
+                            <img src="<?= $url ?>" alt="###company.name###" style="-ms-interpolation-mode:bicubic;clear:both;display:block;max-width:100%;outline:0;text-decoration:none;width:auto">
+                        <?php else: ?>
+                            ###company.name###
+                        <?php endif; ?>
                     </th>
                 </tr>
             </table>

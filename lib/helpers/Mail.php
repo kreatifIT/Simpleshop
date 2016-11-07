@@ -26,6 +26,7 @@ class Mail extends \rex_mailer
         parent::__construct();
         $this->fragment = new \rex_fragment();
         $this->fragment->setVar('base_url', \rex_yrewrite::getFullPath());
+        $this->fragment->setVar('logo_path', 'resources/img/email/logo.png');
         $this->IsHTML(TRUE);
         return $this;
     }
@@ -55,6 +56,5 @@ class Mail extends \rex_mailer
         }
         return parent::send();
     }
-
 }
 
