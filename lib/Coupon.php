@@ -17,7 +17,7 @@ class Coupon extends Discount
 {
     const TABLE = 'rex_shop_coupon';
 
-    public static function redeem($code, $Order)
+    public static function redeem($code)
     {
         if ($code == '')
         {
@@ -29,9 +29,8 @@ class Coupon extends Discount
         {
             throw new CouponException('Coupon not exists', 1);
         }
-        $promotions           = $Order->getValue('promotions');
-        $promotions['coupon'] = $_this;
-        $Order->setValue('promotions', $promotions);
+        \rex_extension::register('simpleshop.Order.calculateDocument', [$_this, 'ext_calculateDocument']);
+
         return $_this;
     }
 
@@ -65,6 +64,15 @@ class Coupon extends Discount
         return self::query()
             ->whereRaw('(code = :w1 AND prefix = "") OR CONCAT(prefix, "-", code) = :w1', ['w1' => $code])
             ->findOne();
+    }
+
+    public function ext_calculateDocument($params)
+    {
+        $Order                = $params->getSubject();
+        $promotions           = $Order->getValue('promotions');
+        $promotions['coupon'] = $this;
+        $Order->setValue('promotions', $promotions);
+        return $Order;
     }
 }
 

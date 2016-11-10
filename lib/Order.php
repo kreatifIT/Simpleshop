@@ -127,11 +127,14 @@ class Order extends Model
         $this->updatedate     = date('Y-m-d H:i:s');
         $this->ip_address     = rex_server('REMOTE_ADDR', 'string', 'notset');
         $this->total          = $this->subtotal + $this->shipping_costs - $this->discount;
+        $this->promotions     = []; // clear promotions!
 
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.calculateDocument', $this));
 
         // add promotions
         $promotions  = [];
+
+        // set promotions for order history
         $_promotions = $this->getValue('promotions');
 
         if ($_promotions)

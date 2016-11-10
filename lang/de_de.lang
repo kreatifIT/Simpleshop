@@ -16,3 +16,6 @@ error.product_has_attribute = Das Produkt hat keine Eigenschaften zugewiesen. Kl
 
 settings.order_settings = Bestellungs-Einstellungen
 settings.order_notification_email = Email für neue Bestellungen
+settings.discount_settings = Rabatt-Einstellungen
+settings.discount_application = Rabatt-Anwendung
+settings.discounts_are_accumulable = Rabatte können (wenn möglich) alle akkumuliert/gleichzeitig angewendet werden

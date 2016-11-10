@@ -47,4 +47,49 @@ fieldset {
         padding:0 12px;
         margin-bottom:15px;
     }
+    .form-label {
+        font-weight:normal;
+        line-height:34px;
+        position: relative;
+        display: block;
+        padding-left: 36px;
+        cursor: pointer;
+        span {
+            display: block;
+            width: 24px;
+            height: 24px;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            background: #fff;
+            border: 1px solid #c1c9d4;
+            margin: -12px 0 0 0 !important;
+        }
+        input[type=radio] ~ span {
+            border-radius: 50%;
+        }
+        input[type=checkbox],
+        input[type=radio] {
+            position: absolute;
+            left: -9999px;
+        }
+        input:checked ~ span:before {
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        input[type=checkbox]:checked ~ span:before {
+            content: "✔";
+            font-size: 20px;
+        }
+        input[type=radio]:checked ~ span:before {
+            content: "";
+            width: 12px;
+            height: 12px;
+            background: #515253;
+            border-radius: 50%;
+        }
+    }
 }

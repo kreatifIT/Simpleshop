@@ -19,42 +19,33 @@ class DiscountGroup extends Discount
 
     public static function ext_calculateDocument($params)
     {
+        $Settings       = \rex::getConfig('simpleshop.Settings');
+        $apply_all      = from_array($Settings, 'discounts_are_accumulable', 0);
         $Order          = $params->getSubject();
         $order_total    = $Order->getValue('total');
         $order_quantity = $Order->getValue('quantity');
-        $discounts      = self::query()->where('status', 1)->find();
+        $discounts      = self::query()->where('status', 1)->orderBy('prior')->find();
 
         foreach ($discounts as $discount)
         {
             $price  = $discount->getValue('price');
             $amount = $discount->getValue('amount');
 
-            if ($order_total >= $price || ($amount && $order_quantity >= $amount))
+            if (($price && $order_total >= $price) || ($amount && $order_quantity >= $amount))
             {
                 $discount_id                            = $discount->getValue('id');
                 $promotions                             = $Order->getValue('promotions');
                 $promotions['discount_' . $discount_id] = $discount;
                 $Order->setValue('promotions', $promotions);
-                break; // discount found - stop here
+
+                if (!$apply_all)
+                {
+                    break; // discount found - stop here
+                }
             }
         }
         return $Order;
     }
-
-//    public function applyToOrder($Order)
-//    {
-//        $order_total    = (float) $Order->getValue('total');
-//        $order_quantity = (int) $Order->getValue('quantity');
-//        $price          = (float) $this->getValue('price');
-//        $amount         = (int) $this->getValue('amount');
-//
-//        // do some checks
-//        if ($order_total < $price && (!$amount || $order_quantity < $amount))
-//        {
-//            throw new DiscountGroupException('Not applyable anymore', 1);
-//        }
-//        return parent::applyToOrder($Order);
-//    }
 }
 
 class DiscountGroupException extends \Exception

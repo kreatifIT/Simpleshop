@@ -13,6 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+$code = $this->getVar('code');
 
 ?>
 <div class="coupon row column margin-bottom">
@@ -20,7 +21,7 @@ namespace FriendsOfREDAXO\Simpleshop;
     <form action="" method="post">
         <h3>###shop.coupon###</h3>
         <p>###shop.apply_coupon_text###</p>
-        <input type="text" name="coupon" value="<?= rex_post('coupon', 'string') ?>"/>
+        <input type="text" name="coupon" value="<?= $code ?>"/>
         <button type="submit" class="button" name="action" value="redeem_coupon">###shop.redeem_coupon###</button>
     </form>
 </div>
