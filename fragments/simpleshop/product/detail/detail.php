@@ -13,7 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-use Kreatif\Resource;
 use Sprog\Wildcard;
 
 $lable_name  = sprogfield('name');
