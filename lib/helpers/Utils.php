@@ -57,6 +57,7 @@ class Utils
     {
         $params = array_merge([
             'get_name'             => 'page',
+            'rex_geturl_params'    => [],
             'pager_elements_count' => 8,
             'use_request_uri'      => FALSE,
             'show_first_link'      => TRUE,
@@ -75,7 +76,7 @@ class Utils
         }
         else
         {
-            $paging_url = rex_getUrl(\rex_article::getCurrentId());
+            $paging_url = rex_getUrl(\rex_article::getCurrentId(), null, $params['rex_geturl_params']);
         }
         if ($totalElements > $elementsPerPage)
         {

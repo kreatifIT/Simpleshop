@@ -17,7 +17,7 @@ $total         = $this->getVar('total');
 $element_count = $this->getVar('element_count') ? $this->getVar('element_count') : 20;
 $paging_params = $this->getVar('paging_params') ? $this->getVar('paging_params') : [];
 
-if (true || $total > $element_count):
+if ($total > $element_count):
     $pagination  = Utils::getPagination($total, $element_count, [], $paging_params);
 ?>
 <div class="row column margin-top margin-bottom">
