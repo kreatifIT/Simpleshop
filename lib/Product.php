@@ -39,10 +39,20 @@ class Product extends Model
     {
         if ($this->__price === NULL || ($includeTax && $this->__tax === NULL))
         {
-            $reduced = $this->getValue('reduced_price');
-            $price   = $this->getValue('price');
-            $price   = $reduced > 0 ? $reduced : $price;
+            $type = $this->getValue('type');
 
+            if ($type == 'giftcard')
+            {
+                $includeTax = FALSE;
+                $extras     = $this->getValue('extras');
+                $price      = $extras['price'];
+            }
+            else
+            {
+                $reduced = $this->getValue('reduced_price');
+                $price   = $this->getValue('price');
+                $price   = $reduced > 0 ? $reduced : $price;
+            }
             if ($includeTax)
             {
                 $tax         = Tax::get($this->getValue('tax'))->getValue('tax');
@@ -206,7 +216,7 @@ class Product extends Model
         return $this->__variants;
     }
 
-    public static function getProductByKey($key, $cart_quantity = NULL)
+    public static function getProductByKey($key, $cart_quantity = NULL, $extras = [])
     {
         if (!strlen($key))
         {
@@ -223,6 +233,7 @@ class Product extends Model
         $features = [];
         $_this->setValue('key', $key);
         $_this->setValue('cart_quantity', $cart_quantity);
+        $_this->setValue('extras', $extras);
         $feature_ids = $variant_key ? explode(',', $variant_key) : [];
 
         if (count($feature_ids))

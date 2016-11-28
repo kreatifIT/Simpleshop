@@ -18,8 +18,9 @@ use Sprog\Wildcard;
 class Session extends Model
 {
     const TABLE = 'rex_shop_session';
-    protected static $session = NULL;
-    public static $errors  = [];
+    protected static $session      = NULL;
+    protected static $has_shipping = FALSE;
+    public static    $errors       = [];
 
     public static function cleanupSessions()
     {
@@ -122,14 +123,18 @@ class Session extends Model
         $session    = self::getSession();
         $cart_items = (array) $session->getValue('cart_items');
 
+
         if (!$raw)
         {
-            $results = [];
+            $results            = [];
+            self::$has_shipping = FALSE;
+
             foreach ($cart_items as $key => $item)
             {
                 try
                 {
-                    $product = Product::getProductByKey($key, $item['quantity']);
+                    $product            = Product::getProductByKey($key, $item['quantity'], $item['extras']);
+                    self::$has_shipping = self::$has_shipping || $product->getValue('type') == 'product';
                 }
                 catch (ProductException $ex)
                 {
@@ -192,8 +197,8 @@ class Session extends Model
                         // not enough products
                         $product = Product::getProductByKey($key, 0);
                         // update cart
-                        Session::setProductQuantity($key, $product->getValue('amount'));
-                        $label = strtr(Wildcard::get('simpleshop.error.cart_product_not_enough_amount'), [
+                        Session::setProductData($key, $product->getValue('amount'));
+                        $label          = strtr(Wildcard::get('simpleshop.error.cart_product_not_enough_amount'), [
                             '{{replace}}' => $product->getValue($label_name),
                             '{{count}}'   => $product->getValue('amount'),
                         ]);
@@ -212,6 +217,10 @@ class Session extends Model
         {
             throw new CartException('Product errors', 1);
         }
+        if (!$raw)
+        {
+            self::setCheckoutData('has_shipping', self::$has_shipping);
+        }
         return $products;
     }
 
@@ -221,18 +230,20 @@ class Session extends Model
         return $product_id . '|' . implode(',', $feature_value_ids);
     }
 
-    public static function addProduct($product_key, $quantity = 1)
+    public static function addProduct($product_key, $quantity = 1, $extras = [])
     {
         $cart_items = self::_getCartItems(TRUE);
-        self::setProductQuantity($product_key, $cart_items[$product_key]['quantity'] + $quantity);
+        self::setProductData($product_key, $cart_items[$product_key]['quantity'] + $quantity, $extras);
     }
 
-    public static function setProductQuantity($product_key, $quantity)
+    public static function setProductData($product_key, $quantity, $extras = [])
     {
         $session    = self::getSession();
         $cart_items = self::_getCartItems(TRUE);
         // update the quantity
         $cart_items[$product_key]['quantity'] = $quantity;
+        // update extras
+        $cart_items[$product_key]['extras'] = array_merge((array) $cart_items[$product_key]['extras'], $extras);
         $session->writeSession(['cart_items' => $cart_items]);
     }
 

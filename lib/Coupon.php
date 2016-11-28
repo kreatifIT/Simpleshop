@@ -34,17 +34,40 @@ class Coupon extends Discount
         return $_this;
     }
 
+    public static function createGiftcard($Order, $Product)
+    {
+        $order_id   = $Order->getValue('id');
+        $label_name = sprogfield('name');
+
+        $_this = self::create();
+        $_this->setValue($label_name, 'Giftcard Order #'. $order_id);
+        $_this->setValue('given_away', 1);
+        $_this->setValue('discount_value', $Product->getPrice());
+        $_this->setValue('prefix', 'OR');
+        $_this->setValue('orders', $order_id);
+        $_this->setValue('start_time', $Order->getValue('status') != 'OP' ? date('Y-m-d') : '9999-12-31');
+        $_this->save();
+
+        // set code to product
+        $extras = $Product->getValue('extras');
+        $extras['coupon_code'] = $_this->prefix .'-'. $_this->code;
+        $Product->setValue('extras', $extras);
+
+        // TODO: create PDF
+    }
+
     public function applyToOrder($Order)
     {
         $start = strtotime($this->getValue('start_time'));
         $end   = $this->getValue('end_time') != '' ? strtotime($this->getValue('end_time')) : NULL;
 
         // do some checks
-        if ($this->getValue('count') <= 0)
-        {
-            throw new CouponException('Coupon consumed', 2);
-        }
-        else if ($start > time())
+//        if ($this->getValue('count') <= 0)
+//        {
+//            throw new CouponException('Coupon consumed', 2);
+//        }
+//        else
+        if ($start > time())
         {
             throw new CouponException('Coupon not yet valid', 3);
         }
@@ -53,6 +76,16 @@ class Coupon extends Discount
             throw new CouponException('Coupon not valid anymore', 4);
         }
         return parent::applyToOrder($Order);
+    }
+
+    public function linkToOrder($orderId)
+    {
+        $orders   = strlen($this->getValue('orders')) ? explode(',', $this->getValue('orders')) : [];
+        $orders[] = $orderId;
+
+        $this->setValue('given_away', 1);
+        $this->setValue('orders', $orders);
+        $this->save();
     }
 
     public static function getByCode($code)

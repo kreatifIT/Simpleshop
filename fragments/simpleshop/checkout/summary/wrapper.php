@@ -49,24 +49,30 @@ if (count($errors)): ?>
     ?>
 
     <?php
-    $this->setVar('title', '###shop.shipping_address###');
-    $this->setVar('url', rex_getUrl(NULL, NULL, ['step' => 2]));
-    if ($extras['address_extras']['use_shipping_address'])
+    if ($shipping)
     {
-        $this->setVar('address', $address_2);
+        $this->setVar('title', '###shop.shipping_address###');
+        $this->setVar('url', rex_getUrl(NULL, NULL, ['step' => 2]));
+        if ($extras['address_extras']['use_shipping_address'])
+        {
+            $this->setVar('address', $address_2);
+        }
+        else
+        {
+            $this->setVar('address', $address_1);
+        }
+        $this->subfragment('simpleshop/checkout/summary/address_item.php');
     }
-    else
-    {
-        $this->setVar('address', $address_1);
-    }
-    $this->subfragment('simpleshop/checkout/summary/address_item.php');
     ?>
 
+<?php if ($shipping): ?>
 </div>
 
 <!-- Lieferung & Zahlung -->
 <div class="row radio-panels">
+<?php endif; ?>
 
+    <?php if ($shipping): ?>
     <div class="medium-6 columns margin-bottom">
         <h3>###label.shipment###</h3>
 
@@ -84,8 +90,9 @@ if (count($errors)): ?>
         $this->subfragment('simpleshop/checkout/shipping_and_payment/shipping_item.php');
         ?>
     </div>
+    <?php endif; ?>
 
-    <div class="medium-6 columns margin-bottom">
+    <div class="medium-6 columns margin-bottom <?php if (!$shipping) echo 'radio-panels no-shipping'; ?>">
         <h3>###label.payment###</h3>
 
         <?php

@@ -23,7 +23,7 @@ if ($_FUNC == 'update')
     $__products = rex_post('quantity', 'array', []);
     foreach ($__products as $key => $quantity)
     {
-        Session::setProductQuantity($key, $quantity);
+        Session::setProductData($key, $quantity);
     }
 }
 else if ($_FUNC == 'remove')
@@ -48,7 +48,6 @@ if ($products === NULL)
         }
     }
 }
-
 
 if (count($errors)):
     foreach ($errors as $error): ?>

@@ -32,15 +32,6 @@ abstract class Model extends \rex_yform_manager_dataset
             $key   = $name . '_' . $type . '_' . $typen;
 
 
-//            if (static::TABLE == Customer::TABLE)
-//            {
-//                pr($key);
-//            }
-//            if ($key == 'email_validate_empty')
-//            {
-//                pr($field);
-//            }
-
             if (!in_array($name, $this->excluded_fields))
             {
                 if (!\rex::isBackend())

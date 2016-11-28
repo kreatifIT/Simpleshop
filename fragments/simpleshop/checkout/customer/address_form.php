@@ -18,6 +18,7 @@ $addresses = [];
 $user_id   = NULL;
 
 $show_address_as_list = $this->getVar('show_address_as_list', FALSE);
+$has_shipping = $this->getVar('has_shipping', TRUE);
 $show_back_and_ahead_btn = $this->getVar('show_back_and_ahead_btn', TRUE);
 
 if (Session::getCheckoutData('Order'))
@@ -212,73 +213,80 @@ $yform->setHiddenField('id_1', $addresses[0]->getValue('id'));
 
 
 
+if ($has_shipping)
+{
+    /**
+     * Alternative shipping address
+     */
+    if ($show_address_as_list)
+    {
+        $yform->setValueField('html', ['opening_tag', '<div class="shipping-address padding-top"><h2>###shop.shipping_address###</h2>']);
+    }
+    else
+    {
+        $yform->setValueField('checkbox', [
+            'name'              => 'use_shipping_address',
+            'label'             => '###shop.use_alternative_shipping_address###',
+            'alternative_label' => '###shop.shipping_address###',
+            'default'           => $extras['address_extras']['use_shipping_address'],
+            'strong'            => TRUE,
+        ]);
 
-/**
- * Alternative shipping address
- */
-if ($show_address_as_list)
-{
-    $yform->setValueField('html', ['opening_tag', '<div class="shipping-address padding-top"><h2>###shop.shipping_address###</h2>']);
-}
-else
-{
-    $yform->setValueField('checkbox', [
-        'name'              => 'use_shipping_address',
-        'label'             => '###shop.use_alternative_shipping_address###',
-        'alternative_label' => '###shop.shipping_address###',
-        'default'           => $extras['address_extras']['use_shipping_address'],
-        'strong'            => TRUE,
+        $visibility_class = $extras['address_extras']['use_shipping_address'] ?: 'style="display: none;"';
+        $yform->setValueField('html', ['opening_tag', '<div id="alternative-shipping-address" ' . $visibility_class . '>']);
+    }
+
+    $yform->setValueField('text', [
+        'name'    => 'customer_address.2.firstname',
+        'label'   => '###label.firstname###',
+        'default' => $addresses[1]->getValue('firstname'),
     ]);
 
-    $visibility_class = $extras['address_extras']['use_shipping_address'] ?: 'style="display: none;"';
-    $yform->setValueField('html', ['opening_tag', '<div id="alternative-shipping-address" ' . $visibility_class . '>']);
+    $yform->setValueField('text', [
+        'name'    => 'customer_address.2.lastname',
+        'label'   => '###label.lastname###',
+        'default' => $addresses[1]->getValue('lastname'),
+    ]);
+
+    $yform->setValueField('text', [
+        'name'    => 'customer_address.2.additional',
+        'label'   => '###label.addition###',
+        'default' => $addresses[1]->getValue('additional'),
+    ]);
+
+    $yform->setValueField('text', [
+        'name'    => 'customer_address.2.street',
+        'label'   => '###label.street###',
+        'default' => $addresses[1]->getValue('street'),
+    ]);
+
+    $yform->setValueField('text', [
+        'name'    => 'customer_address.2.location',
+        'label'   => '###label.location###',
+        'default' => $addresses[1]->getValue('location'),
+    ]);
+
+    $yform->setValueField('text', [
+        'name'    => 'customer_address.2.zip',
+        'label'   => '###label.postal###',
+        'default' => $addresses[1]->getValue('zip'),
+    ]);
+
+    $yform->setValueField('text', [
+        'name'     => 'customer_address.2.country',
+        'label'    => '###label.country###',
+        'default'  => $addresses[1]->getValue('country'),
+    ]);
+
+    $yform->setHiddenField('id_2', $addresses[1]->getValue('id'));
+
+    $yform->setValueField('html', ['closing_tag', '</div>']);
 }
 
-$yform->setValueField('text', [
-    'name'    => 'customer_address.2.firstname',
-    'label'   => '###label.firstname###',
-    'default' => $addresses[1]->getValue('firstname'),
-]);
 
-$yform->setValueField('text', [
-    'name'    => 'customer_address.2.lastname',
-    'label'   => '###label.lastname###',
-    'default' => $addresses[1]->getValue('lastname'),
-]);
 
-$yform->setValueField('text', [
-    'name'    => 'customer_address.2.additional',
-    'label'   => '###label.addition###',
-    'default' => $addresses[1]->getValue('additional'),
-]);
 
-$yform->setValueField('text', [
-    'name'    => 'customer_address.2.street',
-    'label'   => '###label.street###',
-    'default' => $addresses[1]->getValue('street'),
-]);
 
-$yform->setValueField('text', [
-    'name'    => 'customer_address.2.location',
-    'label'   => '###label.location###',
-    'default' => $addresses[1]->getValue('location'),
-]);
-
-$yform->setValueField('text', [
-    'name'    => 'customer_address.2.zip',
-    'label'   => '###label.postal###',
-    'default' => $addresses[1]->getValue('zip'),
-]);
-
-$yform->setValueField('text', [
-    'name'     => 'customer_address.2.country',
-    'label'    => '###label.country###',
-    'default'  => $addresses[1]->getValue('country'),
-]);
-
-$yform->setHiddenField('id_2', $addresses[1]->getValue('id'));
-
-$yform->setValueField('html', ['closing_tag', '</div>']);
 
 /**
  * Submit

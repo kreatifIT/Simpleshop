@@ -13,24 +13,29 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$label_name = sprogfield('name');
-$product = $this->getVar('product');
-$class = $this->getVar('class');
-$has_rm_btn = $this->getVar('has_remove_button', TRUE);
-$has_image = $this->getVar('has_image', TRUE);
+$label_name       = sprogfield('name');
+$product          = $this->getVar('product');
+$class            = $this->getVar('class');
+$has_rm_btn       = $this->getVar('has_remove_button', TRUE);
+$has_image        = $this->getVar('has_image', TRUE);
 $email_tpl_styles = $this->getVar('email_tpl_styles', []);
-$image = $product->getValue('image');
-$price = $product->getPrice(TRUE);
-$features = $product->getValue('features');
-$quantity = $product->getValue('cart_quantity');
-$key = $product->getValue('key');
-$product_url = $product->getUrl();
+$image            = $product->getValue('image');
+$price            = $product->getPrice(TRUE);
+$features         = $product->getValue('features');
+$quantity         = $product->getValue('cart_quantity');
+$key              = $product->getValue('key');
+$product_url      = $product->getUrl();
+$is_giftcard      = $product->getValue('type') == 'giftcard';
+$extras           = $product->getValue('extras');
+$has_qty_ctrl     = $is_giftcard ? FALSE : $this->getVar('has_quantity_control', TRUE);
+
 
 $Category = Category::get($product->getValue('category_id'));
 
-if ($has_image && strlen($image) == 0 && strlen($product->getValue('gallery'))) {
+if ($has_image && strlen($image) == 0 && strlen($product->getValue('gallery')))
+{
     $gallery = explode(',', $product->getValue('gallery'));
-    $image = $gallery[0];
+    $image   = $gallery[0];
 }
 
 ?>
@@ -44,9 +49,16 @@ if ($has_image && strlen($image) == 0 && strlen($product->getValue('gallery'))) 
         <h3 style="<?= $email_tpl_styles['h3'] ? $email_tpl_styles['h3'] : '' ?>">
             <?= $product->getValue($label_name) ?>
         </h3>
+        <?php if (!$is_giftcard): ?>
         <p style="<?= $email_tpl_styles['p'] ? $email_tpl_styles['p'] : '' ?>">
             <?= $Category->getValue($label_name) ?>
         </p>
+        <?php elseif($extras['coupon_code']): ?>
+        <br/>
+        <code style="<?= $email_tpl_styles['code'] ?>">
+            Code: <?= $extras['coupon_code'] ?>
+        </code>
+        <?php endif; ?>
         <?php if (count($features)): ?>
             <?php foreach ($features as $feature): ?>
                 <div class="feature"><?= $feature->getValue($label_name) ?></div>
@@ -58,7 +70,7 @@ if ($has_image && strlen($image) == 0 && strlen($product->getValue('gallery'))) 
     </td>
     <td class="amount" style="<?= $email_tpl_styles['td'] ? $email_tpl_styles['td'] : '' ?>">
         <?php
-        $this->setVar('has_quantity_control', $this->getVar('has_quantity_control', TRUE));
+        $this->setVar('has_quantity_control', $has_qty_ctrl);
         $this->setVar('has_refresh_button', $this->getVar('has_refresh_button', TRUE));
         $this->setVar('cart-quantity', $quantity);
         $this->setVar('product_key', $key);

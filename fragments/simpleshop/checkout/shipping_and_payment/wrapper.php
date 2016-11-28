@@ -13,8 +13,9 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$shippings = Shipping::getAll();
-$payments  = Payment::getAll();
+$shippings    = Shipping::getAll();
+$payments     = Payment::getAll();
+$has_shipping = $this->getVar('has_shipping');
 
 if (Session::getCheckoutData('Order'))
 {
@@ -23,16 +24,20 @@ if (Session::getCheckoutData('Order'))
     $this->setVar('payment', $Order->getValue('payment'));
 }
 
+$this->setVar('class', 'medium-6 columns margin-bottom');
+
 ?>
 <form action="" method="post">
     <div class="radio-panels row column margin-top">
+
+        <?php if ($has_shipping): ?>
         <!-- Shipment -->
         <h3>###label.shipment###</h3>
 
         <fieldset class="row">
             <?php
-            $this->setVar('class', 'medium-6 columns margin-bottom');
-            
+
+
             foreach ($shippings as $shipping)
             {
                 $this->setVar('name', $shipping->getName());
@@ -43,6 +48,7 @@ if (Session::getCheckoutData('Order'))
         </fieldset>
 
         <span class="horizontal-rule large-rule margin-bottom"></span>
+        <?php endif; ?>
 
         <!-- Payment -->
         <h3>###label.payment###</h3>
@@ -62,7 +68,7 @@ if (Session::getCheckoutData('Order'))
     </div>
     <div class="row buttons-checkout margin-bottom">
         <div class="medium-6 columns">
-            <a href="<?= rex_getUrl(null, null, ['step' => 2]) ?>" class="button button-gray">###action.go_back###</a>
+            <a href="<?= rex_getUrl(NULL, NULL, ['step' => 2]) ?>" class="button button-gray">###action.go_back###</a>
         </div>
         <div class="medium-6 columns">
             <button type="submit" name="action" value="process_shipping_and_payment" class="button button-checkout">###action.go_ahead###</button>

@@ -15,22 +15,32 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 $Order     = $this->getVar('order');
 $discounts = $this->getVar('discounts');
+$tax       = $Order->getValue('tax');
+$shipping  = $Order->getValue('shipping_costs');
+$subtotal  = $Order->getValue('subtotal');
+$total     = $Order->getValue('total');
 
 ?>
 <div class="row column">
     <div class="order-total">
+        <?php if ($tax > 0): ?>
         <div class="subtotal">
-            <span>&euro; <?= format_price($Order->getValue('tax')) ?></span>
+            <span>&euro; <?= format_price($tax) ?></span>
             <span>###label.tax_included###</span>
         </div>
+        <?php endif; ?>
+        <?php if ($subtotal != $total): ?>
         <div class="subtotal">
-            <span>&euro; <?= format_price($Order->getValue('subtotal')) ?></span>
+            <span>&euro; <?= format_price($subtotal) ?></span>
             <span>###label.subtotal###</span>
         </div>
+        <?php endif; ?>
+        <?php if ($shipping > 0): ?>
         <div class="subtotal ">
-            <span>&euro; <?= format_price($Order->getValue('shipping_costs')) ?></span>
+            <span>&euro; <?= format_price($shipping) ?></span>
             <span>###label.shipment_cost###</span>
         </div>
+        <?php endif; ?>
         <?php foreach ($discounts as $discount): ?>
             <div class="subtotal ">
                 <span>&euro; -<?= format_price($discount['value']) ?></span>
@@ -38,7 +48,7 @@ $discounts = $this->getVar('discounts');
             </div>
         <?php endforeach; ?>
         <div class="subtotal total">
-            <span>&euro; <?= format_price($Order->getValue('total')) ?></span>
+            <span>&euro; <?= format_price($total) ?></span>
             <span>###label.total_sum###</span>
         </div>
     </div>

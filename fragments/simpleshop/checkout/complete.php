@@ -13,9 +13,9 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$Order   = $this->getVar('order');
+$Order = $this->getVar('order');
 $Payment = $Order->getValue('payment');
-$Shiping = $Order->getValue('shipping');
+$Shipping = $Order->getValue('shipping');
 
 ?>
 
@@ -24,13 +24,16 @@ $Shiping = $Order->getValue('shipping');
     </div>
 
 
-<?php
+    <?php
 
 if ($Order->getValue('total') > 0)
 {
     $this->subfragment('simpleshop/payment/' . $Payment->plugin_name . '/order_complete.php');
 }
-$this->subfragment('simpleshop/shipping/' . $Shiping->plugin_name . '/order_complete.php');
+if ($Shipping)
+{
+    $this->subfragment('simpleshop/shipping/' . $Shipping->plugin_name . '/order_complete.php');
+}
 
 // CLEAR THE SESSION
 Session::clearCheckout();

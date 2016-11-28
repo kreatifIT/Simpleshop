@@ -43,14 +43,7 @@ class Order extends Model
             if ($create_order && isset ($promotions['coupon']))
             {
                 // relate coupon
-                $coupon   = $promotions['coupon'];
-                $orders   = strlen($coupon->getValue('orders')) ? explode(',', $coupon->getValue('orders')) : [];
-                $orders[] = $order_id;
-
-                $coupon->setValue('given_away', 1);
-                $coupon->setValue('count', $coupon->getValue('count') - 1);
-                $coupon->setValue('orders', $orders);
-                $coupon->save();
+                $promotions['coupon']->linkToOrder($order_id);
             }
 
             // clear all products first
@@ -67,19 +60,26 @@ class Order extends Model
                 {
                     $product->setValue($name, $value);
                 }
-                if ($create_order && $product->getValue('inventory') == 'F')
+                if ($create_order)
                 {
-                    // update inventory
-                    if ($product->getValue('variant_key'))
+                    if ($product->getValue('inventory') == 'F')
                     {
-                        $Variant = Variant::getByVariantKey($product->getValue('key'));
-                        $Variant->setValue('amount', $Variant->getValue('amount') - $quantity);
-                        $Variant->save();
+                        // update inventory
+                        if ($product->getValue('variant_key'))
+                        {
+                            $Variant = Variant::getByVariantKey($product->getValue('key'));
+                            $Variant->setValue('amount', $Variant->getValue('amount') - $quantity);
+                            $Variant->save();
+                        }
+                        else
+                        {
+                            $product->setValue('amount', $product->getValue('amount') - $quantity);
+                            $product->save();
+                        }
                     }
-                    else
+                    if ($product->getValue('type') == 'giftcard')
                     {
-                        $product->setValue('amount', $product->getValue('amount') - $quantity);
-                        $product->save();
+                        Coupon::createGiftcard($this, $product);
                     }
                 }
                 OrderProduct::create()
@@ -126,7 +126,8 @@ class Order extends Model
         $this->shipping_costs = (float) $this->shipping ? $this->shipping->getPrice() : 0;
         $this->updatedate     = date('Y-m-d H:i:s');
         $this->ip_address     = rex_server('REMOTE_ADDR', 'string', 'notset');
-        $this->total          = $this->subtotal + $this->shipping_costs - $this->discount;
+        $this->initial_total  = $this->subtotal + $this->shipping_costs;
+        $this->total          = $this->initial_total - $this->discount;
         $this->promotions     = []; // clear promotions!
 
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.calculateDocument', $this));
