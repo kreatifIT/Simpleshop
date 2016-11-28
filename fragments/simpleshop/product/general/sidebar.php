@@ -209,6 +209,8 @@ if (!$object_id || $object_data->urlParamKey != 'product_id'): ?>
     </ul>
 </div>
 <span class="horizontal-rule"></span>
+<a href="<?= rex_getUrl(\Kreatif\Project\Settings::GIFT_CARD_PAGE_ID); ?>" class="button expanded">###label.order_gift_card###</a>
+<span class="horizontal-rule"></span>
 <div class="badges">
     <img src="<?= \rex_url::base('resources/img/siegel_rasenfix_de.jpg') ?>" alt=""/>
 </div>
