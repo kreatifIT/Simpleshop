@@ -13,8 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-use Kreatif\Settings;
-
 $product = $this->getVar('product');
 $image   = $product->getValue('image');
 

@@ -81,6 +81,29 @@ class rex_api_simpleshop_api extends rex_api_function
         $this->response['total_formated'] = format_price($result['total']);
     }
 
+    private function api__cart_addgiftcard()
+    {
+        $product_key = rex_post('product_key', 'string', NULL);
+        $extras      = rex_post('extras', 'array', []);
+
+        if (!$product_key)
+        {
+            throw new rex_api_exception("Invalid request arguments");
+        }
+
+        try
+        {
+            rex_extension::registerPoint(new rex_extension_point('Api.Cart.addGiftcard.PRE_ADD', $product_key, ['extras' => $extras]));
+
+            \FriendsOfREDAXO\Simpleshop\Session::setProductData($product_key, 1, $extras);
+            $this->api__cart_getpopupcontent();
+        }
+        catch (ApiExtension $ex)
+        {
+            $this->getErrorPopup($ex->getLabelByCode());
+        }
+    }
+
     private function api__cart_addproduct()
     {
         $product_key = rex_post('product_key', 'string', NULL);
@@ -91,6 +114,7 @@ class rex_api_simpleshop_api extends rex_api_function
         {
             throw new rex_api_exception("Invalid request arguments");
         }
+
         \FriendsOfREDAXO\Simpleshop\Session::addProduct($product_key, $quantity, $extras);
         $this->api__cart_getpopupcontent();
     }
@@ -119,4 +143,15 @@ class rex_api_simpleshop_api extends rex_api_function
         \FriendsOfREDAXO\Simpleshop\Session::removeProduct($product_key);
         $this->api__cart_getcartcontent();
     }
+
+    private function getErrorPopup($message)
+    {
+        $fragment = new rex_fragment();
+        $fragment->setVar('message', $message);
+        $this->response['popup_html'] = $fragment->parse('simpleshop/product/general/cart/popup_error.php');
+    }
+}
+
+class ApiExtension extends Exception {
+    public function getLabelByCode() {}
 }
