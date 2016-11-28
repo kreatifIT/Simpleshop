@@ -52,7 +52,8 @@ class Coupon extends Discount
         $extras                = $Product->getValue('extras');
         $extras['coupon_code'] = $_this->prefix . '-' . $_this->code;
         $Product->setValue('extras', $extras);
-        // TODO: create PDF
+
+        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Coupon.createGiftcard.CREATED', $_this, ['Order' => $Order, 'Product' => $Product]));
     }
 
     public function applyToOrder($Order)
