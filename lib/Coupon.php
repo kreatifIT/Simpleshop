@@ -40,7 +40,7 @@ class Coupon extends Discount
         $label_name = sprogfield('name');
 
         $_this = self::create();
-        $_this->setValue($label_name, 'Giftcard Order #'. $order_id);
+        $_this->setValue($label_name, 'Giftcard Order #' . $order_id);
         $_this->setValue('given_away', 1);
         $_this->setValue('discount_value', $Product->getPrice());
         $_this->setValue('prefix', 'OR');
@@ -49,25 +49,37 @@ class Coupon extends Discount
         $_this->save();
 
         // set code to product
-        $extras = $Product->getValue('extras');
-        $extras['coupon_code'] = $_this->prefix .'-'. $_this->code;
+        $extras                = $Product->getValue('extras');
+        $extras['coupon_code'] = $_this->prefix . '-' . $_this->code;
         $Product->setValue('extras', $extras);
-
         // TODO: create PDF
     }
 
     public function applyToOrder($Order)
     {
-        $start = strtotime($this->getValue('start_time'));
-        $end   = $this->getValue('end_time') != '' ? strtotime($this->getValue('end_time')) : NULL;
+        $start   = strtotime($this->getValue('start_time'));
+        $end     = $this->getValue('end_time') != '' ? strtotime($this->getValue('end_time')) : NULL;
+        $value   = $this->getValue('discount_value');
+        $percent = $this->getValue('discount_percent');
+        $orders  = (array) $this->getValue('orders');
+
+        // calculate residual balance
+        if ($value && count($orders))
+        {
+            $_value = $value;
+            foreach ($orders as $order_id => $order_discount)
+            {
+                $value -= $order_discount;
+            }
+            $this->setValue('discount_value', $value);
+        }
 
         // do some checks
-//        if ($this->getValue('count') <= 0)
-//        {
-//            throw new CouponException('Coupon consumed', 2);
-//        }
-//        else
-        if ($start > time())
+        if (count($orders) && ($value <= 0 || $percent))
+        {
+            throw new CouponException('Coupon consumed', 2);
+        }
+        else if ($start > time())
         {
             throw new CouponException('Coupon not yet valid', 3);
         }
@@ -75,16 +87,29 @@ class Coupon extends Discount
         {
             throw new CouponException('Coupon not valid anymore', 4);
         }
-        return parent::applyToOrder($Order);
+        $result = parent::applyToOrder($Order);
+
+        if (isset ($_value))
+        {
+            $this->setValue('discount_value', $_value);
+        }
+        return $result;
     }
 
-    public function linkToOrder($orderId)
+    public function linkToOrder($Order)
     {
-        $orders   = strlen($this->getValue('orders')) ? explode(',', $this->getValue('orders')) : [];
-        $orders[] = $orderId;
+        $orders = (array) $this->getValue('orders');
+        $value  = $this->getValue('discount_value');
+        $total  = $Order->getValue('initial_total');
+
+        foreach ($orders as $order_id => $order_discount)
+        {
+            $value -= $order_discount;
+        }
+        $orders[$Order->getValue('id')] = $total < $value ? $total : $value;
 
         $this->setValue('given_away', 1);
-        $this->setValue('orders', $orders);
+        $this->setValue('orders', json_encode($orders));
         $this->save();
     }
 

@@ -43,7 +43,7 @@ class Order extends Model
             if ($create_order && isset ($promotions['coupon']))
             {
                 // relate coupon
-                $promotions['coupon']->linkToOrder($order_id);
+                $promotions['coupon']->linkToOrder($this);
             }
 
             // clear all products first
