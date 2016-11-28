@@ -14,6 +14,7 @@ class rex_api_simpleshop_api extends rex_api_function
 {
     protected $response  = [];
     protected $published = TRUE;
+    protected $success   = TRUE;
 
     public function execute()
     {
@@ -36,7 +37,7 @@ class rex_api_simpleshop_api extends rex_api_function
             throw new rex_api_exception($ex->getMessage());
         }
         $this->response['controller'] = strtolower($controller);
-        return new rex_api_result(TRUE, $this->response);
+        return new rex_api_result($this->success, $this->response);
     }
 
     private function api__cart_getpopupcontent()
@@ -100,6 +101,7 @@ class rex_api_simpleshop_api extends rex_api_function
         }
         catch (ApiExtension $ex)
         {
+            $this->success = FALSE;
             $this->getErrorPopup($ex->getLabelByCode());
         }
     }
