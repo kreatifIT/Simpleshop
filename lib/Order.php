@@ -27,13 +27,13 @@ class Order extends Model
     }
 
 
-    public function save($create_order = FALSE)
+    public function save($create_order = FALSE, $simple_save = FALSE)
     {
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this));
 
         $result = parent::save(TRUE);
 
-        if ($result)
+        if ($result && !$simple_save)
         {
             $order_id   = $this->getValue('id');
             $promotions = $this->getValue('promotions');

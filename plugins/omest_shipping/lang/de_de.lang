@@ -1,3 +1,8 @@
 omest_shipping.set_orders_to_send = Bestellungen zum Versand freigeben
 omest_shipping.orders_info_text = Wählen Sie hier die Bestellungen aus die für Omest zum Versand freigegeben werden sollen.
 omest_shipping.no_orders_to_send = Keine Bestellungen für den Versand bereit
+omest_shipping.orders_submitted = %d Bestellungen erfolgreich an das Logistic Center übermittelt
+omest_shipping.orders_not_submitted = Fehler beim übermitteln der Bestellungen
+omest_shipping.api_settings = Schnittstellen-Einstellungen
+
+omest_shipping.error.order_has_no_product = Bestellung Nr %d hat keine Produkte!

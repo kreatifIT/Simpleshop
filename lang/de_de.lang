@@ -4,6 +4,8 @@ label.variants = Varianten
 label.order_no = Bestellnr.
 label.customer = Kunde
 label.order_sum = Bestellsumme
+label.orders = Bestellungen
+label.data_saved = Daten gespeichert
 
 
 action.manage_variants = Varianten verwalten

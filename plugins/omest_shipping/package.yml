@@ -6,4 +6,5 @@ page:
     title: Omest Shipping
     perm: shop[shipping_omest]
     subpages:
-        orders: { title:shipping_omest, hidden: true }
+        orders: { title:translate:label.orders }
+        settings: { title:translate:settings }

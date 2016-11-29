@@ -17,6 +17,11 @@ class CustomerAddress extends Model
 {
     const TABLE = 'rex_shop_customer_address';
 
+    public function getName()
+    {
+        return $this->getValue('firstname') .' '. $this->getValue('lastname');
+    }
+
     public static function action__save_checkout_address($action)
     {
         $addresses  = [];

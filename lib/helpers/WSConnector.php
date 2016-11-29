@@ -131,7 +131,11 @@ class WSConnector
         }
         else if ($method == 'get' && !empty ($_data))
         {
-            $args = '?' . http_build_query($_data);
+            if (is_array ($_data))
+            {
+                $_data = http_build_query($_data);
+            }
+            $args = '?' . $_data;
         }
         curl_setopt($s, CURLOPT_FRESH_CONNECT, TRUE);
 
@@ -202,9 +206,16 @@ class WSConnector
         }
 
         // everything fine - parse response
-        if ($this->_resp_format == 'application/json')
+        if ($this->_resp_format == 'application/json' && !is_array($this->response['response']))
         {
-            $this->response['response'] = json_decode($this->response['response'], TRUE);
+            if (is_object($this->response['response']))
+            {
+                $this->response['response'] = (array) $this->response['response'];
+            }
+            else if (is_string($this->response['response']))
+            {
+                $this->response['response'] = json_decode($this->response['response'], TRUE);
+            }
         }
         if ($this->debug)
         {

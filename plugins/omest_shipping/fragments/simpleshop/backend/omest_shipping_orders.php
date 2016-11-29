@@ -14,8 +14,9 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-$Addon  = $this->getVar('Addon');
-$orders = $this->getVar('orders');
+$Addon     = $this->getVar('Addon');
+$orders    = $this->getVar('orders');
+$order_ids = $this->getVar('order_ids');
 
 ?>
 <fieldset>
@@ -34,13 +35,13 @@ $orders = $this->getVar('orders');
         <?php if (count($orders)): ?>
             <?php foreach ($orders as $order):
                 $Customer = Customer::get($order->getValue('customer_id'));
-            ?>
-            <tr>
-                <td><input type="checkbox" name="orders[]" value="<?= $order->getValue('id') ?>" checked="checked"/></td>
-                <td><?= $order->getValue('id') ?></td>
-                <td><?= $Customer->getName() ?></td>
-                <td><?= $order->getValue('total') ?></td>
-            </tr>
+                ?>
+                <tr>
+                    <td><input type="checkbox" name="orders[]" value="<?= $order->getValue('id') ?>" <?php if (empty($order_ids) || in_array($order->getValue('id'), $order_ids)) echo 'checked="checked"'; ?>/></td>
+                    <td><?= $order->getValue('id') ?></td>
+                    <td><?= $Customer->getName() ?></td>
+                    <td><?= $order->getValue('total') ?></td>
+                </tr>
             <?php endforeach; ?>
         <?php else: ?>
             <tr>

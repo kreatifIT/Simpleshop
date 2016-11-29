@@ -23,7 +23,10 @@ $Settings = $this->getVar('Settings');
     <legend><?= $Addon->i18n('settings.discount_settings'); ?></legend>
     <dl class="rex-form-group form-group">
         <dt><?= $Addon->i18n('settings.discount_application'); ?></dt>
-        <dd><label class="form-label"><input type="checkbox" name="discounts_are_accumulable" value="1" <?php if (from_array($Settings, 'discounts_are_accumulable') == 1) echo 'checked="checked"'; ?>/><span></span><?= $Addon->i18n('settings.discounts_are_accumulable'); ?></label></dd>
+        <dd><label class="form-label"><input type="checkbox" name="discounts_are_accumulable" value="1" <?php if (from_array($Settings, 'discounts_are_accumulable') == 1)
+                {
+                    echo 'checked="checked"';
+                } ?>/><span></span><?= $Addon->i18n('settings.discounts_are_accumulable'); ?></label></dd>
     </dl>
 
     <legend><?= $Addon->i18n('settings.order_settings'); ?></legend>
@@ -32,16 +35,19 @@ $Settings = $this->getVar('Settings');
         <dd><input type="email" class="form-control" name="order_notification_email" value="<?= from_array($Settings, 'order_notification_email') ?>"/></dd>
     </dl>
 
-<!--    <br/>-->
-<!---->
-<!--    <legend>--><?//= $Addon->i18n('url_settings'); ?><!--</legend>-->
-<!--    <p>--><?//= $Addon->i18n('setup_column_creating_text'); ?><!--</p>-->
-<!--    <div class="row">-->
-<!--        <div class="col-sm-12">-->
-<!--            <div class="rex-select-style">-->
-<!--                --><?//= \rex_var_linklist::getWidget(1, 'test', '') ?>
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
+    <!--    <br/>-->
+    <!---->
+    <!--    <legend>--><? //= $Addon->i18n('url_settings');
+    ?><!--</legend>-->
+    <!--    <p>--><? //= $Addon->i18n('setup_column_creating_text');
+    ?><!--</p>-->
+    <!--    <div class="row">-->
+    <!--        <div class="col-sm-12">-->
+    <!--            <div class="rex-select-style">-->
+    <!--                --><? //= \rex_var_linklist::getWidget(1, 'test', '')
+    ?>
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
 
 </fieldset>

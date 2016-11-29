@@ -150,7 +150,7 @@ abstract class Model extends \rex_yform_manager_dataset
                         {
                             $Object = call_user_func_array([$value['class'], 'get'], [$data['id']]);
                         }
-                        else
+                        if (!$Object)
                         {
                             $Object = call_user_func([$value['class'], 'create']);
                         }
