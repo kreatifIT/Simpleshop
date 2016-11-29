@@ -13,6 +13,8 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+echo \rex_view::title('Simpleshop');
+
 $_FUNC = rex_post('func', 'string');
 
 if($_FUNC == 'save')
@@ -21,23 +23,27 @@ if($_FUNC == 'save')
     \rex::setConfig('simpleshop.Settings', $_POST);
 }
 
-echo \rex_view::title('Simpleshop');
+$orders = Order::query()
+    ->where('status', 'IP')
+    ->where('shipping_key', '')
+    ->where('shipping', '', '!=')
+    ->orderBy('id')
+    ->find();
 
 $sections = '';
 $fragment = new \rex_fragment();
 $fragment->setVar('Addon', $this);
-$fragment->setVar('Settings', \rex::getConfig('simpleshop.Settings'));
-$content  = $fragment->parse('simpleshop/backend/settings.php');
+$fragment->setVar('orders', $orders);
+$content  = $fragment->parse('simpleshop/backend/omest_shipping_orders.php');
 
 $fragment = new \rex_fragment();
 $fragment->setVar('body', $content, FALSE);
 $fragment->setVar('class', 'edit', FALSE);
-$fragment->setVar('title', $this->i18n('setup'), FALSE);
+$fragment->setVar('title', $this->i18n('omest_shipping.set_orders_to_send'), FALSE);
 $sections .= $fragment->parse('core/page/section.php');
 
 $formElements = [
-    ['field' => '<a class="btn btn-abort" href="' . \rex_url::currentBackendPage() . '">' . \rex_i18n::msg('form_abort') . '</a>'],
-    ['field' => '<button class="btn btn-apply rex-form-aligned" type="submit" name="func" value="save"' . \rex::getAccesskey(\rex_i18n::msg('update'), 'apply') . '>' . \rex_i18n::msg('update') . '</button>'],
+    ['field' => '<button class="btn btn-apply rex-form-aligned" type="submit" name="func" value="save"' . \rex::getAccesskey(\rex_i18n::msg('action.submit'), 'apply') . '>' . \rex_i18n::msg('action.submit') . '</button>'],
 ];
 $fragment = new \rex_fragment();
 $fragment->setVar('elements', $formElements, FALSE);

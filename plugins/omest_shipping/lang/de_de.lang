@@ -1,0 +1,3 @@
+omest_shipping.set_orders_to_send = Bestellungen zum Versand freigeben
+omest_shipping.orders_info_text = Wählen Sie hier die Bestellungen aus die für Omest zum Versand freigegeben werden sollen.
+omest_shipping.no_orders_to_send = Keine Bestellungen für den Versand bereit

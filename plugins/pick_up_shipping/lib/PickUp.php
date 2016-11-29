@@ -15,16 +15,16 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 class PickUp extends ShippingAbstract
 {
-    protected $price = 0;
-    protected $name  = '###shop.shipping_pickup_point###';
+    const NAME  = '###shop.shipping_pickup_point###';
+    const PRICE = 0;
 
-    public function getPrice()
+    public function getPrice($products)
     {
-        return $this->price;
+        return self::PRICE;
     }
 
     public function getName()
     {
-        return $this->name;
+        return self::NAME;
     }
 }

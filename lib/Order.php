@@ -123,7 +123,7 @@ class Order extends Model
             $this->quantity += $quantity;
         }
         // get shipping costs
-        $this->shipping_costs = (float) $this->shipping ? $this->shipping->getPrice() : 0;
+        $this->shipping_costs = (float) $this->shipping ? $this->shipping->getPrice($products) : 0;
         $this->updatedate     = date('Y-m-d H:i:s');
         $this->ip_address     = rex_server('REMOTE_ADDR', 'string', 'notset');
         $this->initial_total  = $this->subtotal + $this->shipping_costs;

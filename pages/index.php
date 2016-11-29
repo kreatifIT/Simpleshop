@@ -13,8 +13,4 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-if (\rex_be_controller::getCurrentPage() != 'simpleshop/variants')
-{
-    echo \rex_view::title('Simpleshop');
-}
 \rex_be_controller::includeCurrentPageSubPath();

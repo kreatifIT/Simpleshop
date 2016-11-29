@@ -1,3 +1,9 @@
 package: simpleshop/omest_shipping
 version: '1.0'
 author: FriendsOfREDAXO
+
+page:
+    title: Omest Shipping
+    perm: shop[shipping_omest]
+    subpages:
+        orders: { title:shipping_omest, hidden: true }

@@ -14,8 +14,10 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $Order    = $this->getVar('Order');
+$add_info = $this->getVar('additional_info');
 $Payment  = $Order->getValue('payment');
 $Shipping = $Order->getValue('shipping');
+
 $this->setVar('order', $Order);
 
 ?>
@@ -29,12 +31,16 @@ if ($Shipping)
 }
 $this->subfragment('simpleshop/payment/' . $Payment->plugin_name . '/order_complete.php');
 
-$order      = $this->getVar('order');
-$order_id   = $order->getValue('id');
-$address_1  = $order->getValue('address_1');
-$address_2  = $order->getValue('address_2');
-$promotions = $order->getValue('promotions');
-$extras     = $order->getValue('extras');
+if (strlen($add_info))
+{
+    echo "<p>{$add_info}</p>";
+}
+
+$order_id   = $Order->getValue('id');
+$address_1  = $Order->getValue('address_1');
+$address_2  = $Order->getValue('address_2');
+$promotions = $Order->getValue('promotions');
+$extras     = $Order->getValue('extras');
 
 $products  = [];
 $_products = OrderProduct::query()->where('order_id', $order_id)->find();
@@ -135,6 +141,7 @@ foreach ($_products as $product)
             style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0!important;text-align:left;visibility:hidden;width:0"></th>
     </tr>
 </table>
+
 <!-- cart content -->
 <?php
 
@@ -193,10 +200,6 @@ if ($promotions)
         }
     }
 }
-
-$this->setVar('discounts', $discounts);
-$Order     = $this->getVar('order');
-$discounts = $this->getVar('discounts');
 
 $sum_table_styles = [
     'table' => 'border-collapse:collapse;border-spacing:0;margin-top:20px;padding:0;text-align:left;vertical-align:top;width:100%;',

@@ -35,6 +35,8 @@ if ($Shipping)
     $this->subfragment('simpleshop/shipping/' . $Shipping->plugin_name . '/order_complete.php');
 }
 
+echo \rex_extension::registerPoint(new \rex_extension_point('simpleshop.checkout.complete_additional_info', ''));
+
 // CLEAR THE SESSION
 Session::clearCheckout();
 Session::clearCart();

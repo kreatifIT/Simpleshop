@@ -23,7 +23,7 @@ abstract class ShippingAbstract extends PluginAbstract
 {
     public $plugin_name;
 
-    public abstract function getPrice();
+    public abstract function getPrice($products);
 
     public static function get()
     {
