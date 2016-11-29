@@ -35,7 +35,13 @@ if ($Shipping)
     $this->subfragment('simpleshop/shipping/' . $Shipping->plugin_name . '/order_complete.php');
 }
 
-echo \rex_extension::registerPoint(new \rex_extension_point('simpleshop.checkout.complete_additional_info', ''));
+$additional_info = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.checkout.complete_additional_info', ''));
+
+if (strlen($additional_info)): ?>
+<div class="row column text-center margin-bottom">
+    <p><?= $additional_info ?></p>
+</div>
+<?php endif;
 
 // CLEAR THE SESSION
 Session::clearCheckout();

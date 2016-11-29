@@ -15,3 +15,5 @@
 //{
 //    rex_dir::copy($this->getPath('data'), $this->getDataPath());
 //}
+
+rex_dir::create(rex_path::addonData('simpleshop', 'log'), TRUE);
