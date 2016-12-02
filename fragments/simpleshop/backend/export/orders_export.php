@@ -49,7 +49,7 @@ foreach ($orders as $order)
         '',
         $order_id,
         date('Y', $order_ts),
-        date('F', $order_ts),
+        date('m', $order_ts),
         $date,
         '€',
         $Customer->getName(),
