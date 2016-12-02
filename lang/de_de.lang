@@ -1,3 +1,5 @@
+orders_export = Bestellungs-Export
+
 label.overview = Übersicht
 label.name = Bezeichnung
 label.variants = Varianten
@@ -5,7 +7,12 @@ label.order_no = Bestellnr.
 label.customer = Kunde
 label.order_sum = Bestellsumme
 label.orders = Bestellungen
+label.no_orders_export = Keine Bestellungen zum Export verfügbar
 label.data_saved = Daten gespeichert
+label.orders_export_info_text = Wählen Sie hier die Bestellungen aus die sie exportieren wollen.
+label.orders_export = %d Bestellungen exportieren
+label.filter = Filter
+label.all = Alle
 
 
 action.manage_variants = Varianten verwalten
@@ -13,6 +20,7 @@ action.edit_product = Produkt bearbeiten
 action.edit_value = Wert bearbeiten
 action.show_in_frontend = Im Frontend anzeigen
 action.submit = Absenden
+action.export = Exportieren
 
 error.cannot_delete_category = Die Kategorie "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind
 error.cannot_delete_tax = Der Steuersatz "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind

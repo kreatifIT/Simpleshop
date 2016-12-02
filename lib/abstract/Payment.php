@@ -21,9 +21,19 @@ class Payment extends Plugin
 
 abstract class PaymentAbstract extends PluginAbstract
 {
-    public $plugin_name;
+    public    $plugin_name;
+    protected $name  = '';
+    protected $price = 0;
 
-    public abstract function getPrice();
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function getPrice($products = NULL)
+    {
+        return $this->price;
+    }
 
     public static function get()
     {

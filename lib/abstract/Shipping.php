@@ -21,9 +21,31 @@ class Shipping extends Plugin
 
 abstract class ShippingAbstract extends PluginAbstract
 {
-    public $plugin_name;
+    public    $plugin_name;
+    protected $name           = '';
+    protected $price          = 0;
+    protected $tax            = 0;
+    protected $tax_percentage = 0;
 
-    public abstract function getPrice($products);
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function getPrice($products = NULL)
+    {
+        return $this->price;
+    }
+
+    public function getTax()
+    {
+        return $this->tax;
+    }
+
+    public function getTaxPercentage()
+    {
+        return $this->tax_percentage;
+    }
 
     public static function get()
     {

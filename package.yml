@@ -10,6 +10,9 @@ page:
     pjax: false
     icon: rex-icon fa-shopping-cart
     subpages:
+        orders_export:
+            title: translate:orders_export
+            perm: shop[orders_export]
         settings:
             title: translate:settings
             perm: shop[settings]
@@ -22,3 +25,4 @@ requires:
     redaxo: '>=5.2'
     packages:
         yform: '>=1.1-beta1'
+        sprog: '>=1.0.0-beta4'

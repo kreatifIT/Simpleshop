@@ -68,10 +68,12 @@ foreach ($_products as $product)
 </div>
 
 <div class="row">
+    <?php if ($shipping): ?>
     <div class="medium-6 columns margin-bottom">
         <h3>###label.shipment###</h3>
         <p><?= $shipping->getName() ?></p>
     </div>
+    <?php endif; ?>
 
     <div class="medium-6 columns margin-bottom">
         <h3>###label.payment###</h3>

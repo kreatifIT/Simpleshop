@@ -23,12 +23,6 @@ $total     = $Order->getValue('total');
 ?>
 <div class="row column">
     <div class="order-total">
-        <?php if ($tax > 0): ?>
-        <div class="subtotal">
-            <span>&euro; <?= format_price($tax) ?></span>
-            <span>###label.tax_included###</span>
-        </div>
-        <?php endif; ?>
         <?php if ($subtotal != $total): ?>
         <div class="subtotal">
             <span>&euro; <?= format_price($subtotal) ?></span>
@@ -39,6 +33,12 @@ $total     = $Order->getValue('total');
         <div class="subtotal ">
             <span>&euro; <?= format_price($shipping) ?></span>
             <span>###label.shipment_cost###</span>
+        </div>
+        <?php endif; ?>
+        <?php if ($tax > 0): ?>
+        <div class="subtotal">
+            <span>&euro; <?= format_price($tax) ?></span>
+            <span>###label.tax_included###</span>
         </div>
         <?php endif; ?>
         <?php foreach ($discounts as $discount): ?>

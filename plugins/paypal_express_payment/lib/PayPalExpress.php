@@ -13,8 +13,11 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Sprog\Wildcard;
+
 class PayPalExpress extends PaymentAbstract
 {
+    const NAME                 = 'shop.paypal_express';
     const API_VERSION          = '124.0';
     const SANDBOX_BASE_URL     = 'https://api-3t.sandbox.paypal.com/nvp/';
     const LIVE_BASE_URL        = 'https://api-3t.paypal.com/nvp/';
@@ -22,17 +25,14 @@ class PayPalExpress extends PaymentAbstract
     const SANDBOX_REDIRECT_URL = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=';
 
     protected $responses = [];
-    protected $price = 0;
-    protected $name  = '###shop.paypal_express###';
-
-    public function getPrice()
-    {
-        return $this->price;
-    }
 
     public function getName()
     {
-        return $this->name;
+        if ($this->name == '')
+        {
+            $this->name = checkstr(Wildcard::get(self::NAME), self::NAME);
+        }
+        return parent::getName();
     }
 
     public function initPayment($order_id, $total_amount, $order_descr, $show_cc = FALSE)
@@ -106,11 +106,11 @@ class PayPalExpress extends PaymentAbstract
         {
             Utils::log('Paypal.initPayment.response', $logMsg, 'INFO');
             $this->responses['initPayment'] = $__response;
-            $Order = Session::getCurrentOrder();
+            $Order                          = Session::getCurrentOrder();
             $Order->setValue('payment', $this);
         }
         // redirect to paypal
-        return ($use_sandbox ? self::SANDBOX_REDIRECT_URL : self::LIVE_REDIRECT_URL) .  $__response['TOKEN'];
+        return ($use_sandbox ? self::SANDBOX_REDIRECT_URL : self::LIVE_REDIRECT_URL) . $__response['TOKEN'];
     }
 
     public function processPayment($token, $payer_id, $total_amount)
@@ -168,7 +168,7 @@ class PayPalExpress extends PaymentAbstract
             // log successful payment
             Utils::log('Paypal.processPayment.response', $logMsg, 'INFO');
             $this->responses['processPayment'] = $__response;
-            $Order = Session::getCurrentOrder();
+            $Order                             = Session::getCurrentOrder();
             $Order->setValue('payment', $this);
             // update status
             $Order->setValue('status', 'IP');

@@ -13,18 +13,18 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Sprog\Wildcard;
+
 class PickUp extends ShippingAbstract
 {
-    const NAME  = '###shop.shipping_pickup_point###';
-    const PRICE = 0;
-
-    public function getPrice($products)
-    {
-        return self::PRICE;
-    }
+    const NAME = 'shop.shipping_pickup_point';
 
     public function getName()
     {
-        return self::NAME;
+        if ($this->name == '')
+        {
+            $this->name = checkstr(Wildcard::get(self::NAME), self::NAME);
+        }
+        return parent::getName();
     }
 }

@@ -13,19 +13,18 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Sprog\Wildcard;
+
 class BankTransfer extends PaymentAbstract
 {
-    protected $price = 0;
-    protected $name  = '###shop.bank_transfer###';
-    protected $info  = '###shop.bank_transfer_payment_info###';
-
-    public function getPrice()
-    {
-        return $this->price;
-    }
+    const NAME = 'shop.bank_transfer';
 
     public function getName()
     {
-        return $this->name;
+        if ($this->name == '')
+        {
+            $this->name = checkstr(Wildcard::get(self::NAME), self::NAME);
+        }
+        return parent::getName();
     }
 }

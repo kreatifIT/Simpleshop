@@ -215,14 +215,6 @@ $total          = $Order->getValue('total');
 
 ?>
 <table style="<?= $sum_table_styles['table'] ?>">
-    <?php if ($tax): ?>
-        <tr style="<?= $sum_table_styles['tr'] ?>">
-            <td style="<?= $sum_table_styles['td'] ?>">###label.tax_included###</td>
-            <td style="<?= $sum_table_styles['td'] ?>text-align:right;">
-                &euro; <?= format_price($tax) ?>
-            </td>
-        </tr>
-    <?php endif; ?>
     <?php if ($subtotal != $total): ?>
         <tr style="<?= $sum_table_styles['tr'] ?>">
             <td style="<?= $sum_table_styles['td'] ?>">###label.subtotal###</td>
@@ -236,6 +228,14 @@ $total          = $Order->getValue('total');
             <td style="<?= $sum_table_styles['td'] ?>">###label.shipment_cost###</td>
             <td style="<?= $sum_table_styles['td'] ?>text-align:right;">
                 &euro; <?= format_price($shipping_costs) ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+    <?php if ($tax): ?>
+        <tr style="<?= $sum_table_styles['tr'] ?>">
+            <td style="<?= $sum_table_styles['td'] ?>">###label.tax_included###</td>
+            <td style="<?= $sum_table_styles['td'] ?>text-align:right;">
+                &euro; <?= format_price($tax) ?>
             </td>
         </tr>
     <?php endif; ?>

@@ -13,30 +13,51 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Sprog\Wildcard;
+
 class Omest extends ShippingAbstract
 {
-    const NAME         = '###shop.omest_shipping###';
+    const NAME         = 'shop.omest_shipping';
     const OLC_URL      = 'https://olc.omest.com/services';
     const OLC_TEST_URL = 'http://debug.olc.omest.com/services';
 
-    public function getPrice($products)
+    protected $tax_percentage = 22;
+
+    public function getPrice($products = NULL)
     {
-        foreach ($products as $product)
+        if ($products)
         {
-            $data = [
-                'weight' => $product->getValue('weight'),
-                'length' => $product->getValue('length'),
-                'height' => $product->getValue('height'),
-                'width'  => $product->getValue('width'),
-            ];
-            pr($data);
+            foreach ($products as $product)
+            {
+                $data = [
+                    'weight' => $product->getValue('weight'),
+                    'length' => $product->getValue('length'),
+                    'height' => $product->getValue('height'),
+                    'width'  => $product->getValue('width'),
+                ];
+                pr($data);
+            }
+            $this->price = 5;
         }
-        return 5;
+        return parent::getPrice($products);
+    }
+
+    public function getTax()
+    {
+        if (!$this->tax)
+        {
+            $this->tax = $this->price / ($this->tax_percentage + 100) * $this->tax_percentage;
+        }
+        return parent::getTax();
     }
 
     public function getName()
     {
-        return self::NAME;
+        if ($this->name == '')
+        {
+            $this->name = checkstr(Wildcard::get(self::NAME), self::NAME);
+        }
+        return parent::getName();
     }
 
     public static function sendOrdersToOLC($order_ids, $test = FALSE)
@@ -60,29 +81,29 @@ class Omest extends ShippingAbstract
             {
                 throw new OmestShippingException("Order [{$order_id}] has no products", 1);
             }
-            foreach ($products as $product_order)
-            {
-                $product = $product_order->getValue('data');
-                $count   = $product_order->getValue('quantity');
-
-                for ($i = 0; $i < $count; $i++)
-                {
-                    $parcels[] = [
-                        'key'       => $product_order->getValue('shipping_key'),
-                        'weight'    => $product->getValue('weight'),
-                        'width'     => $product->getValue('width'),
-                        'length'    => $product->getValue('length'),
-                        'height'    => $product->getValue('height'),
-                        'reference' => $product->getValue('code'),
-//                        //                    'palletTypeKey' => "80x120",
-                    ];
-                }
-            }
+//            foreach ($products as $product_order)
+//            {
+//                $product = $product_order->getValue('data');
+//                $count   = $product_order->getValue('quantity');
+//
+//                for ($i = 0; $i < $count; $i++)
+//                {
+//                    $parcels[] = [
+//                        'key'       => $product_order->getValue('shipping_key'),
+//                        'weight'    => $product->getValue('weight'),
+//                        'width'     => $product->getValue('width'),
+//                        'length'    => $product->getValue('length'),
+//                        'height'    => $product->getValue('height'),
+//                        'reference' => $product->getValue('code'),
+////                        //                    'palletTypeKey' => "80x120",
+//                    ];
+//                }
+//            }
 
             $data  = [
                 'key'             => $Order->getValue('shipping_key'),
                 'reference1'      => $order_id,
-                'parcels'         => $parcels,
+                // 'parcels'         => $parcels,
                 //                'shippingServiceKey' => 'IT',
                 //                'shipmentTypeKey'    => 'DOC',
                 //                'codTypeKey'         => 'BM',
