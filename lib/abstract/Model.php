@@ -19,7 +19,7 @@ abstract class Model extends \rex_yform_manager_dataset
     protected $excluded_fields  = [];
     protected $field_data       = [];
 
-    protected static function isRegistered($table)
+    public static function isRegistered($table)
     {
         $table_classes = \rex_addon::get('simpleshop')->getConfig('table_classes');
         return isset($table_classes[$table]);
