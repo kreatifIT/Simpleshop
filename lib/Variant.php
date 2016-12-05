@@ -26,28 +26,16 @@ class Variant extends Model
             ->findOne();
     }
 
-    public function applyProductData($product)
+    public function applyProductData()
     {
-        $variant_data = $this->getData();
+        $_product = Product::get($this->getValue('product_id'));
+        $product  = clone $_product;
+        $product->applyVariantData($this->getData());
+        $product_data = $product->getData();
 
-        foreach ($variant_data as $key => $value)
+        foreach ($product_data as $key => $value)
         {
-            if (in_array($key, ['price', 'reduced_price', 'width', 'height', 'weight', 'length']))
-            {
-                if ((float) $value <= 0)
-                {
-                    $this->setValue($key, (float) $product->getValue($key));
-                }
-            }
-            elseif ($value == '' && !in_array($key, ['id', 'product_id', 'variant_key', 'type']))
-            {
-                $this->setValue($key, $product->getValue($key));
-            }
-        }
-        if ($this->getValue('type') == 'FREE')
-        {
-            $this->setValue('price', 0);
-            $this->setValue('reduced_price', 0);
+            $this->setValue($key, $value);
         }
     }
 }

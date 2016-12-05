@@ -19,28 +19,32 @@ class DiscountGroup extends Discount
 
     public static function ext_calculateDocument($params)
     {
-        $Settings       = \rex::getConfig('simpleshop.Settings');
-        $apply_all      = from_array($Settings, 'discounts_are_accumulable', 0);
-        $Order          = $params->getSubject();
-        $order_total    = $Order->getValue('total');
-        $order_quantity = $Order->getValue('quantity');
-        $discounts      = self::query()->where('status', 1)->orderBy('prior')->find();
+        $Order = $params->getSubject();
 
-        foreach ($discounts as $discount)
+        if (parent::isRegistered(self::TABLE))
         {
-            $price  = $discount->getValue('price');
-            $amount = $discount->getValue('amount');
+            $Settings       = \rex::getConfig('simpleshop.Settings');
+            $apply_all      = from_array($Settings, 'discounts_are_accumulable', 0);
+            $order_total    = $Order->getValue('total');
+            $order_quantity = $Order->getValue('quantity');
+            $discounts      = self::query()->where('status', 1)->orderBy('prior')->find();
 
-            if (($price && $order_total >= $price) || ($amount && $order_quantity >= $amount))
+            foreach ($discounts as $discount)
             {
-                $discount_id                            = $discount->getValue('id');
-                $promotions                             = $Order->getValue('promotions');
-                $promotions['discount_' . $discount_id] = $discount;
-                $Order->setValue('promotions', $promotions);
+                $price  = $discount->getValue('price');
+                $amount = $discount->getValue('amount');
 
-                if (!$apply_all)
+                if (($price && $order_total >= $price) || ($amount && $order_quantity >= $amount))
                 {
-                    break; // discount found - stop here
+                    $discount_id                            = $discount->getValue('id');
+                    $promotions                             = $Order->getValue('promotions');
+                    $promotions['discount_' . $discount_id] = $discount;
+                    $Order->setValue('promotions', $promotions);
+
+                    if (!$apply_all)
+                    {
+                        break; // discount found - stop here
+                    }
                 }
             }
         }

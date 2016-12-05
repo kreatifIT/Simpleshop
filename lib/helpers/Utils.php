@@ -29,7 +29,7 @@ class Utils
         }
         // save to log file
         $append = (int) date('d') == (int) date('d', @filemtime($log_file)) ? FILE_APPEND : NULL;
-        file_put_contents($log_file, "[" . date('Y-m-d H:i:s') . "] {$type} - ". $msg, $append);
+        file_put_contents($log_file, "[" . date('Y-m-d H:i:s') . "] {$type} - " . $msg, $append);
 
         if ($email && $send_mail)
         {
@@ -76,7 +76,7 @@ class Utils
         }
         else
         {
-            $paging_url = rex_getUrl(\rex_article::getCurrentId(), null, $params['rex_geturl_params']);
+            $paging_url = rex_getUrl(\rex_article::getCurrentId(), NULL, $params['rex_geturl_params']);
         }
         if ($totalElements > $elementsPerPage)
         {
@@ -182,5 +182,23 @@ class Utils
         }
         $string = implode($divider, $_p);
         return strlen($string) ? '?' . $string : '';
+    }
+
+    public static function ext_register_tables($params = NULL)
+    {
+        $Addon          = \rex_addon::get('simpleshop');
+        $sql            = \rex_sql::factory();
+        $_table_classes = $Addon->getProperty('table_classes');
+        $db_tables      = $sql->getArray("SHOW TABLES", [], \PDO::FETCH_COLUMN);
+        $table_classes  = [];
+
+        foreach ($_table_classes as $table => $class)
+        {
+            if (in_array($table, $db_tables))
+            {
+                $table_classes[$table] = $class;
+            }
+        }
+        $Addon->setConfig('table_classes', $table_classes);
     }
 }

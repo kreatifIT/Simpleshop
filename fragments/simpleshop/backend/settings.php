@@ -20,6 +20,12 @@ $Settings = $this->getVar('Settings');
 ?>
 <fieldset>
 
+    <legend><?= $Addon->i18n('settings.order_settings'); ?></legend>
+    <dl class="rex-form-group form-group">
+        <dt><?= $Addon->i18n('settings.order_notification_email'); ?></dt>
+        <dd><input type="email" class="form-control" name="order_notification_email" value="<?= from_array($Settings, 'order_notification_email') ?>"/></dd>
+    </dl>
+
     <legend><?= $Addon->i18n('settings.discount_settings'); ?></legend>
     <dl class="rex-form-group form-group">
         <dt><?= $Addon->i18n('settings.discount_application'); ?></dt>
@@ -27,12 +33,6 @@ $Settings = $this->getVar('Settings');
                 {
                     echo 'checked="checked"';
                 } ?>/><span></span><?= $Addon->i18n('settings.discounts_are_accumulable'); ?></label></dd>
-    </dl>
-
-    <legend><?= $Addon->i18n('settings.order_settings'); ?></legend>
-    <dl class="rex-form-group form-group">
-        <dt><?= $Addon->i18n('settings.order_notification_email'); ?></dt>
-        <dd><input type="email" class="form-control" name="order_notification_email" value="<?= from_array($Settings, 'order_notification_email') ?>"/></dd>
     </dl>
 
     <!--    <br/>-->
