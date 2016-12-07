@@ -2,7 +2,7 @@ package: simpleshop
 version: '1.0'
 author: FriendsOfREDAXO
 debug_email: dev@kreatif.it
-compile: 1
+compile: 0
 
 page:
     title: Simpleshop
