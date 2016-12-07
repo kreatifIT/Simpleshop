@@ -29,7 +29,7 @@ class Order extends Model
 
     public function save($create_order = FALSE, $simple_save = FALSE)
     {
-        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this));
+        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['create_order' => $create_order, 'simple_save' => $simple_save]));
 
         $result = parent::save(TRUE);
 

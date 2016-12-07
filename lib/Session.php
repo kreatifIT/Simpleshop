@@ -62,6 +62,11 @@ class Session extends Model
         {
             $_SESSION['checkout']['Order'] = Order::create();
         }
+        else if (!$_SESSION['checkout']['Order']->exists() && $_SESSION['checkout']['Order']->getValue('id'))
+        {
+            // to prevent duplicate key errors on resaving orders
+            $_SESSION['checkout']['Order'] = Order::get($_SESSION['checkout']['Order']->getValue('id'));
+        }
         return $_SESSION['checkout']['Order'];
     }
 
