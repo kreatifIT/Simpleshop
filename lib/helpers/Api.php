@@ -19,7 +19,10 @@ class rex_api_simpleshop_api extends rex_api_function
     public function execute()
     {
         $lang_id = rex_request('lang', 'int');
-        setlocale(LC_ALL, rex_clang::get($lang_id)->getValue('clang_setlocale'));
+        if ($lang_id)
+        {
+            setlocale(LC_ALL, rex_clang::get($lang_id)->getValue('clang_setlocale'));
+        }
 
         $controller  = rex_request('controller', 'string', NULL);
         $_controller = 'api__' . strtr($controller, ['.' => '_']);

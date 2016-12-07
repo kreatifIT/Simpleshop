@@ -49,18 +49,18 @@ namespace FriendsOfREDAXO\Simpleshop;
     <tbody>
     <tr style="padding:0;text-align:left;vertical-align:top">
         <th class="small-6 large-4 columns first"
-            style="Margin:0 auto;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0 auto;padding:0;padding-bottom:16px;padding-left:16px;padding-right:8px;text-align:left;width:177.33px">
+            style="Margin:0 auto;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0 auto;padding:0;padding-bottom:16px;padding-left:16px;padding-right:8px;text-align:left;width:50%">
             <table style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%">
                 <tr style="padding:0;text-align:left;vertical-align:top">
                     <th style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left">
                         <?php
                         $logo_path = $this->getVar('logo_path', '');
                         if (strlen($logo_path)):
-                            $url = \Kreatif\Resource::getImageTag($logo_path, null, [], function($params) {
-                                return $params['attributes']['src'];
-                            });
+                            echo \Kreatif\Resource::getImageTag($logo_path, '', [
+                                'alt' => "###company.name###",
+                                'style' => "-ms-interpolation-mode:bicubic;clear:both;display:block;max-width:100%;outline:0;text-decoration:none;width:auto",
+                            ]);
                             ?>
-                            <img src="<?= $url ?>" alt="###company.name###" style="-ms-interpolation-mode:bicubic;clear:both;display:block;max-width:100%;outline:0;text-decoration:none;width:auto">
                         <?php else: ?>
                             ###company.name###
                         <?php endif; ?>
@@ -69,7 +69,7 @@ namespace FriendsOfREDAXO\Simpleshop;
             </table>
         </th>
         <th class="small-6 large-8 columns last"
-            style="Margin:0 auto;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0 auto;padding:0;padding-bottom:16px;padding-left:8px;padding-right:16px;text-align:left;width:370.67px">
+            style="Margin:0 auto;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0 auto;padding:0;padding-bottom:16px;padding-left:8px;padding-right:16px;text-align:left;width:50%">
             <table style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%">
                 <tr style="padding:0;text-align:left;vertical-align:top">
                     <th style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left">

@@ -39,7 +39,8 @@ class Product extends Model
     {
         if ($this->__price === NULL || ($includeTax && $this->__tax === NULL))
         {
-            $type = $this->getValue('type');
+            $type  = $this->getValue('type');
+            $price = $this->getValue('price');
 
             if ($type == 'giftcard')
             {
@@ -50,7 +51,6 @@ class Product extends Model
             else if ($use_reduced)
             {
                 $reduced = $this->getValue('reduced_price');
-                $price   = $this->getValue('price');
                 $price   = $reduced > 0 ? $reduced : $price;
             }
             if ($includeTax)
