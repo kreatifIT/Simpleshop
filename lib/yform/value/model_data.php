@@ -56,7 +56,7 @@ class rex_yform_value_model_data extends rex_yform_value_textarea
 
             foreach ($columns as $column)
             {
-                if (in_array($column->getType(), ['validate']) || in_array($column->getTypeName(), ['php', 'html']))
+                if (in_array($column->getType(), ['validate']) || in_array($column->getTypeName(), ['php', 'html', 'hidden_input']))
                 {
                     continue;
                 }
