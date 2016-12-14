@@ -37,31 +37,26 @@ class PayPalExpress extends PaymentAbstract
 
     public function initPayment($order_id, $total_amount, $order_descr, $show_cc = FALSE)
     {
-        $use_sandbox = \rex::getProperty('use_paypal_sandbox');
-        $key         = $use_sandbox ? 'paypal_credentials_sandbox' : 'paypal_credentials_live';
-        $url         = $use_sandbox ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
-        $credentials = \rex::getProperty($key);
+        $Settings      = \rex::getConfig('simpleshop.PaypalExpress.Settings');
+        $prefix        = from_array($Settings, 'api_type', '');
+        $url           = $prefix == 'sandbox_' ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
+        $api_user      = from_array($Settings, $prefix . 'username', '');
+        $api_pwd       = from_array($Settings, $prefix . 'password', '');
+        $api_signature = from_array($Settings, $prefix . 'signature', '');
 
-        if (!$credentials || empty ($credentials['signature']))
+
+        if ($api_signature == '' || $api_pwd == '' || $api_user == '')
         {
-            $msg = '
-                The property "' . $key . '" is not set or not correct! It should contain your paypal credentials. Please define them in your Project-Addon like: 
-                rex::setProperty(\'' . $key . '\', [
-                    \'user\'      => \'XXXX\',
-                    \'pwd\'       => \'XXXXXX\',
-                    \'signature\' => \'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\',
-                ]);
-            ';
-            throw new PaypalException($msg);
+            throw new PaypalException('The Paypal credentials are not set!');
         }
 
         $data = [
             'METHOD'  => 'SetExpressCheckout',
             'VERSION' => self::API_VERSION,
 
-            'USER'      => $credentials['user'],
-            'PWD'       => $credentials['pwd'],
-            'SIGNATURE' => $credentials['signature'],
+            'USER'      => $api_user,
+            'PWD'       => $api_pwd,
+            'SIGNATURE' => $api_signature,
 
             'returnUrl' => rex_getFullUrl(NULL, NULL, ['action' => 'pay_process']),
             'cancelUrl' => rex_getFullUrl(NULL, NULL, ['action' => 'cancelled']),
@@ -110,15 +105,17 @@ class PayPalExpress extends PaymentAbstract
             $Order->setValue('payment', $this);
         }
         // redirect to paypal
-        return ($use_sandbox ? self::SANDBOX_REDIRECT_URL : self::LIVE_REDIRECT_URL) . $__response['TOKEN'];
+        return ($prefix == 'sandbox_' ? self::SANDBOX_REDIRECT_URL : self::LIVE_REDIRECT_URL) . $__response['TOKEN'];
     }
 
     public function processPayment($token, $payer_id, $total_amount)
     {
-        $use_sandbox = \rex::getProperty('use_paypal_sandbox');
-        $key         = $use_sandbox ? 'paypal_credentials_sandbox' : 'paypal_credentials_live';
-        $credentials = \rex::getProperty($key);
-        $url         = $use_sandbox ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
+        $Settings      = \rex::getConfig('simpleshop.PaypalExpress.Settings');
+        $prefix        = from_array($Settings, 'api_type', '');
+        $url           = $prefix == 'sandbox_' ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
+        $api_user      = from_array($Settings, $prefix . 'username', '');
+        $api_pwd       = from_array($Settings, $prefix . 'password', '');
+        $api_signature = from_array($Settings, $prefix . 'signature', '');
 
         $data = [
             'METHOD'   => 'DoExpressCheckoutPayment',
@@ -127,9 +124,9 @@ class PayPalExpress extends PaymentAbstract
             'PAYERID'  => $payer_id,
             'MSGSUBID' => $payer_id,
 
-            'USER'      => $credentials['user'],
-            'PWD'       => $credentials['pwd'],
-            'SIGNATURE' => $credentials['signature'],
+            'USER'      => $api_user,
+            'PWD'       => $api_pwd,
+            'SIGNATURE' => $api_signature,
 
             'PAYMENTREQUEST_0_AMT'          => $total_amount,
             'PAYMENTREQUEST_0_CURRENCYCODE' => 'EUR',

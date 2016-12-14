@@ -1,3 +1,9 @@
 package: simpleshop/paypal_express_payment
 version: '1.0'
 author: FriendsOfREDAXO
+
+page:
+    title: Paypal Express
+    perm: shop[paypal_express_payment]
+    subpages:
+        settings: { title: translate:settings, hidden: true }
