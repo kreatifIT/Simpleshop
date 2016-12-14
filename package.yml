@@ -1,8 +1,8 @@
 package: simpleshop
-version: '0.1'
+version: '1.0'
 author: FriendsOfREDAXO
 debug_email: dev@kreatif.it
-compile: 1
+compile: 0
 
 page:
     title: Simpleshop
@@ -25,4 +25,5 @@ requires:
     redaxo: '>=5.2'
     packages:
         yform: '>=1.1-beta1'
+        yform/manager: '>=2.0'
         sprog: '>=1.0.0-beta4'

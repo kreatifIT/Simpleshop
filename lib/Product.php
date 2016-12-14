@@ -35,11 +35,12 @@ class Product extends Model
         return $this->__features;
     }
 
-    public function getPrice($includeTax = FALSE)
+    public function getPrice($includeTax = FALSE, $use_reduced = TRUE)
     {
         if ($this->__price === NULL || ($includeTax && $this->__tax === NULL))
         {
-            $type = $this->getValue('type');
+            $type  = $this->getValue('type');
+            $price = $this->getValue('price');
 
             if ($type == 'giftcard')
             {
@@ -47,10 +48,9 @@ class Product extends Model
                 $extras     = $this->getValue('extras');
                 $price      = $extras['price'];
             }
-            else
+            else if ($use_reduced)
             {
                 $reduced = $this->getValue('reduced_price');
-                $price   = $this->getValue('price');
                 $price   = $reduced > 0 ? $reduced : $price;
             }
             if ($includeTax)
@@ -203,12 +203,16 @@ class Product extends Model
                 $variant = $clone->getVariant($key);
                 // set variants
                 $this->__variants['variants'][$key] = $variant;
-                // create the mapping
-                foreach ($_ids as $id)
+
+                if (parent::isRegistered(FeatureValue::TABLE))
                 {
-                    if (!isset ($this->__variants['features'][$id]))
+                    // create the mapping
+                    foreach ($_ids as $id)
                     {
-                        $this->__variants['features'][$id] = FeatureValue::get($id);
+                        if (!isset ($this->__variants['features'][$id]))
+                        {
+                            $this->__variants['features'][$id] = FeatureValue::get($id);
+                        }
                     }
                 }
             }
@@ -234,6 +238,7 @@ class Product extends Model
         $_this->setValue('key', $key);
         $_this->setValue('cart_quantity', $cart_quantity);
         $_this->setValue('extras', $extras);
+        $_features   = $_this->getValue('features');
         $feature_ids = $variant_key ? explode(',', $variant_key) : [];
 
         if (count($feature_ids))
@@ -252,7 +257,7 @@ class Product extends Model
             $_this->applyVariantData($variant->getData());
         }
 
-        if (count($feature_ids))
+        if ($_features && count($feature_ids))
         {
             foreach ($feature_ids as $feature_id)
             {
@@ -290,7 +295,7 @@ class Product extends Model
         return $_this;
     }
 
-    private function applyVariantData($variant_data)
+    public function applyVariantData($variant_data)
     {
         foreach ($variant_data as $key => $value)
         {

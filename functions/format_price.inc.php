@@ -11,10 +11,10 @@
  * file that was distributed with this source code.
  */
 
-function format_price($price)
+function format_price($price, $decimals = 2)
 {
     $conf = localeconv();
-    return number_format($price, 2, $conf['mon_decimal_point'], $conf['mon_thousands_sep']);
+    return number_format($price, $decimals, $conf['mon_decimal_point'], $conf['mon_thousands_sep']);
 }
 
 function format_date($datetime)

@@ -9,24 +9,41 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
+ *
+ *
+ * // Set Variant by setting/overwriting the simpleshop.product_variants property [NULL|variants]
+ * \rex::setProperty('simpleshop.product_variants', 'variant');
  */
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-\rex_yform_manager_dataset::setModelClass(Category::TABLE, Category::class);
-\rex_yform_manager_dataset::setModelClass(Coupon::TABLE, Coupon::class);
-\rex_yform_manager_dataset::setModelClass(Customer::TABLE, Customer::class);
-\rex_yform_manager_dataset::setModelClass(CustomerAddress::TABLE, CustomerAddress::class);
-\rex_yform_manager_dataset::setModelClass(DiscountGroup::TABLE, DiscountGroup::class);
-\rex_yform_manager_dataset::setModelClass(Feature::TABLE, Feature::class);
-\rex_yform_manager_dataset::setModelClass(FeatureValue::TABLE, FeatureValue::class);
-\rex_yform_manager_dataset::setModelClass(Order::TABLE, Order::class);
-\rex_yform_manager_dataset::setModelClass(OrderProduct::TABLE, OrderProduct::class);
-\rex_yform_manager_dataset::setModelClass(Product::TABLE, Product::class);
-\rex_yform_manager_dataset::setModelClass(Category::TABLE, Category::class);
-\rex_yform_manager_dataset::setModelClass(Session::TABLE, Session::class);
-\rex_yform_manager_dataset::setModelClass(Tax::TABLE, Tax::class);
-\rex_yform_manager_dataset::setModelClass(Variant::TABLE, Variant::class);
+$this->setProperty('table_classes', [
+    Category::TABLE        => Category::class,
+    Coupon::TABLE          => Coupon::class,
+    Customer::TABLE        => Customer::class,
+    CustomerAddress::TABLE => CustomerAddress::class,
+    DiscountGroup::TABLE   => DiscountGroup::class,
+    Feature::TABLE         => Feature::class,
+    FeatureValue::TABLE    => FeatureValue::class,
+    Order::TABLE           => Order::class,
+    OrderProduct::TABLE    => OrderProduct::class,
+    Product::TABLE         => Product::class,
+    Category::TABLE        => Category::class,
+    Session::TABLE         => Session::class,
+    Tax::TABLE             => Tax::class,
+    Variant::TABLE         => Variant::class,
+]);
+$table_classes = $this->getConfig('table_classes');
+
+if (!$table_classes)
+{
+    Utils::ext_register_tables();
+    $table_classes = $this->getConfig('table_classes');
+}
+foreach ($table_classes as $table => $class)
+{
+    \rex_yform_manager_dataset::setModelClass($table, $class);
+}
 
 $include_files = glob($this->getPath('functions/*.inc.php'));
 
@@ -76,33 +93,34 @@ foreach ($include_files as $include_file)
 
 \rex_extension::register('YFORM_DATA_LIST', function ($params)
 {
-    $list        = $params->getSubject();
-    $list_params = $list->getParams();
+    $list         = $params->getSubject();
+    $list_params  = $list->getParams();
+    $variant_type = \rex::getProperty('simpleshop.product_variants');
 
-    if ($list_params['table_name'] == Product::TABLE)
+    if ($variant_type)
     {
         $list->addColumn('variants', $this->i18n('action.manage_variants'), count($list->getColumnNames()) - 2);
         $list->setColumnLabel('variants', $this->i18n('label.variants'));
         $list->setColumnParams('variants', [
-            'page'       => 'simpleshop/variants',
+            'page'       => "simpleshop/{$variant_type}",
             'func'       => 'edit',
             'data_id'    => '###id###',
             'table_name' => Variant::TABLE,
         ]);
     }
-
     return $list;
 });
 
 // TODO: to review
 \rex_extension::register('YFORM_DATA_LIST_SQL', function ($params)
 {
-    $sql        = $params->getSubject();
+    $sql   = $params->getSubject();
     $table = $params->getParams()['table'];
 
     if ($table->getTableName() == Category::TABLE)
     {
-        if (stripos($sql, 'where') === false) {
+        if (stripos($sql, 'where') === FALSE)
+        {
             $sql = preg_replace('/ORDER\sBY/i', 'where `parent_id` = \'\' ORDER BY', $sql);
         }
     }
@@ -110,9 +128,10 @@ foreach ($include_files as $include_file)
 });
 
 
-
 if (\rex::isBackend())
 {
+    \rex::setProperty('simpleshop.product_variants', 'variants');
+
     \rex_extension::register('PACKAGES_INCLUDED', function ()
     {
         if ($this->getProperty('compile'))

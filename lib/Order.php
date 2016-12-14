@@ -29,7 +29,7 @@ class Order extends Model
 
     public function save($create_order = FALSE, $simple_save = FALSE)
     {
-        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this));
+        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['create_order' => $create_order, 'simple_save' => $simple_save]));
 
         $result = parent::save(TRUE);
 
@@ -125,12 +125,13 @@ class Order extends Model
         // get shipping costs
         $this->shipping_costs = (float) $this->shipping ? $this->shipping->getPrice($products) : 0;
         $this->tax += (float) $this->shipping ? $this->shipping->getTax() : 0;
-        
+
         $this->updatedate    = date('Y-m-d H:i:s');
         $this->ip_address    = rex_server('REMOTE_ADDR', 'string', 'notset');
         $this->initial_total = $this->subtotal + $this->shipping_costs;
         $this->total         = $this->initial_total - $this->discount;
         $this->promotions    = []; // clear promotions!
+
 
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.calculateDocument', $this));
 

@@ -62,6 +62,11 @@ class Session extends Model
         {
             $_SESSION['checkout']['Order'] = Order::create();
         }
+        else if (!$_SESSION['checkout']['Order']->exists() && $_SESSION['checkout']['Order']->getValue('id'))
+        {
+            // to prevent duplicate key errors on resaving orders
+            $_SESSION['checkout']['Order'] = Order::get($_SESSION['checkout']['Order']->getValue('id'));
+        }
         return $_SESSION['checkout']['Order'];
     }
 
@@ -170,8 +175,9 @@ class Session extends Model
                 $retry = TRUE;
                 $msg   = $ex->getMessage();
                 $key   = substr($msg, strrpos($msg, '--key:') + 6);
+                $code  = $ex->getCode();
 
-                switch ($ex->getCode())
+                switch ($code)
                 {
                     case 1:
                         // product does not exist any more
@@ -180,7 +186,7 @@ class Session extends Model
                     case 3:
                         // variant-combination does not exist
                         Session::removeProduct($key);
-                        self::$errors['cart_product_not_exists']['label'] = Wildcard::get('simpleshop.error.cart_product_not_exists');
+                        self::$errors['cart_product_not_exists']['label'] = checkstr(Wildcard::get('simpleshop.error.cart_product_not_exists'), '###simpleshop.error.cart_product_not_exists###');
                         self::$errors['cart_product_not_exists']['replace'] += 1;
                         break;
 
@@ -189,7 +195,7 @@ class Session extends Model
                         Session::removeProduct($key);
                         list ($product_id, $feature_ids) = explode('|', trim($key, '|'));
                         $product        = Product::get($product_id);
-                        $label          = strtr(Wildcard::get('simpleshop.error.cart_product_not_available'), ['{{replace}}' => $product->getValue($label_name)]);
+                        $label          = strtr(checkstr(Wildcard::get('simpleshop.error.cart_product_not_available'), '###simpleshop.error.cart_product_not_available###'), ['{{replace}}' => $product->getValue($label_name)]);
                         self::$errors[] = ['label' => $label];
                         break;
 
@@ -198,7 +204,7 @@ class Session extends Model
                         $product = Product::getProductByKey($key, 0);
                         // update cart
                         Session::setProductData($key, $product->getValue('amount'));
-                        $label          = strtr(Wildcard::get('simpleshop.error.cart_product_not_enough_amount'), [
+                        $label          = strtr(checkstr(Wildcard::get('simpleshop.error.cart_product_not_enough_amount'), '###simpleshop.error.cart_product_not_enough_amount###'), [
                             '{{replace}}' => $product->getValue($label_name),
                             '{{count}}'   => $product->getValue('amount'),
                         ]);
@@ -206,7 +212,7 @@ class Session extends Model
                         break;
 
                     default:
-                        throw new ProductException($msg, $ex->getCode());
+                        throw new ProductException($msg, $code);
                         break;
                 }
             }

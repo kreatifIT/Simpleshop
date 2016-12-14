@@ -11,6 +11,8 @@
  * file that was distributed with this source code.
  */
 
+$Settings = \rex::getConfig('simpleshop.Settings');
+$featues  = from_array($Settings, 'features', []);
 
 rex_extension::register('REX_YFORM_SAVED', ['\FriendsOfREDAXO\Simpleshop\Order', 'ext_yform_saved']);
 
@@ -20,6 +22,7 @@ rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Featu
 rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_yform_data_delete']);
 rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Tax', 'ext_yform_data_delete']);
 rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Order', 'ext_yform_data_delete']);
+rex_extension::register('CACHE_DELETED', ['\FriendsOfREDAXO\Simpleshop\Utils', 'ext_register_tables']);
 
 rex_extension::register('simpleshop.Order.calculateDocument', ['\FriendsOfREDAXO\Simpleshop\DiscountGroup', 'ext_calculateDocument']);
 

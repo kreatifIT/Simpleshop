@@ -92,6 +92,7 @@ if (count($errors)): ?>
     </div>
     <?php endif; ?>
 
+    <?php if ($payment): ?>
     <div class="medium-6 columns margin-bottom <?php if (!$shipping) echo 'radio-panels no-shipping'; ?>">
         <h3>###label.payment###</h3>
 
@@ -108,8 +109,8 @@ if (count($errors)): ?>
         $this->setVar('plugin_name', $payment->getPluginName());
         $this->subfragment('simpleshop/checkout/shipping_and_payment/payment_item.php');
         ?>
-
     </div>
+    <?php endif; ?>
 </div>
 
 <?php

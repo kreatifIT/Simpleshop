@@ -33,7 +33,8 @@ $orders = $this->getVar('orders');
         <tbody class="table-hover">
         <?php if (count($orders)): ?>
             <?php foreach ($orders as $order):
-                $Customer = Customer::get($order->getValue('customer_id'));
+                $user_id = $order->getValue('customer_id');
+                $Customer = $user_id ? Customer::get($user_id) : $order->getValue('address_1');
                 ?>
                 <tr>
                     <td><input type="checkbox" name="orders[]" value="<?= $order->getValue('id') ?>" checked="checked"/></td>

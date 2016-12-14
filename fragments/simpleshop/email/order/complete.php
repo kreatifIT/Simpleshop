@@ -29,7 +29,10 @@ if ($Shipping)
 {
     $this->subfragment('simpleshop/shipping/' . $Shipping->plugin_name . '/order_complete.php');
 }
-$this->subfragment('simpleshop/payment/' . $Payment->plugin_name . '/order_complete.php');
+if ($Payment)
+{
+    $this->subfragment('simpleshop/payment/' . $Payment->plugin_name . '/order_complete.php');
+}
 
 if (strlen($add_info))
 {
@@ -128,6 +131,7 @@ foreach ($_products as $product)
         </tr>
     </table>
 <?php endif; ?>
+<?php if ($Payment): ?>
 <!-- payment -->
 <table class="callout"
        style="Margin-bottom:16px;border-collapse:collapse;border-spacing:0;margin-bottom:16px;padding:0;text-align:left;vertical-align:top;width:100%">
@@ -141,6 +145,7 @@ foreach ($_products as $product)
             style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0!important;text-align:left;visibility:hidden;width:0"></th>
     </tr>
 </table>
+<?php endif; ?>
 
 <!-- cart content -->
 <?php

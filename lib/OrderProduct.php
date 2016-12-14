@@ -20,12 +20,13 @@ class OrderProduct extends Model
         'data',
     ];
 
-    public static function create($table = NULL)
+    public function save($prepare = FALSE)
     {
-        $_this = parent::create($table);
-
-        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.OrderProduct.getObjectData', $_this->object_data));
-
-        return $_this;
+        $result = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.OrderProduct.preSave', TRUE, ['this' => $this]));
+        if ($result)
+        {
+            $result = parent::save($prepare);
+        }
+        return $result;
     }
 }
