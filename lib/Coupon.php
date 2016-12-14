@@ -40,6 +40,7 @@ class Coupon extends Discount
         $label_name = sprogfield('name');
 
         $_this = self::create();
+        $_this->setValue('code', ''); // IMPORTANT! reset the code to generate a nice one
         $_this->setValue($label_name, 'Giftcard Order #' . $order_id);
         $_this->setValue('given_away', 1);
         $_this->setValue('discount_value', $Product->getPrice());
