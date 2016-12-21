@@ -76,26 +76,30 @@ class Utils
         }
         else
         {
-            $paging_url = rex_getUrl(\rex_article::getCurrentId(), NULL, $params['rex_geturl_params']);
+            $ss = explode('?', rex_getUrl(\rex_article::getCurrentId()));
+            $paging_url = $ss[0];
+            $params['rex_geturl_params'] = array_merge($params['rex_geturl_params'], $ss[1] ?: []);
         }
         if ($totalElements > $elementsPerPage)
         {
             if ($params['show_first_link'] && $currentPage > 0)
             {
+                $params['rex_geturl_params'][$params['get_name']] = 0;
                 $pagination[] = [
                     "type"  => "first",
                     "class" => "pagination-first",
                     "text"  => "",
-                    "url"   => $paging_url . self::getParamString(array_merge($gets, [$params['get_name'] => 0])),
+                    "url"   => $paging_url . self::getParamString(array_merge($gets, $params['rex_geturl_params'])),
                 ];
             }
             if ($currentPage > 0 && $params['show_prev_link'])
             {
+                $params['rex_geturl_params'][$params['get_name']] = $currentPage - 1;
                 $pagination[] = [
                     "type"  => "prev",
                     "class" => "pagination-previous",
                     "text"  => "",
-                    "url"   => $paging_url . self::getParamString(array_merge($gets, [$params['get_name'] => $currentPage - 1])),
+                    "url"   => $paging_url . self::getParamString(array_merge($gets, $params['rex_geturl_params'])),
                 ];
             }
             for ($i = 1; $i <= (int) ceil($totalElements / $elementsPerPage); $i++)
@@ -103,22 +107,24 @@ class Utils
                 //dots prefix
                 if ($i < ($currentPage - floor($params['pager_elements_count'] / 2)))
                 {
-                    $i            = $currentPage - floor($params['pager_elements_count'] / 2);
+                    $i = $currentPage - floor($params['pager_elements_count'] / 2);
+                    $params['rex_geturl_params'][$params['get_name']] = $i - 1;
                     $pagination[] = [
                         "type"  => "ellipsis",
                         "class" => "pagination-ellipsis",
                         "text"  => "",
-                        "url"   => $paging_url . self::getParamString(array_merge($gets, [$params['get_name'] => $i - 1])),
+                        "url"   => $paging_url . self::getParamString(array_merge($gets, $params['rex_geturl_params'])),
                     ];
                 }
                 //dots suffix
                 else if ($i > $currentPage + ceil($params['pager_elements_count'] / 2))
                 {
+                    $params['rex_geturl_params'][$params['get_name']] = $i - 1;
                     $pagination[] = [
                         "type"  => "ellipsis",
                         "class" => "pagination-ellipsis",
                         "text"  => "",
-                        "url"   => $paging_url . self::getParamString(array_merge($gets, [$params['get_name'] => $i - 1])),
+                        "url"   => $paging_url . self::getParamString(array_merge($gets, $params['rex_geturl_params'])),
                     ];
                     break; //stops iteration
                 }
@@ -126,40 +132,44 @@ class Utils
                 {
                     if ($currentPage != $i - 1)
                     {
+                        $params['rex_geturl_params'][$params['get_name']] = $i - 1;
                         $pagination[] = [
                             "type"  => "page",
                             "class" => "",
                             "text"  => $i,
-                            "url"   => $paging_url . self::getParamString(array_merge($gets, [$params['get_name'] => $i - 1])),
+                            "url"   => $paging_url . self::getParamString(array_merge($gets, $params['rex_geturl_params'])),
                         ];
                     }
                     else
                     {
+                        $params['rex_geturl_params'][$params['get_name']] = $i - 1;
                         $pagination[] = [
                             "type"  => "active",
                             "class" => "pagination-active current",
                             "text"  => $i,
-                            "url"   => $paging_url . self::getParamString(array_merge($gets, [$params['get_name'] => $i - 1])),
+                            "url"   => $paging_url . self::getParamString(array_merge($gets, $params['rex_geturl_params'])),
                         ];
                     }
                 }
             }
             if (($currentPage + 1) <= ((int) ceil($totalElements / $elementsPerPage) - 1) && $params['show_next_link'])
             {
+                $params['rex_geturl_params'][$params['get_name']] = $currentPage + 1;
                 $pagination[] = [
                     "type"  => "next",
                     "class" => "pagination-next",
                     "text"  => "",
-                    "url"   => $paging_url . self::getParamString(array_merge($gets, [$params['get_name'] => $currentPage + 1])),
+                    "url"   => $paging_url . self::getParamString(array_merge($gets, $params['rex_geturl_params'])),
                 ];
             }
             if ($currentPage < ((int) ceil($totalElements / $elementsPerPage) - 1) && $params['show_last_link'])
             {
+                $params['rex_geturl_params'][$params['get_name']] = ((int) ceil($totalElements / $elementsPerPage) - 1);
                 $pagination[] = [
                     "type"  => "last",
                     "class" => "pagination-last",
                     "text"  => "",
-                    "url"   => $paging_url . self::getParamString(array_merge($gets, [$params['get_name'] => ((int) ceil($totalElements / $elementsPerPage) - 1)])),
+                    "url"   => $paging_url . self::getParamString(array_merge($gets, $params['rex_geturl_params'])),
                 ];
             }
         }
