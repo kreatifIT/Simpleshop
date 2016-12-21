@@ -35,10 +35,11 @@ class Order extends Model
 
         if ($result && !$simple_save)
         {
+            $date_now   = date('Y-m-d H:i:s');
             $order_id   = $this->getValue('id');
             $promotions = $this->getValue('promotions');
             $products   = Session::getCartItems(FALSE, FALSE);
-            $this->setValue('createdate', date('Y-m-d H:i:s'));
+            $this->setValue('createdate', $date_now);
 
             if ($create_order && isset ($promotions['coupon']))
             {
@@ -88,6 +89,7 @@ class Order extends Model
                     ->setValue('code', $product->getValue('code'))
                     ->setValue('quantity', $quantity)
                     ->setValue('data', $product)
+                    ->setValue('createdate', $date_now)
                     ->save(TRUE);
             }
         }
