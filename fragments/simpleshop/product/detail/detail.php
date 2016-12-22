@@ -19,7 +19,7 @@ $lable_name  = sprogfield('name');
 $product     = $this->getVar('product');
 $cat_path    = $this->getVar('cat_path');
 $badge       = $product->getValue('badge');
-$price       = $product->getValue('price');
+$price       = $product->getPrice(TRUE, FALSE);
 $offer_price = $product->getValue('reduced_price');
 $tax         = Tax::get($product->getValue('tax'))->getValue('tax');
 $gallery     = strlen($product->getValue('gallery')) ? explode(',', $product->getValue('gallery')) : [];
@@ -158,8 +158,8 @@ if (strlen($image) == 0 && isset($gallery[0])) {
                 <?php if ($offer_price > 0): ?>
                     <span class="price-was">&euro; <?= format_price($price) ?></span>
                 <?php endif; ?>
-                <span class="price">&euro; <?= format_price($offer_price > 0 ? $offer_price : $price) ?></span>
-                <span class="vat"><?= strtr(Wildcard::get('shop.vat_in_addition'), ['{{tax}}' => $tax]); ?></span>
+                <span class="price">&euro; <?= format_price($offer_price > 0 ? ($offer_price * ($tax / 100 + 1)) : $price) ?></span>
+                <span class="vat"><?= strtr(Wildcard::get('shop.vat_included'), ['{{tax}}' => $tax]); ?></span>
             </div>
             <div class="checkout">
                 <?php

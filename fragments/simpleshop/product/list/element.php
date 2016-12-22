@@ -16,7 +16,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 $product     = $this->getVar('product');
 $image       = $product->getValue('image');
 $badge       = $product->getValue('badge');
-$price       = $product->getValue('price');
+$price       = $product->getPrice(TRUE, FALSE);
 $offer_price = $product->getValue('reduced_price');
 $variants    = $product->getFeatureVariants();
 $product_url = $product->getUrl();
@@ -45,7 +45,7 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
             <?php if ($offer_price > 0): ?>
                 <span class="price-was">&euro; <?= format_price($price) ?></span>
             <?php endif; ?>
-            <span class="price">&euro; <?= format_price($offer_price > 0 ? $offer_price : $price) ?></span>
+            <span class="price">&euro; <?= format_price($offer_price > 0 ? ($offer_price * ($tax / 100 + 1)) : $price) ?></span>
         </div>
         <?php
         if(count($variants['mapping']))
