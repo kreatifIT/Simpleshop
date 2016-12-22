@@ -25,10 +25,10 @@ abstract class Model extends \rex_yform_manager_dataset
         return isset($table_classes[$table]);
     }
 
-    public function getFields()
+    public function getFields(array $filter = [])
     {
         $fields  = [];
-        $_fields = parent::getFields();
+        $_fields = parent::getFields($filter);
 
         foreach ($_fields as $field)
         {

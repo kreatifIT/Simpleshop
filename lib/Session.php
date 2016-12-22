@@ -227,7 +227,7 @@ class Session extends Model
         {
             self::setCheckoutData('has_shipping', self::$has_shipping);
         }
-        return $products;
+        return array_filter($products);
     }
 
     public static function getProductKey($product_id, $feature_value_ids = [])
