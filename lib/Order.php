@@ -125,7 +125,14 @@ class Order extends Model
             $this->quantity += $quantity;
         }
         // get shipping costs
-        $this->shipping_costs = (float) $this->shipping ? $this->shipping->getPrice($products) : 0;
+        try
+        {
+            $this->shipping_costs = (float) $this->shipping ? $this->shipping->getPrice($this, $products) : 0;
+        }
+        catch (\Exception $ex)
+        {
+            throw new OrderException($ex->getLabelByCode());
+        }
         $this->tax += (float) $this->shipping ? $this->shipping->getTax() : 0;
 
         $this->updatedate    = date('Y-m-d H:i:s');
@@ -200,4 +207,8 @@ class Order extends Model
         }
         return $result;
     }
+}
+
+class OrderException extends \Exception
+{
 }

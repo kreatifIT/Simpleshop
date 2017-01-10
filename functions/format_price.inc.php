@@ -14,7 +14,7 @@
 function format_price($price, $decimals = 2)
 {
     $conf = localeconv();
-    return number_format($price, $decimals, $conf['mon_decimal_point'], $conf['mon_thousands_sep']);
+    return number_format($price, $decimals, $conf['mon_decimal_point'] ?: $conf['decimal_point'], $conf['mon_thousands_sep'] ?: $conf['thousands_sep']);
 }
 
 function format_date($datetime)

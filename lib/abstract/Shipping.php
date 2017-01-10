@@ -32,7 +32,7 @@ abstract class ShippingAbstract extends PluginAbstract
         return $this->name;
     }
 
-    public function getPrice($products = NULL)
+    public function getPrice($order, $products = NULL)
     {
         return $this->price;
     }

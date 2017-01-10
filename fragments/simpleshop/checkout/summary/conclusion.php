@@ -19,6 +19,7 @@ $tax       = $Order->getValue('tax');
 $shipping  = $Order->getValue('shipping_costs');
 $subtotal  = $Order->getValue('subtotal');
 $total     = $Order->getValue('total');
+$costs     = $subtotal + $shipping;
 
 ?>
 <div class="row column">
@@ -41,7 +42,9 @@ $total     = $Order->getValue('total');
             <span>###label.tax_included###</span>
         </div>
         <?php endif; ?>
-        <?php foreach ($discounts as $discount): ?>
+        <?php foreach ($discounts as $discount):
+            $discount['value'] = $discount['value'] > $costs ? $costs : $discount['value'];
+        ?>
             <div class="subtotal ">
                 <span>&euro; -<?= format_price($discount['value']) ?></span>
                 <span><?= $discount['name'] ?></span>

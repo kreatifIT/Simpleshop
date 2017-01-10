@@ -24,8 +24,8 @@ $cat_path       = $this->getVar('cat_path');
 $sidebar        = $this->getVar('sidebar_content');
 
 // prevent malformed queries
-$orderby = in_array($orderby, ['price', 'createdate']) ? $orderby : 'createdate';
-$order   = $order == 'desc' ? $order : 'asc';
+$orderby = in_array($orderby, ['price', 'prio']) ? $orderby : 'prio';
+$order   = $order == 'asc' ? $order : 'desc';
 
 ?>
 <div class="row column margin-top">
@@ -83,6 +83,7 @@ $order   = $order == 'desc' ? $order : 'asc';
             $query = Product::query()
                 ->alias('m')
                 ->where('m.status', 1)
+                ->where('m.type', 'product')
                 ->leftJoin(Tax::TABLE, 'jt1', 'jt1.id', 'm.tax')
                 ->orderBy($orderby, $order);
 

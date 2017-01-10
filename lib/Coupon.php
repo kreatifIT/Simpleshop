@@ -13,6 +13,8 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Sprog\Wildcard;
+
 class Coupon extends Discount
 {
     const TABLE = 'rex_shop_coupon';
@@ -36,17 +38,26 @@ class Coupon extends Discount
 
     public static function createGiftcard($Order, $Product)
     {
-        $order_id   = $Order->getValue('id');
-        $label_name = sprogfield('name');
+        $order_id = $Order->getValue('id');
 
         $_this = self::create();
         $_this->setValue('code', ''); // IMPORTANT! reset the code to generate a nice one
-        $_this->setValue($label_name, 'Giftcard Order #' . $order_id);
         $_this->setValue('given_away', 1);
         $_this->setValue('discount_value', $Product->getPrice());
         $_this->setValue('prefix', 'OR');
         $_this->setValue('orders', $order_id);
         $_this->setValue('start_time', $Order->getValue('status') != 'OP' ? date('Y-m-d') : '9999-12-31');
+
+        // set names
+        $langs = \rex_clang::getAll(TRUE);
+
+        foreach ($langs as $lang)
+        {
+            $lang_id = $lang->getId();
+            $_this->setValue('name_'. $lang_id, Wildcard::get('label.coupon', $lang_id) .' #' . $order_id);
+        }
+
+
         $_this->save();
 
         // set code to product

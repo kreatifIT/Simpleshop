@@ -97,7 +97,7 @@ foreach ($include_files as $include_file)
     $list_params  = $list->getParams();
     $variant_type = \rex::getProperty('simpleshop.product_variants');
 
-    if ($variant_type)
+    if ($variant_type && $list_params['table_name'] == Product::TABLE)
     {
         $list->addColumn('variants', $this->i18n('action.manage_variants'), count($list->getColumnNames()) - 2);
         $list->setColumnLabel('variants', $this->i18n('label.variants'));
@@ -111,26 +111,25 @@ foreach ($include_files as $include_file)
     return $list;
 });
 
-// TODO: to review
-\rex_extension::register('YFORM_DATA_LIST_SQL', function ($params)
-{
-    $sql   = $params->getSubject();
-    $table = $params->getParams()['table'];
-
-    if ($table->getTableName() == Category::TABLE)
-    {
-        if (stripos($sql, 'where') === FALSE)
-        {
-            $sql = preg_replace('/ORDER\sBY/i', 'where `parent_id` = \'\' ORDER BY', $sql);
-        }
-    }
-    return $sql;
-});
-
-
 if (\rex::isBackend())
 {
     \rex::setProperty('simpleshop.product_variants', 'variants');
+
+    // TODO: to review
+    \rex_extension::register('YFORM_DATA_LIST_SQL', function ($params)
+    {
+        $sql   = $params->getSubject();
+        $table = $params->getParams()['table'];
+
+        if ($table->getTableName() == Category::TABLE)
+        {
+            if (stripos($sql, 'where') === FALSE)
+            {
+                $sql = preg_replace('/ORDER\sBY/i', 'where `parent_id` = \'\' ORDER BY', $sql);
+            }
+        }
+        return $sql;
+    });
 
     \rex_extension::register('PACKAGES_INCLUDED', function ()
     {
