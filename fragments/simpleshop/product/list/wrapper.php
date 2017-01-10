@@ -14,8 +14,8 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $has_pagination = $this->getVar('has_pagination');
-$element_count  = $this->getVar('element_count') ? $this->getVar('element_count') : 20;
-$filter         = $this->getVar('filter') ? $this->getVar('filter') : [];
+$element_count  = $this->getVar('element_count', 20);
+$filter         = $this->getVar('filter', []);
 $offset         = $element_count * (int) rex_request('page', 'int', 0);
 $orderby        = $this->getVar('orderby');
 $order          = $this->getVar('order');
@@ -80,8 +80,10 @@ $order   = $order == 'desc' ? $order : 'asc';
 
         <div class="shop-products-grid <?= $this->getVar('grid-class') ?>">
             <?php
-            $query = \FriendsOfREDAXO\Simpleshop\Product::query()
-                ->where('status', 1)
+            $query = Product::query()
+                ->alias('m')
+                ->where('m.status', 1)
+                ->leftJoin(Tax::TABLE, 'jt1', 'jt1.id', 'm.tax')
                 ->orderBy($orderby, $order);
 
             foreach ($filter as $values)
@@ -92,14 +94,14 @@ $order   = $order == 'desc' ? $order : 'asc';
                     $where = [];
                     foreach ($values[1][0] as $column)
                     {
-                        $where[] = $column . ' LIKE :wr1';
+                        $where[] = "m.{$column} LIKE :wr1";
                     }
                     $query->whereRaw("(" . implode(' OR ', $where) . ")", ['wr1' => $values[1][1]]);
                 }
                 // CATEGORY ////////////////////////////////////////////////////////////////////
                 else if ($values[0] == 'price_range')
                 {
-                    $query->whereRaw("(price BETWEEN :bt1 AND :bt2 OR reduced_price BETWEEN :bt1 AND :bt2)", [
+                    $query->whereRaw("((m.price * (jt1.tax / 100 + 1)) BETWEEN :bt1 AND :bt2 OR (m.reduced_price > 0 AND (m.reduced_price * (jt1.tax / 100 + 1)) BETWEEN :bt1 AND :bt2))", [
                         'bt1' => $values[1][0],
                         'bt2' => $values[1][1],
                     ]);
@@ -116,8 +118,8 @@ $order   = $order == 'desc' ? $order : 'asc';
                     call_user_func_array($values[0], [$query]);
                 }
             }
-            //        pr($query->getQuery());
-            //        exit;
+//                    pr($query->getQuery());
+//                    exit;
             if ($has_pagination)
             {
                 $total = $query->count();
