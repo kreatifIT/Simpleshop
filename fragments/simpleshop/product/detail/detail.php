@@ -15,16 +15,16 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Sprog\Wildcard;
 
-$lable_name  = sprogfield('name');
-$product     = $this->getVar('product');
-$cat_path    = $this->getVar('cat_path');
-$badge       = $product->getValue('badge');
-$price       = $product->getPrice(TRUE, FALSE);
+$lable_name = sprogfield('name');
+$product = $this->getVar('product');
+$cat_path = $this->getVar('cat_path');
+$badge = $product->getValue('badge');
+$price = $product->getPrice(TRUE, FALSE);
 $offer_price = $product->getValue('reduced_price');
-$tax         = Tax::get($product->getValue('tax'))->getValue('tax');
-$gallery     = strlen($product->getValue('gallery')) ? explode(',', $product->getValue('gallery')) : [];
-$image       = $product->getValue('image');
-$variants    = $product->getFeatureVariants();
+$tax = Tax::get($product->getValue('tax'))->getValue('tax');
+$gallery = strlen($product->getValue('gallery')) ? explode(',', $product->getValue('gallery')) : [];
+$image = $product->getValue('image');
+$variants = $product->getFeatureVariants();
 $description = $product->getValue(sprogfield('description'));
 $application = $product->getValue(sprogfield('application'));
 //pr($variants['mapping']);
@@ -93,11 +93,16 @@ if (strlen($image) == 0 && isset($gallery[0])) {
                             if (!$default_color_id) {
                                 $default_color_id = $value_id;
                             }
+                            $icon = \Kreatif\Resource::getImageTag($feature_value->getValue('icon'),'', [], function($params) {
+                                return $params['attributes']['src'];
+                            });
+                            $image = $icon ?: \rex_url::base('resources/img/logo-rasenfix.svg');
                             ?>
                             <option
                                 value="<?= $value_id ?>"
                                 <?php if ($amount <= 0) echo 'disabled'; ?>
                                 data-variant-ids="<?= implode(',', array_keys($variants['mapping'][$value_id]['variants'])) ?>"
+                                data-image="<?= $image ?>"
                             >
                                 <?= $feature_value->getValue($lable_name) ?>
                                 <?php
@@ -158,17 +163,15 @@ if (strlen($image) == 0 && isset($gallery[0])) {
                 <?php if ($offer_price > 0): ?>
                     <span class="price-was">&euro; <?= format_price($price) ?></span>
                 <?php endif; ?>
-                <span class="price">&euro; <?= format_price($offer_price > 0 ? ($offer_price * ($tax / 100 + 1)) : $price) ?></span>
+                <span
+                    class="price">&euro; <?= format_price($offer_price > 0 ? ($offer_price * ($tax / 100 + 1)) : $price) ?></span>
                 <span class="vat"><?= strtr(Wildcard::get('shop.vat_included'), ['{{tax}}' => $tax]); ?></span>
             </div>
             <div class="checkout">
                 <?php
-                if(count($variants['mapping']))
-                {
+                if (count($variants['mapping'])) {
                     $variant_key = array_keys($variants['variants']);
-                }
-                else
-                {
+                } else {
                     $variant_key = [''];
                 }
                 $this->setVar('button-cart-counter', 1);
