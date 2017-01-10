@@ -4,5 +4,10 @@ omest_shipping.no_orders_to_send = Keine Bestellungen für den Versand bereit
 omest_shipping.orders_submitted = %d Bestellungen erfolgreich an das Logistic Center übermittelt
 omest_shipping.orders_not_submitted = Fehler beim übermitteln der Bestellungen
 omest_shipping.api_settings = Schnittstellen-Einstellungen
+omest_shipping.basic_settings = Grundeinstellungen
+omest_shipping.warehouse_key = Warenhaus-Key
+omest_shipping.omest_pickup = OMEST holt die Waren im Shop ab
+omest_shipping.pickup_zip = Postleitzahl vom Shop
+omest_shipping.pickup_country_code = Ländercode vom Shop
 
 omest_shipping.error.order_has_no_product = Bestellung Nr %d hat keine Produkte!

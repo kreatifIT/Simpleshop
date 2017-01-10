@@ -24,7 +24,7 @@ if ($_FUNC == 'submit' && count($order_ids))
     $error     = '';
     try
     {
-        $order_cnt = Omest::sendOrdersToOLC($order_ids, TRUE);
+        $order_cnt = Omest::sendOrdersToOLC($order_ids);
     }
     catch (OmestShippingException $ex)
     {
