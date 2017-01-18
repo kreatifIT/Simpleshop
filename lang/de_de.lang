@@ -13,6 +13,7 @@ label.orders_export_info_text = Wählen Sie hier die Bestellungen aus die sie ex
 label.orders_export = %d Bestellungen exportieren
 label.filter = Filter
 label.all = Alle
+label.activated = aktiviert
 
 
 action.manage_variants = Varianten verwalten

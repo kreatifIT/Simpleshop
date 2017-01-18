@@ -50,9 +50,10 @@ class Omest extends ShippingAbstract
         return parent::getName();
     }
 
-    protected function calculatePriceFromOLC($Order, $products, $test = FALSE)
+    protected function calculatePriceFromOLC($Order, $products)
     {
         $Settings = \rex::getConfig('simpleshop.OmestShipping.Settings');
+        $test     = $Settings['sandbox'];
         $extras   = $Order->getValue('extras');
         $IAddress = $Order->getValue('address_1');
         $DAddress = $extras['address_extras']['use_shipping_address'] ? $Order->getValue('address_2') : $IAddress;
@@ -70,11 +71,11 @@ class Omest extends ShippingAbstract
             'amountInsured'      => 0,
             'parcels'            => [],
             'pickupAddress'      => [
-                'pickupOMEST'  => $Settings['omest_pickup'],
-                'zipcode'      => $Settings['pickup_zip'],
-                'countryCode'  => $Settings['pickup_country_code'],
+                'pickupOMEST' => $Settings['omest_pickup'],
+                'zipcode'     => $Settings['pickup_zip'],
+                'countryCode' => $Settings['pickup_country_code'],
             ],
-            'deliveryAddress' => [
+            'deliveryAddress'    => [
                 'zipcode'     => $DAddress->getValue('zip'),
                 'countryCode' => $extras['shipping']['country_code'],
             ],
@@ -110,10 +111,12 @@ class Omest extends ShippingAbstract
 
         if ($response['response']['status'] <= 0)
         {
+            Utils::log('Omest.calculatePriceFromOLC', $response['response']['message'] . "\n" . print_r($data, TRUE) . "\n" . print_r($DAddress, TRUE), 'Error', TRUE);
             throw new OmestShippingException($response['response']['message'], 2);
         }
         else if ($response['response']['shipment']->price == '' || $response['response']['shipment']->price == '-')
         {
+            Utils::log('Omest.calculatePriceFromOLC', "No price found!\n" . print_r($data, TRUE) . "\n" . print_r($DAddress, TRUE), 'Error', TRUE);
             throw new OmestShippingException('', 3);
         }
         else
@@ -123,10 +126,11 @@ class Omest extends ShippingAbstract
         }
     }
 
-    public static function sendOrdersToOLC($order_ids, $test = FALSE)
+    public static function sendOrdersToOLC($order_ids)
     {
         $procces_cnt = 0;
         $Settings    = \rex::getConfig('simpleshop.OmestShipping.Settings');
+        $test        = $Settings['sandbox'];
 
         foreach ($order_ids as $order_id)
         {

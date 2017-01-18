@@ -54,16 +54,17 @@ $sections   = '';
 $ym_options = [];
 
 $sql = \rex_sql::factory();
-$sql->setQuery("SELECT CONCAT(YEAR(MIN(createdate)), MONTH(MIN(createdate))) AS min_date FROM " . Order::TABLE);
-$_month = range($sql->getValue('min_date'), date('Ym'));
-rsort($_month);
+$sql->setQuery("SELECT CONCAT(YEAR(MIN(createdate)), '-', MONTH(MIN(createdate))) AS min_date FROM " . Order::TABLE);
 
-foreach ($_month as $m)
-{
-    $_y           = substr($m, 0, 4);
-    $_m           = substr($m, 4);
-    $ym_options[] = "<option " . ($m == "{$year}{$month}" ? 'selected="selected"' : '') . ">{$_y}-{$_m}</option>";
+$begin     = new \DateTime($sql->getValue('min_date') . '-01');
+$end       = new \DateTime();
+$interval  = new \DateInterval('P1M');
+$daterange = new \DatePeriod($begin, $interval, $end);
+
+foreach($daterange as $date){
+    $ym_options[] = "<option " . ($date->format("Ym") == "{$year}{$month}" ? 'selected="selected"' : '') . ">{$date->format("Y-m")}</option>";
 }
+krsort($ym_options);
 
 $content  = "
     <div class='row'>
@@ -74,12 +75,12 @@ $content  = "
         <div class='col-sm-2'>
             <div class='rex-select-style'><select name='status' class='form-control'>
                 <option value=''>- {$this->i18n('label.all')} -</option>
-                <option value='OP' ". ($status == 'OP' ? 'selected="selected"' : '') .">auf Zahlung wartend</option>
-                <option value='IP' ". ($status == 'IP' ? 'selected="selected"' : '') .">in Bearbeitung</option>
-                <option value='FA' ". ($status == 'FA' ? 'selected="selected"' : '') .">Fehlgeschlagen</option>
-                <option value='SH' ". ($status == 'SH' ? 'selected="selected"' : '') .">Versendet</option>
-                <option value='CA' ". ($status == 'CA' ? 'selected="selected"' : '') .">Storniert</option>
-                <option value='CL' ". ($status == 'CL' ? 'selected="selected"' : '') .">Abgeschlossen</option>
+                <option value='OP' " . ($status == 'OP' ? 'selected="selected"' : '') . ">auf Zahlung wartend</option>
+                <option value='IP' " . ($status == 'IP' ? 'selected="selected"' : '') . ">in Bearbeitung</option>
+                <option value='FA' " . ($status == 'FA' ? 'selected="selected"' : '') . ">Fehlgeschlagen</option>
+                <option value='SH' " . ($status == 'SH' ? 'selected="selected"' : '') . ">Versendet</option>
+                <option value='CA' " . ($status == 'CA' ? 'selected="selected"' : '') . ">Storniert</option>
+                <option value='CL' " . ($status == 'CL' ? 'selected="selected"' : '') . ">Abgeschlossen</option>
             </select></div>
         </div>
         <div class='col-sm-3'>
