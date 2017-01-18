@@ -54,7 +54,7 @@ class rex_yform_value_coupon_code extends rex_yform_value_text
     {
         do
         {
-            $code = strtoupper(random_string(8)) .'-'. strtoupper(random_string(8));
+            $code = strtoupper(random_string(4)) .'-'. strtoupper(random_string(4));
         }
         while (!empty (\FriendsOfREDAXO\Simpleshop\Coupon::query()->where('code', $code)->findOne()));
 

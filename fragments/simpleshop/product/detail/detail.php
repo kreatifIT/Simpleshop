@@ -27,6 +27,7 @@ $image = $product->getValue('image');
 $variants = $product->getFeatureVariants();
 $description = $product->getValue(sprogfield('description'));
 $application = $product->getValue(sprogfield('application'));
+$delivery_time = $product->getValue(sprogfield('delivery_time'));
 //pr($variants['mapping']);
 $default_color_id = 0;
 $default_packaging_id = 0;
@@ -166,6 +167,7 @@ if (strlen($image) == 0 && isset($gallery[0])) {
                 <span
                     class="price">&euro; <?= format_price($offer_price > 0 ? ($offer_price * ($tax / 100 + 1)) : $price) ?></span>
                 <span class="vat"><?= strtr(Wildcard::get('shop.vat_included'), ['{{tax}}' => $tax]); ?></span>
+                <?php if (strlen($delivery_time)): ?><div class="delivery-times">###shop.delivery_time###: <?= $delivery_time ?></div><?php endif; ?>
             </div>
             <div class="checkout">
                 <?php

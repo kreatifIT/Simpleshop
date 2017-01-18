@@ -17,8 +17,8 @@ $extras    = [];
 $addresses = [];
 $user_id   = NULL;
 
-$show_address_as_list = $this->getVar('show_address_as_list', FALSE);
-$has_shipping = $this->getVar('has_shipping', TRUE);
+$show_address_as_list    = $this->getVar('show_address_as_list', FALSE);
+$has_shipping            = $this->getVar('has_shipping', TRUE);
 $show_back_and_ahead_btn = $this->getVar('show_back_and_ahead_btn', TRUE);
 
 if (Session::getCheckoutData('Order'))
@@ -36,8 +36,15 @@ if (Customer::isLoggedIn())
         ->where('customer_id', $user_id)
         ->find();
 }
+$countries    = ['-' => '- ###shop.choose_country### -'];
 $addresses[0] = isset($_addresses[0]) && !empty($_addresses[0]) ? $_addresses[0] : CustomerAddress::create();
 $addresses[1] = isset($_addresses[1]) && !empty($_addresses[1]) ? $_addresses[1] : CustomerAddress::create();
+$_countries   = Country::query()->where('status', 1)->orderBy('prio', 'asc')->find();
+
+foreach ($_countries as $country)
+{
+    $countries[$country->getValue('code')] = $country->getValue(sprogfield('name'));
+}
 
 $yform = new \rex_yform();
 $yform->addTemplatePath(\rex_path::addon('project') . 'templates');
@@ -152,15 +159,22 @@ $yform->setValidateField('empty', [
     strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.postal###']),
 ]);
 
-$yform->setValueField('text', [
+$yform->setValueField('select', [
     'name'     => 'customer_address.1.country',
     'label'    => '###label.country###',
+    'options'  => $countries,
     'default'  => $addresses[0]->getValue('country'),
     'required' => TRUE,
 ]);
 $yform->setValidateField('empty', [
     'customer_address.1.country',
     strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.country###']),
+]);
+$yform->setValidateField('compare_value', [
+    'name'          => 'customer_address.1.country',
+    'compare_type'  => '==',
+    'compare_value' => '-',
+    'message'       => strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.country###']),
 ]);
 
 
@@ -205,12 +219,6 @@ $yform->setValueField('text', [
 //    'value' => $addresses[0]->getValue('id'),
 //]);
 $yform->setHiddenField('id_1', $addresses[0]->getValue('id'));
-
-
-
-
-
-
 
 
 if ($has_shipping)
@@ -272,20 +280,18 @@ if ($has_shipping)
         'default' => $addresses[1]->getValue('zip'),
     ]);
 
-    $yform->setValueField('text', [
-        'name'     => 'customer_address.2.country',
-        'label'    => '###label.country###',
-        'default'  => $addresses[1]->getValue('country'),
+    array_shift($countries);
+    $yform->setValueField('select', [
+        'name'    => 'customer_address.2.country',
+        'label'   => '###label.country###',
+        'options' => $countries,
+        'default' => $addresses[1]->getValue('country'),
     ]);
 
     $yform->setHiddenField('id_2', $addresses[1]->getValue('id'));
 
     $yform->setValueField('html', ['closing_tag', '</div>']);
 }
-
-
-
-
 
 
 /**

@@ -13,7 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-use Url\Generator;
 use Url\Url;
 
 class Category extends Model

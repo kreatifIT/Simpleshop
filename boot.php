@@ -20,6 +20,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 $this->setProperty('table_classes', [
     Category::TABLE        => Category::class,
     Coupon::TABLE          => Coupon::class,
+    Country::TABLE         => Country::class,
     Customer::TABLE        => Customer::class,
     CustomerAddress::TABLE => CustomerAddress::class,
     DiscountGroup::TABLE   => DiscountGroup::class,
