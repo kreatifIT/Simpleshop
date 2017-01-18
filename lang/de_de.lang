@@ -1,7 +1,10 @@
 orders_export = Bestellungs-Export
 
 label.overview = Übersicht
+label.category = Kategorie
 label.name = Bezeichnung
+label.amount = Menge
+label.weight = Gewicht
 label.variants = Varianten
 label.order_no = Bestellnr.
 label.customer = Kunde
@@ -14,6 +17,9 @@ label.orders_export = %d Bestellungen exportieren
 label.filter = Filter
 label.all = Alle
 label.activated = aktiviert
+label.packing_list_title = Lieferschein
+label.shipping_address = Lieferadresse
+label.product_list = Produktliste
 
 
 action.manage_variants = Varianten verwalten
@@ -22,6 +28,7 @@ action.edit_value = Wert bearbeiten
 action.show_in_frontend = Im Frontend anzeigen
 action.submit = Absenden
 action.export = Exportieren
+action.print_packing_list = Lieferschein drucken
 
 error.cannot_delete_category = Die Kategorie "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind
 error.cannot_delete_tax = Der Steuersatz "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind

@@ -204,6 +204,9 @@ class Omest extends ShippingAbstract
                 'customer_key' => $test ? $Settings['test_customer_key'] : $Settings['customer_key'],
                 'data'         => json_encode($data),
             ]));
+            pr($test ? self::OLC_TEST_URL : self::OLC_URL);
+            pr($data);
+            pr($sdata);
 
             $Connector = new WSConnector($test ? self::OLC_TEST_URL : self::OLC_URL);
             $Connector->setRespFormat('application/json');

@@ -28,4 +28,4 @@ namespace FriendsOfREDAXO\Simpleshop;
     }
 });
 // CSS
-\rex_view::addCssFile($this->getAssetsUrl('css/styles.css'));
+\rex_view::addCssFile($this->getAssetsUrl('css/styles.css?mtime='. filemtime($this->getAssetsPath('css/styles.css'))));

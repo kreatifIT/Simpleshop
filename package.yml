@@ -19,6 +19,10 @@ page:
         variants:
             title: translate:label.variants
             hidden: true
+        packing_list:
+            title: packing_list
+            hidden: true
+
 
 
 requires:
