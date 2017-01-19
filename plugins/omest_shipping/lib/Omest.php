@@ -199,14 +199,11 @@ class Omest extends ShippingAbstract
                     //                    'warehouseKey' => "WH1",
                 ],
             ];
-            $sdata = (http_build_query([
+            $sdata = html_entity_decode(http_build_query([
                 'api_key'      => $test ? $Settings['test_api_key'] : $Settings['api_key'],
                 'customer_key' => $test ? $Settings['test_customer_key'] : $Settings['customer_key'],
                 'data'         => json_encode($data),
             ]));
-            pr($test ? self::OLC_TEST_URL : self::OLC_URL);
-            pr($data);
-            pr($sdata);
 
             $Connector = new WSConnector($test ? self::OLC_TEST_URL : self::OLC_URL);
             $Connector->setRespFormat('application/json');
