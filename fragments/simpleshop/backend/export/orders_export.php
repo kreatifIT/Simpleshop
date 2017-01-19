@@ -22,6 +22,7 @@ $taxes    = Tax::query()->where('status', 1)->orderBy('tax')->find();
 $orders   = Order::query()->where('id', $order_ids)->orderBy('createdate')->find();
 $csv_head = ['Rechn.-Nr', 'ID', 'Jahr', 'Monat', 'Datum', 'Währung', 'Kunde', 'Land', 'Shop', 'Zahlart', 'Grundlage', 'Rabatt', 'Summe'];
 $csv_body = [];
+$totals   = ['base' => 0, 'discount' => 0, 'sum' => 0];
 
 foreach ($taxes as $tax)
 {
@@ -32,18 +33,20 @@ foreach ($taxes as $tax)
 
 foreach ($orders as $order)
 {
-    $_taxes   = [];
-    $date     = $order->getValue('createdate');
-    $order_ts = strtotime($date);
-    $order_id = $order->getValue('id');
-    $Payment  = $order->getValue('payment');
-    $Shipping = $order->getValue('shipping');
-    $Customer = Customer::get($order->getValue('customer_id'));
-    $products = OrderProduct::query()->where('order_id', $order_id)->find();
-    $subtotal = $order->getValue('subtotal');
-    $discount = $order->getValue('discount');
-    $sh_tax   = $Shipping ? $Shipping->getValue('tax') : 0;
-
+    $_taxes      = [];
+    $date        = $order->getValue('createdate');
+    $order_ts    = strtotime($date);
+    $order_id    = $order->getValue('id');
+    $Payment     = $order->getValue('payment');
+    $Shipping    = $order->getValue('shipping');
+    $Customer    = Customer::get($order->getValue('customer_id'));
+    $Address     = $order->getValue('address_1');
+    $products    = OrderProduct::query()->where('order_id', $order_id)->find();
+    $sh_tax      = $Shipping ? $Shipping->getValue('tax') : 0;
+    $subtotal    = $order->getValue('subtotal');
+    $discount    = $order->getValue('discount') >= $subtotal ? $subtotal : ($order->getValue('discount') ?: '');
+    $base_price  = $order->getValue('subtotal') - $order->getValue('tax') + ($Shipping ? $Shipping->getValue('price') : 0);
+    $total_price = $order->getValue('total');
 
     $data = [
         '',
@@ -53,15 +56,20 @@ foreach ($orders as $order)
         $date,
         '€',
         $Customer->getName(),
-        'Italien',
+        $Address->getValue('country'),
         \rex::getServerName(),
         $Payment ? $Payment->getName() : '',
-        $order->getValue('subtotal') - $order->getValue('tax') + ($Shipping ? $Shipping->getValue('price') : 0),
-        $discount >= $subtotal ? $subtotal : ($discount ?: ''),
-        $order->getValue('total'),
+        format_price($base_price),
+        $discount,
+        format_price($total_price),
     ];
 
+    $totals['base'] += $base_price;
+    $totals['discount'] += $discount;
+    $totals['sum'] += $total_price;
+
     if ($Shipping && $sh_tax)
+
     {
         $sh_tax_p = $Shipping->getValue('tax_percentage');
         $tax_key  = array_search($sh_tax_p, $tax_vals);
@@ -83,10 +91,12 @@ foreach ($orders as $order)
     }
     foreach ($tax_vals as $tax_id => $tax)
     {
-        $data[] = $_taxes[$tax_id] ?: '';
+        $data[] = $_taxes[$tax_id] ? format_price($_taxes[$tax_id]) : '';
+        $totals['tax_'. $tax_id] += $_taxes[$tax_id];
     }
     $csv_body[] = $data;
 }
+$csv_body[] = array_merge(['','','','','','','','','',''], $totals);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // OUTPUT
