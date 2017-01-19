@@ -27,7 +27,7 @@ class DiscountGroup extends Discount
             $apply_all      = from_array($Settings, 'discounts_are_accumulable', 0);
             $order_total    = $Order->getValue('total');
             $order_quantity = $Order->getValue('quantity');
-            $discounts      = self::query()->where('status', 1)->orderBy('prior')->find();
+            $discounts      = self::query()->where('status', 1)->orderBy('prio')->find();
 
             foreach ($discounts as $discount)
             {
