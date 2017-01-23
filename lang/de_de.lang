@@ -19,6 +19,7 @@ label.all = Alle
 label.activated = aktiviert
 label.packing_list_title = Lieferschein
 label.shipping_address = Lieferadresse
+label.return_address = Absenderadresse
 label.product_list = Produktliste
 
 

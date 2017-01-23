@@ -13,6 +13,8 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Sprog\Wildcard;
+
 $Order     = $this->getVar('order');
 $SAddress  = $this->getVar('saddress');
 $products  = $this->getVar('products');
@@ -41,14 +43,30 @@ echo $fragment->parse('core/top.php');
 ?>
 <h3><?= $Addon->i18n('label.packing_list_title'); ?> #<?= $Order->getValue('id') ?></h3>
 
-<div class="panel panel-default address">
-    <div class="panel-heading"><?= $Addon->i18n('label.shipping_address') ?></div>
-    <div class="panel-body">
-        <?php foreach ($addr_data as $field => $value): ?>
-            <?php if (strlen($value) != '' && !in_array($field, ['id', 'type', 'lastname', 'customer_id', 'createdate', 'updatedate', 'salutation'])): ?>
-                <?= $value ?> <?= $field == 'firstname' ? $addr_data['lastname'] : '' ?><br/>
-            <?php endif; ?>
-        <?php endforeach; ?>
+<div class="row">
+    <div class="col-xs-6">
+        <div class="panel panel-default address">
+            <div class="panel-heading"><?= $Addon->i18n('label.return_address') ?></div>
+            <div class="panel-body">
+                <?= Wildcard::get('company.legal_name') ?><br/>
+                <?= Wildcard::get('company.street') ?><br/>
+                <?= Wildcard::get('company.location') ?><br/>
+                <?= Wildcard::get('company.postal') ?><br/>
+                <?= Wildcard::get('company.region') ?> (<?= Wildcard::get('company.country') ?>)<br/>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <div class="panel panel-default address">
+            <div class="panel-heading"><?= $Addon->i18n('label.shipping_address') ?></div>
+            <div class="panel-body">
+                <?php foreach ($addr_data as $field => $value): ?>
+                    <?php if (strlen($value) != '' && !in_array($field, ['id', 'type', 'lastname', 'customer_id', 'createdate', 'updatedate', 'salutation', 'fiscal_code', 'vat_num', 'phone'])): ?>
+                        <?= $value ?> <?= $field == 'firstname' ? $addr_data['lastname'] : '' ?><br/>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        </div>
     </div>
 </div>
 

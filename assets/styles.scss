@@ -104,17 +104,25 @@ fieldset {
 //Packing list styles
 .packing-list-page {
     font-size:12px;
-    max-width: 800px;
+    max-width: 630px;
     margin: 0 auto;
     > div {
         padding:10px;
         background: #fff;
 
+        h3 {
+            margin-top: 0;
+        }
         .address {
-            margin: 40px 0;
+            margin: 20px 0 40px 0;
+            .panel-body {
+                font-size:10px;
+            }
         }
         .product-list {
             table td {
+                font-size:10px;
+
                 &.small {
                     width:90px;
                 }
