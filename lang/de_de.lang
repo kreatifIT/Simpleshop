@@ -31,7 +31,7 @@ action.show_in_frontend = Im Frontend anzeigen
 action.submit = Absenden
 action.export = Exportieren
 action.print_packing_list = Lieferschein drucken
-action.edit_product_add_feature = Das Produkt bearbeiten und Eigenschaften zuweisen
+action.edit_product_add_feature = Dem Produkt die fehlenden Eigenschaften zuweisen
 action.remove_all_variants = Alle Varianten entfernen
 
 error.cannot_delete_category = Die Kategorie "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind

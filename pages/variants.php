@@ -24,6 +24,13 @@ if ($_FUNC == 'rm-variants')
     $sql = \rex_sql::factory();
     $sql->setQuery("DELETE FROM ". Variant::TABLE ." WHERE product_id = :product_id", ['product_id' => $product_id]);
 }
+if ($_FUNC == 'apply-features')
+{
+    $features_ids = explode(',', rex_get('feature_ids', 'string'));
+    $current_fids = explode(',', $product->getValue('features'));
+    $product->setValue('features', implode(',', array_unique(array_filter(array_merge($features_ids, $current_fids)))));
+    $product->save();
+}
 
 
 $features    = $product->getFeatures();
@@ -59,7 +66,7 @@ else if (!$features && Variant::query()->where('product_id', $product_id)->count
 
     echo \rex_view::error($this->i18n('error.product_has_no_attribute_but_variants') . '<ul><li>' . implode('</li><li>', $features) . '</li></ul>');
     $formElements = [
-        ['field' => '<a class="btn btn-apply" href="' . $product_url . '" target="_blank">' . $this->i18n('action.edit_product_add_feature') . '</a>',],
+        ['field' => '<a class="btn btn-apply" href="' . \rex_url::currentBackendPage(['table_name' => Variant::TABLE, 'data_id' => $product_id, 'func' => 'apply-features', 'feature_ids' => implode(',', array_keys($features))]) . '" target="_blank">' . $this->i18n('action.edit_product_add_feature') . '</a>',],
         ['field' => '<a class="btn btn-apply" href="' . \rex_url::currentBackendPage(['table_name' => Variant::TABLE, 'data_id' => $product_id, 'func' => 'rm-variants']) . '">' . $this->i18n('action.remove_all_variants') . '</a>',],
     ];
     $fragment     = new \rex_fragment();
