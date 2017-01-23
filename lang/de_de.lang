@@ -21,6 +21,7 @@ label.packing_list_title = Lieferschein
 label.shipping_address = Lieferadresse
 label.return_address = Absenderadresse
 label.product_list = Produktliste
+label.what_u_want_todo = Was wollen Sie tun?
 
 
 action.manage_variants = Varianten verwalten
@@ -30,6 +31,8 @@ action.show_in_frontend = Im Frontend anzeigen
 action.submit = Absenden
 action.export = Exportieren
 action.print_packing_list = Lieferschein drucken
+action.edit_product_add_feature = Das Produkt bearbeiten und Eigenschaften zuweisen
+action.remove_all_variants = Alle Varianten entfernen
 
 error.cannot_delete_category = Die Kategorie "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind
 error.cannot_delete_tax = Der Steuersatz "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind
@@ -37,6 +40,7 @@ error.cannot_delete_feature = Die Eigenschaft "{{name}}" kann nicht gelöscht we
 error.cannot_delete_value = Der Wert "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind
 error.no_product_choosen = Kein Produkt ausgewählt
 error.product_has_attribute = Das Produkt hat keine Eigenschaften zugewiesen. Klicken Sie {{link}}hier{{/link}} und weisen sie Eigenschaften zu.
+error.product_has_no_attribute_but_variants = Das Produkt hat keine Eigenschaften zugewiesen, jedoch existieren aber Varianten mit folgenden Eigenschaften:
 
 settings.order_settings = Bestellungs-Einstellungen
 settings.order_notification_email = Email für neue Bestellungen

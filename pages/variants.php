@@ -15,9 +15,17 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 echo \rex_view::title($this->i18n('label.variants'), '');
 
-$_FUNC       = \rex_request('func', 'string');
-$product_id  = rex_get('data_id', 'int');
-$product     = \FriendsOfREDAXO\Simpleshop\Product::get($product_id);
+$_FUNC      = \rex_request('func', 'string');
+$product_id = rex_get('data_id', 'int');
+$product    = \FriendsOfREDAXO\Simpleshop\Product::get($product_id);
+
+if ($_FUNC == 'rm-variants')
+{
+    $sql = \rex_sql::factory();
+    $sql->setQuery("DELETE FROM ". Variant::TABLE ." WHERE product_id = :product_id", ['product_id' => $product_id]);
+}
+
+
 $features    = $product->getFeatures();
 $product_url = \rex_url::backendPage('yform/manager/data_edit', [
     'table_name' => Product::TABLE,
@@ -25,9 +33,46 @@ $product_url = \rex_url::backendPage('yform/manager/data_edit', [
     'func'       => 'edit',
 ]);
 
+
 if (!$product)
 {
     echo \rex_view::warning($this->i18n('error.no_product_choosen'));
+    return;
+}
+else if (!$features && Variant::query()->where('product_id', $product_id)->count())
+{
+    $features = [];
+    $variants = Variant::query()->where('product_id', $product_id)->find();
+
+    foreach ($variants as $variant)
+    {
+        $_features = explode('|', $variant->getValue('variant_key'));
+
+        foreach ($_features as $feature_id)
+        {
+            if (!isset($features[$feature_id]))
+            {
+                $features[$feature_id] = FeatureValue::get($feature_id)->getValue(sprogfield('name'));
+            }
+        }
+    }
+
+    echo \rex_view::error($this->i18n('error.product_has_no_attribute_but_variants') . '<ul><li>' . implode('</li><li>', $features) . '</li></ul>');
+    $formElements = [
+        ['field' => '<a class="btn btn-apply" href="' . $product_url . '" target="_blank">' . $this->i18n('action.edit_product_add_feature') . '</a>',],
+        ['field' => '<a class="btn btn-apply" href="' . \rex_url::currentBackendPage(['table_name' => Variant::TABLE, 'data_id' => $product_id, 'func' => 'rm-variants']) . '">' . $this->i18n('action.remove_all_variants') . '</a>',],
+    ];
+    $fragment     = new \rex_fragment();
+    $fragment->setVar('elements', $formElements, FALSE);
+    $buttons = $fragment->parse('core/form/submit.php');
+
+    echo '<form action="" method="post">';
+    $fragment = new \rex_fragment();
+    $fragment->setVar('class', 'edit', FALSE);
+    $fragment->setVar('title', $this->i18n('label.what_u_want_todo'));
+    $fragment->setVar('buttons', $buttons, FALSE);
+    echo $fragment->parse('core/page/section.php');
+    echo '</form>';
     return;
 }
 else if (!$features)
@@ -68,7 +113,7 @@ if ($_FUNC == 'save')
         $saved_keys[] = $key;
     }
     // remove previously saved variants
-    \rex_sql::factory()->setQuery("DELETE FROM " . Variant::TABLE . " WHERE product_id = ? AND variant_key NOT IN(". implode(',', $saved_keys) .")", [$product_id]);
+    \rex_sql::factory()->setQuery("DELETE FROM " . Variant::TABLE . " WHERE product_id = ? AND variant_key NOT IN(" . implode(',', $saved_keys) . ")", [$product_id]);
 }
 
 // load all columns from yform
