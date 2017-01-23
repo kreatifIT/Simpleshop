@@ -18,6 +18,7 @@ class rex_yform_value_coupon_code extends rex_yform_value_text
         {
             $code = $this->getRandomCode();
 
+            $this->setValue($code);
             $this->params['value_pool']['email'][$this->getName()] = $code;
             $this->params['value_pool']['sql'][$this->getName()]   = $code;
         }
@@ -50,7 +51,7 @@ class rex_yform_value_coupon_code extends rex_yform_value_text
         }
     }
 
-    public function getRandomCode()
+    public static function getRandomCode()
     {
         do
         {

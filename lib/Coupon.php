@@ -41,7 +41,7 @@ class Coupon extends Discount
         $order_id = $Order->getValue('id');
 
         $_this = self::create();
-        $_this->setValue('code', ''); // IMPORTANT! reset the code to generate a nice one
+        $_this->setValue('code', \rex_yform_value_coupon_code::getRandomCode());
         $_this->setValue('given_away', 1);
         $_this->setValue('discount_value', $Product->getPrice());
         $_this->setValue('prefix', 'OR');
@@ -56,7 +56,6 @@ class Coupon extends Discount
             $lang_id = $lang->getId();
             $_this->setValue('name_'. $lang_id, Wildcard::get('label.coupon', $lang_id) .' #' . $order_id);
         }
-
 
         $_this->save();
 
