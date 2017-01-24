@@ -45,7 +45,7 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
             <?php if ($offer_price > 0): ?>
                 <span class="price-was">&euro; <?= format_price($price) ?></span>
             <?php endif; ?>
-            <span class="price">&euro; <?= format_price($offer_price > 0 ? ($offer_price * ($tax / 100 + 1)) : $price) ?></span>
+            <span class="price">&euro; <?= format_price($offer_price > 0 ? $product->getPrice(true) : $price) ?></span>
         </div>
         <?php
         if(count($variants['mapping']))
