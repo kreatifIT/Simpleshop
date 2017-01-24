@@ -18,7 +18,6 @@ use Url\Url;
 class Product extends Model
 {
     const TABLE = 'rex_shop_product';
-    protected $__price        = NULL;
     protected $__tax          = NULL;
     protected $__feature_data = NULL;
     protected $__variants     = NULL;
@@ -37,31 +36,27 @@ class Product extends Model
 
     public function getPrice($includeTax = FALSE, $use_reduced = TRUE)
     {
-        if ($this->__price === NULL || ($includeTax && $this->__tax === NULL))
-        {
-            $type  = $this->getValue('type');
-            $price = $this->getValue('price');
+        $type  = $this->getValue('type');
+        $price = $this->getValue('price');
 
-            if ($type == 'giftcard')
-            {
-                $includeTax = FALSE;
-                $extras     = $this->getValue('extras');
-                $price      = $extras['price'];
-            }
-            else if ($use_reduced)
-            {
-                $reduced = $this->getValue('reduced_price');
-                $price   = $reduced > 0 ? $reduced : $price;
-            }
-            if ($includeTax)
-            {
-                $tax         = Tax::get($this->getValue('tax'))->getValue('tax');
-                $this->__tax = $price * $tax * 0.01;
-                $price       = $price + $this->__tax;
-            }
-            $this->__price = $price;
+        if ($type == 'giftcard')
+        {
+            $includeTax = FALSE;
+            $extras     = $this->getValue('extras');
+            $price      = $extras['price'];
         }
-        return $this->__price;
+        else if ($use_reduced)
+        {
+            $reduced = $this->getValue('reduced_price');
+            $price   = $reduced > 0 ? $reduced : $price;
+        }
+        if ($includeTax)
+        {
+            $tax         = Tax::get($this->getValue('tax'))->getValue('tax');
+            $this->__tax = $price * $tax * 0.01;
+            $price       = $price + $this->__tax;
+        }
+        return $price;
     }
 
     public function getTax()

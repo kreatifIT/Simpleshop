@@ -211,7 +211,7 @@ $variant_data = [];
 
 foreach ($variants['variants'] as $key => $variant) {
     $variant_data[$key] = $variant->getData();
-    $variant_data[$key]['price_formated'] = format_price($variant->getPrice());
+    $variant_data[$key]['price_formated'] = format_price($variant->getPrice(TRUE));
     $variant_data[$key]['image_big_full'] = Utils::getImageTag($variant_data[$key]['image'], 'fbox', [], function ($params) {
         return $params['attributes']['src'];
     });
