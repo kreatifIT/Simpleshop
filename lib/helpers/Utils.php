@@ -77,9 +77,11 @@ class Utils
         }
         else
         {
-            $ss                   = explode('?', rex_getUrl(\rex_article::getCurrentId(), NULL, $params['rex_geturl_params']));
-            $paging_url           = $ss[0];
-            $params['get_params'] = array_merge($params['get_params'], $ss[1] ?: []);
+            $ss         = explode('?', rex_getUrl(\rex_article::getCurrentId(), NULL, $params['rex_geturl_params']));
+            $paging_url = $ss[0];
+
+            parse_str($ss[1], $g_params);
+            $params['get_params'] = array_merge($params['get_params'], $g_params);
         }
         if ($totalElements > $elementsPerPage)
         {
