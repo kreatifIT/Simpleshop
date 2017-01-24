@@ -13,6 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Kreatif\Project\Settings;
 use Url\Url;
 
 class Product extends Model
@@ -36,8 +37,9 @@ class Product extends Model
 
     public function getPrice($includeTax = FALSE, $use_reduced = TRUE)
     {
-        $type  = $this->getValue('type');
-        $price = $this->getValue('price');
+        $type     = $this->getValue('type');
+        $price    = $this->getValue('price');
+        $settings = \rex::getConfig('simpleshop.Settings');
 
         if ($type == 'giftcard')
         {
@@ -55,6 +57,10 @@ class Product extends Model
             $tax         = Tax::get($this->getValue('tax'))->getValue('tax');
             $this->__tax = $price * $tax * 0.01;
             $price       = $price + $this->__tax;
+        }
+        if ($settings['price_rounding'])
+        {
+            $price = round($price, 1);
         }
         return $price;
     }

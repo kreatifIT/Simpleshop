@@ -20,6 +20,16 @@ $Settings = $this->getVar('Settings');
 ?>
 <fieldset>
 
+    <legend><?= $Addon->i18n('settings.shop_settings'); ?></legend>
+    <dl class="rex-form-group form-group">
+        <dt><?= $Addon->i18n('settings.price_rounding'); ?></dt>
+        <dd>
+            <label class="form-label">
+                <input type="checkbox" name="price_rounding" value="1" <?php if (from_array($Settings, 'price_rounding') == 1) echo 'checked="checked"'; ?>/><span></span><?= $Addon->i18n('settings.price_rounding_info'); ?>
+            </label>
+        </dd>
+    </dl>
+
     <legend><?= $Addon->i18n('settings.order_settings'); ?></legend>
     <dl class="rex-form-group form-group">
         <dt><?= $Addon->i18n('settings.order_notification_email'); ?></dt>
@@ -30,10 +40,7 @@ $Settings = $this->getVar('Settings');
     <legend><?= $Addon->i18n('settings.discount_settings'); ?></legend>
     <dl class="rex-form-group form-group">
         <dt><?= $Addon->i18n('settings.discount_application'); ?></dt>
-        <dd><label class="form-label"><input type="checkbox" name="discounts_are_accumulable" value="1" <?php if (from_array($Settings, 'discounts_are_accumulable') == 1)
-                {
-                    echo 'checked="checked"';
-                } ?>/><span></span><?= $Addon->i18n('settings.discounts_are_accumulable'); ?></label></dd>
+        <dd><label class="form-label"><input type="checkbox" name="discounts_are_accumulable" value="1" <?php if (from_array($Settings, 'discounts_are_accumulable') == 1) echo 'checked="checked"'; ?>/><span></span><?= $Addon->i18n('settings.discounts_are_accumulable'); ?></label></dd>
     </dl>
     <?php endif; ?>
 
