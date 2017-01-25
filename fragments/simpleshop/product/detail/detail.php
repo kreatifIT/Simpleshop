@@ -69,7 +69,20 @@ if (strlen($image) == 0 && isset($gallery[0])) {
             <?php endif; ?>
             <a href="<?= Utils::getImageTag($image, 'fbox', [], function ($params) {
                 return $params['attributes']['src'];
-            }) ?>" class="fbox"><?= Utils::getImageTag($image, 'product-detail-main') ?></a>
+            }) ?>" class="fbox" rel="product-images"><?= Utils::getImageTag($image, 'product-detail-main') ?></a>
+        </div>
+        <div class="row product-image-detail-carousel">
+            <?php for ($i = 0; $i < 5; $i++) : ?>
+                <div class="column">
+                    <div class="product-image">
+                        <a href="<?= Utils::getImageTag($image, 'fbox', [], function ($params) {
+                            return $params['attributes']['src'];
+                        }) ?>" class="fbox" rel="product-images">
+                            <?= Utils::getImageTag($image, 'product-detail-main') ?>
+                        </a>
+                    </div>
+                </div>
+            <?php endfor; ?>
         </div>
     </div>
     <div class="large-6 columns">
@@ -94,7 +107,7 @@ if (strlen($image) == 0 && isset($gallery[0])) {
                             if (!$default_color_id) {
                                 $default_color_id = $value_id;
                             }
-                            $icon = \Kreatif\Resource::getImageTag($feature_value->getValue('icon'),'', [], function($params) {
+                            $icon = \Kreatif\Resource::getImageTag($feature_value->getValue('icon'), '', [], function ($params) {
                                 return $params['attributes']['src'];
                             });
                             $image = $icon ?: \rex_url::base('resources/img/logo-rasenfix.svg');
@@ -161,10 +174,13 @@ if (strlen($image) == 0 && isset($gallery[0])) {
             <?php endif; ?>
 
             <div class="product-price price-large">
-                <span class="price-was <?php if ($offer_price <= 0) echo 'hidden' ?>">&euro; <?= format_price($price) ?></span>
-                <span class="price">&euro; <?= format_price($offer_price > 0 ? $product->getPrice(true) : $price) ?></span>
+                <span
+                    class="price-was <?php if ($offer_price <= 0) echo 'hidden' ?>">&euro; <?= format_price($price) ?></span>
+                <span
+                    class="price">&euro; <?= format_price($offer_price > 0 ? $product->getPrice(true) : $price) ?></span>
                 <span class="vat"><?= strtr(Wildcard::get('shop.vat_included'), ['{{tax}}' => $tax]); ?></span>
-                <?php if (strlen($delivery_time)): ?><div class="delivery-times">###shop.delivery_time###: <?= $delivery_time ?></div><?php endif; ?>
+                <?php if (strlen($delivery_time)): ?>
+                    <div class="delivery-times">###shop.delivery_time###: <?= $delivery_time ?></div><?php endif; ?>
             </div>
             <div class="checkout">
                 <?php
