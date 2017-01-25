@@ -42,9 +42,7 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
         <a href="<?= $product_url ?>"><?= Utils::getImageTag($image, 'product-list-element-main') ?></a>
         <h3><a href="<?= $product_url ?>"><?= $product->getValue(sprogfield('name')) ?></a></h3>
         <div class="product-price">
-            <?php if ($offer_price > 0): ?>
-                <span class="price-was">&euro; <?= format_price($price) ?></span>
-            <?php endif; ?>
+            <span class="price-was <?php if ($offer_price <= 0) echo 'hidden' ?>">&euro; <?= format_price($price) ?></span>
             <span class="price">&euro; <?= format_price($offer_price > 0 ? $product->getPrice(true) : $price) ?></span>
         </div>
         <?php

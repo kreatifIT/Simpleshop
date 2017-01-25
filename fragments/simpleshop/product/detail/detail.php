@@ -161,11 +161,8 @@ if (strlen($image) == 0 && isset($gallery[0])) {
             <?php endif; ?>
 
             <div class="product-price price-large">
-                <?php if ($offer_price > 0): ?>
-                    <span class="price-was">&euro; <?= format_price($price) ?></span>
-                <?php endif; ?>
-                <span
-                    class="price">&euro; <?= format_price($offer_price > 0 ? $product->getPrice(true) : $price) ?></span>
+                <span class="price-was <?php if ($offer_price <= 0) echo 'hidden' ?>">&euro; <?= format_price($price) ?></span>
+                <span class="price">&euro; <?= format_price($offer_price > 0 ? $product->getPrice(true) : $price) ?></span>
                 <span class="vat"><?= strtr(Wildcard::get('shop.vat_included'), ['{{tax}}' => $tax]); ?></span>
                 <?php if (strlen($delivery_time)): ?><div class="delivery-times">###shop.delivery_time###: <?= $delivery_time ?></div><?php endif; ?>
             </div>
@@ -212,6 +209,7 @@ $variant_data = [];
 foreach ($variants['variants'] as $key => $variant) {
     $variant_data[$key] = $variant->getData();
     $variant_data[$key]['price_formated'] = format_price($variant->getPrice(TRUE));
+    $variant_data[$key]['orig_price_formated'] = $variant_data[$key]['reduced_price'] ? format_price($variant->getPrice(TRUE, FALSE)) : NULL;
     $variant_data[$key]['image_big_full'] = Utils::getImageTag($variant_data[$key]['image'], 'fbox', [], function ($params) {
         return $params['attributes']['src'];
     });
