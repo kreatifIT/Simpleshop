@@ -24,6 +24,7 @@ $offer_price = $product->getValue('reduced_price');
 $tax = Tax::get($product->getValue('tax'))->getValue('tax');
 $gallery = strlen($product->getValue('gallery')) ? explode(',', $product->getValue('gallery')) : [];
 $image = $product->getValue('image');
+$pictures = strlen($product->getValue('pictures')) ? explode(',', $product->getValue('pictures')) : [];
 $variants = $product->getFeatureVariants();
 $description = $product->getValue(sprogfield('description'));
 $application = $product->getValue(sprogfield('application'));
@@ -71,19 +72,21 @@ if (strlen($image) == 0 && isset($gallery[0])) {
                 return $params['attributes']['src'];
             }) ?>" class="fbox" rel="product-images"><?= Utils::getImageTag($image, 'product-detail-main') ?></a>
         </div>
+        <?php if (count($pictures)): ?>
         <div class="row product-image-detail-carousel">
-            <?php for ($i = 0; $i < 5; $i++) : ?>
+            <?php foreach ($pictures as $picture): ?>
                 <div class="column">
                     <div class="product-image">
-                        <a href="<?= Utils::getImageTag($image, 'fbox', [], function ($params) {
+                        <a href="<?= Utils::getImageTag($picture, 'fbox', [], function ($params) {
                             return $params['attributes']['src'];
                         }) ?>" class="fbox" rel="product-images">
-                            <?= Utils::getImageTag($image, 'product-detail-main') ?>
+                            <?= Utils::getImageTag($picture, 'cart-list-element-main') ?>
                         </a>
                     </div>
                 </div>
-            <?php endfor; ?>
+            <?php endforeach; ?>
         </div>
+        <?php endif; ?>
     </div>
     <div class="large-6 columns">
         <!-- Popup -->
