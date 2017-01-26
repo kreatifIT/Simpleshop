@@ -26,16 +26,16 @@ class Session extends Model
     {
         $sessions      = [];
         $sql           = \rex_sql::factory();
-        $_this         = parent::create();
-        $session_files = glob(ini_get('session.save_path') . '/*');
-        // call getSession to merge possible duplicate sessions
-        self::getSession();
-        foreach ($session_files as $_session)
-        {
-            list ($path, $session) = explode('/sess_', $_session);
-            $sessions[] = $session;
-        }
-        $sql->setQuery("DELETE FROM " . $_this->getTableName() . " WHERE session_id NOT IN('" . implode("', '", $sessions) . "')");
+//        $_this         = parent::create();
+//        $session_files = glob(ini_get('session.save_path') . '/*');
+//        // call getSession to merge possible duplicate sessions
+//        self::getSession();
+//        foreach ($session_files as $_session)
+//        {
+//            list ($path, $session) = explode('/sess_', $_session);
+//            $sessions[] = $session;
+//        }
+        $sql->setQuery("DELETE FROM " . self::TABLE . " WHERE lastupdate < '". date('Y-m-d H:i:s', strtotime('-30 Days')) ."'");
     }
 
     public static function getCheckoutData($key = NULL, $default = NULL)
@@ -101,6 +101,10 @@ class Session extends Model
 
     public function writeSession($data = [])
     {
+        if (\rex::isBackend())
+        {
+            return;
+        }
         $User = Customer::getCurrentUser();
 
         foreach ($data as $key => $value)
@@ -136,21 +140,24 @@ class Session extends Model
 
             foreach ($cart_items as $key => $item)
             {
-                try
+                if (is_array($item))
                 {
-                    $product            = Product::getProductByKey($key, $item['quantity'], $item['extras']);
-                    self::$has_shipping = self::$has_shipping || $product->getValue('type') == 'product';
-                }
-                catch (ProductException $ex)
-                {
-                    if ($throwErrors)
+                    try
                     {
-                        throw new ProductException($ex->getMessage(), $ex->getCode());
+                        $product            = Product::getProductByKey($key, $item['quantity'], $item['extras']);
+                        self::$has_shipping = self::$has_shipping || $product->getValue('type') == 'product';
                     }
-                }
-                if ($product)
-                {
-                    $results[] = $product;
+                    catch (ProductException $ex)
+                    {
+                        if ($throwErrors)
+                        {
+                            throw new ProductException($ex->getMessage(), $ex->getCode());
+                        }
+                    }
+                    if ($product)
+                    {
+                        $results[] = $product;
+                    }
                 }
             }
             $cart_items = $results;
