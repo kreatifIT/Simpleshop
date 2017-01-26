@@ -29,6 +29,7 @@ $variants = $product->getFeatureVariants();
 $description = $product->getValue(sprogfield('description'));
 $application = $product->getValue(sprogfield('application'));
 $delivery_time = $product->getValue(sprogfield('delivery_time'));
+$unit = $product->getValue(sprogfield('unit'));
 //pr($variants['mapping']);
 $default_color_id = 0;
 $default_packaging_id = 0;
@@ -177,13 +178,13 @@ if (strlen($image) == 0 && isset($gallery[0])) {
             <?php endif; ?>
 
             <div class="product-price price-large">
-                <span
-                    class="price-was <?php if ($offer_price <= 0) echo 'hidden' ?>">&euro; <?= format_price($price) ?></span>
-                <span
-                    class="price">&euro; <?= format_price($offer_price > 0 ? $product->getPrice(true) : $price) ?></span>
+                <span class="price-was <?php if ($offer_price <= 0) echo 'hidden' ?>">&euro; <?= format_price($price) ?></span>
+                <span class="price">&euro; <?= format_price($offer_price > 0 ? $product->getPrice(true) : $price) ?></span>
                 <span class="vat"><?= strtr(Wildcard::get('shop.vat_included'), ['{{tax}}' => $tax]); ?></span>
                 <?php if (strlen($delivery_time)): ?>
-                    <div class="delivery-times">###shop.delivery_time###: <?= $delivery_time ?></div><?php endif; ?>
+                    <div class="delivery-times">###shop.delivery_time###: <?= $delivery_time ?></div>
+                <?php endif; ?>
+                <div class="unit">###shop.unit###: <?= $unit ?></div>
             </div>
             <div class="checkout">
                 <?php

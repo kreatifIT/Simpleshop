@@ -23,6 +23,7 @@ $image            = $product->getValue('image');
 $price            = $product->getPrice(TRUE);
 $features         = $product->getValue('features');
 $quantity         = $product->getValue('cart_quantity');
+$unit             = $product->getValue(sprogfield('unit'));
 $key              = $product->getValue('key');
 $product_url      = $product->getUrl();
 $is_giftcard      = $product->getValue('type') == 'giftcard';
@@ -50,14 +51,14 @@ if ($has_image && strlen($image) == 0 && strlen($product->getValue('gallery')))
             <?= $product->getValue($label_name) ?>
         </h3>
         <?php if (!$is_giftcard): ?>
-        <p style="<?= $email_tpl_styles['p'] ? $email_tpl_styles['p'] : '' ?>">
-            <?= $Category->getValue($label_name) ?>
-        </p>
-        <?php elseif($extras['coupon_code']): ?>
-        <br/>
-        <code style="<?= $email_tpl_styles['code'] ?>">
-            Code: <?= $extras['coupon_code'] ?>
-        </code>
+            <p style="<?= $email_tpl_styles['p'] ? $email_tpl_styles['p'] : '' ?>">
+                <?= $Category->getValue($label_name) ?>
+            </p>
+        <?php elseif ($extras['coupon_code']): ?>
+            <br/>
+            <code style="<?= $email_tpl_styles['code'] ?>">
+                Code: <?= $extras['coupon_code'] ?>
+            </code>
         <?php endif; ?>
         <?php if (count($features)): ?>
             <?php foreach ($features as $feature): ?>
@@ -74,6 +75,7 @@ if ($has_image && strlen($image) == 0 && strlen($product->getValue('gallery')))
         $this->setVar('has_refresh_button', $this->getVar('has_refresh_button', TRUE));
         $this->setVar('cart-quantity', $quantity);
         $this->setVar('product_key', $key);
+        $this->setVar('unit', $unit);
         echo $this->subfragment('simpleshop/product/general/cart/button.php');
         ?>
     </td>
