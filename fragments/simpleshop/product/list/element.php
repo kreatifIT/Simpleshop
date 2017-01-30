@@ -13,19 +13,18 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$product      = $this->getVar('product');
-$image        = $product->getValue('image');
-$badge        = $product->getValue('badge');
-$price        = $product->getPrice(TRUE, FALSE);
-$offer_price  = $product->getValue('reduced_price');
+$product = $this->getVar('product');
+$image = $product->getValue('image');
+$badge = $product->getValue('badge');
+$price = $product->getPrice(TRUE, FALSE);
+$offer_price = $product->getValue('reduced_price');
 $product_type = $product->getValue('type');
-$variants     = $product->getFeatureVariants();
-$product_url  = $product->getUrl();
+$variants = $product->getFeatureVariants();
+$product_url = $product->getUrl();
 
-if (strlen($image) == 0 && strlen($product->getValue('gallery')))
-{
+if (strlen($image) == 0 && strlen($product->getValue('gallery'))) {
     $gallery = explode(',', $product->getValue('gallery'));
-    $image   = $gallery[0];
+    $image = $gallery[0];
 }
 
 ?>
@@ -42,29 +41,30 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery')))
 
         <a href="<?= $product_url ?>"><?= Utils::getImageTag($image, 'product-list-element-main') ?></a>
         <h3><a href="<?= $product_url ?>"><?= $product->getValue(sprogfield('name')) ?></a></h3>
-        <?php if ($product_type == 'product'): ?>
-        <div class="product-price">
-            <span class="price-was <?php if ($offer_price <= 0) echo 'hidden' ?>">&euro; <?= format_price($price) ?></span>
-            <span class="price">&euro; <?= format_price($offer_price > 0 ? $product->getPrice(TRUE) : $price) ?></span>
+        <div class="bottom-container">
+            <?php if ($product_type == 'product'): ?>
+                <div class="product-price">
+                    <span
+                        class="price-was <?php if ($offer_price <= 0) echo 'hidden' ?>">&euro; <?= format_price($price) ?></span>
+                    <span
+                        class="price">&euro; <?= format_price($offer_price > 0 ? $product->getPrice(TRUE) : $price) ?></span>
+                </div>
+            <?php endif; ?>
+            <?php
+            if (count($variants['mapping'])) {
+                $variant_key = array_keys($variants['variants']);
+            } else {
+                $variant_key = [''];
+            }
+            $this->setVar('is_disabled', $product->getValue('amount') <= 0);
+            $this->setVar('product_key', $product->getValue('id') . '|' . $variant_key[0]);
+            $this->setVar('has_quantity_control', FALSE);
+            $this->setVar('has_quantity', FALSE);
+            $this->setVar('product_url', $product_url);
+            $this->setVar('has_add_to_cart_button', $product_type == 'product');
+            $this->setVar('has_detail_button', $product_type != 'product');
+            echo $this->subfragment('simpleshop/product/general/cart/button.php');
+            ?>
         </div>
-        <?php endif; ?>
-        <?php
-        if (count($variants['mapping']))
-        {
-            $variant_key = array_keys($variants['variants']);
-        }
-        else
-        {
-            $variant_key = [''];
-        }
-        $this->setVar('is_disabled', $product->getValue('amount') <= 0);
-        $this->setVar('product_key', $product->getValue('id') . '|' . $variant_key[0]);
-        $this->setVar('has_quantity_control', FALSE);
-        $this->setVar('has_quantity', FALSE);
-        $this->setVar('product_url', $product_url);
-        $this->setVar('has_add_to_cart_button', $product_type == 'product');
-        $this->setVar('has_detail_button', $product_type != 'product');
-        echo $this->subfragment('simpleshop/product/general/cart/button.php');
-        ?>
     </div>
 </div>
