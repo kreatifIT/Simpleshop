@@ -22,6 +22,10 @@ $unit                   = $this->getVar('unit', '');
 $has_quantity_ctrl      = $this->getVar('has_quantity_control', FALSE);
 $has_add_to_cart_button = $this->getVar('has_add_to_cart_button', FALSE);
 $has_refresh_button     = $this->getVar('has_refresh_button', FALSE);
+$has_request_button     = $this->getVar('has_request_button', FALSE);
+$has_detail_button      = $this->getVar('has_detail_button', FALSE);
+$product_url            = $this->getVar('product_url', '#');
+$product_request_url    = $this->getVar('product_request_url', FALSE);
 
 if (!$quantity)
 {
@@ -54,5 +58,13 @@ if (!$quantity)
                 <span>###action.add_to_cart###</span>
             </a>
         <?php endif; ?>
+    <?php elseif ($has_detail_button): ?>
+        <a class="button" href="<?= $product_url ?>">
+            <span>###label.details###</span>
+        </a>
+    <?php elseif ($has_request_button && $product_request_url): ?>
+        <a class="button" href="<?= $product_request_url ?>">
+            <span>###action.request_product###</span>
+        </a>
     <?php endif; ?>
 </div>

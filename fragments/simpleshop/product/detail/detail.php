@@ -29,6 +29,7 @@ $variants = $product->getFeatureVariants();
 $description = $product->getValue(sprogfield('description'));
 $application = $product->getValue(sprogfield('application'));
 $delivery_time = $product->getValue(sprogfield('delivery_time'));
+$product_type = $product->getValue('type');
 $unit = $product->getValue(sprogfield('unit'));
 //pr($variants['mapping']);
 $default_color_id = 0;
@@ -178,9 +179,13 @@ if (strlen($image) == 0 && isset($gallery[0])) {
             <?php endif; ?>
 
             <div class="product-price price-large">
-                <span class="price-was <?php if ($offer_price <= 0) echo 'hidden' ?>">&euro; <?= format_price($price) ?></span>
-                <span class="price">&euro; <?= format_price($offer_price > 0 ? $product->getPrice(true) : $price) ?></span>
-                <span class="vat"><?= strtr(Wildcard::get('shop.vat_included'), ['{{tax}}' => $tax]); ?></span>
+                <?php if ($product_type == 'product'): ?>
+                    <span class="price-was <?php if ($offer_price <= 0) echo 'hidden' ?>">&euro; <?= format_price($price) ?></span>
+                    <span class="price">&euro; <?= format_price($offer_price > 0 ? $product->getPrice(true) : $price) ?></span>
+                    <span class="vat"><?= strtr(Wildcard::get('shop.vat_included'), ['{{tax}}' => $tax]); ?></span>
+                <?php else: ?>
+                    <div class="price product-request-info">###label.product_request_info###</div>
+                <?php endif; ?>
                 <?php if (strlen($delivery_time)): ?>
                     <div class="delivery-times">###shop.delivery_time###: <?= $delivery_time ?></div>
                 <?php endif; ?>
@@ -194,8 +199,10 @@ if (strlen($image) == 0 && isset($gallery[0])) {
                     $variant_key = [''];
                 }
                 $this->setVar('button-cart-counter', 1);
-                $this->setVar('has_quantity_control', TRUE);
-                $this->setVar('has_add_to_cart_button', TRUE);
+                $this->setVar('has_quantity_control', $product_type == 'product');
+                $this->setVar('has_add_to_cart_button', $product_type == 'product');
+                $this->setVar('has_request_button', $product_type == 'product_request');
+                $this->setVar('has_quantity', $product_type == 'product');
                 $this->setVar('is_disabled', $product->getValue('amount') <= 0);
                 $this->setVar('product_key', $product->getValue('id') . '|' . $variant_key[0]);
                 echo $this->subfragment('simpleshop/product/general/cart/button.php');
