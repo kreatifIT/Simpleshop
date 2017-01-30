@@ -83,7 +83,7 @@ $order   = $order == 'asc' ? $order : 'desc';
             $query = Product::query()
                 ->alias('m')
                 ->where('m.status', 1)
-                ->whereRaw('m.type = :type1 OR m.type = :type2', ['type1' => 'product', 'type2' => 'product_request'])
+                ->whereRaw('(m.type = :type1 OR m.type = :type2)', ['type1' => 'product', 'type2' => 'product_request'])
                 ->leftJoin(Tax::TABLE, 'jt1', 'jt1.id', 'm.tax')
                 ->orderBy($orderby, $order);
 
