@@ -13,36 +13,33 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+global $yform;
+
 $extras    = [];
 $addresses = [];
-$user_id   = NULL;
+$user_id   = null;
 
-$show_address_as_list    = $this->getVar('show_address_as_list', FALSE);
-$has_shipping            = $this->getVar('has_shipping', TRUE);
-$show_back_and_ahead_btn = $this->getVar('show_back_and_ahead_btn', TRUE);
+$show_address_as_list    = $this->getVar('show_address_as_list', false);
+$has_shipping            = $this->getVar('has_shipping', true);
+$show_back_and_ahead_btn = $this->getVar('show_back_and_ahead_btn', true);
 
-if (Session::getCheckoutData('Order'))
-{
+if (Session::getCheckoutData('Order')) {
     $Order         = Session::getCurrentOrder();
     $_addresses[0] = $Order->getValue('address_1');
     $_addresses[1] = $Order->getValue('address_2');
     $extras        = $Order->getValue('extras');
 }
-if (Customer::isLoggedIn())
-{
+if (Customer::isLoggedIn()) {
     $User       = Customer::getCurrentUser();
     $user_id    = $User->getValue('id');
-    $_addresses = CustomerAddress::query()
-        ->where('customer_id', $user_id)
-        ->find();
+    $_addresses = CustomerAddress::query()->where('customer_id', $user_id)->find();
 }
 $countries    = ['-' => '- ###shop.choose_country### -'];
 $addresses[0] = isset($_addresses[0]) && !empty($_addresses[0]) ? $_addresses[0] : CustomerAddress::create();
 $addresses[1] = isset($_addresses[1]) && !empty($_addresses[1]) ? $_addresses[1] : CustomerAddress::create();
 $_countries   = Country::query()->where('status', 1)->orderBy('prio', 'asc')->find();
 
-foreach ($_countries as $country)
-{
+foreach ($_countries as $country) {
     $countries[$country->getValue('code')] = $country->getValue(sprogfield('name'));
 }
 
@@ -50,22 +47,20 @@ $yform = new \rex_yform();
 $yform->addTemplatePath(\rex_path::addon('project') . 'templates');
 $yform->setObjectparams('form_ytemplate', 'form,bootstrap');
 $yform->setObjectparams('error_class', 'form_warning');
-$yform->setObjectparams('submit_btn_show', FALSE);
+$yform->setObjectparams('submit_btn_show', false);
 $yform->setObjectparams('form_name', 'customer_address');
 $yform->setObjectparams('form_action', '');
 $yform->setObjectparams('form_class', 'row column');
-$yform->setObjectparams('form_showformafterupdate', TRUE);
+$yform->setObjectparams('form_showformafterupdate', true);
 
 
-if ($show_address_as_list)
-{
+if ($show_address_as_list) {
     $yform->setValueField('html', ['opening_tag', '<h2>###shop.invoice_address###']);
     $yform->setValueField('html', ['closing_tag', '</h2>']);
 }
 
-if (Session::getCheckoutData('as_guest') || !Customer::isLoggedIn())
-{
-    Session::setCheckoutData('as_guest', TRUE);
+if (Session::getCheckoutData('as_guest') || !Customer::isLoggedIn()) {
+    Session::setCheckoutData('as_guest', true);
     /**
      * Guest checkout
      */
@@ -73,7 +68,7 @@ if (Session::getCheckoutData('as_guest') || !Customer::isLoggedIn())
         'name'     => 'email',
         'label'    => '###label.email###',
         'default'  => $extras['address_extras']['email'],
-        'required' => TRUE,
+        'required' => true,
     ]);
     $yform->setValidateField('empty', [
         'email',
@@ -94,14 +89,14 @@ $yform->setValueField('radio', [
     'label'   => '###label.gender###',
     'options' => '###label.female###=Miss,###label.male###=Mr',
     'default' => $addresses[0]->getValue('salutation') ?: 'Miss',
-    'inline'  => TRUE,
+    'inline'  => true,
 ]);
 
 $yform->setValueField('text', [
     'name'     => 'customer_address.1.firstname',
     'label'    => '###label.firstname###',
     'default'  => $addresses[0]->getValue('firstname'),
-    'required' => TRUE,
+    'required' => true,
 ]);
 $yform->setValidateField('empty', [
     'customer_address.1.firstname',
@@ -112,7 +107,7 @@ $yform->setValueField('text', [
     'name'     => 'customer_address.1.lastname',
     'label'    => '###label.lastname###',
     'default'  => $addresses[0]->getValue('lastname'),
-    'required' => TRUE,
+    'required' => true,
 ]);
 $yform->setValidateField('empty', [
     'customer_address.1.lastname',
@@ -129,7 +124,7 @@ $yform->setValueField('text', [
     'name'     => 'customer_address.1.street',
     'label'    => '###label.street###',
     'default'  => $addresses[0]->getValue('street'),
-    'required' => TRUE,
+    'required' => true,
 ]);
 $yform->setValidateField('empty', [
     'customer_address.1.street',
@@ -141,7 +136,7 @@ $yform->setValueField('text', [
     'name'     => 'customer_address.1.location',
     'label'    => '###label.location###',
     'default'  => $addresses[0]->getValue('location'),
-    'required' => TRUE,
+    'required' => true,
 ]);
 $yform->setValidateField('empty', [
     'customer_address.1.location',
@@ -152,7 +147,7 @@ $yform->setValueField('text', [
     'name'     => 'customer_address.1.zip',
     'label'    => '###label.postal###',
     'default'  => $addresses[0]->getValue('zip'),
-    'required' => TRUE,
+    'required' => true,
 ]);
 $yform->setValidateField('empty', [
     'customer_address.1.zip',
@@ -164,7 +159,7 @@ $yform->setValueField('select', [
     'label'    => '###label.country###',
     'options'  => $countries,
     'default'  => $addresses[0]->getValue('country'),
-    'required' => TRUE,
+    'required' => true,
 ]);
 $yform->setValidateField('empty', [
     'customer_address.1.country',
@@ -182,7 +177,7 @@ $yform->setValueField('text', [
     'name'     => 'customer_address.1.phone',
     'label'    => '###label.phone###',
     'default'  => $addresses[0]->getValue('phone'),
-    'required' => TRUE,
+    'required' => true,
 ]);
 $yform->setValidateField('empty', [
     'customer_address.1.phone',
@@ -210,8 +205,8 @@ $yform->setValueField('text', [
     'name'     => 'customer_address.1.fiscal_code',
     'label'    => '###label.fiscal_code###',
     'default'  => $addresses[0]->getValue('fiscal_code'),
-    'required' => TRUE,
-    'strong'   => TRUE,
+    'required' => false,
+    'strong'   => true,
 ]);
 
 //$yform->setValueField('hidden', [
@@ -221,23 +216,20 @@ $yform->setValueField('text', [
 $yform->setHiddenField('id_1', $addresses[0]->getValue('id'));
 
 
-if ($has_shipping)
-{
+if ($has_shipping) {
     /**
      * Alternative shipping address
      */
-    if ($show_address_as_list)
-    {
+    if ($show_address_as_list) {
         $yform->setValueField('html', ['opening_tag', '<div class="shipping-address padding-top"><h2>###shop.shipping_address###</h2>']);
     }
-    else
-    {
+    else {
         $yform->setValueField('checkbox', [
             'name'              => 'use_shipping_address',
             'label'             => '###shop.use_alternative_shipping_address###',
             'alternative_label' => '###shop.shipping_address###',
             'default'           => $extras['address_extras']['use_shipping_address'],
-            'strong'            => TRUE,
+            'strong'            => true,
         ]);
 
         $visibility_class = $extras['address_extras']['use_shipping_address'] ?: 'style="display: none;"';
@@ -298,8 +290,7 @@ if ($has_shipping)
  * Submit
  */
 
-if ($show_back_and_ahead_btn)
-{
+if ($show_back_and_ahead_btn) {
     $yform->setValueField('html', ['opening_tag', '<div class="row buttons-checkout margin-bottom">']);
     $yform->setValueField('html', ['opening_tag', '<div class="medium-6 columns">']);
     $yform->setValueField('html', ['back_button', '<a href="#" class="button button-gray">###action.go_back###</a>']);
@@ -312,8 +303,7 @@ if ($show_back_and_ahead_btn)
         'css_classes' => 'submit-button-container',
     ]);
 }
-else
-{
+else {
     $yform->setValueField('html', ['opening_tag', '<div class="row buttons-checkout margin-top">']);
     $yform->setValueField('submit', [
         'name'        => 'submit',
@@ -329,5 +319,20 @@ $yform->setValueField('html', ['closing_tag', '</div>']);
 $yform->setFieldValue('send', !empty ($_POST), '', 'send');
 $yform->setHiddenField('customer_id', $user_id);
 $yform->setActionField('callback', ['\FriendsOfREDAXO\Simpleshop\CustomerAddress::action__save_checkout_address']);
+
+\rex_extension::register('simpleshop.CustomerAddress.verifyAddressValues', function ($params) {
+    global $yform;
+
+    $success = $params->getSubject();
+    $values  = $params->getParam('values');
+
+    if ($values['email']['customer_address.1.country'] == 'IT' && trim($values['email']['customer_address.1.fiscal_code']) == '') {
+        $success    = false;
+        $warnings   = $yform->getObjectparams('warning_messages');
+        $warnings[] = strtr(\Sprog\Wildcard::get('error.field_empty'), ['{{fieldname}}' => '###label.fiscal_code###']);
+        $yform->setObjectparams('warning_messages', $warnings);
+    }
+    return $success;
+});
 
 echo $yform->getForm();

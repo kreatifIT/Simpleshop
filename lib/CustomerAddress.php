@@ -22,6 +22,9 @@ class CustomerAddress extends Model
         return $this->getValue('firstname') .' '. $this->getValue('lastname');
     }
 
+    /**
+     * @param $action
+     */
     public static function action__save_checkout_address($action)
     {
         $addresses  = [];
@@ -30,6 +33,14 @@ class CustomerAddress extends Model
         $values     = $action->getParam('value_pool');
         $hidden     = $action->getParam('form_hiddenfields');
         $user_id    = $hidden['customer_id'] ?: 0;
+
+        if (!\rex_extension::registerPoint(new \rex_extension_point('simpleshop.CustomerAddress.verifyAddressValues', true, [
+            'values'  => $values,
+            'hidden'  => $hidden,
+            'user_id' => $user_id,
+        ]))) {
+            return false;
+        }
 
         foreach ($values['sql'] as $name => $value)
         {
