@@ -34,12 +34,12 @@ $order_ids = $this->getVar('order_ids');
         <tbody class="table-hover">
         <?php if (count($orders)): ?>
             <?php foreach ($orders as $order):
-                $Customer = Customer::get($order->getValue('customer_id'));
+                $Address = $order->getShippingAddress();
                 ?>
                 <tr>
                     <td><input type="checkbox" name="orders[]" value="<?= $order->getValue('id') ?>" <?php if (empty($order_ids) || in_array($order->getValue('id'), $order_ids)) echo 'checked="checked"'; ?>/></td>
                     <td><?= $order->getValue('id') ?></td>
-                    <td><?= $Customer->getName() ?></td>
+                    <td><?= $Address->getName() ?></td>
                     <td><?= $order->getValue('total') ?></td>
                 </tr>
             <?php endforeach; ?>

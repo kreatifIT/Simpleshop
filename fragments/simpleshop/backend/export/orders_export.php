@@ -39,8 +39,7 @@ foreach ($orders as $order)
     $order_id    = $order->getValue('id');
     $Payment     = $order->getValue('payment');
     $Shipping    = $order->getValue('shipping');
-    $Customer    = Customer::get($order->getValue('customer_id'));
-    $Address     = $order->getValue('address_1');
+    $Address     = $order->getInvoiceAddress();
     $products    = OrderProduct::query()->where('order_id', $order_id)->find();
     $sh_tax      = $Shipping ? $Shipping->getValue('tax') : 0;
     $subtotal    = $order->getValue('subtotal');
@@ -55,7 +54,7 @@ foreach ($orders as $order)
         date('m', $order_ts),
         $date,
         '€',
-        $Customer->getName(),
+        $Address->getName(),
         $Address->getValue('country'),
         \rex::getServerName(),
         $Payment ? $Payment->getName() : '',

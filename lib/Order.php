@@ -26,6 +26,14 @@ class Order extends Model
         return $_this;
     }
 
+    public function getShippingAddress() {
+        return $this->valueIsset('address_2') ? $this->getValue('address_2') : $this->getValue('address_1');
+    }
+
+    public function getInvoiceAddress() {
+        return $this->getValue('address_1');
+    }
+
 
     public function save($create_order = FALSE, $simple_save = FALSE)
     {
