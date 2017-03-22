@@ -28,6 +28,7 @@ abstract class Model extends \rex_yform_manager_dataset
             'groupBy' => '',
             'limit'   => 0,
             'offset'  => 0,
+            'select'  => [],
             'filter'  => [],
             'joins'   => [],
             'lang_id' => null,
@@ -63,8 +64,18 @@ abstract class Model extends \rex_yform_manager_dataset
             $stmt->groupByRaw($params['groupBy']);
         }
 
+        if (count($params['select'])) {
+            $stmt->selectRaw(implode(', ', (array) $params['select']));
+        }
+
+        $query = $stmt->getQuery();
+
+        if (count($params['having'])) {
+            $query = strtr($query, ['ORDER BY' => ' HAVING ' . implode(' AND ', $params['having']) . ' ORDER BY']);
+        }
+
         if ($debug) {
-            pr($stmt->getQuery());
+            pr($query);
 
             if ($debug > 1) {
                 pr($stmt->getParams(), 'blue');
@@ -74,7 +85,7 @@ abstract class Model extends \rex_yform_manager_dataset
             }
         }
 
-        $coll = $stmt->find();
+        $coll = \rex_yform_manager_dataset::queryCollection($query, $stmt->getParams(), $stmt->getTableName());
 
         if ($debug > 2) {
             pr($coll, 'green');
