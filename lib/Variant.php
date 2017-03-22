@@ -38,4 +38,9 @@ class Variant extends Model
             $this->setValue($key, $value);
         }
     }
+
+    public function isOnline($lang_id = null)
+    {
+        return true;
+    }
 }

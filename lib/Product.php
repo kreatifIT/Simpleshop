@@ -13,7 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-use Kreatif\Project\Settings;
 use Url\Url;
 
 class Product extends Model

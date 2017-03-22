@@ -18,6 +18,174 @@ abstract class Model extends \rex_yform_manager_dataset
     protected $adddional_fields = [];
     protected $excluded_fields  = [];
     protected $field_data       = [];
+    static    $lang_fields      = [];
+
+    protected static function prepareQuery($ignoreOffline = true, $params = [], $debug = 0)
+    {
+        $params = array_merge([
+            'orderBy' => 'prio',
+            'order'   => 'asc',
+            'groupBy' => '',
+            'limit'   => 0,
+            'offset'  => 0,
+            'filter'  => [],
+            'joins'   => [],
+            'lang_id' => null,
+        ], $params);
+
+        $stmt = self::query(static::TABLE)->alias('m')->orderByRaw($params['orderBy'], $params['order']);
+
+        if ($params['offset'] && $params['limit']) {
+            $stmt->limit($params['offset'], $params['limit']);
+        }
+        else if ($params['limit']) {
+            $stmt->limit($params['limit']);
+        }
+
+        if (count($params['filter'])) {
+            foreach ($params['filter'] as $filter) {
+                if (isset($filter[2])) {
+                    $stmt->where($filter[0], $filter[1], $filter[2]);
+                }
+                else {
+                    $stmt->where($filter[0], $filter[1]);
+                }
+            }
+        }
+
+        if (count($params['joins'])) {
+            foreach ($params['joins'] as $join) {
+                $stmt->joinRaw(($join[3] ?: ''), $join[0], $join[1], $join[2]);
+            }
+        }
+
+        if (strlen($params['groupBy'])) {
+            $stmt->groupByRaw($params['groupBy']);
+        }
+
+        if ($debug) {
+            pr($stmt->getQuery());
+
+            if ($debug > 1) {
+                pr($stmt->getParams(), 'blue');
+            }
+            if ($debug > 3) {
+                exit;
+            }
+        }
+
+        $coll = $stmt->find();
+
+        if ($debug > 2) {
+            pr($coll, 'green');
+        }
+
+        if ($ignoreOffline) {
+            $data    = [];
+            $lang_id = $params['lang_id'] ?: \rex_clang::getCurrentId();
+
+            foreach ($coll as $row) {
+                if ($row->isOnline($lang_id)) {
+                    $data[] = $row;
+                }
+            }
+            $coll = new \rex_yform_manager_collection(static::TABLE, $data);
+        }
+        return $coll;
+    }
+
+    public static function getAll($ignoreOffline = true, $params = [], $debug = 0)
+    {
+        return self::prepareQuery($ignoreOffline, $params, $debug);
+    }
+
+    public static function getCount($ignoreOffline = true, $params = [], $debug = 0)
+    {
+        $params['limit']  = 0;
+        $params['offset'] = 0;
+        return count(self::prepareQuery($ignoreOffline, $params, $debug));
+    }
+
+    public function getValue($key, $lang_id = false, $default = '')
+    {
+        if ($lang_id) {
+            $key .= '_' . ($lang_id === true ? \rex_clang::getCurrentId() : $lang_id);
+
+            if (!isset(static::$lang_fields[$key])) {
+                static::$lang_fields[$key] = $key;
+            }
+            $key = static::$lang_fields[$key];
+        }
+        $value = parent::getValue($key);
+        $value = !is_string($value) || strlen($value) ? $value : ($value === null ? null : $default);
+
+        if (is_array($value)) {
+            $_values = [];
+            foreach ($value as $name => $val) {
+                $_values[$name] = $this->unprepare($val);
+            }
+            $value = $_values;
+        }
+        else {
+            $value = $this->unprepare($value);
+        }
+        return $value;
+    }
+
+    public function valueIsset($key, $dependsOnLang = false)
+    {
+        $value = $this->getValue($key, $dependsOnLang);
+        return strlen($value) > 0;
+    }
+
+    public function getArrayValue($key, $dependsOnLang = false, $default = [])
+    {
+        $result = $default;
+        $value  = $this->getValue($key, $dependsOnLang);
+
+        if (strlen($value)) {
+
+            $decoded_json = (array) json_decode($value, true);
+
+            if (json_last_error() == JSON_ERROR_NONE) {
+                $result = $decoded_json;
+            }
+            else {
+                $result = explode(',', $value);
+            }
+        }
+        return $result;
+    }
+
+    public function isOnline($lang_id = null)
+    {
+        $is_online = $this->getValue('status') == null || $this->getValue('status') == 1;
+        return $is_online && ($lang_id == null || !$this->nameIsEmpty($lang_id));
+    }
+
+    /*
+     * @$lang_id = [int|boolean]
+     */
+    public function getName($lang_id = true)
+    {
+        return $this->getValue('name', $lang_id) ?: $this->getValue('title', $lang_id) ?: $this->getValue('name') ?: $this->getValue('title');
+    }
+
+    public function nameIsEmpty($lang_id = null)
+    {
+        return strlen(trim(strip_tags($this->getName($lang_id)))) == 0;
+    }
+
+    public function getUrl($params = [])
+    {
+        $_params = [];
+
+        if ($this->getValue('url_data') || defined('static::URL_PARAMKEY')) {
+            $key     = defined('static::URL_PARAMKEY') ? static::URL_PARAMKEY : $this->url_data->urlParamKey;
+            $_params = [$key => $this->getId()];
+        }
+        return rex_getUrl(null, null, array_merge($_params, $params));
+    }
 
     public static function isRegistered($table)
     {
@@ -30,24 +198,19 @@ abstract class Model extends \rex_yform_manager_dataset
         $fields  = [];
         $_fields = parent::getFields($filter);
 
-        foreach ($_fields as $field)
-        {
+        foreach ($_fields as $field) {
             $typen = $field->getTypeName();
             $type  = $field->getType();
             $name  = $field->getName();
             $key   = $name . '_' . $type . '_' . $typen;
 
 
-            if (!in_array($name, $this->excluded_fields))
-            {
-                if (!\rex::isBackend())
-                {
+            if (!in_array($name, $this->excluded_fields)) {
+                if (!\rex::isBackend()) {
                     $field['notice'] = '';
                 }
-                if (isset ($this->field_data[$key]))
-                {
-                    foreach ($this->field_data[$key] as $value_name => $value)
-                    {
+                if (isset ($this->field_data[$key])) {
+                    foreach ($this->field_data[$key] as $value_name => $value) {
                         $field[$value_name] = $value;
                     }
                 }
@@ -55,16 +218,13 @@ abstract class Model extends \rex_yform_manager_dataset
             }
         }
         // add additional fields
-        foreach ($this->adddional_fields as $field)
-        {
+        foreach ($this->adddional_fields as $field) {
             $_nfield = new \rex_yform_manager_field($field['values']);
 
-            if ($field['values'] !== NULL)
-            {
+            if ($field['values'] !== null) {
                 array_splice($fields, $field['position'], 0, [$_nfield]);
             }
-            else
-            {
+            else {
                 $fields[] = $_nfield;
             }
         }
@@ -73,8 +233,7 @@ abstract class Model extends \rex_yform_manager_dataset
 
     public function addExcludedField($fieldnames)
     {
-        if (!is_array($fieldnames))
-        {
+        if (!is_array($fieldnames)) {
             $fieldnames = [$fieldnames];
         }
         $this->excluded_fields = array_unique(array_merge($this->excluded_fields, $fieldnames));
@@ -98,38 +257,12 @@ abstract class Model extends \rex_yform_manager_dataset
         ];
     }
 
-
-    public function getValue($key, $process = TRUE)
+    public function save($prepare = false)
     {
-        $value = parent::getValue($key);
-
-        if ($process)
-        {
-            if (is_array($value))
-            {
-                $_values = [];
-                foreach ($value as $name => $val)
-                {
-                    $_values[$name] = $this->unprepare($val);
-                }
-                $value = $_values;
-            }
-            else
-            {
-                $value = $this->unprepare($value);
-            }
-        }
-        return $value;
-    }
-
-    public function save($prepare = FALSE)
-    {
-        if ($prepare)
-        {
+        if ($prepare) {
             $data = $this->prepare($this);
 
-            foreach ($data as $name => $value)
-            {
+            foreach ($data as $name => $value) {
                 $this->setValue($name, $value);
             }
         }
@@ -138,44 +271,34 @@ abstract class Model extends \rex_yform_manager_dataset
 
     public static function unprepare($value)
     {
-        if (is_string($value))
-        {
-            $decoded_json = json_decode($value, TRUE);
+        if (is_string($value)) {
+            $decoded_json = json_decode($value, true);
 
-            if (json_last_error() == JSON_ERROR_NONE)
-            {
+            if (json_last_error() == JSON_ERROR_NONE) {
                 $value = $decoded_json;
 
-                if (isset ($value['class']))
-                {
+                if (isset ($value['class'])) {
                     $data = (array) $value['data'];
 
-                    if (class_exists($value['class']))
-                    {
-                        if (isset ($data['id']))
-                        {
+                    if (class_exists($value['class'])) {
+                        if (isset ($data['id'])) {
                             $Object = call_user_func_array([$value['class'], 'get'], [$data['id']]);
                         }
-                        if (!$Object)
-                        {
+                        if (!$Object) {
                             $Object = call_user_func([$value['class'], 'create']);
                         }
                     }
-                    else
-                    {
+                    else {
                         $Object = Std::create();
                     }
 
-                    foreach ($data as $name => $value)
-                    {
+                    foreach ($data as $name => $value) {
                         $Object->setValue($name, $value);
                     }
                     $value = $Object;
                 }
-                else if (is_array($value))
-                {
-                    foreach ($value as $name => &$val)
-                    {
+                else if (is_array($value)) {
+                    foreach ($value as $name => &$val) {
                         $val = self::unprepare($val);
                     }
                 }
@@ -188,27 +311,21 @@ abstract class Model extends \rex_yform_manager_dataset
     {
         $data = $object->getData();
 
-        foreach ($data as $name => &$value)
-        {
-            if (is_array($value))
-            {
+        foreach ($data as $name => &$value) {
+            if (is_array($value)) {
                 $_values = [];
-                foreach ($value as $name => $val)
-                {
-                    if (is_object($val))
-                    {
+                foreach ($value as $name => $val) {
+                    if (is_object($val)) {
                         $class_name     = get_class($val);
                         $_values[$name] = json_encode(['class' => $class_name, 'data' => self::prepare($val)]);
                     }
-                    else
-                    {
+                    else {
                         $_values[$name] = $val;
                     }
                 }
                 $value = json_encode($_values);
             }
-            else if (is_object($value))
-            {
+            else if (is_object($value)) {
                 $class_name = get_class($value);
                 $value      = json_encode(['class' => $class_name, 'data' => $value->getData()]);
             }
