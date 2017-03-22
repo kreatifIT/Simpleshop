@@ -18,6 +18,8 @@ use Url\Url;
 class Product extends Model
 {
     const TABLE = 'rex_shop_product';
+    const URL_PARAMKEY = 'product_id';
+
     protected $__tax          = NULL;
     protected $__feature_data = NULL;
     protected $__variants     = NULL;
@@ -330,12 +332,6 @@ class Product extends Model
             // if variant has a price
             $this->setValue('reduced_price', 0);
         }
-    }
-
-    public function getUrl($lang_id = NULL, $params = [])
-    {
-        $params = array_merge($params, ['product_id' => $this->getValue('id')]);
-        return rex_getUrl(NULL, $lang_id, $params);
     }
 
     public function generatePath($lang_id, $path = '')

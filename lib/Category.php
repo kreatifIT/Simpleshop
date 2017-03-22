@@ -18,6 +18,7 @@ use Url\Url;
 class Category extends Model
 {
     const TABLE = 'rex_shop_category';
+    const URL_PARAMKEY = 'category_id';
 
     private $parents = NULL;
 
@@ -51,12 +52,6 @@ class Category extends Model
             }
         }
         return $this->parents;
-    }
-
-    public function getUrl($lang_id = NULL, $params = [])
-    {
-        $params = array_merge($params, ['category_id' => $this->getValue('id')]);
-        return rex_getUrl(NULL, $lang_id, $params);
     }
 
     public function generatePath($lang_id, $path = '')
