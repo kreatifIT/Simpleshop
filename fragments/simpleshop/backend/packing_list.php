@@ -95,7 +95,7 @@ echo $fragment->parse('core/top.php');
                         <div class="description"><?= (int) ($product->getValue('width') ?: 0.1) / 10 ?>cm x <?= (int) ($product->getValue('length') ?: 0.1) / 10 ?>cm x <?= (int) ($product->getValue('height') ?: 0.1) / 10 ?>cm</div>
                     <?php endif; ?>
                 </td>
-                <td class="xs-small text-center"><?= $product->getValue('weight') ? $product->getValue('weight') / 100 . 'g' : '-' ?></td>
+                <td class="xs-small text-center"><?= $product->getValue('weight') ? $product->getValue('weight') . 'g' : '-' ?></td>
                 <td class="xs-small text-center"><?= $product->getValue('cart_quantity') ?></td>
             </tr>
         <?php endforeach; ?>
