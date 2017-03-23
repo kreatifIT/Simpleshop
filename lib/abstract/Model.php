@@ -170,7 +170,7 @@ abstract class Model extends \rex_yform_manager_dataset
 
     public function isOnline($lang_id = null)
     {
-        $is_online = $this->getValue('status') == null || $this->getValue('status') == 1;
+        $is_online = $this->getValue('status') === null || $this->getValue('status') == 1;
         return $is_online && ($lang_id == null || !$this->nameIsEmpty($lang_id));
     }
 
