@@ -10,8 +10,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace FriendsOfREDAXO\Simpleshop;
+
 
 class FeatureValue extends Model
 {
@@ -21,25 +21,19 @@ class FeatureValue extends Model
     {
         $result = $params->getSubject();
 
-        if ($result !== FALSE && $params->getParam('table')->getTableName() == self::TABLE)
-        {
+        if ($result !== false && $params->getParam('table')->getTableName() == self::TABLE) {
             $links    = [];
             $name     = sprogfield('name');
             $Addon    = \rex_addon::get('simpleshop');
             $obj_id   = $params->getParam('data_id');
-            $products = Product::query()
-                ->resetSelect()
-                ->select('id')
-                ->select($name)
-                ->whereRaw("
+            $products = Product::query()->resetSelect()->select('id')->select($name)->whereRaw("
                     features = {$obj_id}
                     OR features LIKE '{$obj_id},%'
                     OR features LIKE '%,{$obj_id},%'
                     OR features LIKE '%,{$obj_id}'
                 ")->find();
 
-            foreach ($products as $product)
-            {
+            foreach ($products as $product) {
                 $links[] = $product->getValue($name) . ' -
                     <a href="' . \rex_url::backendPage('yform/manager/data_edit', [
                         'data_id'    => $product->getValue('id'),
@@ -49,13 +43,12 @@ class FeatureValue extends Model
                     <a href="' . $product->getUrl() . '" target="_blank">' . $Addon->i18n('action.show_in_frontend') . '</a>
                 ';
             }
-            if (count($links))
-            {
+            if (count($links)) {
                 $object  = FeatureValue::get($obj_id);
                 $content = '<p>' . strtr($Addon->i18n('error.cannot_delete_value'), ['{{name}}' => $object->getValue($name)]) . '</p>';
                 $content .= '<li>' . implode('</li><li>', $links) . '</li>';
                 echo \rex_view::warning($content);
-                $result = FALSE;
+                $result = false;
             }
         }
         return $result;

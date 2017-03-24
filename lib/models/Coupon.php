@@ -10,8 +10,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace FriendsOfREDAXO\Simpleshop;
+
 
 use Sprog\Wildcard;
 
@@ -21,14 +21,12 @@ class Coupon extends Discount
 
     public static function redeem($code)
     {
-        if ($code == '')
-        {
-            return FALSE;
+        if ($code == '') {
+            return false;
         }
         $_this = self::getByCode($code);
 
-        if (!$_this)
-        {
+        if (!$_this) {
             throw new CouponException('Coupon not exists', 1);
         }
         \rex_extension::register('simpleshop.Order.calculateDocument', [$_this, 'ext_calculateDocument']);
@@ -49,12 +47,11 @@ class Coupon extends Discount
         $_this->setValue('start_time', $Order->getValue('status') != 'OP' ? date('Y-m-d') : '9999-12-31');
 
         // set names
-        $langs = \rex_clang::getAll(TRUE);
+        $langs = \rex_clang::getAll(true);
 
-        foreach ($langs as $lang)
-        {
+        foreach ($langs as $lang) {
             $lang_id = $lang->getId();
-            $_this->setValue('name_'. $lang_id, Wildcard::get('label.coupon', $lang_id) .' #' . $order_id);
+            $_this->setValue('name_' . $lang_id, Wildcard::get('label.coupon', $lang_id) . ' #' . $order_id);
         }
 
         $_this->save();
@@ -70,39 +67,33 @@ class Coupon extends Discount
     public function applyToOrder($Order)
     {
         $start   = strtotime($this->getValue('start_time'));
-        $end     = $this->getValue('end_time') != '' ? strtotime($this->getValue('end_time')) : NULL;
+        $end     = $this->getValue('end_time') != '' ? strtotime($this->getValue('end_time')) : null;
         $value   = $this->getValue('discount_value');
         $percent = $this->getValue('discount_percent');
         $orders  = (array) $this->getValue('orders');
 
         // calculate residual balance
-        if ($value && count($orders))
-        {
+        if ($value && count($orders)) {
             $_value = $value;
-            foreach ($orders as $order_id => $order_discount)
-            {
+            foreach ($orders as $order_id => $order_discount) {
                 $value -= $order_discount;
             }
             $this->setValue('discount_value', $value);
         }
 
         // do some checks
-        if (count($orders) && ($value <= 0 || $percent))
-        {
+        if (count($orders) && ($value <= 0 || $percent)) {
             throw new CouponException('Coupon consumed', 2);
         }
-        else if ($start > time())
-        {
+        else if ($start > time()) {
             throw new CouponException('Coupon not yet valid', 3);
         }
-        else if ($end && $end <= time())
-        {
+        else if ($end && $end <= time()) {
             throw new CouponException('Coupon not valid anymore', 4);
         }
         $result = parent::applyToOrder($Order);
 
-        if (isset ($_value))
-        {
+        if (isset ($_value)) {
             $this->setValue('discount_value', $_value);
         }
         return $result;
@@ -114,8 +105,7 @@ class Coupon extends Discount
         $value  = $this->getValue('discount_value');
         $total  = $Order->getValue('initial_total');
 
-        foreach ($orders as $order_id => $order_discount)
-        {
+        foreach ($orders as $order_id => $order_discount) {
             $value -= $order_discount;
         }
         $orders[$Order->getValue('id')] = $total < $value ? $total : $value;
@@ -127,13 +117,10 @@ class Coupon extends Discount
 
     public static function getByCode($code)
     {
-        if (trim($code) == '')
-        {
-            return FALSE;
+        if (trim($code) == '') {
+            return false;
         }
-        return self::query()
-            ->whereRaw('(code = :w1 AND prefix = "") OR CONCAT(prefix, "-", code) = :w1', ['w1' => $code])
-            ->findOne();
+        return self::query()->whereRaw('(code = :w1 AND prefix = "") OR CONCAT(prefix, "-", code) = :w1', ['w1' => $code])->findOne();
     }
 
     public function ext_calculateDocument($params)
@@ -150,8 +137,7 @@ class CouponException extends \Exception
 {
     public function getLabelByCode()
     {
-        switch ($this->getCode())
-        {
+        switch ($this->getCode()) {
             case 1:
                 $errors = '###shop.error.coupon_not_exists###';
                 break;

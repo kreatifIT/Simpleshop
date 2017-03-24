@@ -10,8 +10,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace FriendsOfREDAXO\Simpleshop;
+
 
 class Variant extends Model
 {
@@ -20,10 +20,7 @@ class Variant extends Model
     public static function getByVariantKey($key)
     {
         list ($product_id, $variant_key) = explode('|', $key);
-        return self::query()
-            ->where('product_id', $product_id)
-            ->where('variant_key', $variant_key)
-            ->findOne();
+        return self::query()->where('product_id', $product_id)->where('variant_key', $variant_key)->findOne();
     }
 
     public function applyProductData()
@@ -33,8 +30,7 @@ class Variant extends Model
         $product->applyVariantData($this->getData());
         $product_data = $product->getData();
 
-        foreach ($product_data as $key => $value)
-        {
+        foreach ($product_data as $key => $value) {
             $this->setValue($key, $value);
         }
     }

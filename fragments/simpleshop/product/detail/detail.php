@@ -93,7 +93,7 @@ if (strlen($image) == 0 && isset($gallery[0])) {
     <div class="large-6 columns">
         <!-- Popup -->
         <?php
-        $this->subfragment('simpleshop/product/general/cart/popup-wrapper.php');
+        $this->subfragment('simpleshop/cart/popup-wrapper.php');
         ?>
         <div class="product-info-panel">
             <?php if (strlen($badge)) : ?>
@@ -205,7 +205,7 @@ if (strlen($image) == 0 && isset($gallery[0])) {
                 $this->setVar('has_quantity', $product_type == 'product');
                 $this->setVar('is_disabled', $product->getValue('amount') <= 0);
                 $this->setVar('product_key', $product->getValue('id') . '|' . $variant_key[0]);
-                echo $this->subfragment('simpleshop/product/general/cart/button.php');
+                echo $this->subfragment('simpleshop/cart/button.php');
                 ?>
             </div>
         </div>

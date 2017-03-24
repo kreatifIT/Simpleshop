@@ -10,14 +10,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace FriendsOfREDAXO\Simpleshop;
+
 
 class Order extends Model
 {
     const TABLE = 'rex_shop_order';
 
-    public static function create($table = NULL)
+    public static function create($table = null)
     {
         $_this = parent::create($table);
 
@@ -26,31 +26,31 @@ class Order extends Model
         return $_this;
     }
 
-    public function getShippingAddress() {
+    public function getShippingAddress()
+    {
         return $this->valueIsset('address_2') ? $this->getValue('address_2') : $this->getValue('address_1');
     }
 
-    public function getInvoiceAddress() {
+    public function getInvoiceAddress()
+    {
         return $this->getValue('address_1');
     }
 
 
-    public function save($create_order = FALSE, $simple_save = FALSE)
+    public function save($create_order = false, $simple_save = false)
     {
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['create_order' => $create_order, 'simple_save' => $simple_save]));
 
-        $result = parent::save(TRUE);
+        $result = parent::save(true);
 
-        if ($result && !$simple_save)
-        {
+        if ($result && !$simple_save) {
             $date_now   = date('Y-m-d H:i:s');
             $order_id   = $this->getValue('id');
             $promotions = $this->getValue('promotions');
-            $products   = Session::getCartItems(FALSE, FALSE);
+            $products   = Session::getCartItems(false, false);
             $this->setValue('createdate', $date_now);
 
-            if ($create_order && isset ($promotions['coupon']))
-            {
+            if ($create_order && isset ($promotions['coupon'])) {
                 // relate coupon
                 $promotions['coupon']->linkToOrder($this);
             }
@@ -59,46 +59,32 @@ class Order extends Model
             \rex_sql::factory()->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$order_id}");
 
             // set order products
-            foreach ($products as $product)
-            {
+            foreach ($products as $product) {
                 $prod_data = Model::prepare($product);
                 $quantity  = $product->getValue('cart_quantity');
 
 
-                foreach ($prod_data as $name => $value)
-                {
+                foreach ($prod_data as $name => $value) {
                     $product->setValue($name, $value);
                 }
-                if ($create_order)
-                {
-                    if ($product->getValue('inventory') == 'F')
-                    {
+                if ($create_order) {
+                    if ($product->getValue('inventory') == 'F') {
                         // update inventory
-                        if ($product->getValue('variant_key'))
-                        {
+                        if ($product->getValue('variant_key')) {
                             $Variant = Variant::getByVariantKey($product->getValue('key'));
                             $Variant->setValue('amount', $Variant->getValue('amount') - $quantity);
                             $Variant->save();
                         }
-                        else
-                        {
+                        else {
                             $product->setValue('amount', $product->getValue('amount') - $quantity);
                             $product->save();
                         }
                     }
-                    if ($product->getValue('type') == 'giftcard')
-                    {
+                    if ($product->getValue('type') == 'giftcard') {
                         Coupon::createGiftcard($this, $product);
                     }
                 }
-                OrderProduct::create()
-                    ->setValue('order_id', $order_id)
-                    ->setValue('product_id', $product->getValue('id'))
-                    ->setValue('code', $product->getValue('code'))
-                    ->setValue('quantity', $quantity)
-                    ->setValue('data', $product)
-                    ->setValue('createdate', $date_now)
-                    ->save(TRUE);
+                OrderProduct::create()->setValue('order_id', $order_id)->setValue('product_id', $product->getValue('id'))->setValue('code', $product->getValue('code'))->setValue('quantity', $quantity)->setValue('data', $product)->setValue('createdate', $date_now)->save(true);
             }
         }
         return $result;
@@ -112,33 +98,27 @@ class Order extends Model
         $this->quantity = 0;
         $this->discount = 0;
 
-        try
-        {
+        try {
             $products = Session::getCartItems();
         }
-        catch (CartException $ex)
-        {
-            if ($ex->getCode() == 1)
-            {
+        catch (CartException $ex) {
+            if ($ex->getCode() == 1) {
                 $errors   = Session::$errors;
                 $products = Session::getCartItems();
             }
         }
         // calculate total
-        foreach ($products as $product)
-        {
+        foreach ($products as $product) {
             $quantity = $product->getValue('cart_quantity');
-            $this->subtotal += (float) $product->getPrice(TRUE) * $quantity;
+            $this->subtotal += (float) $product->getPrice(true) * $quantity;
             $this->tax += (float) $product->getTax() * $quantity;
             $this->quantity += $quantity;
         }
         // get shipping costs
-        try
-        {
+        try {
             $this->shipping_costs = (float) $this->shipping ? $this->shipping->getPrice($this, $products) : 0;
         }
-        catch (\Exception $ex)
-        {
+        catch (\Exception $ex) {
             throw new OrderException($ex->getLabelByCode());
         }
         $this->tax += (float) $this->shipping ? $this->shipping->getTax() : 0;
@@ -158,21 +138,16 @@ class Order extends Model
         // set promotions for order history
         $_promotions = $this->getValue('promotions');
 
-        if ($_promotions)
-        {
-            foreach ($_promotions as $name => $_promotion)
-            {
-                $promotion = NULL;
-                try
-                {
+        if ($_promotions) {
+            foreach ($_promotions as $name => $_promotion) {
+                $promotion = null;
+                try {
                     $promotion = $_promotion->applyToOrder($this);
                 }
-                catch (\Exception $ex)
-                {
+                catch (\Exception $ex) {
                     $errors[] = ['label' => $ex->getLabelByCode()];
                 }
-                if ($promotion)
-                {
+                if ($promotion) {
                     $promotions[$name] = $promotion;
                 }
             }
@@ -180,8 +155,7 @@ class Order extends Model
         $this->setValue('promotions', $promotions);
 
         // re-check order totals
-        if ($this->total < 0)
-        {
+        if ($this->total < 0) {
             $this->total = 0;
         }
         return $errors;
@@ -191,11 +165,9 @@ class Order extends Model
     {
         $result = $params->getSubject();
 
-        if ($result !== FALSE && $params->getParam('table') == self::TABLE)
-        {
+        if ($result !== false && $params->getParam('table') == self::TABLE) {
             $dataset = $params->getParam('form')->getParam('manager_dataset');
-            if (!$dataset)
-            {
+            if (!$dataset) {
                 $dataset = rex_yform_manager_dataset::getRaw($params->getParam('id'), $table->getTableName());
             }
         }
@@ -205,8 +177,7 @@ class Order extends Model
     {
         $result = $params->getSubject();
 
-        if ($result !== FALSE && $params->getParam('table')->getTableName() == self::TABLE)
-        {
+        if ($result !== false && $params->getParam('table')->getTableName() == self::TABLE) {
             // remove all related order products
             $obj_id = $params->getParam('data_id');
             $query  = "DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$obj_id}";

@@ -75,7 +75,7 @@ $order   = $order == 'asc' ? $order : 'desc';
 
         <!-- Popup -->
         <?php
-        $this->subfragment('simpleshop/product/general/cart/popup-wrapper.php');
+        $this->subfragment('simpleshop/cart/popup-wrapper.php');
         ?>
 
         <div class="shop-products-grid <?= $this->getVar('grid-class') ?>">

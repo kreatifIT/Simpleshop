@@ -99,7 +99,7 @@ foreach ($_products as $product)
         $this->setVar('has_quantity_control', FALSE);
         $this->setVar('has_remove_button', FALSE);
         $this->setVar('has_image', FALSE);
-        echo $this->subfragment('simpleshop/product/general/cart/item.php');
+        echo $this->subfragment('simpleshop/cart/item.php');
     }
     ?>
 

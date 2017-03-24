@@ -183,7 +183,7 @@ $cart_item_styles = [
         $this->setVar('has_remove_button', FALSE);
         $this->setVar('has_image', FALSE);
         $this->setVar('email_tpl_styles', $cart_item_styles);
-        echo $this->subfragment('simpleshop/product/general/cart/item.php');
+        echo $this->subfragment('simpleshop/cart/item.php');
     }
     ?>
     </tbody>

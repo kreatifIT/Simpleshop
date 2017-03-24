@@ -10,7 +10,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace FriendsOfREDAXO\Simpleshop;
 
 
@@ -18,8 +17,8 @@ use Sprog\Wildcard;
 
 class Customer extends Model
 {
-    const TABLE               = 'rex_shop_customer';
-    const MIN_PASSWORD_LENGTH = 6;
+    const TABLE       = 'rex_shop_customer';
+    const MIN_PWD_LEN = 6;
 
 
     public static function getUserByEmail($email)
@@ -29,9 +28,8 @@ class Customer extends Model
 
     public static function getCurrentUser()
     {
-        $result = NULL;
-        if (!empty($_SESSION['customer']['user']) && (int) $_SESSION['customer']['user']['id'] > 0)
-        {
+        $result = null;
+        if (!empty($_SESSION['customer']['user']) && (int) $_SESSION['customer']['user']['id'] > 0) {
             $result = parent::get($_SESSION['customer']['user']['id']);
         }
         return $result;
@@ -39,46 +37,37 @@ class Customer extends Model
 
     public function getName()
     {
-        $name = $this->getValue('firstname') .' '. $this->getValue('lastname');
+        $name = $this->getValue('firstname') . ' ' . $this->getValue('lastname');
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.getName', $name, ['Customer' => $this]));
         return $name;
     }
 
     public static function register($email, $password, $attributes = [])
     {
-        $result = NULL;
+        $result = null;
         $User   = self::getUserByEmail($email);
 
         // verify if a user with the given email already exist
-        if ($User)
-        {
+        if ($User) {
             throw new CustomerException("User with given email already exist", 1);
         }
         // verify the password length
-        else if (self::MIN_PASSWORD_LENGTH > strlen($password))
-        {
-            throw new CustomerException("Password must have at least " . self::MIN_PASSWORD_LENGTH . " characters", 2);
+        else if (self::MIN_PWD_LEN > strlen($password)) {
+            throw new CustomerException("Password must have at least " . self::MIN_PWD_LEN . " characters", 2);
         }
-        else if (filter_var($email, FILTER_VALIDATE_EMAIL) === FALSE)
-        {
+        else if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
             throw new CustomerException("Email not valid", 3);
         }
         $_this = parent::create();
 
-        foreach ($attributes as $attr => $value)
-        {
+        foreach ($attributes as $attr => $value) {
             $_this->setValue($attr, $value);
         }
-        $_this
-            ->setValue('email', $email)
-            ->setValue('password', $password)
-            ->setValue('status', 1)
-            ->setValue('created', date('Y-m-d H:i:s'));
+        $_this->setValue('email', $email)->setValue('password', $password)->setValue('status', 1)->setValue('created', date('Y-m-d H:i:s'));
         $success  = $_this->save();
         $messages = $_this->getMessages();
 
-        if (count($messages))
-        {
+        if (count($messages)) {
             throw new CustomerException(implode('||', $messages), 99);
         }
 
@@ -87,10 +76,9 @@ class Customer extends Model
             'password' => $password,
         ]));
 
-        if($success)
-        {
+        if ($success) {
             $Mail          = new Mail();
-            $do_send       = TRUE;
+            $do_send       = true;
             $Mail->Subject = '###shop.email.user_registration_subject###';
             $Mail->setFragmentPath('customer/registration');
 
@@ -105,8 +93,7 @@ class Customer extends Model
                 'password' => $password,
             ]));
 
-            if ($do_send)
-            {
+            if ($do_send) {
                 $Mail->send();
             }
             $result = $_this;
@@ -116,16 +103,14 @@ class Customer extends Model
 
     public static function login($email, $password)
     {
-        $result = NULL;
+        $result = null;
         $user   = self::getUserByEmail($email);
 
-        if ($user && $user->isActive())
-        {
+        if ($user && $user->isActive()) {
             $pwd = $user->getValue('password_hash');
             // prevent login for empty passwords!
             // and verify hash
-            if (strlen($pwd) >= self::MIN_PASSWORD_LENGTH && self::getPasswordHash($password) == $pwd)
-            {
+            if (strlen($pwd) >= self::MIN_PWD_LEN && self::getPasswordHash($password) == $pwd) {
                 // logged in
                 $_SESSION['customer']['user'] = ['id' => $user->getValue('id')];
                 // update login timestamp
@@ -136,8 +121,7 @@ class Customer extends Model
                 ]));
             }
         }
-        if (!$result)
-        {
+        if (!$result) {
             // login failed
             self::logout();
         }
@@ -148,16 +132,15 @@ class Customer extends Model
 
     public static function resetPassword($email)
     {
-        $password = NULL;
+        $password = null;
         $User     = self::getUserByEmail($email);
 
-        if ($User)
-        {
-            $password = random_string(self::MIN_PASSWORD_LENGTH);
+        if ($User) {
+            $password = random_string(self::MIN_PWD_LEN);
             $User->setValue('password', $password)->save();
 
             $Mail          = new Mail();
-            $do_send       = TRUE;
+            $do_send       = true;
             $Mail->Subject = '###shop.email.user_password_reset###';
             $Mail->setFragmentPath('customer/password_reset');
 
@@ -172,8 +155,7 @@ class Customer extends Model
                 'password' => $password,
             ]));
 
-            if ($do_send)
-            {
+            if ($do_send) {
                 $Mail->send();
             }
         }
@@ -208,13 +190,12 @@ class CustomerException extends \Exception
 {
     public function getLabelByCode()
     {
-        switch ($this->getCode())
-        {
+        switch ($this->getCode()) {
             case 1:
                 $errors = ['###error.user_already_exist###'];
                 break;
             case 2:
-                $errors = [strtr(Wildcard::get('error.password_to_short'), ['%d' => Customer::MIN_PASSWORD_LENGTH])];
+                $errors = [strtr(Wildcard::get('error.password_to_short'), ['%d' => Customer::MIN_PWD_LEN])];
                 break;
             case 3:
                 $errors = ['###error.email_not_valid###'];

@@ -63,7 +63,7 @@ if (strlen($image) == 0 && strlen($product->getValue('gallery'))) {
             $this->setVar('product_url', $product_url);
             $this->setVar('has_add_to_cart_button', $product_type == 'product');
             $this->setVar('has_detail_button', $product_type != 'product');
-            echo $this->subfragment('simpleshop/product/general/cart/button.php');
+            echo $this->subfragment('simpleshop/cart/button.php');
             ?>
         </div>
     </div>

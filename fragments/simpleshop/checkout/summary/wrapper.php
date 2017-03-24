@@ -10,78 +10,69 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace FriendsOfREDAXO\Simpleshop;
 
-$discounts   = [];
-$fatal_error = NULL;
-$Order       = $this->getVar('order');
 
-try
-{
-    $errors = $Order->calculateDocument();
-}
-catch (OrderException $ex)
-{
-    $back_url    = rex_getUrl(null, null, ['step' => 2]);
-    $fatal_error = $ex->getMessage();
-}
+$Order    = $this->getVar('Order');
+$cart_url = $this->getVar('cart_url');
+$errors   = $this->getVar('errors', []);
+$warnings = $this->getVar('warnings', []);
 
-$address_1  = $Order->getValue('address_1');
-$address_2  = $Order->getValue('address_2');
-$shipping   = $Order->getValue('shipping');
-$payment    = $Order->getValue('payment');
-$promotions = $Order->getValue('promotions');
-$extras     = $Order->getValue('extras');
+$discounts     = [];
+$invoice_addr  = $Order->getInvoiceAddress();
+$shipping_addr = $Order->getShippingAddress();
+$shipping      = $Order->getValue('shipping');
+$payment       = $Order->getValue('payment');
+$promotions    = $Order->getValue('promotions');
+$extras        = $Order->getValue('extras');
 
 
-if (count($errors)): ?>
+if (count($warnings)): ?>
     <div class="row column">
-        <?php foreach ($errors as $error): ?>
+        <?php foreach ($warnings as $warning): ?>
             <div class="callout alert margin-bottom">
-                <p><?= isset($error['replace']) ? strtr($error['label'], ['{{replace}}' => $error['replace']]) : $error['label'] ?></p>
+                <p><?= isset($warning['replace']) ? strtr($warning['label'], ['{{replace}}' => $warning['replace']]) : $warning['label'] ?></p>
             </div>
         <?php endforeach; ?>
     </div>
-<?php elseif ($fatal_error): ?>
+<?php endif; ?>
+<?php if (count($errors)): ?>
     <div class="row column">
         <div class="callout alert margin-bottom">
-            <p><?= $fatal_error ?></p>
+            <p><?= implode('<br/>', $errors) ?></p>
         </div>
         <div class="margin-bottom text-center">
-            <a href="<?= $back_url ?>">###action.go_back###</a>
+            <a href="<?= $cart_url ?>">###action.go_back###</a>
         </div>
     </div>
 <?php endif; ?>
 
-<?php if (!$fatal_error): ?>
+<?php if (count($errors) == 0): ?>
     <!-- Adressen -->
     <div class="row address-panels">
     <h3>###label.summary_order###</h3>
 
     <?php
-    $this->setVar('title', '###shop.invoice_address###');
-    $this->setVar('url', rex_getUrl(NULL, NULL, ['step' => 2]));
-    $this->setVar('address', $address_1);
-    if (Session::getCheckoutData('as_guest'))
-    {
-        $this->setVar('email', $extras['address_extras']['email']);
+    if ($invoice_addr) {
+        $this->setVar('title', '###shop.invoice_address###');
+        $this->setVar('url', rex_getUrl(null, null, ['step' => 2]));
+        $this->setVar('address', $invoice_addr);
+        if (Session::getCheckoutData('as_guest')) {
+            $this->setVar('email', $extras['address_extras']['email']);
+        }
+        $this->subfragment('simpleshop/checkout/summary/address_item.php');
     }
-    $this->subfragment('simpleshop/checkout/summary/address_item.php');
     ?>
 
     <?php
-    if ($shipping)
-    {
+    if ($shipping && $shipping_addr) {
         $this->setVar('title', '###shop.shipping_address###');
-        $this->setVar('url', rex_getUrl(NULL, NULL, ['step' => 2]));
-        if ($extras['address_extras']['use_shipping_address'])
-        {
-            $this->setVar('address', $address_2);
+        $this->setVar('url', rex_getUrl(null, null, ['step' => 2]));
+        if ($extras['address_extras']['use_shipping_address']) {
+            $this->setVar('address', $shipping_addr);
         }
-        else
-        {
-            $this->setVar('address', $address_1);
+        else {
+            $this->setVar('address', $invoice_addr);
         }
         $this->subfragment('simpleshop/checkout/summary/address_item.php');
     }
@@ -100,12 +91,12 @@ if (count($errors)): ?>
 
             <?php
             $before = '
-            <a href="' . rex_getUrl(NULL, NULL, ['step' => 3]) . '" class="edit">
+            <a href="' . rex_getUrl(null, null, ['step' => 3]) . '" class="edit">
                 <i class="fa fa-pencil hide-for-large" aria-hidden="true"></i>
                 <span class="show-for-large">###action.edit###</span>
             </a>
         ';
-            $this->setVar('before', $before, FALSE);
+            $this->setVar('before', $before, false);
             $this->setVar('shipping', $shipping);
             $this->setVar('name', $shipping->getName());
             $this->setVar('plugin_name', $shipping->getPluginName());
@@ -115,20 +106,19 @@ if (count($errors)): ?>
     <?php endif; ?>
 
     <?php if ($payment): ?>
-        <div class="medium-6 columns margin-bottom <?php if (!$shipping)
-        {
+        <div class="medium-6 columns margin-bottom <?php if (!$shipping) {
             echo 'radio-panels no-shipping';
         } ?>">
             <h3>###label.payment###</h3>
 
             <?php
             $before = '
-            <a href="' . rex_getUrl(NULL, NULL, ['step' => 3]) . '" class="edit">
+            <a href="' . rex_getUrl(null, null, ['step' => 3]) . '" class="edit">
                 <i class="fa fa-pencil hide-for-large" aria-hidden="true"></i>
                 <span class="show-for-large">###action.edit###</span>
             </a>
         ';
-            $this->setVar('before', $before, FALSE);
+            $this->setVar('before', $before, false);
             $this->setVar('payment', $payment);
             $this->setVar('name', $payment->getName());
             $this->setVar('plugin_name', $payment->getPluginName());
@@ -139,7 +129,7 @@ if (count($errors)): ?>
     </div>
 
     <?php
-// coupons
+    // coupons
     $this->subfragment('simpleshop/checkout/summary/coupon.php');
     ?>
 
@@ -149,10 +139,8 @@ if (count($errors)): ?>
             <h3>###shop.promotions###</h3>
             <p>###shop.applied_promotion_text###</p>
             <?php
-            foreach ($promotions as $promotion)
-            {
-                if ($promotion->getValue('discount'))
-                {
+            foreach ($promotions as $promotion) {
+                if ($promotion->getValue('discount')) {
                     $discounts[] = ['name' => $promotion->getValue(sprogfield('name')), 'value' => $promotion->getValue('discount'),];
                 }
                 $this->setVar('promotion', $promotion);
@@ -165,12 +153,13 @@ if (count($errors)): ?>
     <!-- Warenkorb -->
     <div class="shop row column">
 
-        <?php
-        $this->setVar('has_quantity_control', FALSE);
-        $this->setVar('has_quantity', TRUE);
-        $this->setVar('has_remove_button', FALSE);
-        $this->subfragment('simpleshop/product/general/cart/wrapper.php');
-        ?>
+        <?= CartController::execute([
+            'config' => [
+                'has_quantity_control' => false,
+                'has_quantity'         => true,
+                'has_remove_button'    => false,
+            ],
+        ]); ?>
 
     </div>
 

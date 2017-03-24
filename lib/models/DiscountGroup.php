@@ -10,8 +10,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace FriendsOfREDAXO\Simpleshop;
+
 
 class DiscountGroup extends Discount
 {
@@ -21,28 +21,24 @@ class DiscountGroup extends Discount
     {
         $Order = $params->getSubject();
 
-        if (parent::isRegistered(self::TABLE))
-        {
+        if (parent::isRegistered(self::TABLE)) {
             $Settings       = \rex::getConfig('simpleshop.Settings');
             $apply_all      = from_array($Settings, 'discounts_are_accumulable', 0);
             $order_total    = $Order->getValue('total');
             $order_quantity = $Order->getValue('quantity');
             $discounts      = self::query()->where('status', 1)->orderBy('prio')->find();
 
-            foreach ($discounts as $discount)
-            {
+            foreach ($discounts as $discount) {
                 $price  = $discount->getValue('price');
                 $amount = $discount->getValue('amount');
 
-                if (($price && $order_total >= $price) || ($amount && $order_quantity >= $amount))
-                {
+                if (($price && $order_total >= $price) || ($amount && $order_quantity >= $amount)) {
                     $discount_id                            = $discount->getValue('id');
                     $promotions                             = $Order->getValue('promotions');
                     $promotions['discount_' . $discount_id] = $discount;
                     $Order->setValue('promotions', $promotions);
 
-                    if (!$apply_all)
-                    {
+                    if (!$apply_all) {
                         break; // discount found - stop here
                     }
                 }
@@ -56,8 +52,7 @@ class DiscountGroupException extends \Exception
 {
     public function getLabelByCode()
     {
-        switch ($this->getCode())
-        {
+        switch ($this->getCode()) {
             case 1:
                 $errors = '###shop.error.discountgroup_not_applyable_anymore###';
                 break;

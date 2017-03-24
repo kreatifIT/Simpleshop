@@ -10,8 +10,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace FriendsOfREDAXO\Simpleshop;
+
 
 class CustomerAddress extends Model
 {
@@ -19,7 +19,7 @@ class CustomerAddress extends Model
 
     public function getName()
     {
-        return $this->getValue('firstname') .' '. $this->getValue('lastname');
+        return $this->getValue('firstname') . ' ' . $this->getValue('lastname');
     }
 
     /**
@@ -38,31 +38,27 @@ class CustomerAddress extends Model
             'values'  => $values,
             'hidden'  => $hidden,
             'user_id' => $user_id,
-        ]))) {
+        ]))
+        ) {
             return false;
         }
 
-        foreach ($values['sql'] as $name => $value)
-        {
+        foreach ($values['sql'] as $name => $value) {
             list ($key, $index, $_name) = explode('.', $name);
 
-            if (strlen($name) && $key == 'customer_address')
-            {
+            if (strlen($name) && $key == 'customer_address') {
                 $addresses[$index][$_name] = $value;
             }
-            else if (strlen($name))
-            {
+            else if (strlen($name)) {
                 $extras[$name] = $value;
             }
         }
 
-        foreach ($addresses as $index => $address)
-        {
+        foreach ($addresses as $index => $address) {
             $_this = (int) $hidden['id_' . $index] ? self::get($hidden['id_' . $index]) : self::create();
             $_this->setValue('customer_id', $user_id);
 
-            foreach ($address as $name => $value)
-            {
+            foreach ($address as $name => $value) {
                 $_this->setValue($name, $value);
             }
             $_this = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.CustomerAddress.preSaveAddress', $_this, [
@@ -72,8 +68,7 @@ class CustomerAddress extends Model
                 'address' => $address,
                 'user_id' => $user_id,
             ]));
-            if ($user_id)
-            {
+            if ($user_id) {
                 // just save for registered user
                 $_this->save();
             }

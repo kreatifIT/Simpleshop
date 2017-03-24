@@ -49,7 +49,7 @@ class rex_api_simpleshop_api extends rex_api_function
         }
         $fragment = new rex_fragment();
         $fragment->setVar('product', $product);
-        $html                         = $fragment->parse('simpleshop/product/general/cart/popup.php');
+        $html                         = $fragment->parse('simpleshop/cart/popup.php');
         $this->response['popup_html'] = rex_extension::registerPoint(new rex_extension_point('Api.Cart.getPopupContent', $html, ['product' => $product]));
     }
 
@@ -69,7 +69,7 @@ class rex_api_simpleshop_api extends rex_api_function
             $fragment->setVar('class', 'cart-item-preview');
             $fragment->setVar('has_quantity_control', false);
             $fragment->setVar('has_remove_button', false);
-            $result['html'] .= $fragment->parse('simpleshop/product/general/cart/item.php');
+            $result['html'] .= $fragment->parse('simpleshop/cart/item.php');
         }
         $result = rex_extension::registerPoint(new rex_extension_point('Api.Cart.getCartContent', $result, ['products' => $products]));
 
@@ -147,7 +147,7 @@ class rex_api_simpleshop_api extends rex_api_function
     {
         $fragment = new rex_fragment();
         $fragment->setVar('message', $message);
-        $this->response['popup_html'] = $fragment->parse('simpleshop/product/general/cart/popup_error.php');
+        $this->response['popup_html'] = $fragment->parse('simpleshop/cart/popup_error.php');
     }
 }
 

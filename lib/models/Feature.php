@@ -10,27 +10,23 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace FriendsOfREDAXO\Simpleshop;
+
 
 class Feature extends Model
 {
     const TABLE = 'rex_shop_feature';
-    private $values = NULL;
+    private $values = null;
 
     public static function getFeatureByKey($key)
     {
         return self::query()->where('key', $key)->findOne();
     }
 
-    public function getValues($ignore_offline = TRUE)
+    public function getValues($ignore_offline = true)
     {
-        if ($this->values === NULL)
-        {
-            $this->values = FeatureValue::query()
-                ->where('feature_id', $this->getValue('id'))
-                ->where('status', (int) $ignore_offline)
-                ->find();
+        if ($this->values === null) {
+            $this->values = FeatureValue::query()->where('feature_id', $this->getValue('id'))->where('status', (int) $ignore_offline)->find();
         }
         return $this->values;
     }
@@ -39,32 +35,24 @@ class Feature extends Model
     {
         $result = $params->getSubject();
 
-        if ($result !== FALSE && $params->getParam('table')->getTableName() == self::TABLE)
-        {
+        if ($result !== false && $params->getParam('table')->getTableName() == self::TABLE) {
             $Addon  = \rex_addon::get('simpleshop');
             $links  = [];
             $name   = sprogfield('name');
             $obj_id = $params->getParam('data_id');
-            $values = FeatureValue::query()
-                ->resetSelect()
-                ->select('id')
-                ->select($name)
-                ->where('feature_id', $obj_id)
-                ->find();
+            $values = FeatureValue::query()->resetSelect()->select('id')->select($name)->where('feature_id', $obj_id)->find();
 
-            foreach ($values as $value)
-            {
+            foreach ($values as $value) {
                 $links[] = $value->getValue($name) . ' -
                     <a href="' . \rex_url::backendPage('yform/manager/data_edit', ['data_id' => $value->getValue('id'), 'table_name' => FeatureValue::TABLE, 'func' => 'edit',]) . '" target="_blank">' . $Addon->i18n('action.edit_value') . '</a>
                 ';
             }
-            if (count($links))
-            {
+            if (count($links)) {
                 $object  = Feature::get($obj_id);
                 $content = '<p>' . strtr($Addon->i18n('error.cannot_delete_feature'), ['{{name}}' => $object->getValue($name)]) . '</p>';
                 $content .= '<li>' . implode('</li><li>', $links) . '</li>';
                 echo \rex_view::warning($content);
-                $result = FALSE;
+                $result = false;
             }
         }
         return $result;
