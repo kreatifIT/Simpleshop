@@ -204,6 +204,43 @@ abstract class Model extends \rex_yform_manager_dataset
         return isset($table_classes[$table]);
     }
 
+    public function getFieldsAsArray($excludedFields = [])
+    {
+        $fields  = [];
+        $_fields = $this->getFields();
+
+        foreach ($_fields as $field) {
+            $type_id = $field->getType();
+            $type    = $field->getTypeName();
+            $name    = $field->getName();
+
+            if (!in_array($name, (array) $excludedFields)) {
+                if ($type_id == 'value') {
+                    $fields[$name] = [
+                        'type'      => $type,
+                        'css_class' => '',
+                        'label'     => \Sprog\Wildcard::get('label.' . $name) ?: \Sprog\Wildcard::get('custom.' . $name),
+                        'required'  => false,
+                    ];
+                    if ($type == 'select') {
+                        $_options = explode(',', $field->getElement('options'));
+
+                        foreach ($_options as $option) {
+                            $_var = explode('=', $option);
+                            $key  = $_var[1] ?: $_var[0];
+
+                            $fields[$name]['options'][$key] = \Sprog\Wildcard::get('label.' . $key) ?: \Sprog\Wildcard::get('custom.' . $key);
+                        }
+                    }
+                }
+                else if ($type_id == 'validate' && $type == 'empty') {
+                    $fields[$name]['required'] = true;
+                }
+            }
+        }
+        return $fields;
+    }
+
     public function getFields(array $filter = [])
     {
         $fields  = [];

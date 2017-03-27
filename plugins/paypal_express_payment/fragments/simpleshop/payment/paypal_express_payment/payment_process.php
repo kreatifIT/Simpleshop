@@ -19,7 +19,7 @@ use Sprog\Wildcard;
 setlocale(LC_ALL, 'en_US');
 
 $errors = [];
-$Order    = $this->getVar('order');
+$Order    = $this->getVar('Order');
 $Payment  = $Order->getValue('payment');
 $token    = rex_get('token', 'string');
 $payer_id = rex_get('PayerID', 'string');

@@ -19,18 +19,30 @@ use Whoops\Exception\ErrorException;
 class CheckoutController extends Controller
 {
     protected $products = [];
+    protected $Order = null;
 
     protected function _execute()
     {
         $this->products = Session::getCartItems(true);
+        $this->Order = Session::getCurrentOrder();
 
         $this->verifyParams(['cart_page_id', 'action']);
+        $this->setVar('Order', $this->Order);
 
         if (count($this->products)) {
             switch ($this->params['action']) {
                 case 'show-summary':
                     return $this->getSummaryView();
-                    break;
+                    
+                case 'complete':
+                    return $this->getCompleteView();
+                    
+                case 'pay_process':
+                case 'pay-process':
+                    return $this->doPay();
+                    
+                case 'init-payment':
+                    return $this->initPayment();
             }
         }
         else {
@@ -53,10 +65,9 @@ class CheckoutController extends Controller
     {
         $errors   = [];
         $warnings = [];
-        $Order    = Session::getCurrentOrder();
 
         try {
-            $warnings = $Order->calculateDocument();
+            $warnings = $this->Order->calculateDocument();
         }
         catch (OrderException $ex) {
             $errors[] = $ex->getMessage();
@@ -70,9 +81,57 @@ class CheckoutController extends Controller
         }
 
         $this->fragment_path = 'simpleshop/checkout/summary/wrapper.php';
-        $this->setVar('Order', $Order);
         $this->setVar('errors', $errors);
         $this->setVar('warnings', $warnings);
         $this->setVar('cart_url', rex_getUrl($this->params['cart_page_id']));
+    }
+    
+    protected function getCompleteView() 
+    {        
+        // finally save order - DONE / COMPLETE
+        $this->Order->save(true);
+
+        $do_send  = true;
+        $Customer = $this->Order->getInvoiceAddress();
+        $Mail     = new \FriendsOfREDAXO\Simpleshop\Mail();
+        $Settings = \rex::getConfig('simpleshop.Settings');
+
+        $Mail->Subject = '###shop.email.order_complete###';
+        $Mail->setFragmentPath('order/complete');
+
+        // add vars
+        $Mail->setVar('Order', $this->Order);
+
+        // set order notification email
+        $Mail->AddAddress($Customer->getValue('email'));
+        $Mail->AddAddress(from_array($Settings, 'order_notification_email'));
+
+        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.orderComplete', $do_send, [
+            'Mail'  => $Mail,
+            'User'  => $Customer,
+            'Order' => $this->Order,
+        ]));
+
+        if ($do_send) {
+            $Mail->send();
+        }
+        
+        // CLEAR THE SESSION
+        Session::clearCheckout();
+        Session::clearCart();
+        
+        $this->fragment_path = 'simpleshop/checkout/complete.php';
+    }
+    
+    protected function initPayment()
+    {
+        $payment = $this->Order->getValue('payment');
+        $this->fragment_path = 'simpleshop/payment/' . $payment->getValue('plugin_name') . '/payment_init.php';
+    }
+    
+    protected function doPay() 
+    {
+        $payment = $this->Order->getValue('payment');
+        $this->fragment_path = 'simpleshop/payment/' . $payment->getValue('plugin_name') . '/payment_process.php';
     }
 }

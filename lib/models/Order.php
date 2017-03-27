@@ -39,16 +39,20 @@ class Order extends Model
 
     public function save($create_order = false, $simple_save = false)
     {
+        // TODO: order-debug
+        return;
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['create_order' => $create_order, 'simple_save' => $simple_save]));
 
+        $date_now = date('Y-m-d H:i:s');
+        $this->setValue('createdate', $date_now);
+        
         $result = parent::save(true);
 
         if ($result && !$simple_save) {
-            $date_now   = date('Y-m-d H:i:s');
+            
             $order_id   = $this->getValue('id');
             $promotions = $this->getValue('promotions');
             $products   = Session::getCartItems(false, false);
-            $this->setValue('createdate', $date_now);
 
             if ($create_order && isset ($promotions['coupon'])) {
                 // relate coupon
@@ -84,7 +88,14 @@ class Order extends Model
                         Coupon::createGiftcard($this, $product);
                     }
                 }
-                OrderProduct::create()->setValue('order_id', $order_id)->setValue('product_id', $product->getValue('id'))->setValue('code', $product->getValue('code'))->setValue('quantity', $quantity)->setValue('data', $product)->setValue('createdate', $date_now)->save(true);
+                OrderProduct::create()
+                    ->setValue('order_id', $order_id)
+                    ->setValue('product_id', $product->getValue('id'))
+                    ->setValue('code', $product->getValue('code'))
+                    ->setValue('quantity', $quantity)
+                    ->setValue('data', $product)
+                    ->setValue('createdate', $date_now)
+                    ->save(true);
             }
         }
         return $result;

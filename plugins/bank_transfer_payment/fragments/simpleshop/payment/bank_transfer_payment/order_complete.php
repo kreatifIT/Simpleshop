@@ -14,7 +14,7 @@
 namespace FriendsOfREDAXO\Simpleshop;
 use Sprog\Wildcard;
 
-$Order = $this->getVar('order');
+$Order = $this->getVar('Order');
 
 ?>
 <div class="row column margin-bottom">

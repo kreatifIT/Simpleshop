@@ -27,6 +27,10 @@ abstract class Controller
         $inst = new $name();
 
         $inst->params = $params;
+
+        foreach ($inst->params as $key => $value) {
+            $inst->setVar($key, $value);
+        }
         $inst->_execute();
         return $inst;
     }
@@ -38,7 +42,7 @@ abstract class Controller
         }
         $this->fragment->setVar($key, $value);
     }
-
+    
     public function getVar($key, $default = null)
     {
         return $this->fragment->getVar($key, $default);

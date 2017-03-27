@@ -29,6 +29,14 @@ $Settings = $this->getVar('Settings');
             </label>
         </dd>
     </dl>
+    <dl class="rex-form-group form-group">
+        <dt><?= $Addon->i18n('label.packing_list_title'); ?></dt>
+        <dd>
+            <label class="form-label">
+                <input type="checkbox" name="packing_list_printing" value="1" <?php if (from_array($Settings, 'packing_list_printing') == 1) echo 'checked="checked"'; ?>/><span></span><?= $Addon->i18n('action.print_packing_list'); ?>
+            </label>
+        </dd>
+    </dl>
 
     <legend><?= $Addon->i18n('settings.order_settings'); ?></legend>
     <dl class="rex-form-group form-group">

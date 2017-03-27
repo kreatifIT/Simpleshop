@@ -13,7 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$Order = $this->getVar('order');
+$Order = $this->getVar('Order');
 $Payment = $Order->getValue('payment');
 $Shipping = $Order->getValue('shipping');
 
@@ -42,7 +42,3 @@ if (strlen($additional_info)): ?>
     <p><?= $additional_info ?></p>
 </div>
 <?php endif;
-
-// CLEAR THE SESSION
-Session::clearCheckout();
-Session::clearCart();
