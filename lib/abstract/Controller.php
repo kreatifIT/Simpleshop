@@ -35,6 +35,16 @@ abstract class Controller
         return $inst;
     }
 
+    protected function verifyParams($required_params)
+    {
+        // verifiy params
+        foreach ($required_params as $param) {
+            if (!$this->params[$param]) {
+                throw new ErrorException("The param '{$param}' is missing!");
+            }
+        }
+    }
+
     public function setVar($key, $value)
     {
         if ($this->fragment === null) {

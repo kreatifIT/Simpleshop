@@ -54,16 +54,6 @@ class CheckoutController extends Controller
         }
     }
 
-    protected function verifyParams($required_params)
-    {
-        // verifiy params
-        foreach ($required_params as $param) {
-            if (!$this->params[$param]) {
-                throw new ErrorException("The param '{$param}' is missing!");
-            }
-        }
-    }
-
     protected function cancelPayment()
     {
         Utils::log('Payment cancelled', 'Customer cancelled payment', 'INFO');

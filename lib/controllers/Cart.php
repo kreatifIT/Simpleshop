@@ -20,6 +20,7 @@ class CartController extends Controller
     {
         $this->params = array_merge([
             'check_cart' => true,
+            'ahead_url'  => '',
             'products'   => [],
             'config'     => [],
         ], $this->params);
