@@ -19,6 +19,14 @@ abstract class Model extends \rex_yform_manager_dataset
     protected $excluded_fields  = [];
     protected $field_data       = [];
     static    $lang_fields      = [];
+    static    $settings         = [];
+
+    protected static function getSetting($key, $default = null) {
+        if (count(self::$settings) == 0) {
+            self::$settings = \rex::getConfig('simpleshop.Settings');
+        }
+        return self::$settings[$key] ?: $default;
+    }
 
     protected static function prepareQuery($ignoreOffline = true, $params = [], $debug = 0)
     {

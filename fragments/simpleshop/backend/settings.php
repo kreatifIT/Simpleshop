@@ -30,6 +30,14 @@ $Settings = $this->getVar('Settings');
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
+        <dt><?= $Addon->i18n('settings.brutto_prices'); ?></dt>
+        <dd>
+            <label class="form-label">
+                <input type="checkbox" name="brutto_prices" value="1" <?php if (from_array($Settings, 'brutto_prices') == 1) echo 'checked="checked"'; ?>/><span></span><?= $Addon->i18n('settings.brutto_prices_info'); ?>
+            </label>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
         <dt><?= $Addon->i18n('label.packing_list_title'); ?></dt>
         <dd>
             <label class="form-label">

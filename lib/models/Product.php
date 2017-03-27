@@ -51,9 +51,21 @@ class Product extends Model
             $price   = $reduced > 0 ? $reduced : $price;
         }
         if ($includeTax) {
-            $tax         = Tax::get($this->getValue('tax'))->getValue('tax');
-            $this->__tax = $price * $tax * 0.01;
-            $price       = $price + $this->__tax;
+            $tax = Tax::get($this->getValue('tax'))->getValue('tax');
+
+            if ($this->getSetting('brutto_prices')) {
+                $this->__tax = ($price / ($tax + 100)) * $tax;
+            }
+            else {
+                $this->__tax = $price * $tax * 0.01;
+                $price       = $price + $this->__tax;
+            }
+        }
+        else if ($this->getSetting('brutto_prices')) {
+            $tax = Tax::get($this->getValue('tax'))->getValue('tax');
+
+            $this->__tax = ($price / ($tax + 100)) * $tax;
+            $price       = $price - $this->__tax;
         }
         if ($settings['price_rounding']) {
             $price = round($price, 1);
