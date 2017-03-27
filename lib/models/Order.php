@@ -39,8 +39,6 @@ class Order extends Model
 
     public function save($create_order = false, $simple_save = false)
     {
-        // TODO: order-debug
-        return;
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['create_order' => $create_order, 'simple_save' => $simple_save]));
 
         $date_now = date('Y-m-d H:i:s');
