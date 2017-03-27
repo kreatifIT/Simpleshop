@@ -19,12 +19,12 @@ use Whoops\Exception\ErrorException;
 class CheckoutController extends Controller
 {
     protected $products = [];
-    protected $Order = null;
+    protected $Order    = null;
 
     protected function _execute()
     {
         $this->products = Session::getCartItems(true);
-        $this->Order = Session::getCurrentOrder();
+        $this->Order    = Session::getCurrentOrder();
 
         $this->verifyParams(['cart_page_id', 'action']);
         $this->setVar('Order', $this->Order);
@@ -33,14 +33,17 @@ class CheckoutController extends Controller
             switch ($this->params['action']) {
                 case 'show-summary':
                     return $this->getSummaryView();
-                    
+
+                case 'cancelled':
+                    return $this->cancelPayment();
+
                 case 'complete':
                     return $this->getCompleteView();
-                    
+
                 case 'pay_process':
                 case 'pay-process':
                     return $this->doPay();
-                    
+
                 case 'init-payment':
                     return $this->initPayment();
             }
@@ -59,6 +62,15 @@ class CheckoutController extends Controller
                 throw new ErrorException("The param '{$param}' is missing!");
             }
         }
+    }
+
+    protected function cancelPayment()
+    {
+        Utils::log('Payment cancelled', 'Customer cancelled payment', 'INFO');
+        $this->Order->setValue('status', 'CA');
+        $this->Order->save();
+
+        rex_redirect($this->params['cart_page_id'], null, $_GET);
     }
 
     protected function getSummaryView()
@@ -85,9 +97,9 @@ class CheckoutController extends Controller
         $this->setVar('warnings', $warnings);
         $this->setVar('cart_url', rex_getUrl($this->params['cart_page_id']));
     }
-    
-    protected function getCompleteView() 
-    {        
+
+    protected function getCompleteView()
+    {
         // finally save order - DONE / COMPLETE
         $this->Order->save(true);
 
@@ -98,6 +110,7 @@ class CheckoutController extends Controller
 
         $Mail->Subject = '###shop.email.order_complete###';
         $Mail->setFragmentPath('order/complete');
+
 
         // add vars
         $Mail->setVar('Order', $this->Order);
@@ -115,23 +128,23 @@ class CheckoutController extends Controller
         if ($do_send) {
             $Mail->send();
         }
-        
+
         // CLEAR THE SESSION
         Session::clearCheckout();
         Session::clearCart();
-        
+
         $this->fragment_path = 'simpleshop/checkout/complete.php';
     }
-    
+
     protected function initPayment()
     {
-        $payment = $this->Order->getValue('payment');
+        $payment             = $this->Order->getValue('payment');
         $this->fragment_path = 'simpleshop/payment/' . $payment->getValue('plugin_name') . '/payment_init.php';
     }
-    
-    protected function doPay() 
+
+    protected function doPay()
     {
-        $payment = $this->Order->getValue('payment');
+        $payment             = $this->Order->getValue('payment');
         $this->fragment_path = 'simpleshop/payment/' . $payment->getValue('plugin_name') . '/payment_process.php';
     }
 }
