@@ -13,17 +13,21 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $config = $this->getVar('config', []);
+$styles = array_merge([
+    'tr' => '',
+    'th' => '',
+], $config['email_tpl_styles']);
 
 ?>
-<tr class="cart-header">
+<tr class="cart-header" <?= $styles['tr'] ? 'style="'. $styles['tr'] .'"' : '' ?>>
     <?php if ($config['has_image']): ?>
-        <th>###label.preview###</th>
+        <th <?= $styles['th'] ? 'style="'. $styles['th'] .'"' : '' ?>>###label.preview###</th>
     <?php endif; ?>
-    <th>###label.product###</th>
-    <th>###label.single_price###</th>
-    <th>###label.amount###</th>
-    <th>###label.total###</th>
+    <th <?= $styles['th'] ? 'style="'. $styles['th'] .'"' : '' ?>>###label.product###</th>
+    <th <?= $styles['th'] ? 'style="'. $styles['th'] .'"' : '' ?>>###label.single_price###</th>
+    <th <?= $styles['th'] ? 'style="'. $styles['th'] .'"' : '' ?>>###label.amount###</th>
+    <th <?= $styles['th'] ? 'style="'. $styles['th'] .'"' : '' ?>>###label.total###</th>
     <?php if ($config['has_remove_button']): ?>
-        <th>&nbsp;</th>
+        <th <?= $styles['th'] ? 'style="'. $styles['th'] .'"' : '' ?>>&nbsp;</th>
     <?php endif; ?>
 </tr>

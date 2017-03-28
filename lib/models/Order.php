@@ -17,6 +17,8 @@ class Order extends Model
 {
     const TABLE = 'rex_shop_order';
 
+    private $finalizeOrder = false;
+
     public static function create($table = null)
     {
         $_this = parent::create($table);
@@ -36,23 +38,54 @@ class Order extends Model
         return $this->getValue('address_1');
     }
 
+    public function getProducts($raw = true)
+    {
+        $products = OrderProduct::getAll(false, [
+            'filter'  => [['order_id', $this->getId()]],
+            'orderBy' => 'id',
+        ]);
+        if (!$raw) {
+            $_products = $products;
+            $products  = [];
 
-    public function save($create_order = false, $simple_save = false)
+            foreach ($_products as $product) {
+                $_product = $product->getValue('data');
+                $_data    = $product->getData();
+                $_pdata   = $_product->getData();
+
+                foreach ($_data as $key => $value) {
+                    if (!array_key_exists($key, $_pdata)) {
+                        $_product->setValue($key, $value);
+                    }
+                }
+                $products[] = $_product;
+            }
+        }
+        return $products;
+    }
+
+    public function completeOrder()
+    {
+        $this->finalizeOrder = true;
+        return $this->save(false);
+    }
+
+    public function save($simple_save = true)
     {
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['create_order' => $create_order, 'simple_save' => $simple_save]));
 
         $date_now = date('Y-m-d H:i:s');
         $this->setValue('createdate', $date_now);
-        
+
         $result = parent::save(true);
 
         if ($result && !$simple_save) {
-            
+
             $order_id   = $this->getValue('id');
             $promotions = $this->getValue('promotions');
             $products   = Session::getCartItems(false, false);
 
-            if ($create_order && isset ($promotions['coupon'])) {
+            if ($this->finalizeOrder && isset ($promotions['coupon'])) {
                 // relate coupon
                 $promotions['coupon']->linkToOrder($this);
             }
@@ -69,7 +102,7 @@ class Order extends Model
                 foreach ($prod_data as $name => $value) {
                     $product->setValue($name, $value);
                 }
-                if ($create_order) {
+                if ($this->finalizeOrder) {
                     if ($product->getValue('inventory') == 'F') {
                         // update inventory
                         if ($product->getValue('variant_key')) {
@@ -86,14 +119,7 @@ class Order extends Model
                         Coupon::createGiftcard($this, $product);
                     }
                 }
-                OrderProduct::create()
-                    ->setValue('order_id', $order_id)
-                    ->setValue('product_id', $product->getValue('id'))
-                    ->setValue('code', $product->getValue('code'))
-                    ->setValue('quantity', $quantity)
-                    ->setValue('data', $product)
-                    ->setValue('createdate', $date_now)
-                    ->save(true);
+                OrderProduct::create()->setValue('order_id', $order_id)->setValue('product_id', $product->getValue('id'))->setValue('code', $product->getValue('code'))->setValue('quantity', $quantity)->setValue('data', $product)->setValue('createdate', $date_now)->save(true);
             }
         }
         return $result;

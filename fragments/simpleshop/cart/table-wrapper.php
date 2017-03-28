@@ -23,11 +23,14 @@ $config    = array_merge([
     'has_global_refresh_button' => true,
 ], $this->getVar('config', []));
 
-$this->setVar('config', $config);
+$styles = array_merge([
+    'body' => '',
+], $config['email_tpl_styles']);
 
+$this->setVar('config', $config);
 ?>
 <form action="" method="post" class="cart-form">
-    <table class="cart-content stack margin-bottom">
+    <table class="cart-content stack margin-bottom" <?= $styles['body'] ? 'style="margin-top:30px;'. $styles['body'] . '"' : '' ?>>
         <thead>
         <?= $this->subfragment('simpleshop/cart/table-head.php'); ?>
         </thead>
@@ -41,7 +44,7 @@ $this->setVar('config', $config);
         </tbody>
     </table>
     <?php if (strlen($ahead_url)): ?>
-    <a href="<?= rex_getUrl(\Kreatif\Project\Settings::SUMMARY_PAGE_ID) ?>" class="button ahead float-right margin-left">###action.go_ahead### &raquo;</a>
+        <a href="<?= rex_getUrl(\Kreatif\Project\Settings::SUMMARY_PAGE_ID) ?>" class="button ahead float-right margin-left">###action.go_ahead### &raquo;</a>
     <?php endif; ?>
     <?php if ($config['has_global_refresh_button']): ?>
         <button class="button secondary refresh float-right" type="submit" name="func" value="update">

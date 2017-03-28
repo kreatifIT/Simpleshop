@@ -35,24 +35,32 @@ $config = array_merge([
     'has_quantity_control' => $is_giftcard ? false : $this->getVar('has_quantity_control', true),
 ], $this->getVar('config', []));
 
+$styles = array_merge([
+    'tr'   => '',
+    'td'   => '',
+    'h3'   => '',
+    'p'    => '',
+    'code' => '',
+], $config['email_tpl_styles']);
+
 ?>
-<tr class="cart-item <?= $config['class'] ?>" style="<?= $config['email_tpl_styles']['tr'] ?>">
+<tr class="cart-item <?= $config['class'] ?>" <?= $styles['tr'] ? 'style="'. $styles['tr'] .'"' : '' ?>>
     <?php if ($config['has_image']): ?>
-        <td class="product-image" style="<?= $config['email_tpl_styles']['td'] ?>">
+        <td class="product-image" <?= $styles['td'] ? 'style="'. $styles['td'] .'"' : '' ?>>
             <a href="<?= $product_url ?>"><?= Utils::getImageTag($picture, 'cart-list-element-main') ?></a>
         </td>
     <?php endif; ?>
-    <td class="description" style="<?= $config['email_tpl_styles']['td'] ?>">
-        <h3 style="<?= $config['email_tpl_styles']['h3'] ?>">
+    <td class="description" <?= $styles['td'] ? 'style="'. $styles['td'] .'"' : '' ?>>
+        <h3 <?= $styles['h2'] ? 'style="'. $styles['h3'] .'"' : '' ?>>
             <?= $product->getName() ?>
         </h3>
         <?php if (!$is_giftcard): ?>
-            <p style="<?= $config['email_tpl_styles']['p'] ?>">
+            <p <?= $styles['p'] ? 'style="'. $styles['p'] .'"' : '' ?>>
                 <?= $Category->getName() ?>
             </p>
         <?php elseif ($extras['coupon_code']): ?>
             <br/>
-            <code style="<?= $config['email_tpl_styles']['code'] ?>">
+            <code <?= $styles['code'] ? 'style="'. $styles['code'] .'"' : '' ?>>
                 Code: <?= $extras['coupon_code'] ?>
             </code>
         <?php endif; ?>
@@ -62,10 +70,10 @@ $config = array_merge([
             <?php endforeach; ?>
         <?php endif; ?>
     </td>
-    <td class="price-single" style="<?= $config['email_tpl_styles']['td'] ?>">
+    <td class="price-single" <?= $styles['td'] ? 'style="'. $styles['td'] .'"' : '' ?>>
         &euro; <?= format_price($price) ?>
     </td>
-    <td class="amount" style="<?= $config['email_tpl_styles']['td'] ?>">
+    <td class="amount" <?= $styles['td'] ? 'style="'. $styles['td'] .'"' : '' ?>>
         <?php
         $fragment = new \rex_fragment();
         $fragment->setVar('config', $config);
@@ -74,7 +82,7 @@ $config = array_merge([
         echo $fragment->parse('simpleshop/cart/button.php');
         ?>
     </td>
-    <td class="price-total" style="<?= $config['email_tpl_styles']['td'] ?>">
+    <td class="price-total" <?= $styles['td'] ? 'style="'. $styles['td'] .'"' : '' ?>>
         &euro; <?= format_price($price * $quantity) ?>
     </td>
     <?php if ($config['has_remove_button']): ?>

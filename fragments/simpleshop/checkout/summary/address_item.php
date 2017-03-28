@@ -13,16 +13,16 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$has_el  = $this->getVar('has_edit_link', TRUE);
-$title   = $this->getVar('title');
-$url     = $this->getVar('url');
-$address = $this->getVar('address');
+$type     = $this->getVar('type', 'invoice');
+$title    = $this->getVar('title');
+$edit_url = $this->getVar('edit_url');
+$address  = $this->getVar('address');
 
 ?>
 <div class="medium-6 columns margin-bottom">
     <div class="address-panel">
-        <?php if ($has_el): ?>
-            <a href="<?= $url ?>" class="edit">
+        <?php if (strlen($edit_url)): ?>
+            <a href="<?= $edit_url ?>" class="edit">
                 <i class="fa fa-pencil hide-for-large" aria-hidden="true"></i>
                 <span class="show-for-large">###action.edit###</span>
             </a>

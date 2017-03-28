@@ -91,7 +91,7 @@ class CheckoutController extends Controller
     protected function getCompleteView()
     {
         // finally save order - DONE / COMPLETE
-        $this->Order->save(true);
+        $this->Order->save();
 
         $do_send  = true;
         $Customer = $this->Order->getInvoiceAddress();
