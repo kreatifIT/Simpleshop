@@ -38,7 +38,7 @@ abstract class Model extends \rex_yform_manager_dataset
             'offset'  => 0,
             'select'  => [],
             'filter'  => [],
-            'joins'   => [],
+            'joins'   => [], // tablename, alias, condition, join_type
             'lang_id' => null,
         ], $params);
 
