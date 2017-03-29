@@ -67,15 +67,29 @@ class Order extends Model
     public function completeOrder()
     {
         $this->finalizeOrder = true;
-        return $this->save(false);
+        $result              = $this->save(false);
+
+        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.completeOrder', $result, [
+            'Order' => $this,
+        ]));
     }
 
     public function save($simple_save = true)
     {
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['create_order' => $create_order, 'simple_save' => $simple_save]));
 
+        $sql      = \rex_sql::factory();
         $date_now = date('Y-m-d H:i:s');
         $this->setValue('createdate', $date_now);
+
+        if ($this->finalizeOrder && $this->getValue('invoice_num') === null) {
+            $sql->setQuery('SELECT MAX(invoice_num) as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"');
+            $num = $sql->getValue('num');
+            $num = (int) substr($num, 2) + 1;
+            $num = date('y') . str_pad($num, 5, '0', STR_PAD_LEFT);
+
+            $this->setValue('invoice_num', \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoice_num', $num, ['Order' => $this])));
+        }
 
         $result = parent::save(true);
 
@@ -90,6 +104,29 @@ class Order extends Model
                 $promotions['coupon']->linkToOrder($this);
             }
 
+            // reset quanities
+            $order_products = OrderProduct::getAll(false, ['filter' => [['order_id', $order_id]], 'orderBy' => 'id']);
+
+            foreach ($order_products as $order_product) {
+                if ($order_product->getValue('quantity')) {
+                    $_product = $order_product->getValue('data');
+                    $quantity = $order_product->getValue('quantity');
+
+                    if ($_product->getValue('inventory') == 'F') {
+                        // update inventory
+                        if ($_product->getValue('variant_key')) {
+                            $Variant = Variant::getByVariantKey($_product->getValue('key'));
+                            $Variant->setValue('amount', $Variant->getValue('amount') + $quantity);
+                            $Variant->save();
+                        }
+                        else {
+                            $product = Product::get($_product->getId());
+                            $product->setValue('amount', $product->getValue('amount') + $quantity);
+                            $product->save();
+                        }
+                    }
+                }
+            }
             // clear all products first
             \rex_sql::factory()->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$order_id}");
 
