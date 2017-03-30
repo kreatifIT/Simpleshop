@@ -14,7 +14,6 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 
 use Sprog\Wildcard;
-use Whoops\Exception\ErrorException;
 
 class CheckoutController extends Controller
 {

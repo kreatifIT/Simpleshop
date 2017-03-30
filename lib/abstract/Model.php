@@ -52,9 +52,24 @@ abstract class Model extends \rex_yform_manager_dataset
         }
 
         if (count($params['filter'])) {
-            foreach ($params['filter'] as $filter) {
+            foreach ($params['filter'] as $filter_index => $filter) {
                 if (isset($filter[2])) {
-                    $stmt->where($filter[0], $filter[1], $filter[2]);
+                    if ($filter[2] == '1n') {
+                        $stmt->whereRaw("(
+                            {$filter[0]} = :fw1{$filter_index}
+                            OR {$filter[0]} LIKE :fw2{$filter_index}
+                            OR {$filter[0]} LIKE :fw3{$filter_index}
+                            OR {$filter[0]} LIKE :fw4{$filter_index}
+                        )", [
+                            "fw1{$filter_index}" => $filter[1],
+                            "fw2{$filter_index}" => "{$filter[1]},%",
+                            "fw3{$filter_index}" => "%,{$filter[1]},%",
+                            "fw4{$filter_index}" => "%,{$filter[1]}",
+                        ]);
+                    }
+                    else {
+                        $stmt->where($filter[0], $filter[1], $filter[2]);
+                    }
                 }
                 else {
                     $stmt->where($filter[0], $filter[1]);
@@ -192,7 +207,7 @@ abstract class Model extends \rex_yform_manager_dataset
 
     public function nameIsEmpty($lang_id = null)
     {
-        return strlen(trim(strip_tags($this->getName($lang_id)))) == 0;
+        return $this->getName($lang_id) !== null && strlen(trim(strip_tags($this->getName($lang_id)))) == 0;
     }
 
     public function getUrl($params = [])

@@ -18,7 +18,7 @@ use Sprog\Wildcard;
 class Session extends Model
 {
     const TABLE = 'rex_shop_session';
-    
+
     protected static $session      = null;
     protected static $has_shipping = false;
     public static    $errors       = [];
@@ -112,7 +112,7 @@ class Session extends Model
         $this->save();
     }
 
-    private static function _getCartItems($raw = false, $throwErrors = true)
+    private static function _getCartItems($raw = false, $throwErrors = false)
     {
         $session    = self::getSession();
         $cart_items = (array) $session->getValue('cart_items');
@@ -145,7 +145,6 @@ class Session extends Model
 
     public static function getCartItems($raw = false, $throwErrors = true)
     {
-        $label_name   = sprogfield('name');
         self::$errors = [];
 
         do {
@@ -176,7 +175,7 @@ class Session extends Model
                         Session::removeProduct($key);
                         list ($product_id, $feature_ids) = explode('|', trim($key, '|'));
                         $product        = Product::get($product_id);
-                        $label          = strtr(checkstr(Wildcard::get('simpleshop.error.cart_product_not_available'), '###simpleshop.error.cart_product_not_available###'), ['{{replace}}' => $product->getValue($label_name)]);
+                        $label          = strtr(checkstr(Wildcard::get('simpleshop.error.cart_product_not_available'), '###simpleshop.error.cart_product_not_available###'), ['{{replace}}' => $product->getName()]);
                         self::$errors[] = ['label' => $label];
                         break;
 
@@ -186,7 +185,7 @@ class Session extends Model
                         // update cart
                         Session::setProductData($key, $product->getValue('amount'));
                         $label          = strtr(checkstr(Wildcard::get('simpleshop.error.cart_product_not_enough_amount'), '###simpleshop.error.cart_product_not_enough_amount###'), [
-                            '{{replace}}' => $product->getValue($label_name),
+                            '{{replace}}' => $product->getName(),
                             '{{count}}'   => $product->getValue('amount'),
                         ]);
                         self::$errors[] = ['label' => $label];
@@ -217,25 +216,25 @@ class Session extends Model
 
     public static function addProduct($product_key, $quantity = 1, $extras = [])
     {
-        $cart_items = self::_getCartItems(true);
-        self::setProductData($product_key, $cart_items[$product_key]['quantity'] + $quantity, $extras);
+        $cart_items = self::_getCartItems(true, false);
+        self::setProductData($product_key, $cart_items[$product_key]['quantity'] + $quantity, array_merge((array) $cart_items[$product_key]['extras'], $extras));
     }
 
     public static function setProductData($product_key, $quantity, $extras = [])
     {
         $session    = self::getSession();
-        $cart_items = self::_getCartItems(true);
+        $cart_items = self::_getCartItems(true, false);
         // update the quantity
         $cart_items[$product_key]['quantity'] = $quantity;
         // update extras
-        $cart_items[$product_key]['extras'] = array_merge((array) $cart_items[$product_key]['extras'], $extras);
+        $cart_items[$product_key]['extras'] = $extras;
         $session->writeSession(['cart_items' => $cart_items]);
     }
 
     public static function removeProduct($product_key)
     {
         $session    = self::getSession();
-        $cart_items = self::_getCartItems(true);
+        $cart_items = self::_getCartItems(true, false);
         unset($cart_items[$product_key]);
         $session->writeSession(['cart_items' => $cart_items]);
     }

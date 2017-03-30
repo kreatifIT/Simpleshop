@@ -39,15 +39,17 @@ class rex_yform_value_model_data extends rex_yform_value_textarea
         $close_table = TRUE;
         $content     = ['<table class="table table-condensed">'];
 
-        if (is_array($Object))
+        if (!is_object($Object) && is_array($Object))
         {
             foreach ($Object as $key => $val)
             {
-                if (in_array ($key, ['submit']))
+                if (!is_numeric($key) && in_array ($key, ['submit']))
                 {
                     continue;
                 }
-                $content[] = '<tr><td>' . $key . '</td><td>' . implode('', $this->unprepare($val)) . '</td></tr>';
+                else {
+                    $content[] = '<tr><td>' . (is_numeric($key) ? 'index: '. $key : $key) . '</td><td>' . implode('', $this->unprepare($val)) . '</td></tr>';
+                }
             }
         }
         else if (is_object($Object) && defined(get_class($Object) . "::TABLE"))

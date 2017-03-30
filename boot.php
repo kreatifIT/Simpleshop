@@ -28,6 +28,8 @@ $this->setProperty('table_classes', [
     FeatureValue::TABLE    => FeatureValue::class,
     Order::TABLE           => Order::class,
     OrderProduct::TABLE    => OrderProduct::class,
+    Package::TABLE         => Package::class,
+    PackageCategory::TABLE => PackageCategory::class,
     Product::TABLE         => Product::class,
     Category::TABLE        => Category::class,
     Session::TABLE         => Session::class,
@@ -36,31 +38,26 @@ $this->setProperty('table_classes', [
 ]);
 $table_classes = $this->getConfig('table_classes');
 
-if (!$table_classes)
-{
+if (!$table_classes) {
     Utils::ext_register_tables();
     $table_classes = $this->getConfig('table_classes');
 }
-foreach ($table_classes as $table => $class)
-{
+foreach ($table_classes as $table => $class) {
     \rex_yform_manager_dataset::setModelClass($table, $class);
 }
 
 $include_files = glob($this->getPath('functions/*.inc.php'));
 $include_files = array_merge($include_files, glob($this->getPath('inc/*.inc.php')));
 
-foreach ($include_files as $include_file)
-{
+foreach ($include_files as $include_file) {
     include_once $include_file;
 }
 
 
-if (\rex::isBackend())
-{
+if (\rex::isBackend()) {
     $include_files = glob($this->getPath('inc/backend/*.inc.php'));
 
-    foreach ($include_files as $include_file)
-    {
+    foreach ($include_files as $include_file) {
         include_once $include_file;
     }
 }
