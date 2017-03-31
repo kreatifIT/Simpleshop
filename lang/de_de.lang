@@ -21,6 +21,7 @@ label.packing_list_title = Lieferschein
 label.shipping_address = Lieferadresse
 label.return_address = Absenderadresse
 label.product_list = Produktliste
+label.accounting = Buchhaltung
 label.what_u_want_todo = Was wollen Sie tun?
 
 
@@ -33,6 +34,7 @@ action.export = Exportieren
 action.print_packing_list = Lieferschein drucken
 action.edit_product_add_feature = Dem Produkt die fehlenden Eigenschaften zuweisen
 action.remove_all_variants = Alle Varianten entfernen
+action.use_invoicing = Rechnungslegung verwenden
 
 error.cannot_delete_category = Die Kategorie "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind
 error.cannot_delete_tax = Der Steuersatz "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind

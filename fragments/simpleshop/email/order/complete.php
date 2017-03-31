@@ -22,6 +22,7 @@ $Shipping = $Order->getValue('shipping');
 $config = array_merge([
     'primary_color'             => $prim_color,
     'is_order_complete'         => true,
+    'use_invoicing'             => false,
     'has_image'                 => false,
     'has_remove_button'         => false,
     'has_quantity_control'      => false,
@@ -83,6 +84,9 @@ if ($promotions) {
 <?php endif; ?>
 
     <h2>###label.order### #<?= $order_id ?></h2>
+    <?php if ($config['use_invoicing']): ?>
+        <h2>###label.invoice_num### <?= $Order->getInvoiceNum() ?></h2>
+    <?php endif; ?>
 
     <?php
 $this->setVar('invoice_address', $Order->getInvoiceAddress());

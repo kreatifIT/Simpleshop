@@ -45,6 +45,14 @@ $Settings = $this->getVar('Settings');
             </label>
         </dd>
     </dl>
+    <dl class="rex-form-group form-group">
+        <dt><?= $Addon->i18n('label.accounting'); ?></dt>
+        <dd>
+            <label class="form-label">
+                <input type="checkbox" name="use_invoicing" value="1" <?php if (from_array($Settings, 'use_invoicing') == 1) echo 'checked="checked"'; ?>/><span></span><?= $Addon->i18n('action.use_invoicing'); ?>
+            </label>
+        </dd>
+    </dl>
 
     <legend><?= $Addon->i18n('settings.order_settings'); ?></legend>
     <dl class="rex-form-group form-group">

@@ -17,7 +17,7 @@ class Order extends Model
 {
     const TABLE = 'rex_shop_order';
 
-    private $finalizeOrder = false;
+    private static $_finalizeOrder = false;
 
     public static function create($table = null)
     {
@@ -64,10 +64,18 @@ class Order extends Model
         return $products;
     }
 
+    public function getInvoiceNum()
+    {
+        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.getInvoiceNum', $this->getValue('invoice_num'), [
+            'Order' => $this,
+        ]));
+    }
+
     public function completeOrder()
     {
-        $this->finalizeOrder = true;
-        $result              = $this->save(false);
+        self::$_finalizeOrder = true;
+
+        $result = $this->save(false);
 
         return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.completeOrder', $result, [
             'Order' => $this,
@@ -82,13 +90,13 @@ class Order extends Model
         $date_now = date('Y-m-d H:i:s');
         $this->setValue('createdate', $date_now);
 
-        if ($this->finalizeOrder && $this->getValue('invoice_num') === null) {
+        if (self::$_finalizeOrder && ($this->getValue('invoice_num') === null || $this->getValue('invoice_num') === 0)) {
             $sql->setQuery('SELECT MAX(invoice_num) as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"');
-            $num = $sql->getValue('num');
-            $num = (int) substr($num, 2) + 1;
-            $num = date('y') . str_pad($num, 5, '0', STR_PAD_LEFT);
+            $value = $sql->getValue('num');
+            $num   = (int) substr($value, 2) + 1;
+            $num   = date('y') . str_pad($num, 5, '0', STR_PAD_LEFT);
 
-            $this->setValue('invoice_num', \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoice_num', $num, ['Order' => $this])));
+            $this->setValue('invoice_num', \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoice_num', $num, ['Order' => $this, 'value' => $value])));
         }
 
         $result = parent::save(true);
@@ -99,7 +107,7 @@ class Order extends Model
             $promotions = $this->getValue('promotions');
             $products   = Session::getCartItems(false, false);
 
-            if ($this->finalizeOrder && isset ($promotions['coupon'])) {
+            if (self::$_finalizeOrder && isset ($promotions['coupon'])) {
                 // relate coupon
                 $promotions['coupon']->linkToOrder($this);
             }
@@ -139,7 +147,7 @@ class Order extends Model
                 foreach ($prod_data as $name => $value) {
                     $product->setValue($name, $value);
                 }
-                if ($this->finalizeOrder) {
+                if (self::$_finalizeOrder) {
                     if ($product->getValue('inventory') == 'F') {
                         // update inventory
                         if ($product->getValue('variant_key')) {
