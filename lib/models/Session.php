@@ -217,7 +217,7 @@ class Session extends Model
     public static function addProduct($product_key, $quantity = 1, $extras = [])
     {
         $cart_items = self::_getCartItems(true, false);
-        self::setProductData($product_key, $cart_items[$product_key]['quantity'] + $quantity, array_merge((array) $cart_items[$product_key]['extras'], $extras));
+        self::setProductData($product_key, $cart_items[$product_key]['quantity'] + $quantity, $extras);
     }
 
     public static function setProductData($product_key, $quantity, $extras = [])
@@ -227,7 +227,7 @@ class Session extends Model
         // update the quantity
         $cart_items[$product_key]['quantity'] = $quantity;
         // update extras
-        $cart_items[$product_key]['extras'] = $extras;
+        $cart_items[$product_key]['extras'] = array_merge((array) $cart_items[$product_key]['extras'], $extras);
         $session->writeSession(['cart_items' => $cart_items]);
     }
 
