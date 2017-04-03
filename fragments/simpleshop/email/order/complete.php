@@ -84,8 +84,8 @@ if ($promotions) {
 <?php endif; ?>
 
     <?php if ($config['use_invoicing']): ?>
-    <br/>
     <div>
+    <br/>
         <strong>###company.name###</strong><br/>
         ###company.street###<br/>
         ###company.postal### ###company.location### (###company.province###)<br/>

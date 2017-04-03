@@ -22,7 +22,7 @@ $tax            = $this->getVar('tax', null);
     <?php if ($subtotal != $total): ?>
         <tr <?= $styles['tr'] ? 'style="' . $styles['tr'] . '"' : '' ?>>
             <td <?= $styles['td'] ? 'style="' . $styles['td'] . '"' : '' ?>>###label.subtotal###</td>
-            <td class="text-right" <?= $styles['td'] ? 'style="style="text-align:right;' . $styles['td'] . '"' : '' ?>>
+            <td class="text-right" <?= $styles['td'] ? 'style="text-align:right;' . $styles['td'] . '"' : '' ?>>
                 &euro; <?= format_price($subtotal) ?>
             </td>
         </tr>
