@@ -165,6 +165,8 @@ class Customer extends Model
     public static function logout()
     {
         $_SESSION['customer']['user'] = [];
+        session_regenerate_id(true);
+        session_destroy();
     }
 
     public static function getPasswordHash($password, $func = 'sha1')
