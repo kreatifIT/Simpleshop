@@ -76,14 +76,15 @@ class Session extends Model
             self::$session = $session ?: parent::create();
 
             if ($User) {
-                $user_session = parent::query()->where('customer_id', $User->getValue('id'))->where('session_id', $session_id, '!=')->findOne();
+                $user_session = parent::query()->where('customer_id', $User->getId())->where('session_id', $session_id, '!=')->findOne();
 
                 if ($user_session) {
                     // merge sessions because we found to sessions for the same user
-                    $cart_items = self::_getCartItems(true, self::$session) + self::_getCartItems(true, $user_session);
+                    $cart_items = (array) $user_session->getValue('cart_items') + (array) self::$session->getValue('cart_items');
+                    unset($cart_items[0]);
+                    self::$session = $user_session;
+                    self::$session->setValue('session_id', $session_id);
                     self::$session->writeSession(['cart_items' => $cart_items]);
-                    // remove the previous session
-                    $user_session->delete();
                 }
             }
         }
