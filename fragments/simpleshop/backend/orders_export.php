@@ -39,7 +39,7 @@ $orders = $this->getVar('orders');
                 <tr>
                     <td><input type="checkbox" name="orders[]" value="<?= $order->getValue('id') ?>" checked="checked"/></td>
                     <td><?= $order->getValue('id') ?></td>
-                    <td><?= $Customer->getName() ?></td>
+                    <td><?= $Customer ? $Customer->getName() : '<i>unknown</i>' ?></td>
                     <td><?= $order->getValue('total') ?></td>
                 </tr>
             <?php endforeach; ?>
