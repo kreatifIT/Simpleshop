@@ -103,7 +103,11 @@ class CheckoutController extends Controller
 
         // add vars
         $Mail->setVar('Order', $this->Order);
-        $Mail->setVar('config', array_merge(['use_invoicing' => from_array($Settings, 'use_invoicing')], $this->getVar('config', [])));
+        $Mail->setVar('config', array_merge([
+            'is_order_complete' => true,
+            'is_email'          => true,
+            'use_invoicing'     => from_array($Settings, 'use_invoicing'),
+        ], $this->getVar('config', [])));
 
         // set order notification email
         $Mail->AddAddress($Customer->getValue('email'));

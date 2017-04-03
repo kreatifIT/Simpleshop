@@ -83,6 +83,18 @@ if ($promotions) {
     <p><?= $add_info ?></p>
 <?php endif; ?>
 
+    <?php if ($config['use_invoicing']): ?>
+    <br/>
+    <div>
+        <strong>###company.name###</strong><br/>
+        ###company.street###<br/>
+        ###company.postal### ###company.location### (###company.province###)<br/>
+        ###label.vat_short###: ###company.vat###<br/>
+        ###company.shop_invoice_info###
+    </div>
+    <br/>
+    <?php endif; ?>
+
     <h2>###label.order### #<?= $order_id ?></h2>
     <?php if ($config['use_invoicing']): ?>
         <h2>###label.invoice_num### <?= $Order->getInvoiceNum() ?></h2>
