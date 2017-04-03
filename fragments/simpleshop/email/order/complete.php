@@ -15,12 +15,10 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 $Order = $this->getVar('Order');
 $add_info = $this->getVar('additional_info');
-$prim_color = $this->getVar('primary_color', 'green');
 $Payment = $Order->getValue('payment');
 $Shipping = $Order->getValue('shipping');
 
 $config = array_merge([
-    'primary_color'             => $prim_color,
     'is_order_complete'         => true,
     'use_invoicing'             => false,
     'has_image'                 => false,
