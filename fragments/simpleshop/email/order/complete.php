@@ -135,7 +135,7 @@ $this->subfragment('simpleshop/email/order/address-wrapper.php');
     <?php
 $config['email_tpl_styles'] = array_merge($config['email_tpl_styles'], [
     'body' => $config['email_tpl_styles']['body'] . 'margin-top:20px;',
-    'th'   => $config['email_tpl_styles']['th'] . 'background:' . $prim_color . ';border:1px solid #fff;color:#fff;padding:10px;',
+    'th'   => $config['email_tpl_styles']['th'] . 'background:' . $config['primary_color'] . ';border:1px solid #fff;color:#fff;padding:10px;',
 ]);
 $this->setVar('config', $config);
 $this->setVar('products', $products);
