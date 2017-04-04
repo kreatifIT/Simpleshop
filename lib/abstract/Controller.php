@@ -20,6 +20,11 @@ abstract class Controller
 
     protected abstract function _execute();
 
+    public function __construct() {
+        if ($this->fragment === null) {
+            $this->fragment = new \rex_fragment();
+        }
+    }
 
     public static function execute($params = [])
     {

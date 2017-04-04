@@ -23,6 +23,8 @@ label.return_address = Absenderadresse
 label.product_list = Produktliste
 label.accounting = Buchhaltung
 label.what_u_want_todo = Was wollen Sie tun?
+label.resend_email = Bestellungs-Email an Kunde senden
+label.msg_resend_email = Email wurde versendet
 
 
 action.manage_variants = Varianten verwalten
@@ -54,3 +56,6 @@ settings.price_rounding = Preis-Rundung
 settings.brutto_prices = Bruttopreise
 settings.brutto_prices_info = Bruttopreise bei der Eingabe im Backend verwenden (inkl. MwSt)
 settings.price_rounding_info = Alle Preise auf 1 Nachkommastelle runden
+
+yform_values.order_functions_label = Funktionen
+yform_values.order_functions_description = Funktionen für Bestelldokumente

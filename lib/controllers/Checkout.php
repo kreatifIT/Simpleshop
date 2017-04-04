@@ -53,6 +53,11 @@ class CheckoutController extends Controller
         }
     }
 
+    public function setOrder(Order $Order)
+    {
+        $this->Order = $Order;
+    }
+
     protected function cancelPayment()
     {
         Utils::log('Payment cancelled', 'Customer cancelled payment', 'INFO');
@@ -87,19 +92,15 @@ class CheckoutController extends Controller
         $this->setVar('cart_url', rex_getUrl($this->params['cart_page_id']));
     }
 
-    protected function getCompleteView()
+    public function sendMail()
     {
-        // finally save order - DONE / COMPLETE
-        $this->Order->save();
-
         $do_send  = true;
-        $Customer = $this->Order->getInvoiceAddress();
         $Mail     = new \FriendsOfREDAXO\Simpleshop\Mail();
         $Settings = \rex::getConfig('simpleshop.Settings');
+        $Customer = $this->Order->getInvoiceAddress();
 
         $Mail->Subject = '###shop.email.order_complete###';
         $Mail->setFragmentPath('order/complete');
-
 
         // add vars
         $Mail->setVar('Order', $this->Order);
@@ -122,6 +123,13 @@ class CheckoutController extends Controller
         if ($do_send) {
             $Mail->send();
         }
+    }
+
+    protected function getCompleteView()
+    {
+        // finally save order - DONE / COMPLETE
+        $this->Order->save();
+        $this->sendMail();
 
         // CLEAR THE SESSION
         Session::clearCheckout();
