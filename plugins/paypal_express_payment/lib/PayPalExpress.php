@@ -28,14 +28,13 @@ class PayPalExpress extends PaymentAbstract
 
     public function getName()
     {
-        if ($this->name == '')
-        {
+        if ($this->name == '') {
             $this->name = checkstr(Wildcard::get(self::NAME), self::NAME);
         }
         return parent::getName();
     }
 
-    public function initPayment($order_id, $total_amount, $order_descr, $show_cc = FALSE)
+    public function initPayment($order_id, $total_amount, $order_descr, $show_cc = false)
     {
         $Settings      = \rex::getConfig('simpleshop.PaypalExpress.Settings');
         $prefix        = from_array($Settings, 'api_type', '');
@@ -45,8 +44,7 @@ class PayPalExpress extends PaymentAbstract
         $api_signature = from_array($Settings, $prefix . 'signature', '');
 
 
-        if ($api_signature == '' || $api_pwd == '' || $api_user == '')
-        {
+        if ($api_signature == '' || $api_pwd == '' || $api_user == '') {
             throw new PaypalException('The Paypal credentials are not set!');
         }
 
@@ -58,8 +56,8 @@ class PayPalExpress extends PaymentAbstract
             'PWD'       => $api_pwd,
             'SIGNATURE' => $api_signature,
 
-            'returnUrl' => rex_getFullUrl(NULL, NULL, ['action' => 'pay_process']),
-            'cancelUrl' => rex_getFullUrl(NULL, NULL, ['action' => 'cancelled']),
+            'returnUrl' => rex_getFullUrl(null, null, ['action' => 'pay_process']),
+            'cancelUrl' => rex_getFullUrl(null, null, ['action' => 'cancelled']),
 
             'PAYMENTREQUEST_0_PAYMENTREQUESTID' => $order_id,
             'PAYMENTREQUEST_0_AMT'              => $total_amount, // total payment (including tax + shipping)
@@ -89,16 +87,14 @@ class PayPalExpress extends PaymentAbstract
 
         $logMsg = "
             {$__response['L_LONGMESSAGE0']}
-            Data: " . print_r($data, TRUE) . "
-            Response: " . print_r($__response, TRUE) . "
+            Data: " . print_r($data, true) . "
+            Response: " . print_r($__response, true) . "
         ";
-        if ($__response['ACK'] != 'Success')
-        {
-            Utils::log('Paypal.initPayment.response', $logMsg, 'ERROR', TRUE);
+        if ($__response['ACK'] != 'Success') {
+            Utils::log('Paypal.initPayment.response', $logMsg, 'ERROR', true);
             throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
         }
-        else
-        {
+        else {
             Utils::log('Paypal.initPayment.response', $logMsg, 'INFO');
             $this->responses['initPayment'] = $__response;
             $Order                          = Session::getCurrentOrder();
@@ -141,31 +137,36 @@ class PayPalExpress extends PaymentAbstract
 
         $logMsg = "
             {$__response['L_LONGMESSAGE0']}
-            Data: " . print_r($data, TRUE) . "
-            Response: " . print_r($__response, TRUE) . "
+            Data: " . print_r($data, true) . "
+            Response: " . print_r($__response, true) . "
         ";
 
-        if ($__response['ACK'] != 'Success')
-        {
+        if ($__response['ACK'] != 'Success') {
+            if ($__response['ERRORCODE0'] == 10486) {
+                Utils::log('Paypal.processPayment.response4', $logMsg, 'WARNING', true);
+                $this->responses['processPayment'] = $__response;
 
-            Utils::log('Paypal.processPayment.response', $logMsg, 'ERROR', TRUE);
-            throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
+                header('Location: '. $url .'?'. $sdata);
+                exit;
+            }
+            else {
+                Utils::log('Paypal.processPayment.response3', $logMsg, 'ERROR', true);
+                throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
+            }
         }
-        if ($__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Completed')
-        {
+        if ($__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Completed') {
             $logMsg = "
-                The Payment with Transaction-ID = {$__response['PAYMENTINFO_0_TRANSACTIONID']} "
-                . "has status = '{$__response['PAYMENTINFO_0_PAYMENTSTATUS']}'
+                The Payment with Transaction-ID = {$__response['PAYMENTINFO_0_TRANSACTIONID']} " . "has status = '{$__response['PAYMENTINFO_0_PAYMENTSTATUS']}'
             ";
-            Utils::log('Paypal.processPayment.response', $logMsg, 'ERROR', TRUE);
+            Utils::log('Paypal.processPayment.response2', $logMsg, 'ERROR', true);
             throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
         }
-        else
-        {
+        else {
             // log successful payment
-            Utils::log('Paypal.processPayment.response', $logMsg, 'INFO');
+            Utils::log('Paypal.processPayment.response1', $logMsg, 'INFO');
             $this->responses['processPayment'] = $__response;
-            $Order                             = Session::getCurrentOrder();
+
+            $Order = Session::getCurrentOrder();
             $Order->setValue('payment', $this);
             // update status
             $Order->setValue('status', 'IP');
