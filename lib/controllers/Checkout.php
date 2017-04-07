@@ -129,7 +129,7 @@ class CheckoutController extends Controller
     {
         // finally save order - DONE / COMPLETE
         $this->Order->save();
-        $this->sendMail();
+        $this->sendMail(true);
 
         // CLEAR THE SESSION
         Session::clearCheckout();
@@ -140,7 +140,7 @@ class CheckoutController extends Controller
 
     protected function initPayment()
     {
-        $payment             = $this->Order->getValue('payment');
+        $payment = $this->Order->getValue('payment');
         $this->fragment_path = 'simpleshop/payment/' . $payment->getValue('plugin_name') . '/payment_init.php';
     }
 

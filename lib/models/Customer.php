@@ -35,7 +35,7 @@ class Customer extends Model
         return $result;
     }
 
-    public function getName()
+    public function getName($lang_id = null)
     {
         $name = $this->getValue('firstname') . ' ' . $this->getValue('lastname');
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.getName', $name, ['Customer' => $this]));
