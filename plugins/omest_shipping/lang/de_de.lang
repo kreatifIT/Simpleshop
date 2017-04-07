@@ -7,6 +7,9 @@ omest_shipping.api_settings = Schnittstellen-Einstellungen
 omest_shipping.basic_settings = Grundeinstellungen
 omest_shipping.warehouse_key = Warenhaus-Key
 omest_shipping.omest_pickup = OMEST holt die Waren im Shop ab
+omest_shipping.pickup_company_name = Name des Shops
+omest_shipping.pickup_city = Ort/Stadt vom Shop
+omest_shipping.pickup_street = Straße vom Shop
 omest_shipping.pickup_zip = Postleitzahl vom Shop
 omest_shipping.pickup_country_code = Ländercode vom Shop
 

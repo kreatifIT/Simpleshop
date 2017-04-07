@@ -23,10 +23,9 @@ class Omest extends ShippingAbstract
 
     protected $tax_percentage = 22;
 
-    public function getPrice($order, $products = NULL)
+    public function getPrice($order, $products = null)
     {
-        if ($products)
-        {
+        if ($products) {
             $this->price = $this->calculatePriceFromOLC($order, $products);
         }
         return parent::getPrice($products);
@@ -34,8 +33,7 @@ class Omest extends ShippingAbstract
 
     public function getTax()
     {
-        if (!$this->tax)
-        {
+        if (!$this->tax) {
             $this->tax = $this->price / ($this->tax_percentage + 100) * $this->tax_percentage;
         }
         return parent::getTax();
@@ -43,8 +41,7 @@ class Omest extends ShippingAbstract
 
     public function getName()
     {
-        if ($this->name == '')
-        {
+        if ($this->name == '') {
             $this->name = checkstr(Wildcard::get(self::NAME), self::NAME);
         }
         return parent::getName();
@@ -59,8 +56,7 @@ class Omest extends ShippingAbstract
         $DAddress = $extras['address_extras']['use_shipping_address'] ? $Order->getValue('address_2') : $IAddress;
 
         // SKIP if no products
-        if (count($products) < 1)
-        {
+        if (count($products) < 1) {
             throw new OmestShippingException("Order has no products", 1);
         }
 
@@ -81,14 +77,11 @@ class Omest extends ShippingAbstract
             ],
         ];
 
-        if ($Settings['warehouse_key'])
-        {
+        if ($Settings['warehouse_key']) {
             $data['pickupAddress']['warehouseKey'] = $Settings['warehouse_key'];
         }
-        foreach ($products as $product)
-        {
-            for ($i = 0; $i < $product->getValue('cart_quantity'); $i++)
-            {
+        foreach ($products as $product) {
+            for ($i = 0; $i < $product->getValue('cart_quantity'); $i++) {
                 $data['parcels'][] = [
                     'weight' => $product->getValue('weight') / 1000,
                     'width'  => $product->getValue('width') / 10,
@@ -106,21 +99,18 @@ class Omest extends ShippingAbstract
 
         $Connector = new WSConnector($test ? self::OLC_TEST_URL : self::OLC_URL);
         $Connector->setRespFormat('application/json');
-        $Connector->setDebug(FALSE);
+        $Connector->setDebug(false);
         $response = $Connector->request('/shipment-rate', $sdata, 'get', 'Omest.calculatePriceFromOLC');
 
-        if ($response['response']['status'] <= 0)
-        {
-            Utils::log('Omest.calculatePriceFromOLC', $response['response']['message'] . "\n" . print_r($data, TRUE) . "\n" . print_r($DAddress, TRUE), 'Error', TRUE);
+        if ($response['response']['status'] <= 0) {
+            Utils::log('Omest.calculatePriceFromOLC', $response['response']['message'] . "\n" . print_r($data, true) . "\n" . print_r($DAddress, true), 'Error', true);
             throw new OmestShippingException($response['response']['message'], 2);
         }
-        else if ($response['response']['shipment']->price == '' || $response['response']['shipment']->price == '-')
-        {
-            Utils::log('Omest.calculatePriceFromOLC', "No price found!\n" . print_r($data, TRUE) . "\n" . print_r($DAddress, TRUE), 'Error', TRUE);
+        else if ($response['response']['shipment']->price == '' || $response['response']['shipment']->price == '-') {
+            Utils::log('Omest.calculatePriceFromOLC', "No price found!\n" . print_r($data, true) . "\n" . print_r($DAddress, true), 'Error', true);
             throw new OmestShippingException('', 3);
         }
-        else
-        {
+        else {
             // return shipping costs
             return (float) $response['response']['shipment']->price;
         }
@@ -132,61 +122,57 @@ class Omest extends ShippingAbstract
         $Settings    = \rex::getConfig('simpleshop.OmestShipping.Settings');
         $test        = $Settings['sandbox'];
 
-        foreach ($order_ids as $order_id)
-        {
+        foreach ($order_ids as $order_id) {
             $parcels  = [];
             $Order    = Order::get($order_id);
             $IAddress = $Order->getValue('address_1');
             $DAddress = $Order->getValue('address_2');
-            $Customer = $Order->getValue('customer_id') ? Customer::get($Order->getValue('customer_id')) : NULL;
-            $products = OrderProduct::query()
-                ->where('order_id', $order_id)
-                ->find();
+            $Customer = $Order->getValue('customer_id') ? Customer::get($Order->getValue('customer_id')) : null;
+            $extras   = $Order->getValue('extras');
+            $products = OrderProduct::query()->where('order_id', $order_id)->find();
 
             // SKIP if no products
-            if (count($products) < 1)
-            {
+            if (count($products) < 1) {
                 throw new OmestShippingException("Order [{$order_id}] has no products", 1);
             }
-//            foreach ($products as $product_order)
-//            {
-//                $product = $product_order->getValue('data');
-//                $count   = $product_order->getValue('quantity');
-//
-//                for ($i = 0; $i < $count; $i++)
-//                {
-//                    $parcels[] = [
-//                        'key'       => $product_order->getValue('shipping_key'),
-//                        'weight'    => $product->getValue('weight'),
-//                        'width'     => $product->getValue('width'),
-//                        'length'    => $product->getValue('length'),
-//                        'height'    => $product->getValue('height'),
-//                        'reference' => $product->getValue('code'),
-////                        //                    'palletTypeKey' => "80x120",
-//                    ];
-//                }
-//            }
+            //            foreach ($products as $product_order)
+            //            {
+            //                $product = $product_order->getValue('data');
+            //                $count   = $product_order->getValue('quantity');
+            //
+            //                for ($i = 0; $i < $count; $i++)
+            //                {
+            //                    $parcels[] = [
+            //                        'key'       => $product_order->getValue('shipping_key'),
+            //                        'weight'    => $product->getValue('weight'),
+            //                        'width'     => $product->getValue('width'),
+            //                        'length'    => $product->getValue('length'),
+            //                        'height'    => $product->getValue('height'),
+            //                        'reference' => $product->getValue('code'),
+            ////                        //                    'palletTypeKey' => "80x120",
+            //                    ];
+            //                }
+            //            }
 
             $data  = [
-                'key'             => $Order->getValue('shipping_key'),
-                'reference1'      => $order_id,
+                'key'                => $Order->getValue('shipping_key'),
+                'reference1'         => $order_id,
+                'shippingServiceKey' => $extras['shipping']['service_key'],
+                'shipmentTypeKey'    => 'PARCEL',
                 // 'parcels'         => $parcels,
-                //                'shippingServiceKey' => 'IT',
-                //                'shipmentTypeKey'    => 'DOC',
                 //                'codTypeKey'         => 'BM',
                 //                'amountCOD'          => 12,
                 //                'amountInsured'      => $Order->getValue('initial_total'),
                 //                'comment'            => '',
-                //                'pickupAddress'      => [
-                //                    'personName'   => "person",
-                //                    'companyName'  => "company",
-                //                    'street'       => "street",
-                //                    'zipcode'      => "39100",
-                //                    'city'         => "bolzano",
-                //                    'countryCode'  => "IT",
-                //                    'warehouseKey' => "WH1",
-                //                ],
-                'deliveryAddress' => [
+                'pickupAddress'      => [
+                    'pickupOMEST' => $Settings['omest_pickup'],
+                    'companyName' => $Settings['pickup_company_name'],
+                    'street'      => $Settings['pickup_street'],
+                    'city'        => $Settings['pickup_city'],
+                    'zipcode'     => $Settings['pickup_zip'],
+                    'countryCode' => $Settings['pickup_country_code'],
+                ],
+                'deliveryAddress'    => [
                     'personName'  => $DAddress->getName(),
                     'companyName' => $DAddress->getValue('company'),
                     'street'      => $DAddress->getValue('street'),
@@ -209,15 +195,13 @@ class Omest extends ShippingAbstract
             $Connector->setRespFormat('application/json');
             $response = $Connector->request('/create-update-shipment', $sdata, 'get', 'Omest.sendOrdersToOLC');
 
-            if ($response['response']['status'] <= 0)
-            {
+            if ($response['response']['status'] <= 0) {
                 throw new OmestShippingException($response['response']['message']);
             }
-            else
-            {
+            else {
                 // save shipping key
                 $Order->setValue('shipping_key', $response['response']['shipment']->key);
-                $Order->save(FALSE, TRUE);
+                $Order->save(false, true);
                 $procces_cnt++;
             }
         }
@@ -229,20 +213,17 @@ class OmestShippingException extends \Exception
 {
     public function getLabelByCode()
     {
-        switch ($this->getCode())
-        {
+        switch ($this->getCode()) {
             case 1:
                 $errors = '###shop.error.order_has_no_product###';
                 break;
             case 2:
                 $msg = $this->getMessage();
 
-                if (preg_match('/zipcode (.*) invalid/', $msg))
-                {
+                if (preg_match('/zipcode (.*) invalid/', $msg)) {
                     $errors = '###shop.error.shipping_zipcode_not_valid###';
                 }
-                else
-                {
+                else {
                     $errors = $this->getMessage();
                 }
                 break;

@@ -30,16 +30,34 @@ $Settings = $this->getVar('Settings');
     <dl class="rex-form-group form-group">
         <dt><?= $Addon->i18n('omest_shipping.omest_pickup'); ?></dt>
         <dd>
-            <select class="form-control">
+            <select class="form-control" name="omest_pickup">
                 <option value="0"><?= $Addon->i18n('no') ?></option>
-                <option value="1"><?= $Addon->i18n('yes') ?></option>
+                <option value="1" <?= from_array($Settings, 'omest_pickup') ? 'selected="selected"' : '' ?>><?= $Addon->i18n('yes') ?></option>
             </select>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
+        <dt><?= $Addon->i18n('omest_shipping.pickup_company_name'); ?></dt>
+        <dd>
+            <input type="text" class="form-control" name="pickup_company_name" value="<?= from_array($Settings, 'pickup_company_name') ?>"/>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
+        <dt><?= $Addon->i18n('omest_shipping.pickup_street'); ?></dt>
+        <dd>
+            <input type="text" class="form-control" name="pickup_street" value="<?= from_array($Settings, 'pickup_street') ?>"/>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
         <dt><?= $Addon->i18n('omest_shipping.pickup_zip'); ?></dt>
         <dd>
             <input type="text" class="form-control" name="pickup_zip" value="<?= from_array($Settings, 'pickup_zip') ?>"/>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
+        <dt><?= $Addon->i18n('omest_shipping.pickup_city'); ?></dt>
+        <dd>
+            <input type="text" class="form-control" name="pickup_city" value="<?= from_array($Settings, 'pickup_city') ?>"/>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
