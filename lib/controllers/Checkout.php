@@ -92,7 +92,7 @@ class CheckoutController extends Controller
         $this->setVar('cart_url', rex_getUrl($this->params['cart_page_id']));
     }
 
-    public function sendMail()
+    public function sendMail($debug = false)
     {
         $do_send  = true;
         $Mail     = new \FriendsOfREDAXO\Simpleshop\Mail();
@@ -121,7 +121,7 @@ class CheckoutController extends Controller
         ]));
 
         if ($do_send) {
-            $Mail->send();
+            $Mail->send($debug);
         }
     }
 
