@@ -14,9 +14,8 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
 
     public function enterObject()
     {
-        $action = rex_get('ss-action', 'string');
-
-        if ($this->getParam('main_id') > 0) {
+        if ($this->getParam('main_id') > 0 && rex::isBackend()) {
+            $action   = rex_get('ss-action', 'string');
             $Order    = \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id'));
             $Customer = $Order->getValue('customer_id') ? \FriendsOfREDAXO\Simpleshop\Customer::get($Order->getValue('customer_id')) : null;
 
