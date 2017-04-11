@@ -129,7 +129,7 @@ class CheckoutController extends Controller
     {
         // finally save order - DONE / COMPLETE
         $this->Order->save();
-        $this->sendMail(true);
+        $this->sendMail();
 
         // CLEAR THE SESSION
         Session::clearCheckout();
