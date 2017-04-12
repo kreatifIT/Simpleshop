@@ -236,7 +236,37 @@ class Session extends Model
         }
         return array_filter($products);
     }
+    
+    public static function getGAProducts() {
+        $items = Session::getCartItems();
+        $products = [];
+        $label_name = sprogfield("name");
+        foreach($items as $item) {
+            $variantId = explode("|",$item->getValue('key'));
+            $variantId = $variantId[1];
+            $variants = $item->getFeatureVariants();
+            $variantData = $variants['variants'][$variantId]->getData();
 
+            $variantName = "";
+            foreach($variantData['features'] as $data) {
+                if($variantName != "")
+                    $variantName .= ", ";
+                if($data->getValue($label_name) != "")
+                    $variantName .= $data->getValue($label_name);
+            }
+
+            $products[] = [
+                'id' => $item->getId(),
+                'name' => $item->getValue(sprogfield("name")),
+                'category' => $item->generatePath(\rex_clang::getCurrentId()),
+                'variant' => $variantName,
+                'price' => number_format($variants['variants'][$variantId]->getPrice(TRUE),2,'.',','),
+                'quantity' => $item->getValue('cart_quantity'),
+            ];
+        }
+        return $products;
+    }
+    
     public static function getProductKey($product_id, $feature_value_ids = [])
     {
         $feature_value_ids = !is_array($feature_value_ids) ? [$feature_value_ids] : $feature_value_ids;

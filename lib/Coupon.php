@@ -144,6 +144,11 @@ class Coupon extends Discount
         $Order->setValue('promotions', $promotions);
         return $Order;
     }
+
+    public function getCode() {
+        $code = $this->getValue("prefix");
+        return $code != "" ? $code."-".$this->getValue("code") : $this->getValue("code");
+    }
 }
 
 class CouponException extends \Exception
