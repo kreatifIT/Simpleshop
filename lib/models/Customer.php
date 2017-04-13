@@ -121,10 +121,6 @@ class Customer extends Model
                 ]));
             }
         }
-        if (!$result) {
-            // login failed
-            self::logout();
-        }
         // cleanup sessions
         Session::cleanupSessions();
         return $result;
