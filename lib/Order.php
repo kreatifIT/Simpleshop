@@ -17,7 +17,7 @@ class Order extends Model
 {
     const TABLE = 'rex_shop_order';
 
-    public static function create($table = NULL)
+    public static function create($table = null)
     {
         $_this = parent::create($table);
 
@@ -26,31 +26,32 @@ class Order extends Model
         return $_this;
     }
 
-    public function getShippingAddress() {
+    public function getShippingAddress()
+    {
         return $this->valueIsset('address_2') ? $this->getValue('address_2') : $this->getValue('address_1');
     }
 
-    public function getInvoiceAddress() {
+    public function getInvoiceAddress()
+    {
         return $this->getValue('address_1');
     }
 
 
-    public function save($create_order = FALSE, $simple_save = FALSE)
+    public function save($create_order = false, $simple_save = false)
     {
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['create_order' => $create_order, 'simple_save' => $simple_save]));
 
-        $result = parent::save(TRUE);
+        $date_now   = date('Y-m-d H:i:s');
+        $this->setValue('createdate', $date_now);
+        
+        $result = parent::save(true);
 
-        if ($result && !$simple_save)
-        {
-            $date_now   = date('Y-m-d H:i:s');
+        if ($result && !$simple_save) {
             $order_id   = $this->getValue('id');
             $promotions = $this->getValue('promotions');
-            $products   = Session::getCartItems(FALSE, FALSE);
-            $this->setValue('createdate', $date_now);
+            $products   = Session::getCartItems(false, false);
 
-            if ($create_order && isset ($promotions['coupon']))
-            {
+            if ($create_order && isset ($promotions['coupon'])) {
                 // relate coupon
                 $promotions['coupon']->linkToOrder($this);
             }
@@ -59,130 +60,133 @@ class Order extends Model
             \rex_sql::factory()->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$order_id}");
 
             // set order products
-            foreach ($products as $product)
-            {
+            foreach ($products as $product) {
                 $prod_data = Model::prepare($product);
                 $quantity  = $product->getValue('cart_quantity');
 
 
-                foreach ($prod_data as $name => $value)
-                {
+                foreach ($prod_data as $name => $value) {
                     $product->setValue($name, $value);
                 }
-                if ($create_order)
-                {
-                    if ($product->getValue('inventory') == 'F')
-                    {
+                if ($create_order) {
+                    if ($product->getValue('inventory') == 'F') {
                         // update inventory
-                        if ($product->getValue('variant_key'))
-                        {
+                        if ($product->getValue('variant_key')) {
                             $Variant = Variant::getByVariantKey($product->getValue('key'));
                             $Variant->setValue('amount', $Variant->getValue('amount') - $quantity);
                             $Variant->save();
                         }
-                        else
-                        {
+                        else {
                             $product->setValue('amount', $product->getValue('amount') - $quantity);
                             $product->save();
                         }
                     }
-                    if ($product->getValue('type') == 'giftcard')
-                    {
+                    if ($product->getValue('type') == 'giftcard') {
                         Coupon::createGiftcard($this, $product);
                     }
                 }
-                OrderProduct::create()
-                    ->setValue('order_id', $order_id)
-                    ->setValue('product_id', $product->getValue('id'))
-                    ->setValue('code', $product->getValue('code'))
-                    ->setValue('quantity', $quantity)
-                    ->setValue('data', $product)
-                    ->setValue('createdate', $date_now)
-                    ->save(TRUE);
+                OrderProduct::create()->setValue('order_id', $order_id)->setValue('product_id', $product->getValue('id'))->setValue('code', $product->getValue('code'))->setValue('quantity', $quantity)->setValue('data', $product)->setValue('createdate', $date_now)->save(true);
             }
         }
         return $result;
     }
 
+    public function getTaxTotal()
+    {
+        return array_sum($this->getValue('tax', false, []));
+    }
+
+    public function getNetPrice()
+    {
+        return $this->getValue('initial_total', false, 0);
+    }
+
+    public function getGrossPrice()
+    {
+        return $this->getValue('total', false, 0);
+    }
+
     public function calculateDocument()
     {
-        $errors         = [];
-        $this->tax      = 0;
-        $this->subtotal = 0;
-        $this->quantity = 0;
-        $this->discount = 0;
+        $errors               = [];
+        $taxes                = [];
+        $promotions           = [];
+        $net_prices           = [];
+        $this->quantity       = 0;
+        $this->discount       = 0;
+        $this->shipping_costs = 0;
+        $this->initial_total  = 0;
 
-        try
-        {
+        try {
             $products = Session::getCartItems();
         }
-        catch (CartException $ex)
-        {
-            if ($ex->getCode() == 1)
-            {
+        catch (CartException $ex) {
+            if ($ex->getCode() == 1) {
                 $errors   = Session::$errors;
                 $products = Session::getCartItems();
             }
         }
         // calculate total
-        foreach ($products as $product)
-        {
+        foreach ($products as $product) {
             $quantity = $product->getValue('cart_quantity');
-            $this->subtotal += (float) $product->getPrice(TRUE) * $quantity;
-            $this->tax += (float) $product->getTax() * $quantity;
+            $tax_perc = Tax::get($product->getValue('tax'))->getValue('tax');
+
+            $net_prices[$tax_perc] += (float) $product->getPrice() * $quantity;
+            $this->initial_total += (float) $product->getPrice(true) * $quantity;
             $this->quantity += $quantity;
         }
         // get shipping costs
-        try
-        {
-            $this->shipping_costs = (float) $this->shipping ? $this->shipping->getPrice($this, $products) : 0;
+        try {
+            if ($this->shipping) {
+                $this->setValue('shipping_costs', (float) $this->shipping->getNetPrice($this, $products));
+                $this->setValue('initial_shipping_costs', (float) $this->shipping->getPrice($this, $products));
+            }
         }
-        catch (\Exception $ex)
-        {
+        catch (\Exception $ex) {
             throw new OrderException($ex->getLabelByCode());
         }
-        $this->tax += (float) $this->shipping ? $this->shipping->getTax() : 0;
 
-        $this->updatedate    = date('Y-m-d H:i:s');
-        $this->ip_address    = rex_server('REMOTE_ADDR', 'string', 'notset');
-        $this->initial_total = $this->subtotal + $this->shipping_costs;
-        $this->total         = $this->initial_total - $this->discount;
-        $this->promotions    = []; // clear promotions!
+        $this->setValue('updatedate', date('Y-m-d H:i:s'));
+        $this->setValue('ip_address', rex_server('REMOTE_ADDR', 'string', 'notset'));
+        $this->setValue('net_prices', $net_prices);
+        $this->setValue('subtotal', array_sum($net_prices));
+        $this->setValue('total', array_sum($net_prices));
 
+        $_promotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.applyDiscounts', [], ['Order' => $this]));
+
+        // set promotions for order history
+        foreach ($_promotions as $name => $_promotion) {
+            $promotion = null;
+            try {
+                $promotion = $_promotion->applyToOrder($this);
+            }
+            catch (\Exception $ex) {
+                $errors[] = ['label' => $ex->getLabelByCode()];
+            }
+            if ($promotion) {
+                $promotions[$name] = $promotion;
+            }
+        }
+
+        // set tax values
+        foreach ($this->net_prices as $tax => $net_price) {
+            $taxes[$tax] += (float) $net_price / 100 * $tax;
+        }
+        if ($this->shipping_costs) {
+            $tax = $this->shipping->getTaxPercentage();
+            $taxes[$tax] += (float) $this->shipping_costs / 100 * $tax;
+        }
+        ksort($taxes);
+
+        $this->setValue('promotions', $promotions);
+        $this->setValue('tax', $taxes);
+        $this->setValue('total', $this->shipping_costs + array_sum($this->net_prices) + array_sum($taxes));
 
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.calculateDocument', $this));
 
-        // add promotions
-        $promotions = [];
-
-        // set promotions for order history
-        $_promotions = $this->getValue('promotions');
-
-        if ($_promotions)
-        {
-            foreach ($_promotions as $name => $_promotion)
-            {
-                $promotion = NULL;
-                try
-                {
-                    $promotion = $_promotion->applyToOrder($this);
-                }
-                catch (\Exception $ex)
-                {
-                    $errors[] = ['label' => $ex->getLabelByCode()];
-                }
-                if ($promotion)
-                {
-                    $promotions[$name] = $promotion;
-                }
-            }
-        }
-        $this->setValue('promotions', $promotions);
-
         // re-check order totals
-        if ($this->total < 0)
-        {
-            $this->total = 0;
+        if ($this->total < 0) {
+            $this->setValue('total', $this->total);
         }
         return $errors;
     }
@@ -191,11 +195,9 @@ class Order extends Model
     {
         $result = $params->getSubject();
 
-        if ($result !== FALSE && $params->getParam('table') == self::TABLE)
-        {
+        if ($result !== false && $params->getParam('table') == self::TABLE) {
             $dataset = $params->getParam('form')->getParam('manager_dataset');
-            if (!$dataset)
-            {
+            if (!$dataset) {
                 $dataset = rex_yform_manager_dataset::getRaw($params->getParam('id'), $table->getTableName());
             }
         }
@@ -205,8 +207,7 @@ class Order extends Model
     {
         $result = $params->getSubject();
 
-        if ($result !== FALSE && $params->getParam('table')->getTableName() == self::TABLE)
-        {
+        if ($result !== false && $params->getParam('table')->getTableName() == self::TABLE) {
             // remove all related order products
             $obj_id = $params->getParam('data_id');
             $query  = "DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$obj_id}";

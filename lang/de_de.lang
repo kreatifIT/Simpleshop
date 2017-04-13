@@ -48,5 +48,5 @@ settings.discount_settings = Rabatt-Einstellungen
 settings.discount_application = Rabatt-Anwendung
 settings.discounts_are_accumulable = Rabatte können (wenn möglich) alle akkumuliert/gleichzeitig angewendet werden
 settings.shop_settings = Shop-Einstellungen
-settings.price_rounding = Preis-Rundung
-settings.price_rounding_info = Alle Preise auf 1 Nachkommastelle runden
+settings.brutto_prices = Bruttopreise
+settings.brutto_prices_info = Bruttopreise bei der Eingabe im Backend verwenden (inkl. MwSt)

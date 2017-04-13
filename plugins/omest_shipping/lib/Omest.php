@@ -30,6 +30,11 @@ class Omest extends ShippingAbstract
         }
         return parent::getPrice($products);
     }
+    
+    public function getNetPrice($order, $products = null) {
+        $price = $this->getPrice($order, $products);
+        return $price / ($this->tax_percentage + 100) * 100;
+    }
 
     public function getTax()
     {

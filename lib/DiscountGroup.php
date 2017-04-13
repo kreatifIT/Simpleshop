@@ -17,38 +17,30 @@ class DiscountGroup extends Discount
 {
     const TABLE = 'rex_shop_discount_group';
 
-    public static function ext_calculateDocument($params)
+    public static function ext_applyDiscounts(\rex_extension_point $Ep)
     {
-        $Order = $params->getSubject();
+        $promotions = $Ep->getSubject();
+        $Order      = $Ep->getParam('Order');
 
-        if (parent::isRegistered(self::TABLE))
-        {
-            $Settings       = \rex::getConfig('simpleshop.Settings');
-            $apply_all      = from_array($Settings, 'discounts_are_accumulable', 0);
-            $order_total    = $Order->getValue('total');
-            $order_quantity = $Order->getValue('quantity');
-            $discounts      = self::query()->where('status', 1)->orderBy('prio')->find();
+        if (parent::isRegistered(self::TABLE)) {
+            $Settings  = \rex::getConfig('simpleshop.Settings');
+            $apply_all = from_array($Settings, 'discounts_are_accumulable', 0);
+            $discounts = self::query()->where('status', 1)->orderBy('prio')->find();
 
-            foreach ($discounts as $discount)
-            {
+            foreach ($discounts as $discount) {
                 $price  = $discount->getValue('price');
                 $amount = $discount->getValue('amount');
 
-                if (($price && $order_total >= $price) || ($amount && $order_quantity >= $amount))
-                {
-                    $discount_id                            = $discount->getValue('id');
-                    $promotions                             = $Order->getValue('promotions');
-                    $promotions['discount_' . $discount_id] = $discount;
-                    $Order->setValue('promotions', $promotions);
+                if (($price && $Order->getValue('total') >= $price) || ($amount && $Order->getValue('quantity') >= $amount)) {
+                    $promotions['discount_' . $discount->getValue('id')] = $discount;
 
-                    if (!$apply_all)
-                    {
+                    if (!$apply_all) {
                         break; // discount found - stop here
                     }
                 }
             }
         }
-        return $Order;
+        return $promotions;
     }
 }
 
@@ -56,8 +48,7 @@ class DiscountGroupException extends \Exception
 {
     public function getLabelByCode()
     {
-        switch ($this->getCode())
-        {
+        switch ($this->getCode()) {
             case 1:
                 $errors = '###shop.error.discountgroup_not_applyable_anymore###';
                 break;

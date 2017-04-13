@@ -23,7 +23,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 \rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Order', 'ext_yform_data_delete']);
 \rex_extension::register('CACHE_DELETED', ['\FriendsOfREDAXO\Simpleshop\Utils', 'ext_register_tables']);
 
-\rex_extension::register('simpleshop.Order.calculateDocument', ['\FriendsOfREDAXO\Simpleshop\DiscountGroup', 'ext_calculateDocument']);
+\rex_extension::register('simpleshop.Order.applyDiscounts', ['\FriendsOfREDAXO\Simpleshop\DiscountGroup', 'ext_applyDiscounts']);
 
 // yform/usability extensions
 \rex_extension::register('yform/usability.addStatusToggle', function ($params)

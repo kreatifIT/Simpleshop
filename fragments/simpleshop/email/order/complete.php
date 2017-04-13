@@ -25,17 +25,14 @@ $this->setVar('order', $Order);
 
 <?php
 
-if ($Shipping)
-{
+if ($Shipping) {
     $this->subfragment('simpleshop/shipping/' . $Shipping->plugin_name . '/order_complete.php');
 }
-if ($Payment)
-{
+if ($Payment) {
     $this->subfragment('simpleshop/payment/' . $Payment->plugin_name . '/order_complete.php');
 }
 
-if (strlen($add_info))
-{
+if (strlen($add_info)) {
     echo "<p>{$add_info}</p>";
 }
 
@@ -48,8 +45,7 @@ $extras     = $Order->getValue('extras');
 $products  = [];
 $_products = OrderProduct::query()->where('order_id', $order_id)->find();
 
-foreach ($_products as $product)
-{
+foreach ($_products as $product) {
     $_product = $product->getValue('data');
     $_product->setValue('cart_quantity', $product->getValue('quantity'));
     $_product->setValue('code', $product->getValue('code'));
@@ -77,7 +73,7 @@ foreach ($_products as $product)
                                     <?php
                                     $this->setVar('address', $address_1);
                                     $this->setVar('title', '###shop.invoice_address###');
-                                    $this->setVar('has_edit_link', FALSE);
+                                    $this->setVar('has_edit_link', false);
                                     $this->subfragment('simpleshop/checkout/summary/address_item.php');
                                     ?>
                                 </th>
@@ -91,16 +87,14 @@ foreach ($_products as $product)
                                 <tr style="padding:0;text-align:left;vertical-align:top">
                                     <th style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left">
                                         <?php
-                                        if ($extras['address_extras']['use_shipping_address'])
-                                        {
+                                        if ($extras['address_extras']['use_shipping_address']) {
                                             $this->setVar('address', $address_2);
                                         }
-                                        else
-                                        {
+                                        else {
                                             $this->setVar('address', $address_1);
                                         }
                                         $this->setVar('title', '###shop.shipping_address###');
-                                        $this->setVar('has_edit_link', FALSE);
+                                        $this->setVar('has_edit_link', false);
                                         $this->subfragment('simpleshop/checkout/summary/address_item.php');
                                         ?>
                                     </th>
@@ -132,19 +126,19 @@ foreach ($_products as $product)
     </table>
 <?php endif; ?>
 <?php if ($Payment): ?>
-<!-- payment -->
-<table class="callout"
-       style="Margin-bottom:16px;border-collapse:collapse;border-spacing:0;margin-bottom:16px;padding:0;text-align:left;vertical-align:top;width:100%">
-    <tr style="padding:0;text-align:left;vertical-align:top">
-        <th class="callout-inner"
-            style="Margin:0;background:#f3f3f3;border:1px solid #cacaca;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:10px;text-align:left;width:100%">
-            <h3>###label.payment###</h3>
-            <p><?= $Payment->getName() ?><br/><?= $Payment->getValue('info') ?></p>
-        </th>
-        <th class="expander"
-            style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0!important;text-align:left;visibility:hidden;width:0"></th>
-    </tr>
-</table>
+    <!-- payment -->
+    <table class="callout"
+           style="Margin-bottom:16px;border-collapse:collapse;border-spacing:0;margin-bottom:16px;padding:0;text-align:left;vertical-align:top;width:100%">
+        <tr style="padding:0;text-align:left;vertical-align:top">
+            <th class="callout-inner"
+                style="Margin:0;background:#f3f3f3;border:1px solid #cacaca;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:10px;text-align:left;width:100%">
+                <h3>###label.payment###</h3>
+                <p><?= $Payment->getName() ?><br/><?= $Payment->getValue('info') ?></p>
+            </th>
+            <th class="expander"
+                style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0!important;text-align:left;visibility:hidden;width:0"></th>
+        </tr>
+    </table>
 <?php endif; ?>
 
 <!-- cart content -->
@@ -157,10 +151,10 @@ $cart_table_styles = [
 ];
 
 $cart_item_styles = [
-    'tr' => 'padding:0;text-align:left;vertical-align:top',
-    'td' => '-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border:1px solid #cacaca;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:1.6;margin:0;padding:10px;text-align:left;vertical-align:top;word-wrap:break-word',
-    'h3' => 'Margin:0;Margin-bottom:10px;color:inherit;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left;word-wrap:normal',
-    'p'  => 'Margin:0;Margin-bottom:10px;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left',
+    'tr'   => 'padding:0;text-align:left;vertical-align:top',
+    'td'   => '-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border:1px solid #cacaca;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:1.6;margin:0;padding:10px;text-align:left;vertical-align:top;word-wrap:break-word',
+    'h3'   => 'Margin:0;Margin-bottom:10px;color:inherit;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left;word-wrap:normal',
+    'p'    => 'Margin:0;Margin-bottom:10px;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left',
     'code' => 'font-family:Consolas,"Liberation Mono",Courier,monospace;background:#f9f9f9;border:1px solid #cacaca;padding:5px 8px;margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;text-align:left',
 ];
 ?>
@@ -176,12 +170,11 @@ $cart_item_styles = [
     </thead>
     <tbody>
     <?php
-    foreach ($products as $product)
-    {
+    foreach ($products as $product) {
         $this->setVar('product', $product);
-        $this->setVar('has_quantity_control', FALSE);
-        $this->setVar('has_remove_button', FALSE);
-        $this->setVar('has_image', FALSE);
+        $this->setVar('has_quantity_control', false);
+        $this->setVar('has_remove_button', false);
+        $this->setVar('has_image', false);
         $this->setVar('email_tpl_styles', $cart_item_styles);
         echo $this->subfragment('simpleshop/product/general/cart/item.php');
     }
@@ -191,20 +184,6 @@ $cart_item_styles = [
 
 <!-- order conclusion/sum -->
 <?php
-$discounts = [];
-if ($promotions)
-{
-    foreach ($promotions as $promotion)
-    {
-        if ($promotion->getValue('discount'))
-        {
-            $discounts[] = [
-                'name'  => $promotion->getValue(sprogfield('name')),
-                'value' => $promotion->getValue('discount'),
-            ];
-        }
-    }
-}
 
 $sum_table_styles = [
     'table' => 'border-collapse:collapse;border-spacing:0;margin-top:20px;padding:0;text-align:left;vertical-align:top;width:100%;',
@@ -213,9 +192,9 @@ $sum_table_styles = [
     'total' => 'font-size:18px;font-weight:700;',
 ];
 
-$tax            = $Order->getValue('tax');
-$shipping_costs = $Order->getValue('shipping_costs');
-$subtotal       = $Order->getValue('subtotal');
+$taxes          = $Order->getValue('tax');
+$shipping_costs = $Order->getValue('initial_shipping_costs');
+$subtotal       = $Order->getValue('initial_total');
 $total          = $Order->getValue('total');
 
 ?>
@@ -236,21 +215,27 @@ $total          = $Order->getValue('total');
             </td>
         </tr>
     <?php endif; ?>
-    <?php if ($tax): ?>
+    <?php foreach ($taxes as $tax_perc => $tax): ?>
         <tr style="<?= $sum_table_styles['tr'] ?>">
-            <td style="<?= $sum_table_styles['td'] ?>">###label.tax_included###</td>
+            <td style="<?= $sum_table_styles['td'] ?>">###label.tax_included### <?= $tax_perc ?>%</td>
             <td style="<?= $sum_table_styles['td'] ?>text-align:right;">
                 &euro; <?= format_price($tax) ?>
             </td>
         </tr>
-    <?php endif; ?>
-    <?php foreach ($discounts as $discount): ?>
+    <?php endforeach; ?>
+    <?php foreach ($promotions as $promotion):
+        $percent = $promotion->getValue('discount_percent');
+        $_value = $promotion->getValue('discount_value');
+        $value = $percent ? $percent . '%' : ($_value > $total ? $total : $_value);
+        ?>
+        <?php if ($value != 0): ?>
         <tr style="<?= $sum_table_styles['tr'] ?>">
-            <td style="<?= $sum_table_styles['td'] ?>"><?= $discount['name'] ?></td>
+            <td style="<?= $sum_table_styles['td'] ?>"><?= $promotion->getName() ?></td>
             <td style="<?= $sum_table_styles['td'] ?>text-align:right;">
-                &euro; -<?= format_price($discount['value']) ?>
+                &euro; -<?= format_price($value) ?>
             </td>
         </tr>
+    <?php endif; ?>
     <?php endforeach; ?>
     <!-- total -->
     <tr style="<?= $sum_table_styles['tr'] ?>">

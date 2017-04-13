@@ -13,7 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$discounts   = [];
 $fatal_error = NULL;
 $Order       = $this->getVar('order');
 
@@ -151,10 +150,6 @@ if (count($errors)): ?>
             <?php
             foreach ($promotions as $promotion)
             {
-                if ($promotion->getValue('discount'))
-                {
-                    $discounts[] = ['name' => $promotion->getValue(sprogfield('name')), 'value' => $promotion->getValue('discount'),];
-                }
                 $this->setVar('promotion', $promotion);
                 $this->subfragment('simpleshop/checkout/summary/discount_item.php');
             }
@@ -176,7 +171,6 @@ if (count($errors)): ?>
 
     <!-- Summe -->
     <?php
-    $this->setVar('discounts', $discounts);
     $this->subfragment('simpleshop/checkout/summary/conclusion.php');
     ?>
 
