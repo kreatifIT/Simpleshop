@@ -245,10 +245,11 @@ class Session extends Model
             $variantId = explode("|",$item->getValue('key'));
             $variantId = $variantId[1];
             $variants = $item->getFeatureVariants();
-            $variantData = $variants['variants'][$variantId]->getData();
+            $Variant = $variants['variants'][$variantId] ?: $item;
+            $features = $Variant ? $Variant->getValue('features', false, []) : [];
 
             $variantName = "";
-            foreach($variantData['features'] as $data) {
+            foreach($features as $data) {
                 if($variantName != "")
                     $variantName .= ", ";
                 if($data->getValue($label_name) != "")
@@ -260,7 +261,7 @@ class Session extends Model
                 'name' => $item->getValue(sprogfield("name")),
                 'category' => $item->generatePath(\rex_clang::getCurrentId()),
                 'variant' => $variantName,
-                'price' => number_format($variants['variants'][$variantId]->getPrice(TRUE),2,'.',','),
+                'price' => number_format($Variant->getPrice(TRUE),2,'.',','),
                 'quantity' => $item->getValue('cart_quantity'),
             ];
         }
