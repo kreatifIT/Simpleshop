@@ -96,7 +96,7 @@ class Customer extends Model
             if ($do_send) {
                 $Mail->send();
             }
-            $result = $_this;
+            $result = Customer::get($_this->getId());
         }
         return $result;
     }
