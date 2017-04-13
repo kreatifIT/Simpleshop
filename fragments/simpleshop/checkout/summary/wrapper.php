@@ -18,7 +18,6 @@ $cart_url = $this->getVar('cart_url');
 $errors   = $this->getVar('errors', []);
 $warnings = $this->getVar('warnings', []);
 
-$discounts     = [];
 $invoice_addr  = $Order->getInvoiceAddress();
 $shipping_addr = $Order->getShippingAddress();
 $shipping      = $Order->getValue('shipping');
@@ -140,9 +139,6 @@ if (count($warnings)): ?>
             <p>###shop.applied_promotion_text###</p>
             <?php
             foreach ($promotions as $promotion) {
-                if ($promotion->getValue('discount')) {
-                    $discounts[] = ['name' => $promotion->getValue(sprogfield('name')), 'value' => $promotion->getValue('discount'),];
-                }
                 $this->setVar('promotion', $promotion);
                 $this->subfragment('simpleshop/checkout/summary/discount_item.php');
             }
@@ -165,7 +161,6 @@ if (count($warnings)): ?>
 
     <!-- Summe -->
     <?php
-    $this->setVar('discounts', $discounts);
     $this->subfragment('simpleshop/checkout/summary/conclusion.php');
     ?>
 

@@ -20,32 +20,47 @@ $order_ids = $this->getVar('order_ids');
 $tax_vals = [];
 $taxes    = Tax::query()->where('status', 1)->orderBy('tax')->find();
 $orders   = Order::query()->where('id', $order_ids)->orderBy('createdate')->find();
-$csv_head = ['Rechn.-Nr', 'ID', 'Jahr', 'Monat', 'Datum', 'Währung', 'Kunde', 'Land', 'Shop', 'Zahlart', 'Grundlage', 'Rabatt', 'Summe'];
+$csv_head = ['Rechn.-Nr', 'ID', 'Jahr', 'Monat', 'Datum', 'Währung', 'Kunde', 'Land', 'Shop', 'Zahlart', 'Grundlage', 'Rabatt', 'Gesamtbetrag'];
 $csv_body = [];
 $totals   = ['base' => 0, 'discount' => 0, 'sum' => 0];
 
-foreach ($taxes as $tax)
-{
+foreach ($taxes as $tax) {
     $_id            = $tax->getValue('id');
     $tax_vals[$_id] = $tax->getValue('tax');
-    $csv_head[]     = "Mwst.-Satz {$tax->getValue('tax')}%";
+    $csv_head[]     = "Imponibile {$tax->getValue('tax')}%";
+    $csv_head[]     = "Totale {$tax->getValue('tax')}%";
 }
 
-foreach ($orders as $order)
-{
-    $_taxes      = [];
-    $date        = $order->getValue('createdate');
-    $order_ts    = strtotime($date);
-    $order_id    = $order->getValue('id');
-    $Payment     = $order->getValue('payment');
-    $Shipping    = $order->getValue('shipping');
-    $Address     = $order->getInvoiceAddress();
-    $products    = OrderProduct::query()->where('order_id', $order_id)->find();
-    $sh_tax      = $Shipping ? $Shipping->getValue('tax') : 0;
-    $subtotal    = $order->getValue('subtotal');
-    $discount    = $order->getValue('discount') >= $subtotal ? $subtotal : ($order->getValue('discount') ?: '');
-    $base_price  = $order->getValue('subtotal') - $order->getValue('tax') + ($Shipping ? $Shipping->getValue('price') : 0);
+foreach ($orders as $order) {
+    $_taxes     = [];
+    $date       = $order->getValue('createdate');
+    $order_ts   = strtotime($date);
+    $order_id   = $order->getValue('id');
+    $Payment    = $order->getValue('payment');
+    $Shipping   = $order->getValue('shipping');
+    $Address    = $order->getInvoiceAddress();
+    $products   = OrderProduct::query()->where('order_id', $order_id)->find();
+    $shipping   = $order->getValue('shipping_costs');
+    $taxes      = $order->getValue('tax');
+    $subtotal   = $order->getValue('subtotal');
+    $discount   = $order->getValue('discount') >= $subtotal ? $subtotal : ($order->getValue('discount') ?: '');
+    $net_prices = $order->getValue('net_prices', false, []);
+    //    $discount    = $order->getValue('discount') >= $subtotal ? $subtotal : ($order->getValue('discount') ?: '');
+    //    $base_price  = $order->getValue('subtotal') - $order->getValue('tax') + ($Shipping ? $Shipping->getValue('price') : 0);
     $total_price = $order->getValue('total');
+
+    if ($Shipping && $shipping) {
+        $tax_perc = $Shipping->getValue('tax_percentage');
+
+        if (!in_array($tax_perc, $tax_vals)) {
+            $tax_vals[] = $tax_perc;
+            $csv_head[] = "Imponibile {$tax_perc}%";
+            $csv_head[] = "Totale {$tax_perc}%";
+        }
+        $subtotal += $shipping;
+        $net_prices[$tax_perc] += $shipping;
+        $_taxes[$tax_perc] += $shipping + ($shipping / 100 * $tax_perc);
+    }
 
     $data = [
         '',
@@ -58,67 +73,53 @@ foreach ($orders as $order)
         $Address->getValue('country'),
         \rex::getServerName(),
         $Payment ? $Payment->getName() : '',
-        format_price($base_price),
+        format_price($subtotal),
         $discount,
         format_price($total_price),
     ];
 
-    $totals['base'] += $base_price;
+    $totals['base'] += $subtotal;
     $totals['discount'] += $discount;
     $totals['sum'] += $total_price;
 
-    if ($Shipping && $sh_tax)
-
-    {
-        $sh_tax_p = $Shipping->getValue('tax_percentage');
-        $tax_key  = array_search($sh_tax_p, $tax_vals);
-
-        if ($tax_key === FALSE)
-        {
-            $tax_key            = '_' . $sh_tax_p;
-            $tax_vals[$tax_key] = $sh_tax_p;
-            $csv_head[]         = "Mwst.-Satz {$sh_tax_p}%";
+    if (is_array($taxes)) {
+        $_taxes = $taxes;
+    }
+    else {
+        foreach ($products as $product) {
+            $_Product = $product->getValue('data');
+            $quantity = $product->getValue('quantity');
+            $_taxes[Tax::get($_Product->getValue('tax'))->getValue('tax')] += $_Product->getPrice(true) * $quantity;
         }
-        $_taxes[$tax_key] += $Shipping->getValue('tax');
     }
-    foreach ($products as $product)
-    {
-        $_data    = $product->getValue('data');
-        $quantity = $product->getValue('quantity');
-        $tax_id   = $_data->getValue('tax');
-        $_taxes[$tax_id] += $_data->getValue('price') / 100 * ($tax_vals[$tax_id]) * $quantity;
-    }
-    foreach ($tax_vals as $tax_id => $tax)
-    {
-        $data[] = $_taxes[$tax_id] ? format_price($_taxes[$tax_id]) : '';
-        $totals['tax_'. $tax_id] += $_taxes[$tax_id];
+    foreach ($tax_vals as $tax) {
+        $data[] = $net_prices[$tax] ? format_price($net_prices[$tax]) : '';
+        $data[] = $_taxes[$tax] ? format_price($net_prices[$tax] + $_taxes[$tax]) : '';
+        $totals['imp_tax_' . $tax] += $net_prices[$tax];
+        $totals['tax_' . $tax] += $net_prices[$tax] + $_taxes[$tax];
     }
     $csv_body[] = $data;
 }
-$csv_body[] = array_merge(['','','','','','','','','',''], $totals);
+$csv_body[] = array_merge(['', '', '', '', '', '', '', '', '', ''], $totals);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // OUTPUT
-if ($output == 'html')
-{
+if ($output == 'html') {
     $html = [
         '<table border="1" cellpadding="5" cellspacing="0">',
         '<tr><th>' . implode('</th><th>', $csv_head) . '</th></tr>',
     ];
-    foreach ($csv_body as $item)
-    {
+    foreach ($csv_body as $item) {
         $html[] = '<tr><td>' . implode('</td><td>', $item) . '</td></tr>';
     }
     $html[] = '</table>';
     echo implode('', $html);
 }
-else
-{
+else {
     $buffer = fopen('php://output', 'w');
     // set headline
     fputcsv($buffer, $csv_head, ';');
-    foreach ($csv_body as $item)
-    {
+    foreach ($csv_body as $item) {
         fputcsv($buffer, $item, ';');
     }
     fclose($buffer);

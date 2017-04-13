@@ -250,6 +250,37 @@ class Session extends Model
     {
         $_SESSION['checkout'] = [];
     }
+
+    public static function getGAProducts()
+    {
+        $products = [];
+        $items    = Session::getCartItems();
+
+        foreach ($items as $product) {
+            $variantName = [];
+            $variantId   = explode("|", $product->getValue('key'));
+            $variantId   = $variantId[1];
+            $variants    = $product->getFeatureVariants();
+            $Variant     = $variants['variants'][$variantId] ?: $product;
+            $features    = $Variant->getValue('features', false, []);
+
+            foreach ($features as $data) {
+                if (!$data->nameIsEmpty()) {
+                    $variantName[] = $data->getName();
+                }
+            }
+
+            $products[] = [
+                'id'       => $product->getId(),
+                'name'     => $product->getName(),
+                'category' => $product->generatePath(\rex_clang::getCurrentId()),
+                'quantity' => $product->getValue('cart_quantity'),
+                'variant'  => implode(', ', $variantName),
+                'price'    => number_format($Variant->getPrice(true), 2, '.', ','),
+            ];
+        }
+        return $products;
+    }
 }
 
 

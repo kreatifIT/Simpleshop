@@ -47,8 +47,7 @@ $this->setVar('order', $Order);
 
     <?php
 
-$order_id   = $Order->getValue('id');
-$promotions = $Order->getValue('promotions');
+$order_id = $Order->getValue('id');
 
 $this->setVar('tax', $Order->getValue('tax'));
 $this->setVar('total', $Order->getValue('total'));
@@ -62,28 +61,16 @@ if ($Payment) {
     $this->subfragment('simpleshop/payment/' . $Payment->plugin_name . '/order_complete.php');
 }
 
-$discounts = [];
-$products  = $Order->getProducts(false);
-
-if ($promotions) {
-    foreach ($promotions as $promotion) {
-        if ($promotion->getValue('discount')) {
-            $discounts[] = [
-                'name'  => $promotion->getName(),
-                'value' => $promotion->getValue('discount'),
-            ];
-        }
-    }
-}
+$products = $Order->getProducts(false);
 
 ?>
 <?php if (strlen($add_info)): ?>
     <p><?= $add_info ?></p>
 <?php endif; ?>
 
-    <?php if ($config['use_invoicing']): ?>
+<?php if ($config['use_invoicing']): ?>
     <div>
-    <br/>
+        <br/>
         <strong>###company.name###</strong><br/>
         ###company.street###<br/>
         ###company.postal### ###company.location### (###company.province###)<br/>
@@ -91,12 +78,12 @@ if ($promotions) {
         ###company.shop_invoice_info###
     </div>
     <br/>
-    <?php endif; ?>
+<?php endif; ?>
 
     <h2>###label.order### #<?= $order_id ?></h2>
-    <?php if ($config['use_invoicing']): ?>
-        <h2>###label.invoice_num### <?= $Order->getInvoiceNum() ?></h2>
-    <?php endif; ?>
+<?php if ($config['use_invoicing']): ?>
+    <h2>###label.invoice_num### <?= $Order->getInvoiceNum() ?></h2>
+<?php endif; ?>
 
     <?php
 $this->setVar('invoice_address', $Order->getInvoiceAddress());

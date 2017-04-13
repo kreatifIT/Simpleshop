@@ -39,7 +39,6 @@ class Product extends Model
     {
         $type     = $this->getValue('type');
         $price    = $this->getValue('price');
-        $settings = \rex::getConfig('simpleshop.Settings');
 
         if ($type == 'giftcard') {
             $includeTax = false;
@@ -66,9 +65,6 @@ class Product extends Model
 
             $this->__tax = ($price / ($tax + 100)) * $tax;
             $price       = $price - $this->__tax;
-        }
-        if ($settings['price_rounding']) {
-            $price = round($price, 1);
         }
         return $price;
     }

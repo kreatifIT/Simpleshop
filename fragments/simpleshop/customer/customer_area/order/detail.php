@@ -108,23 +108,6 @@ foreach ($_products as $product)
 
 <!-- Summe -->
 <?php
-
-$discounts = [];
-
-if ($promotions)
-{
-    foreach ($promotions as $promotion)
-    {
-        if ($promotion->getValue('discount'))
-        {
-            $discounts[] = [
-                'name'  => $promotion->getValue(sprogfield('name')),
-                'value' => $promotion->getValue('discount'),
-            ];
-        }
-    }
-}
-$this->setVar('discounts', $discounts);
 $this->subfragment('simpleshop/checkout/summary/conclusion.php');
 ?>
 

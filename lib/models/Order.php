@@ -71,6 +71,21 @@ class Order extends Model
         ]));
     }
 
+    public function getTaxTotal()
+    {
+        return array_sum($this->getValue('tax', false, []));
+    }
+
+    public function getNetPrice()
+    {
+        return $this->getValue('initial_total', false, 0);
+    }
+
+    public function getGrossPrice()
+    {
+        return $this->getValue('total', false, 0);
+    }
+
     public function completeOrder()
     {
         self::$_finalizeOrder = true;
@@ -172,11 +187,14 @@ class Order extends Model
 
     public function calculateDocument()
     {
-        $errors         = [];
-        $this->tax      = 0;
-        $this->subtotal = 0;
-        $this->quantity = 0;
-        $this->discount = 0;
+        $errors               = [];
+        $taxes                = [];
+        $promotions           = [];
+        $net_prices           = [];
+        $this->quantity       = 0;
+        $this->discount       = 0;
+        $this->shipping_costs = 0;
+        $this->initial_total  = 0;
 
         try {
             $products = Session::getCartItems();
@@ -190,53 +208,64 @@ class Order extends Model
         // calculate total
         foreach ($products as $product) {
             $quantity = $product->getValue('cart_quantity');
-            $this->subtotal += (float) $product->getPrice(true) * $quantity;
-            $this->tax += (float) $product->getTax() * $quantity;
+            $tax_perc = Tax::get($product->getValue('tax'))->getValue('tax');
+
+            $net_prices[$tax_perc] += (float) $product->getPrice() * $quantity;
+            $this->initial_total += (float) $product->getPrice(true) * $quantity;
             $this->quantity += $quantity;
         }
         // get shipping costs
         try {
-            $this->shipping_costs = (float) $this->shipping ? $this->shipping->getPrice($this, $products) : 0;
+            if ($this->shipping) {
+                $this->setValue('shipping_costs', (float) $this->shipping->getNetPrice($this, $products));
+                $this->setValue('initial_shipping_costs', (float) $this->shipping->getPrice($this, $products));
+            }
         }
         catch (\Exception $ex) {
             throw new OrderException($ex->getLabelByCode());
         }
-        $this->tax += (float) $this->shipping ? $this->shipping->getTax() : 0;
 
-        $this->updatedate    = date('Y-m-d H:i:s');
-        $this->ip_address    = rex_server('REMOTE_ADDR', 'string', 'notset');
-        $this->initial_total = $this->subtotal + $this->shipping_costs;
-        $this->total         = $this->initial_total - $this->discount;
-        $this->promotions    = []; // clear promotions!
+        $this->setValue('updatedate', date('Y-m-d H:i:s'));
+        $this->setValue('ip_address', rex_server('REMOTE_ADDR', 'string', 'notset'));
+        $this->setValue('net_prices', $net_prices);
+        $this->setValue('subtotal', array_sum($net_prices));
+        $this->setValue('total', array_sum($net_prices));
 
+        $_promotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.applyDiscounts', [], ['Order' => $this]));
+
+        // set promotions for order history
+        foreach ($_promotions as $name => $_promotion) {
+            $promotion = null;
+            try {
+                $promotion = $_promotion->applyToOrder($this);
+            }
+            catch (\Exception $ex) {
+                $errors[] = ['label' => $ex->getLabelByCode()];
+            }
+            if ($promotion) {
+                $promotions[$name] = $promotion;
+            }
+        }
+
+        // set tax values
+        foreach ($this->net_prices as $tax => $net_price) {
+            $taxes[$tax] += (float) $net_price / 100 * $tax;
+        }
+        if ($this->shipping_costs) {
+            $tax = $this->shipping->getTaxPercentage();
+            $taxes[$tax] += (float) $this->shipping_costs / 100 * $tax;
+        }
+        ksort($taxes);
+
+        $this->setValue('promotions', $promotions);
+        $this->setValue('tax', $taxes);
+        $this->setValue('total', $this->shipping_costs + array_sum($this->net_prices) + array_sum($taxes));
 
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.calculateDocument', $this));
 
-        // add promotions
-        $promotions = [];
-
-        // set promotions for order history
-        $_promotions = $this->getValue('promotions');
-
-        if ($_promotions) {
-            foreach ($_promotions as $name => $_promotion) {
-                $promotion = null;
-                try {
-                    $promotion = $_promotion->applyToOrder($this);
-                }
-                catch (\Exception $ex) {
-                    $errors[] = ['label' => $ex->getLabelByCode()];
-                }
-                if ($promotion) {
-                    $promotions[$name] = $promotion;
-                }
-            }
-        }
-        $this->setValue('promotions', $promotions);
-
         // re-check order totals
         if ($this->total < 0) {
-            $this->total = 0;
+            $this->setValue('total', $this->total);
         }
         return $errors;
     }

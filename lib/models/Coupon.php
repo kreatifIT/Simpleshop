@@ -29,7 +29,7 @@ class Coupon extends Discount
         if (!$_this) {
             throw new CouponException('Coupon not exists', 1);
         }
-        \rex_extension::register('simpleshop.Order.calculateDocument', [$_this, 'ext_calculateDocument']);
+        \rex_extension::register('simpleshop.Order.applyDiscounts', [$_this, 'ext_applyDiscounts']);
 
         return $_this;
     }
@@ -123,13 +123,17 @@ class Coupon extends Discount
         return self::query()->whereRaw('(code = :w1 AND prefix = "") OR CONCAT(prefix, "-", code) = :w1', ['w1' => $code])->findOne();
     }
 
-    public function ext_calculateDocument($params)
+    public function ext_applyDiscounts(\rex_extension_point $Ep)
     {
-        $Order                = $params->getSubject();
-        $promotions           = $Order->getValue('promotions');
+        $promotions           = $Ep->getSubject();
         $promotions['coupon'] = $this;
-        $Order->setValue('promotions', $promotions);
-        return $Order;
+        return $promotions;
+    }
+
+    public function getCode()
+    {
+        $code = $this->getValue("prefix");
+        return $code != "" ? $code . "-" . $this->getValue("code") : $this->getValue("code");
     }
 }
 
