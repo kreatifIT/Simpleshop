@@ -31,7 +31,8 @@ class Omest extends ShippingAbstract
         return parent::getPrice($products);
     }
 
-    public function getNetPrice($order, $products = null) {
+    public function getNetPrice($order, $products = null)
+    {
         $price = $this->getPrice($order, $products);
         return $price / ($this->tax_percentage + 100) * 100;
     }
@@ -164,6 +165,10 @@ class Omest extends ShippingAbstract
                 'reference1'         => $order_id,
                 'shippingServiceKey' => $extras['shipping']['service_key'],
                 'shipmentTypeKey'    => 'PARCEL',
+                'weight'             => $Order->getValue('weight'),
+                'width'              => $Order->getValue('width'),
+                'length'             => $Order->getValue('length'),
+                'height'             => $Order->getValue('height'),
                 // 'parcels'         => $parcels,
                 //                'codTypeKey'         => 'BM',
                 //                'amountCOD'          => 12,
