@@ -29,6 +29,8 @@ $order_ids = $this->getVar('order_ids');
             <th><?= $Addon->i18n('label.order_no'); ?></th>
             <th><?= $Addon->i18n('label.customer'); ?></th>
             <th><?= $Addon->i18n('label.order_sum'); ?></th>
+            <th><?= $Addon->i18n('omest_shipping.size_info'); ?></th>
+            <th><?= $Addon->i18n('omest_shipping.weight_info'); ?></th>
         </tr>
 
         <tbody class="table-hover">
@@ -41,6 +43,12 @@ $order_ids = $this->getVar('order_ids');
                     <td><?= $order->getValue('id') ?></td>
                     <td><?= $Address->getName() ?></td>
                     <td><?= $order->getValue('total') ?></td>
+                    <td>
+                        <input type="text" size="8" name="prop[<?= $order->getId() ?>][length]" value="<?= $order->getValue('length') ?>">
+                        <input type="text" size="8" name="prop[<?= $order->getId() ?>][width]" value="<?= $order->getValue('width') ?>">
+                        <input type="text" size="8" name="prop[<?= $order->getId() ?>][height]" value="<?= $order->getValue('height') ?>">
+                    </td>
+                    <td><input type="text" size="12" name="prop[<?= $order->getId() ?>][weight]" value="<?= $order->getValue('weight') ?>"></td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>

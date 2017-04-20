@@ -12,5 +12,8 @@ omest_shipping.pickup_city = Ort/Stadt vom Shop
 omest_shipping.pickup_street = Straße vom Shop
 omest_shipping.pickup_zip = Postleitzahl vom Shop
 omest_shipping.pickup_country_code = Ländercode vom Shop
+omest_shipping.size_info = Länge / Breite / Höhe in mm
+omest_shipping.weight_info = Gewicht in g
+omest_shipping.prop_not_set_msg = Einige Produkte konnten nicht übermittelt werden da sie keine Gewicht- oder Maßangaben haben
 
 omest_shipping.error.order_has_no_product = Bestellung Nr %d hat keine Produkte!
