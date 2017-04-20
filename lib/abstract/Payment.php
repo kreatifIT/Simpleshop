@@ -30,9 +30,14 @@ abstract class PaymentAbstract extends PluginAbstract
         return $this->name;
     }
 
-    public function getPrice($products = NULL)
+    public function getPrice($products = null)
     {
         return $this->price;
+    }
+
+    public function canBePayedNow()
+    {
+        return method_exists($this, 'initPayment');
     }
 
     public static function get()
