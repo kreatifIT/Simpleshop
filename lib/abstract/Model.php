@@ -21,7 +21,8 @@ abstract class Model extends \rex_yform_manager_dataset
     static    $lang_fields      = [];
     static    $settings         = [];
 
-    protected static function getSetting($key, $default = null) {
+    protected static function getSetting($key, $default = null)
+    {
         if (count(self::$settings) == 0) {
             self::$settings = \rex::getConfig('simpleshop.Settings');
         }
@@ -31,15 +32,16 @@ abstract class Model extends \rex_yform_manager_dataset
     protected static function prepareQuery($ignoreOffline = true, $params = [], $debug = 0)
     {
         $params = array_merge([
-            'orderBy' => 'prio',
-            'order'   => 'asc',
-            'groupBy' => '',
-            'limit'   => 0,
-            'offset'  => 0,
-            'select'  => [],
-            'filter'  => [],
-            'joins'   => [], // tablename, alias, condition, join_type
-            'lang_id' => null,
+            'orderBy'     => 'prio',
+            'order'       => 'asc',
+            'groupBy'     => '',
+            'limit'       => 0,
+            'offset'      => 0,
+            'select'      => [],
+            'filter'      => [],
+            'joins'       => [], // tablename, alias, condition, join_type
+            'lang_id'     => null,
+            'singleField' => null,
         ], $params);
 
         $stmt = self::query(static::TABLE)->alias('m')->orderByRaw($params['orderBy'], $params['order']);
@@ -120,12 +122,34 @@ abstract class Model extends \rex_yform_manager_dataset
 
             foreach ($coll as $row) {
                 if ($row->isOnline($lang_id)) {
-                    $data[] = $row;
+                    $data[] = $params['singleField'] ? $row->getValue($params['singleField']) : $row;
                 }
             }
-            $coll = new \rex_yform_manager_collection(static::TABLE, $data);
+            if ($params['singleField']) {
+                $coll = $data;
+            }
+            else {
+                $coll = new \rex_yform_manager_collection(static::TABLE, $data);
+            }
         }
         return $coll;
+    }
+
+    public static function fetchColumn($ignoreOffline = true, $params = [], $debug = 0)
+    {
+        $params['singleField'] = $params['singleField'] ?: 'id';
+
+        $results = self::prepareQuery($ignoreOffline, $params, $debug);
+
+        if (!$ignoreOffline) {
+            $_results = [];
+
+            foreach ($results as $data) {
+                $_results[] = $data->getValue($params['singleField']);
+            }
+            $results = $_results;
+        }
+        return $results;
     }
 
     public static function getAll($ignoreOffline = true, $params = [], $debug = 0)
