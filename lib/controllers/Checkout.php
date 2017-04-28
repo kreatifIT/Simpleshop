@@ -99,6 +99,9 @@ class CheckoutController extends Controller
         $Settings = \rex::getConfig('simpleshop.Settings');
         $Customer = $this->Order->getInvoiceAddress();
 
+        // set user lang id
+        \rex_clang::setCurrentId($Customer->getValue('lang_id', false, \rex_clang::getCurrentId()));
+
         $Mail->Subject = '###shop.email.order_complete###';
         $Mail->setFragmentPath('order/complete');
 
