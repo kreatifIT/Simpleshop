@@ -32,7 +32,7 @@ if ($_FUNC == 'submit' && count($order_ids)) {
         $Order->setValue('width', $props[$order_id]['width']);
         $Order->setValue('height', $props[$order_id]['height']);
         $Order->setValue('weight', $props[$order_id]['weight']);
-        $Order->save();
+        $Order->save(false, true);
 
         if (!empty($props[$order_id]['length']) && !empty($props[$order_id]['width']) && !empty($props[$order_id]['height']) && !empty($props[$order_id]['weight'])) {
 
