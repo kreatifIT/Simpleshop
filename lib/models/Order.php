@@ -103,7 +103,10 @@ class Order extends Model
 
         $sql      = \rex_sql::factory();
         $date_now = date('Y-m-d H:i:s');
-        $this->setValue('createdate', $date_now);
+
+        if (!$this->valueIsset('createdate')) {
+            $this->setValue('createdate', $date_now);
+        }
 
         if (self::$_finalizeOrder && ($this->getValue('invoice_num') === null || $this->getValue('invoice_num') === 0)) {
             $sql->setQuery('SELECT MAX(invoice_num) as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"');
