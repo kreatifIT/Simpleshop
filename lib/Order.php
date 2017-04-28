@@ -42,7 +42,10 @@ class Order extends Model
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['create_order' => $create_order, 'simple_save' => $simple_save]));
 
         $date_now   = date('Y-m-d H:i:s');
-        $this->setValue('createdate', $date_now);
+
+        if (!$this->valueIsset('createdate')) {
+            $this->setValue('createdate', $date_now);
+        }
         
         $result = parent::save(true);
 
