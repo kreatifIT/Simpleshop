@@ -17,7 +17,11 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
         if ($this->getParam('main_id') > 0 && rex::isBackend()) {
             $action   = rex_get('ss-action', 'string');
             $Order    = \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id'));
-            $Customer = $Order->getValue('customer_id') ? \FriendsOfREDAXO\Simpleshop\Customer::get($Order->getValue('customer_id')) : null;
+            $Customer = $Order->getValue('customer_id') ? \FriendsOfREDAXO\Simpleshop\Customer::get($Order->getValue('customer_id')) : $Order->getInvoiceAddress();;
+
+            // set user lang id
+            \rex_clang::setCurrentId($Customer->getValue('lang_id', false, \rex_clang::getCurrentId()));
+            setlocale(LC_ALL, \rex_clang::getCurrent()->getValue('clang_setlocale'));
 
             switch ($action) {
                 case 'resend_email':
