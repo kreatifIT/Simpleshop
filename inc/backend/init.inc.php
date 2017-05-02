@@ -24,8 +24,11 @@ namespace FriendsOfREDAXO\Simpleshop;
         $compiler->compile();
         \rex_file::copy($this->getPath('assets/styles.css'), $this->getAssetsPath('css/styles.css'));
         \rex_file::delete($this->getPath('assets/css/styles.css'));
+
+        \rex_file::copy($this->getPath('assets/simpleshop.js'), $this->getAssetsPath('js/simpleshop.js'));
     }
 
-    // CSS
+    // include assets
     \rex_view::addCssFile($this->getAssetsUrl('css/styles.css?mtime=' . filemtime($this->getAssetsPath('css/styles.css'))));
+    \rex_view::addJsFile($this->getAssetsUrl('js/simpleshop.js?mtime=' . filemtime($this->getAssetsPath('js/simpleshop.js'))));
 });

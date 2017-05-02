@@ -25,22 +25,27 @@ if ($_FUNC == 'submit' && count($order_ids)) {
     $props      = rex_post('prop', 'array');
 
     foreach ($order_ids as $order_id) {
-        $Order = Order::get($order_id);
+        $parcels  = [];
+        $Order    = Order::get($order_id);
+        $Shipping = $Order->getValue('shipping');
+        $pparcels = $props[$order_id];
+
+        ksort($pparcels);
+
+        // set shipping parcels
+        foreach ($pparcels as $parcel) {
+            if ($parcel['length'] && $parcel['width'] && $parcel['height'] && $parcel['weight']) {
+                $parcels[] = new Parcel($parcel['length'], $parcel['width'], $parcel['height'], $parcel['weight'], $parcel['pallett']);
+            }
+        }
+        $Shipping->setParcels($parcels);
+        Model::prepareData($Shipping);
 
         // update props
-        $Order->setValue('length', $props[$order_id]['length']);
-        $Order->setValue('width', $props[$order_id]['width']);
-        $Order->setValue('height', $props[$order_id]['height']);
-        $Order->setValue('weight', $props[$order_id]['weight']);
+        $Order->setValue('shipping', $Shipping);
         $Order->save(false, true);
 
-        if (!empty($props[$order_id]['length']) && !empty($props[$order_id]['width']) && !empty($props[$order_id]['height']) && !empty($props[$order_id]['weight'])) {
-
-            $_order_ids[] = $order_id;
-        }
-        else if (strlen($error) == 0){
-            $error = $this->i18n('omest_shipping.prop_not_set_msg');
-        }
+        $_order_ids[] = $order_id;
     }
     try {
         $order_cnt = Omest::sendOrdersToOLC($_order_ids);
@@ -50,6 +55,10 @@ if ($_FUNC == 'submit' && count($order_ids)) {
             case 1:
                 preg_match('!\[(\d+)\]!', $ex->getMessage(), $matches);
                 $error = sprintf($this->i18n('omest_shipping.error.order_has_no_product'), $matches[1]);
+                break;
+            case 2:
+                preg_match('!\[(\d+)\]!', $ex->getMessage(), $matches);
+                $error = sprintf($this->i18n('omest_shipping.error.prop_not_set_msg'), $matches[1]);
                 break;
             default:
                 $error = $ex->getMessage();

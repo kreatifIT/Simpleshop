@@ -147,3 +147,22 @@ fieldset {
         }
     }
 }
+table.table {
+    td {
+        >.form-group {
+            margin: 0 0 3px 0;
+            select.form-control {
+                line-height: 26px;
+                height: 26px;
+            }
+        }
+        >label.form-label {
+            line-height:24px;
+        }
+        .dimensions, .weights {
+            input {
+                margin-bottom: 3px;
+            }
+        }
+    }
+}

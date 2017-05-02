@@ -355,13 +355,19 @@ abstract class Model extends \rex_yform_manager_dataset
     public function save($prepare = false)
     {
         if ($prepare) {
-            $data = $this->prepare($this);
-
-            foreach ($data as $name => $value) {
-                $this->setValue($name, $value);
-            }
+            $this->prepareData($this);
         }
         return parent::save();
+    }
+
+    public static function prepareData($Object)
+    {
+        $data = self::prepare($Object);
+
+        foreach ($data as $name => $value) {
+            $Object->setValue($name, $value);
+        }
+        return $Object;
     }
 
     public static function unprepare($value)
