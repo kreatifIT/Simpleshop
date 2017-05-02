@@ -49,7 +49,7 @@ $Settings = $this->getVar('Settings');
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
-        <dt><?= $Addon->i18n('omest_shipping.pickup_zip'); ?></dt>
+        <dt><?= $Addon->i18n('omest_shipping.pickup_zip'); ?> *</dt>
         <dd>
             <input type="text" class="form-control" name="pickup_zip" value="<?= from_array($Settings, 'pickup_zip') ?>"/>
         </dd>
@@ -61,7 +61,7 @@ $Settings = $this->getVar('Settings');
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
-        <dt><?= $Addon->i18n('omest_shipping.pickup_country_code'); ?></dt>
+        <dt><?= $Addon->i18n('omest_shipping.pickup_country_code'); ?> *</dt>
         <dd>
             <input type="text" class="form-control" name="pickup_country_code" value="<?= from_array($Settings, 'pickup_country_code') ?>"/>
         </dd>

@@ -129,51 +129,29 @@ class Omest extends ShippingAbstract
         $test        = $Settings['sandbox'];
 
         foreach ($order_ids as $order_id) {
-            $parcels  = [];
             $Order    = Order::get($order_id);
             $IAddress = $Order->getValue('address_1');
             $DAddress = $Order->getValue('address_2');
             $Customer = $Order->getValue('customer_id') ? Customer::get($Order->getValue('customer_id')) : null;
             $extras   = $Order->getValue('extras');
+            $Shipping = $Order->getValue('shipping');
+            $parcels  = $Shipping->getValue('parcels');
             $products = OrderProduct::query()->where('order_id', $order_id)->find();
 
             // SKIP if no products
             if (count($products) < 1) {
                 throw new OmestShippingException("Order [{$order_id}] has no products", 1);
             }
-            //            foreach ($products as $product_order)
-            //            {
-            //                $product = $product_order->getValue('data');
-            //                $count   = $product_order->getValue('quantity');
-            //
-            //                for ($i = 0; $i < $count; $i++)
-            //                {
-            //                    $parcels[] = [
-            //                        'key'       => $product_order->getValue('shipping_key'),
-            //                        'weight'    => $product->getValue('weight'),
-            //                        'width'     => $product->getValue('width'),
-            //                        'length'    => $product->getValue('length'),
-            //                        'height'    => $product->getValue('height'),
-            //                        'reference' => $product->getValue('code'),
-            ////                        //                    'palletTypeKey' => "80x120",
-            //                    ];
-            //                }
-            //            }
+            if (count($parcels) < 1) {
+                throw new OmestShippingException("Order [{$order_id}] has no parcels", 2);
+            }
 
-            $data  = [
+            $data = [
                 'key'                => $Order->getValue('shipping_key'),
                 'reference1'         => $order_id,
                 'shippingServiceKey' => $extras['shipping']['service_key'],
                 'shipmentTypeKey'    => 'PARCEL',
-                'weight'             => $Order->getValue('weight'),
-                'width'              => $Order->getValue('width'),
-                'length'             => $Order->getValue('length'),
-                'height'             => $Order->getValue('height'),
-                // 'parcels'         => $parcels,
-                //                'codTypeKey'         => 'BM',
-                //                'amountCOD'          => 12,
-                //                'amountInsured'      => $Order->getValue('initial_total'),
-                //                'comment'            => '',
+                'parcels'            => [],
                 'pickupAddress'      => [
                     'pickupOMEST' => $Settings['omest_pickup'],
                     'companyName' => $Settings['pickup_company_name'],
@@ -195,6 +173,21 @@ class Omest extends ShippingAbstract
                     //                    'warehouseKey' => "WH1",
                 ],
             ];
+
+            foreach ($parcels as $parcel) {
+                $_parcel = [
+                    'key'    => null,
+                    'weight' => $parcel->getValue('weight'),
+                    'width'  => $parcel->getValue('width'),
+                    'length' => $parcel->getValue('length'),
+                    'height' => $parcel->getValue('height'),
+                ];
+                if ($parcel->getValue('pallett')) {
+                    $_parcel['palletTypeKey'] = $parcel->getValue('pallett');
+                }
+                $data['parcels'][] = $_parcel;
+            }
+
             $sdata = html_entity_decode(http_build_query([
                 'api_key'      => $test ? $Settings['test_api_key'] : $Settings['api_key'],
                 'customer_key' => $test ? $Settings['test_customer_key'] : $Settings['customer_key'],

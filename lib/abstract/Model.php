@@ -21,7 +21,8 @@ abstract class Model extends \rex_yform_manager_dataset
     static    $lang_fields      = [];
     static    $settings         = [];
 
-    protected static function getSetting($key, $default = null) {
+    protected static function getSetting($key, $default = null)
+    {
         if (count(self::$settings) == 0) {
             self::$settings = \rex::getConfig('simpleshop.Settings');
         }
@@ -279,13 +280,19 @@ abstract class Model extends \rex_yform_manager_dataset
     public function save($prepare = false)
     {
         if ($prepare) {
-            $data = $this->prepare($this);
-
-            foreach ($data as $name => $value) {
-                $this->setValue($name, $value);
-            }
+            $this->prepareData($this);
         }
         return parent::save();
+    }
+
+    public static function prepareData($Object)
+    {
+        $data = self::prepare($Object);
+
+        foreach ($data as $name => $value) {
+            $Object->setValue($name, $value);
+        }
+        return $Object;
     }
 
     public static function unprepare($value)

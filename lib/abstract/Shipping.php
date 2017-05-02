@@ -26,18 +26,32 @@ abstract class ShippingAbstract extends PluginAbstract
     protected $price          = 0;
     protected $tax            = 0;
     protected $tax_percentage = 0;
+    protected $parcels        = [];
 
     public function getName()
     {
         return $this->name;
     }
 
-    public function getPrice($order, $products = NULL)
+    public function setParcels($parcels)
+    {
+        $_parcels = [];
+
+        foreach ($parcels as $parcel) {
+            if (!$parcel instanceof Parcel) {
+                throw new ShippingException('Parcel must be of type Parcel');
+            }
+            $_parcels[] = $parcel;
+        }
+        $this->setValue('parcels', $_parcels);
+    }
+
+    public function getPrice($order, $products = null)
     {
         return $this->price;
     }
 
-    public function getNetPrice($order, $products = NULL)
+    public function getNetPrice($order, $products = null)
     {
         return $this->getPrice($order, $products);
     }
@@ -56,4 +70,8 @@ abstract class ShippingAbstract extends PluginAbstract
     {
         return Shipping::getByClass(get_called_class());
     }
+}
+
+class ShippingException extends \Exception
+{
 }
