@@ -84,7 +84,7 @@ class Omest extends ShippingAbstract
         ];
 
         if ($Settings['warehouse_key']) {
-            $data['pickupAddress']['warehouseKey'] = $Settings['warehouse_key'];
+            $data['warehouseKey'] = $Settings['warehouse_key'];
         }
         foreach ($products as $product) {
             for ($i = 0; $i < $product->getValue('cart_quantity'); $i++) {
