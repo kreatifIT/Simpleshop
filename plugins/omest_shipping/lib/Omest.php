@@ -84,7 +84,7 @@ class Omest extends ShippingAbstract
         ];
 
         if ($Settings['warehouse_key']) {
-            $data['warehouseKey'] = $Settings['warehouse_key'];
+            $data['pickupAddress']['warehouseKey'] = $Settings['warehouse_key'];
         }
         foreach ($products as $product) {
             for ($i = 0; $i < $product->getValue('cart_quantity'); $i++) {
@@ -147,19 +147,19 @@ class Omest extends ShippingAbstract
             }
 
             $data = [
-                'warehouseKey'       => $Settings['warehouse_key'],
                 'key'                => $Order->getValue('shipping_key'),
                 'reference1'         => $order_id,
                 'shippingServiceKey' => $extras['shipping']['service_key'],
                 'shipmentTypeKey'    => 'PARCEL',
                 'parcels'            => [],
                 'pickupAddress'      => [
-                    'pickupOMEST' => $Settings['omest_pickup'],
-                    'companyName' => $Settings['pickup_company_name'],
-                    'street'      => $Settings['pickup_street'],
-                    'city'        => $Settings['pickup_city'],
-                    'zipcode'     => $Settings['pickup_zip'],
-                    'countryCode' => $Settings['pickup_country_code'],
+                    'pickupOMEST'  => $Settings['omest_pickup'],
+                    'companyName'  => $Settings['pickup_company_name'],
+                    'street'       => $Settings['pickup_street'],
+                    'city'         => $Settings['pickup_city'],
+                    'zipcode'      => $Settings['pickup_zip'],
+                    'countryCode'  => $Settings['pickup_country_code'],
+                    'warehouseKey' => $Settings['warehouse_key'],
                 ],
                 'deliveryAddress'    => [
                     'personName'  => $DAddress->getName(),
@@ -177,12 +177,13 @@ class Omest extends ShippingAbstract
             foreach ($parcels as $parcel) {
                 $_parcel = [
                     'key'    => null,
-                    'weight' => $parcel->getValue('weight'),
+                    'weight' => $parcel->getValue('weight') / 1000,
                     'width'  => $parcel->getValue('width'),
                     'length' => $parcel->getValue('length'),
                     'height' => $parcel->getValue('height'),
                 ];
                 if ($parcel->getValue('pallett')) {
+                    $data['shipmentTypeKey']  = 'PALLET';
                     $_parcel['palletTypeKey'] = $parcel->getValue('pallett');
                 }
                 $data['parcels'][] = $_parcel;
