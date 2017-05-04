@@ -10,20 +10,20 @@ $styles = array_merge([
     'total' => '',
 ], (array) $config['email_tpl_styles']);
 
-    $discounts      = $this->getVar('discounts', []);
+$discounts      = $this->getVar('discounts', []);
 $shipping_costs = $this->getVar('shipping_costs', null);
-$subtotal       = $this->getVar('subtotal', 0);
+$initial_total  = $this->getVar('initial_total', 0);
 $total          = $this->getVar('total', 0);
 $tax            = $this->getVar('tax', null);
 
 ?>
 <table class="<?= $styles['css'] ?>" style="<?= $styles['table'] ?>">
 
-    <?php if ($subtotal != $total): ?>
+    <?php if ($initial_total != $total): ?>
         <tr <?= $styles['tr'] ? 'style="' . $styles['tr'] . '"' : '' ?>>
             <td <?= $styles['td'] ? 'style="' . $styles['td'] . '"' : '' ?>>###label.subtotal###</td>
             <td class="text-right" <?= $styles['td'] ? 'style="text-align:right;' . $styles['td'] . '"' : '' ?>>
-                &euro; <?= format_price($subtotal) ?>
+                &euro; <?= format_price($initial_total) ?>
             </td>
         </tr>
     <?php endif; ?>
