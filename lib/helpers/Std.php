@@ -29,5 +29,10 @@ class Std extends PluginAbstract
     {
         return $this->name;
     }
+
+    public function getData()
+    {
+        return get_object_vars($this);
+    }
 }
 

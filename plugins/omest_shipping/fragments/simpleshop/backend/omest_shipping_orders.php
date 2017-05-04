@@ -18,6 +18,16 @@ $Addon     = $this->getVar('Addon');
 $orders    = $this->getVar('orders');
 $order_ids = $this->getVar('order_ids');
 
+$pallet_types = [
+    '80x60',
+    '80x80',
+    '80x120',
+    '100x100',
+    '100x120',
+    '150x120',
+    '200x120',
+];
+
 ?>
 <fieldset>
 
@@ -29,26 +39,59 @@ $order_ids = $this->getVar('order_ids');
             <th><?= $Addon->i18n('label.order_no'); ?></th>
             <th><?= $Addon->i18n('label.customer'); ?></th>
             <th><?= $Addon->i18n('label.order_sum'); ?></th>
+            <th><?= $Addon->i18n('omest_shipping.is_pallett'); ?></th>
             <th><?= $Addon->i18n('omest_shipping.size_info'); ?></th>
             <th><?= $Addon->i18n('omest_shipping.weight_info'); ?></th>
+            <th></th>
         </tr>
 
         <tbody class="table-hover">
         <?php if (count($orders)): ?>
             <?php foreach ($orders as $order):
                 $Address = $order->getShippingAddress();
+                $Shipping = $order->getValue('shipping');
+                $parcels = $Shipping->getValue('parcels');
+
+                if (count($parcels) == 0) {
+                    $parcels[] = new Parcel();
+                }
                 ?>
                 <tr>
-                    <td><input type="checkbox" name="orders[]" value="<?= $order->getValue('id') ?>" <?php if (empty($order_ids) || in_array($order->getValue('id'), $order_ids)) echo 'checked="checked"'; ?>/></td>
+                    <td><input type="checkbox" name="orders[]" value="<?= $order->getValue('id') ?>" <?= (empty($order_ids) || in_array($order->getValue('id'), $order_ids)) ? 'checked="checked"' : '' ?>/></td>
                     <td><?= $order->getValue('id') ?></td>
                     <td><?= $Address->getName() ?></td>
                     <td><?= $order->getValue('total') ?></td>
                     <td>
-                        <input type="text" size="8" name="prop[<?= $order->getId() ?>][length]" value="<?= $order->getValue('length') ?>">
-                        <input type="text" size="8" name="prop[<?= $order->getId() ?>][width]" value="<?= $order->getValue('width') ?>">
-                        <input type="text" size="8" name="prop[<?= $order->getId() ?>][height]" value="<?= $order->getValue('height') ?>">
+                        <?php foreach ($parcels as $parcel_index => $parcel): ?>
+                            <div class="pallett form-group">
+                                <select name="prop[<?= $order->getId() ?>][<?= $parcel_index ?>][pallett]" class="form-control">
+                                    <option value="">- keine Pallette -</option>
+                                    <?php foreach ($pallet_types as $pallet_type): ?>
+                                        <option value="<?= $pallet_type ?>" <?= $parcel->getValue('pallett') == $pallet_type ? 'selected="selected"' : '' ?>><?= $pallet_type ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        <?php endforeach; ?>
                     </td>
-                    <td><input type="text" size="12" name="prop[<?= $order->getId() ?>][weight]" value="<?= $order->getValue('weight') ?>"></td>
+                    <td>
+                        <?php foreach ($parcels as $parcel_index => $parcel): ?>
+                            <div class="dimensions">
+                                <input type="text" size="8" name="prop[<?= $order->getId() ?>][<?= $parcel_index ?>][length]" value="<?= $parcel->getValue('length') ?>">
+                                <input type="text" size="8" name="prop[<?= $order->getId() ?>][<?= $parcel_index ?>][width]" value="<?= $parcel->getValue('width') ?>">
+                                <input type="text" size="8" name="prop[<?= $order->getId() ?>][<?= $parcel_index ?>][height]" value="<?= $parcel->getValue('height') ?>">
+                            </div>
+                        <?php endforeach; ?>
+                    </td>
+                    <td>
+                        <?php foreach ($parcels as $parcel_index => $parcel): ?>
+                            <div class="weights">
+                                <input type="text" size="12" name="prop[<?= $order->getId() ?>][<?= $parcel_index ?>][weight]" value="<?= $parcel->getValue('weight') ?>">
+                            </div>
+                        <?php endforeach; ?>
+                    </td>
+                    <td>
+                        <a href="#" onclick="return Simpleshop.addShippingPackage(this);"><?= $Addon->i18n('omest_shipping.add_package'); ?></a>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
