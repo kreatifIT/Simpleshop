@@ -24,7 +24,7 @@ $Settings = $this->getVar('Settings');
     <dl class="rex-form-group form-group">
         <dt><?= $Addon->i18n('omest_shipping.warehouse_key'); ?></dt>
         <dd>
-            <input type="text" class="form-control" name="warehouse_key" value="<?= from_array($Settings, 'warehouse_key') ?>"/>
+            <input type="text" class="form-control" name="warehouse_key" value="<?= from_array($Settings, 'warehouse_key') ?>" placeholder="WH1"/>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">

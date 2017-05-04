@@ -147,6 +147,7 @@ class Omest extends ShippingAbstract
             }
 
             $data = [
+                'warehouseKey'       => $Settings['warehouse_key'],
                 'key'                => $Order->getValue('shipping_key'),
                 'reference1'         => $order_id,
                 'shippingServiceKey' => $extras['shipping']['service_key'],
@@ -170,7 +171,6 @@ class Omest extends ShippingAbstract
                     //                    'countryCode'  => $DAddress->getValue('country'),
                     'phone'       => $DAddress->getValue('phone'),
                     'email'       => $Customer ? $Customer->getValue('email') : $IAddress->getValue('email'),
-                    //                    'warehouseKey' => "WH1",
                 ],
             ];
 
