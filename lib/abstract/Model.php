@@ -137,7 +137,7 @@ abstract class Model extends \rex_yform_manager_dataset
 
     public static function fetchColumn($ignoreOffline = true, $params = [], $debug = 0)
     {
-        $params['singleField'] = $params['singleField'] ?: 'm.id';
+        $params['singleField'] = $params['singleField'] ?: 'id';
 
         $results = self::prepareQuery($ignoreOffline, $params, $debug);
 
