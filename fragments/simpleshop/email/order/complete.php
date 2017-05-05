@@ -49,9 +49,10 @@ $this->setVar('order', $Order);
 
 $order_id = $Order->getValue('id');
 
-$this->setVar('tax', $Order->getValue('tax'));
+$this->setVar('tax', $Order->getTaxTotal());
+$this->setVar('taxes', $Order->getValue('taxes'));
 $this->setVar('total', $Order->getValue('total'));
-$this->setVar('subtotal', $Order->getValue('subtotal'));
+$this->setVar('initial_total', $Order->getValue('initial_total'));
 
 if ($Shipping) {
     $this->subfragment('simpleshop/shipping/' . $Shipping->plugin_name . '/order_complete.php');

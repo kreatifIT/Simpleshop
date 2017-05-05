@@ -41,7 +41,7 @@ foreach ($orders as $order) {
     $Address    = $order->getInvoiceAddress();
     $products   = OrderProduct::query()->where('order_id', $order_id)->find();
     $shipping   = $order->getValue('shipping_costs');
-    $taxes      = $order->getValue('tax');
+    $taxes      = $order->getValue('taxes');
     $subtotal   = $order->getValue('subtotal');
     $discount   = $order->getValue('discount') >= $subtotal ? $subtotal : ($order->getValue('discount') ?: '');
     $net_prices = $order->getValue('net_prices', false, []);

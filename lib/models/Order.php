@@ -73,7 +73,7 @@ class Order extends Model
 
     public function getTaxTotal()
     {
-        return array_sum($this->getValue('tax', false, []));
+        return array_sum($this->getValue('taxes', false, [])) ?: array_sum($this->getValue('tax'));
     }
 
     public function getNetPrice()
@@ -99,7 +99,7 @@ class Order extends Model
 
     public function save($simple_save = true)
     {
-        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['create_order' => $create_order, 'simple_save' => $simple_save]));
+        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['finalize_order' => self::$_finalizeOrder, 'simple_save' => $simple_save]));
 
         $sql      = \rex_sql::factory();
         $date_now = date('Y-m-d H:i:s');
@@ -109,6 +109,7 @@ class Order extends Model
         }
 
         if (self::$_finalizeOrder && ($this->getValue('invoice_num') === null || $this->getValue('invoice_num') === 0)) {
+
             $sql->setQuery('SELECT MAX(invoice_num) as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"');
             $value = $sql->getValue('num');
             $num   = (int) substr($value, 2) + 1;
@@ -227,6 +228,7 @@ class Order extends Model
         catch (\Exception $ex) {
             throw new OrderException($ex->getLabelByCode());
         }
+        ksort($net_prices);
 
         $this->setValue('updatedate', date('Y-m-d H:i:s'));
         $this->setValue('ip_address', rex_server('REMOTE_ADDR', 'string', 'notset'));
@@ -234,13 +236,38 @@ class Order extends Model
         $this->setValue('subtotal', array_sum($net_prices));
         $this->setValue('total', array_sum($net_prices));
 
-        $_promotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.applyDiscounts', [], ['Order' => $this]));
+        try {
+            $_promotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.applyDiscounts', [$this->getValue('discount')], ['Order' => $this]));
+        }
+        catch (\Exception $ex) {
+            $_promotions = [];
+            $errors[]    = ['label' => $ex->getLabelByCode()];
+        }
 
         // set promotions for order history
         foreach ($_promotions as $name => $_promotion) {
             $promotion = null;
             try {
-                $promotion = $_promotion->applyToOrder($this);
+                if (is_object($_promotion)) {
+                    $promotion = $_promotion->applyToOrder($this);
+                }
+                else if (is_numeric($_promotion)) {
+                    foreach ($net_prices as &$net_price) {
+                        if ($_promotion <= 0) {
+                            break;
+                        }
+                        else if ($_promotion < $net_price) {
+                            $net_price -= $_promotion;
+                            $this->discount -= $_promotion;
+                            $_promotion = 0;
+                        }
+                        else {
+                            $_promotion -= $net_price;
+                            $this->discount -= $net_price;
+                            $net_price = 0;
+                        }
+                    }
+                }
             }
             catch (\Exception $ex) {
                 $errors[] = ['label' => $ex->getLabelByCode()];
@@ -249,6 +276,9 @@ class Order extends Model
                 $promotions[$name] = $promotion;
             }
         }
+
+        $this->setValue('net_prices', $net_prices);
+        $this->setValue('subtotal', array_sum($net_prices));
 
         // set tax values
         foreach ($this->net_prices as $tax => $net_price) {
@@ -261,10 +291,15 @@ class Order extends Model
         ksort($taxes);
 
         $this->setValue('promotions', $promotions);
-        $this->setValue('tax', $taxes);
+        $this->setValue('taxes', $taxes);
         $this->setValue('total', $this->shipping_costs + array_sum($this->net_prices) + array_sum($taxes));
 
-        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.calculateDocument', $this));
+        try {
+            \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.calculateDocument', $this));
+        }
+        catch (\Exception $ex) {
+            $errors[] = ['label' => $ex->getLabelByCode()];
+        }
 
         // re-check order totals
         if ($this->total < 0) {

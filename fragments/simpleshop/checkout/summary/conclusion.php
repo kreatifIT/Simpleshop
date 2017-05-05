@@ -14,7 +14,7 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $Order      = $this->getVar('order');
-$taxes      = $Order->getValue('tax', []);
+$taxes      = $Order->getTaxTotal();
 $shipping   = $Order->getValue('initial_shipping_costs');
 $subtotal   = $Order->getValue('initial_total');
 $total      = $Order->getValue('total');

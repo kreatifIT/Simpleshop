@@ -50,12 +50,12 @@ abstract class Controller
         }
     }
 
-    public function setVar($key, $value)
+    public function setVar($key, $value, $escape = true)
     {
         if ($this->fragment === null) {
             $this->fragment = new \rex_fragment();
         }
-        $this->fragment->setVar($key, $value);
+        $this->fragment->setVar($key, $value, $escape);
     }
     
     public function getVar($key, $default = null)

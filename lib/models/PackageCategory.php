@@ -17,3 +17,7 @@ class PackageCategory extends Model
 {
     const TABLE = 'rex_shop_package_category';
 }
+
+class PackageCategoryException extends \Exception
+{
+}
