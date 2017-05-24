@@ -41,6 +41,11 @@ class Mail extends \rex_mailer
         $this->fragment->setVar($key, $value);
     }
 
+    public function getVar($key, $default = null)
+    {
+        $this->fragment->getVar($key, $default);
+    }
+
     public function send($debug = FALSE)
     {
         $this->Body = $this->fragment->parse('simpleshop/email/master.php');

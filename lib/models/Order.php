@@ -189,26 +189,18 @@ class Order extends Model
         return $result;
     }
 
-    public function calculateDocument()
+    public function recalculateDocument($products = [], $promotions = [])
     {
-        $errors               = [];
-        $taxes                = [];
-        $promotions           = [];
+        $locale = setlocale(LC_NUMERIC, 0);
+        setlocale(LC_NUMERIC, 'en_US.utf8');
+
         $net_prices           = [];
         $this->quantity       = 0;
         $this->discount       = 0;
         $this->shipping_costs = 0;
         $this->initial_total  = 0;
+        $manual_discount      = $this->getValue('manual_discount', false, 0);
 
-        try {
-            $products = Session::getCartItems();
-        }
-        catch (CartException $ex) {
-            if ($ex->getCode() == 1) {
-                $errors   = Session::$errors;
-                $products = Session::getCartItems();
-            }
-        }
         // calculate total
         foreach ($products as $product) {
             $quantity = $product->getValue('cart_quantity');
@@ -231,39 +223,92 @@ class Order extends Model
         ksort($net_prices);
 
         $this->setValue('updatedate', date('Y-m-d H:i:s'));
-        $this->setValue('ip_address', rex_server('REMOTE_ADDR', 'string', 'notset'));
         $this->setValue('net_prices', $net_prices);
         $this->setValue('subtotal', array_sum($net_prices));
         $this->setValue('total', array_sum($net_prices));
 
-        try {
-            $_promotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.applyDiscounts', [$this->getValue('discount')], ['Order' => $this]));
-        }
-        catch (\Exception $ex) {
-            $_promotions = [];
-            $errors[]    = ['label' => $ex->getLabelByCode()];
-        }
+        // reset manual discount
+        unset($promotions['manual_discount']);
 
         // set promotions for order history
-        foreach ($_promotions as $name => $_promotion) {
+        list($errors, $_promotions) = $this->calculatePrices($promotions, $net_prices);
+
+        // calculate manual discount
+        if ($manual_discount > 0) {
+            $netto_discount = 0;
+
+            foreach ($this->net_prices as $tax_perc => $net_price) {
+                if ($manual_discount <= 0) {
+                    break;
+                }
+
+                $_ndiscount = $manual_discount / (100 + $tax_perc) * 100;
+
+                if ($_ndiscount <= $net_price) {
+                    $netto_discount += $_ndiscount;
+                    $manual_discount = 0;
+                }
+                else {
+                    $_bdiscount = $_ndiscount * (1 + $tax_perc / 100);
+                    $manual_discount -= $_bdiscount;
+                    $netto_discount += $net_price;
+                }
+            }
+
+            list($__errors, $__promotions) = $this->calculatePrices(['manual_discount' => $netto_discount], $this->net_prices);
+
+            $errors      = array_merge($errors, $__errors);
+            $_promotions = array_merge($_promotions, $__promotions);
+        }
+
+        $this->setValue('promotions', $_promotions);
+
+        try {
+            \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.calculateDocument', $this));
+        }
+        catch (\Exception $ex) {
+            $errors[] = ['label' => $ex->getLabelByCode()];
+        }
+
+        // re-check order totals
+        if ($this->total < 0) {
+            $this->setValue('total', $this->total);
+        }
+
+        setlocale(LC_NUMERIC, $locale);
+
+        return $errors;
+    }
+
+    private function calculatePrices($promotions, $net_prices)
+    {
+        $taxes       = [];
+        $errors      = [];
+        $_promotions = [];
+
+        foreach ($promotions as $name => $_promotion) {
             $promotion = null;
             try {
                 if (is_object($_promotion)) {
                     $promotion = $_promotion->applyToOrder($this);
                 }
-                else if (is_numeric($_promotion)) {
+                else if (is_numeric($_promotion) && $_promotion > 0) {
+                    $__promotion = $_promotion;
+
                     foreach ($net_prices as &$net_price) {
-                        if ($_promotion <= 0) {
+                        if ($__promotion <= 0) {
                             break;
                         }
-                        else if ($_promotion < $net_price) {
-                            $net_price -= $_promotion;
-                            $this->discount -= $_promotion;
-                            $_promotion = 0;
+                        if ($__promotion < $net_price) {
+                            $net_price -= $__promotion;
+                            $this->discount -= $__promotion;
+                            $__promotion = 0;
+                            $promotion   = $_promotion;
                         }
                         else {
-                            $_promotion -= $net_price;
+                            $__promotion -= $net_price;
                             $this->discount -= $net_price;
+                            $promotion += $net_price;
                             $net_price = 0;
                         }
                     }
@@ -273,7 +318,7 @@ class Order extends Model
                 $errors[] = ['label' => $ex->getLabelByCode()];
             }
             if ($promotion) {
-                $promotions[$name] = $promotion;
+                $_promotions[$name] = $promotion;
             }
         }
 
@@ -290,22 +335,35 @@ class Order extends Model
         }
         ksort($taxes);
 
-        $this->setValue('promotions', $promotions);
         $this->setValue('taxes', $taxes);
         $this->setValue('total', $this->shipping_costs + array_sum($this->net_prices) + array_sum($taxes));
 
+        return [$errors, $_promotions];
+    }
+
+    public function calculateDocument(CheckoutController $caller) // $caller is used to prevent unauthorized method calls
+    {
         try {
-            \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.calculateDocument', $this));
+            $products = Session::getCartItems();
         }
-        catch (\Exception $ex) {
-            $errors[] = ['label' => $ex->getLabelByCode()];
+        catch (CartException $ex) {
+            if ($ex->getCode() == 1) {
+                $errors   = Session::$errors;
+                $products = Session::getCartItems();
+            }
         }
 
-        // re-check order totals
-        if ($this->total < 0) {
-            $this->setValue('total', $this->total);
+        try {
+            $promotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.applyDiscounts', [$this->getValue('discount')], ['Order' => $this]));
         }
-        return $errors;
+        catch (\Exception $ex) {
+            $promotions = [];
+            $errors[]   = ['label' => $ex->getLabelByCode()];
+        }
+
+        $this->setValue('ip_address', rex_server('REMOTE_ADDR', 'string', 'notset'));
+
+        return $this->recalculateDocument($products, $promotions);
     }
 
     public static function ext_yform_saved($params)

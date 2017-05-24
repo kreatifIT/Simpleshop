@@ -14,7 +14,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
 
     public function enterObject()
     {
-        if ($this->getParam('main_id') > 0 && rex::isBackend()) {
+        if ($this->getParam('send') == 0 && $this->getParam('main_id') > 0 && rex::isBackend()) {
             $action   = rex_get('ss-action', 'string');
             $Order    = \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id'));
             $Customer = $Order->getValue('customer_id') ? \FriendsOfREDAXO\Simpleshop\Customer::get($Order->getValue('customer_id')) : $Order->getInvoiceAddress();;
@@ -30,6 +30,23 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                     $Controller = new \FriendsOfREDAXO\Simpleshop\CheckoutController();
                     $Controller->setOrder($Order);
                     $Controller->sendMail();
+
+                    unset($_GET['ss-action']);
+                    $_GET['ss-msg'] = $action;
+                    header('Location: ' . html_entity_decode(rex_url::currentBackendPage($_GET)));
+                    exit;
+
+                case 'recalculate_sums':
+                    $products       = [];
+                    $order_products = \FriendsOfREDAXO\Simpleshop\OrderProduct::getAll(true, ['filter' => [['order_id', $Order->getId()]], 'orderBy' => 'm.id']);
+                    $promotions     = $Order->getValue('promotions', false, []);
+
+                    foreach ($order_products as $order_product) {
+                        $products[] = $order_product->getValue('data');
+                    }
+
+                    $Order->recalculateDocument($products, $promotions);
+                    $Order->save();
 
                     unset($_GET['ss-action']);
                     $_GET['ss-msg'] = $action;
@@ -52,6 +69,12 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                             </a>
                         ';
                     }
+                    $output[]                                    = '
+                        <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'recalculate_sums'])) . '" class="btn btn-default">
+                            <i class="fa fa-calculator"></i>&nbsp;
+                            ' . rex_i18n::msg('label.recalculate_sums') . '
+                        </a>
+                    ';
                     $this->params['form_output'][$this->getId()] = '
                         <div class="row nested-panel">
                             <div class="form-group col-xs-12" id="' . $this->getHTMLId() . '">

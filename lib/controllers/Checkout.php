@@ -73,7 +73,7 @@ class CheckoutController extends Controller
         $warnings = [];
 
         try {
-            $warnings = $this->Order->calculateDocument();
+            $warnings = $this->Order->calculateDocument($this);
         }
         catch (OrderException $ex) {
             $errors[] = $ex->getMessage();
@@ -114,7 +114,7 @@ class CheckoutController extends Controller
         $Mail->AddAddress($Customer->getValue('email'));
         $Mail->AddAddress(from_array($Settings, 'order_notification_email'));
 
-        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.orderComplete', $do_send, [
+        $do_send = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.orderComplete', $do_send, [
             'Mail'  => $Mail,
             'User'  => $Customer,
             'Order' => $this->Order,
