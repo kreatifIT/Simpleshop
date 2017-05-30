@@ -86,11 +86,11 @@ $content  = "
                 <option value='CL' " . ($status == 'CL' ? 'selected="selected"' : '') . ">Abgeschlossen</option>
             </select></div>
         </div>
-        <div class='col-sm-3'>
+        <div class='col-sm-5'>
             <button class='btn btn-default float-left' type='submit' name='func' value='filter'>{$this->i18n('update')}</button>&nbsp;&nbsp;&nbsp;
             <button class='btn btn-apply float-left' type='submit' name='func' value='export'>". \rex_i18n::msg('action.export') ."</button>
         </div>
-        <div class='col-sm-4'>
+        <div class='col-sm-2'>
         </div>
     </div>
 ";
