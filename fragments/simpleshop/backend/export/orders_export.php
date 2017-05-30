@@ -16,6 +16,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 $buffer    = $this->getVar('buffer');
 $output    = $this->getVar('output');
 $order_ids = $this->getVar('order_ids');
+$statuses  = $this->getVar('statuses');
 
 $tax_vals = [];
 $taxes    = Tax::query()->where('status', 1)->orderBy('tax')->find();
@@ -42,14 +43,6 @@ $totals   = [
     'sum' => 0,
     // 'discount' => 0
 ];
-
-$statuses = [];
-$_options = explode(',', \rex_yform_manager_table::get(Order::TABLE)->getValueField('status')->getElement('options'));
-
-foreach ($_options as $option) {
-    list ($value, $key) = explode('=', $option);
-    $statuses[trim($key)] = trim($value);
-}
 
 foreach ($taxes as $tax) {
     $_id            = $tax->getValue('id');

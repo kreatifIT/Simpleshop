@@ -22,12 +22,20 @@ $status    = rex_request('status', 'string');
 
 list ($year, $month) = explode('-', rex_request('year-month', 'string', date('Y-m')));
 
-if ($_FUNC == 'export' && count($order_ids))
-{
+$statuses     = [];
+$_status_opts = [];
+$_options     = explode(',', \rex_yform_manager_table::get(Order::TABLE)->getValueField('status')->getElement('options'));
+
+foreach ($_options as $option) {
+    list ($value, $key) = explode('=', $option);
+    $statuses[trim($key)] = trim($value);
+    $_status_opts[] = '<option value="'. $key .'" '. ($key == $status ? 'selected="selected"' : '') .'>'. trim($value) .'</option>';
+}
+
+if ($_FUNC == 'export' && count($order_ids)) {
     ob_clean();
 
-    if ($output == 'file')
-    {
+    if ($output == 'file') {
         header('Content-Type: text/csv; charset=utf-8');
         header("Content-Disposition: attachment;filename=orders-{$year}-{$month}.csv");
     }
@@ -37,17 +45,14 @@ if ($_FUNC == 'export' && count($order_ids))
     $fragment = new \rex_fragment();
     $fragment->setVar('order_ids', $order_ids);
     $fragment->setVar('output', $output);
+    $fragment->setVar('statuses', $statuses);
     echo $fragment->parse('simpleshop/backend/export/orders_export.php');
     exit;
 }
 
-$orders = Order::query()
-    ->where('createdate', "{$year}-{$month}-01", '>=')
-    ->where('createdate', date('Y-m-d', strtotime("{$year}-{$month} next month -1 day")), '<=')
-    ->orderBy('id');
+$orders = Order::query()->where('createdate', "{$year}-{$month}-01", '>=')->where('createdate', date('Y-m-d', strtotime("{$year}-{$month} next month -1 day")), '<=')->orderBy('id');
 
-if ($status != '')
-{
+if ($status != '') {
     $orders->where('status', $status);
 }
 $orders = $orders->find();
@@ -64,7 +69,7 @@ $end       = new \DateTime();
 $interval  = new \DateInterval('P1M');
 $daterange = new \DatePeriod($begin, $interval, $end);
 
-foreach($daterange as $date){
+foreach ($daterange as $date) {
     $ym_options[] = "<option " . ($date->format("Ym") == "{$year}{$month}" ? 'selected="selected"' : '') . ">{$date->format("Y-m")}</option>";
 }
 krsort($ym_options);
@@ -78,48 +83,44 @@ $content  = "
         <div class='col-sm-2'>
             <div class='rex-select-style'><select name='status' class='form-control'>
                 <option value=''>- {$this->i18n('label.all')} -</option>
-                <option value='OP' " . ($status == 'OP' ? 'selected="selected"' : '') . ">auf Zahlung wartend</option>
-                <option value='IP' " . ($status == 'IP' ? 'selected="selected"' : '') . ">in Bearbeitung</option>
-                <option value='FA' " . ($status == 'FA' ? 'selected="selected"' : '') . ">Fehlgeschlagen</option>
-                <option value='SH' " . ($status == 'SH' ? 'selected="selected"' : '') . ">Versendet</option>
-                <option value='CA' " . ($status == 'CA' ? 'selected="selected"' : '') . ">Storniert</option>
-                <option value='CL' " . ($status == 'CL' ? 'selected="selected"' : '') . ">Abgeschlossen</option>
+                ". implode('', $_status_opts) ."
             </select></div>
         </div>
         <div class='col-sm-5'>
             <button class='btn btn-default float-left' type='submit' name='func' value='filter'>{$this->i18n('update')}</button>&nbsp;&nbsp;&nbsp;
-            <button class='btn btn-apply float-left' type='submit' name='func' value='export'>". \rex_i18n::msg('action.export') ."</button>
+            <button class='btn btn-apply float-left' type='submit' name='func' value='export'>" . \rex_i18n::msg('action.export') . "</button>
         </div>
         <div class='col-sm-2'>
         </div>
     </div>
 ";
 $fragment = new \rex_fragment();
-$fragment->setVar('body', $content, FALSE);
+$fragment->setVar('body', $content, false);
 $sections .= $fragment->parse('core/page/section.php');
 
 $fragment = new \rex_fragment();
 $fragment->setVar('Addon', $this);
 $fragment->setVar('orders', $orders);
 $fragment->setVar('order_ids', $order_ids);
+$fragment->setVar('statuses', $statuses);
 $content = $fragment->parse('simpleshop/backend/orders_export.php');
 
 $fragment = new \rex_fragment();
-$fragment->setVar('body', $content, FALSE);
-$fragment->setVar('class', 'edit', FALSE);
-$fragment->setVar('title', sprintf($this->i18n('label.orders_export'), count($orders)), FALSE);
+$fragment->setVar('body', $content, false);
+$fragment->setVar('class', 'edit', false);
+$fragment->setVar('title', sprintf($this->i18n('label.orders_export'), count($orders)), false);
 $sections .= $fragment->parse('core/page/section.php');
 
 $formElements = [
     ['field' => '<button class="btn btn-apply rex-form-aligned" type="submit" name="func" value="export"' . \rex::getAccesskey(\rex_i18n::msg('action.export'), 'apply') . '>' . \rex_i18n::msg('action.export') . '</button>'],
 ];
 $fragment     = new \rex_fragment();
-$fragment->setVar('elements', $formElements, FALSE);
+$fragment->setVar('elements', $formElements, false);
 $buttons = $fragment->parse('core/form/submit.php');
 
 $fragment = new \rex_fragment();
-$fragment->setVar('class', 'edit', FALSE);
-$fragment->setVar('buttons', $buttons, FALSE);
+$fragment->setVar('class', 'edit', false);
+$fragment->setVar('buttons', $buttons, false);
 $sections .= $fragment->parse('core/page/section.php');
 
 echo '<form action="' . \rex_url::currentBackendPage(['output' => $output]) . '" method="post">' . $sections . '</form>';

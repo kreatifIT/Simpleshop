@@ -14,16 +14,9 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-$Addon  = $this->getVar('Addon');
-$orders = $this->getVar('orders');
-
-$statuses = [];
-$_options = explode(',', \rex_yform_manager_table::get(Order::TABLE)->getValueField('status')->getElement('options'));
-
-foreach ($_options as $option) {
-    list ($value, $key) = explode('=', $option);
-    $statuses[trim($key)] = trim($value);
-}
+$Addon    = $this->getVar('Addon');
+$orders   = $this->getVar('orders');
+$statuses = $this->getVar('statuses');
 
 ?>
 <fieldset>
