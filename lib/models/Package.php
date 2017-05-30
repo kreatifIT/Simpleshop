@@ -34,7 +34,8 @@ class Package extends Model
         foreach ($product_ids as $product_id) {
             $product = Product::get($product_id);
             if (
-                !$product->isOnline()
+                !$product
+                || !$product->isOnline()
                 || $product->getValue('amount') < 1
                 || \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Package.verifyPackageValidity', false, ['Package' => $this, 'Product' => $product]))
             ) {
