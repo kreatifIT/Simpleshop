@@ -49,7 +49,7 @@ foreach ($_options as $option) {
                     <td><input type="checkbox" name="orders[]" value="<?= $order->getValue('id') ?>" checked="checked"/></td>
                     <td><?= $order->getValue('id') ?></td>
                     <td><?= $Customer ? $Customer->getName() : '<i>unknown</i>' ?></td>
-                    <td><?= $order->getValue('total') ?></td>
+                    <td><?= format_price($order->getValue('total')) ?></td>
                     <td><?= $statuses[$order->getValue('status')] ?: $order->getValue('status') ?></td>
                 </tr>
             <?php endforeach; ?>
