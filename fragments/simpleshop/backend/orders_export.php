@@ -17,6 +17,14 @@ namespace FriendsOfREDAXO\Simpleshop;
 $Addon  = $this->getVar('Addon');
 $orders = $this->getVar('orders');
 
+$statuses = [];
+$_options = explode(',', \rex_yform_manager_table::get(Order::TABLE)->getValueField('status')->getElement('options'));
+
+foreach ($_options as $option) {
+    list ($value, $key) = explode('=', $option);
+    $statuses[trim($key)] = trim($value);
+}
+
 ?>
 <fieldset>
 
@@ -28,6 +36,7 @@ $orders = $this->getVar('orders');
             <th><?= $Addon->i18n('label.order_no'); ?></th>
             <th><?= $Addon->i18n('label.customer'); ?></th>
             <th><?= $Addon->i18n('label.order_sum'); ?></th>
+            <th><?= $Addon->i18n('status'); ?></th>
         </tr>
 
         <tbody class="table-hover">
@@ -41,6 +50,7 @@ $orders = $this->getVar('orders');
                     <td><?= $order->getValue('id') ?></td>
                     <td><?= $Customer ? $Customer->getName() : '<i>unknown</i>' ?></td>
                     <td><?= $order->getValue('total') ?></td>
+                    <td><?= $statuses[$order->getValue('status')] ?: $order->getValue('status') ?></td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>

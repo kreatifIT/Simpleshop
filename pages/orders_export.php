@@ -31,6 +31,9 @@ if ($_FUNC == 'export' && count($order_ids))
         header('Content-Type: text/csv; charset=utf-8');
         header("Content-Disposition: attachment;filename=orders-{$year}-{$month}.csv");
     }
+    else {
+        header('Content-Type: text/html; charset=utf-8');
+    }
     $fragment = new \rex_fragment();
     $fragment->setVar('order_ids', $order_ids);
     $fragment->setVar('output', $output);

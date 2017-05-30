@@ -20,9 +20,36 @@ $order_ids = $this->getVar('order_ids');
 $tax_vals = [];
 $taxes    = Tax::query()->where('status', 1)->orderBy('tax')->find();
 $orders   = Order::query()->where('id', $order_ids)->orderBy('createdate')->find();
-$csv_head = ['Rechn.-Nr', 'ID', 'Jahr', 'Monat', 'Datum', 'Währung', 'Kunde', 'Land', 'Shop', 'Zahlart', 'Grundlage', 'Rabatt', 'Gesamtbetrag'];
+$csv_head = [
+    'Rechn.-Nr',
+    'ID',
+    'Jahr',
+    'Monat',
+    'Datum',
+    'Währung',
+    'Kunde',
+    'Land',
+    'Shop',
+    'Zahlart',
+    'Status',
+    // 'Grundlage',
+    'Gesamtbetrag',
+    // 'Rabatt'
+];
 $csv_body = [];
-$totals   = ['base' => 0, 'discount' => 0, 'sum' => 0];
+$totals   = [
+    // 'base' => 0,
+    'sum' => 0,
+    // 'discount' => 0
+];
+
+$statuses = [];
+$_options = explode(',', \rex_yform_manager_table::get(Order::TABLE)->getValueField('status')->getElement('options'));
+
+foreach ($_options as $option) {
+    list ($value, $key) = explode('=', $option);
+    $statuses[trim($key)] = trim($value);
+}
 
 foreach ($taxes as $tax) {
     $_id            = $tax->getValue('id');
@@ -36,6 +63,7 @@ foreach ($orders as $order) {
     $date       = $order->getValue('createdate');
     $order_ts   = strtotime($date);
     $order_id   = $order->getValue('id');
+    $status     = $order->getValue('status', false, '');
     $Payment    = $order->getValue('payment');
     $Shipping   = $order->getValue('shipping');
     $Address    = $order->getInvoiceAddress();
@@ -43,10 +71,9 @@ foreach ($orders as $order) {
     $shipping   = $order->getValue('shipping_costs');
     $taxes      = $order->getValue('taxes');
     $subtotal   = $order->getValue('subtotal');
-    $discount   = $order->getValue('discount') >= $subtotal ? $subtotal : ($order->getValue('discount') ?: '');
+    $discount   = $order->getValue('discount') >= $subtotal ? $subtotal : (abs($order->getValue('discount')) ?: '');
     $net_prices = $order->getValue('net_prices', false, []);
-    //    $discount    = $order->getValue('discount') >= $subtotal ? $subtotal : ($order->getValue('discount') ?: '');
-    //    $base_price  = $order->getValue('subtotal') - $order->getValue('tax') + ($Shipping ? $Shipping->getValue('price') : 0);
+    // $base_price  = $order->getValue('subtotal') - $order->getValue('tax') + ($Shipping ? $Shipping->getValue('price') : 0);
     $total_price = $order->getValue('total');
 
     if ($Shipping && $shipping) {
@@ -62,8 +89,25 @@ foreach ($orders as $order) {
         $_taxes[$tax_perc] += $shipping + ($shipping / 100 * $tax_perc);
     }
 
+    if (is_array($taxes)) {
+        $_taxes = $taxes;
+    }
+    else {
+        foreach ($products as $product) {
+            $_Product = $product->getValue('data');
+            $quantity = $product->getValue('quantity');
+            $tax_val  = Tax::get($_Product->getValue('tax'))->getValue('tax');
+            $_taxes[$tax_val] += $_Product->getTax() * $quantity;
+            $net_prices[$tax_val] += $_Product->getPrice(false) * $quantity;
+        }
+        if ($discount) {
+            $net_prices[$tax_val] -= $discount / (100 + $tax_val) * 100;
+            $_taxes[$tax_val] = $net_prices[$tax_val] / 100 * $tax_val;
+        }
+    }
+
     $data = [
-        '',
+        $order->getValue('invoice_num', false, ''),
         $order_id,
         date('Y', $order_ts),
         date('m', $order_ts),
@@ -73,34 +117,25 @@ foreach ($orders as $order) {
         $Address->getValue('country'),
         \rex::getServerName(),
         $Payment ? $Payment->getName() : '',
-        format_price($subtotal),
-        $discount,
+        $statuses[$status] ?: $status,
+        // format_price($subtotal),
         format_price($total_price),
+        // $discount,
     ];
 
-    $totals['base'] += $subtotal;
-    $totals['discount'] += $discount;
+    // $totals['base'] += $subtotal;
+    // $totals['discount'] += $discount;
     $totals['sum'] += $total_price;
 
-    if (is_array($taxes)) {
-        $_taxes = $taxes;
-    }
-    else {
-        foreach ($products as $product) {
-            $_Product = $product->getValue('data');
-            $quantity = $product->getValue('quantity');
-            $_taxes[Tax::get($_Product->getValue('tax'))->getValue('tax')] += $_Product->getPrice(true) * $quantity;
-        }
-    }
     foreach ($tax_vals as $tax) {
         $data[] = $net_prices[$tax] ? format_price($net_prices[$tax]) : '';
         $data[] = $_taxes[$tax] ? format_price($net_prices[$tax] + $_taxes[$tax]) : '';
-        $totals['imp_tax_' . $tax] += $net_prices[$tax];
-        $totals['tax_' . $tax] += $net_prices[$tax] + $_taxes[$tax];
+        $totals['imp_tax_' . $tax] += number_format($net_prices[$tax], 2);
+        $totals['tax_' . $tax] += number_format($net_prices[$tax] + $_taxes[$tax], 2);
     }
     $csv_body[] = $data;
 }
-$csv_body[] = array_merge(['', '', '', '', '', '', '', '', '', ''], $totals);
+$csv_body[] = array_merge(['', '', '', '', '', '', '', '', '', '', ''], $totals);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // OUTPUT
