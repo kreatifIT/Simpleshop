@@ -27,13 +27,13 @@ class rex_api_simpleshop_api extends rex_api_function
         $_controller = 'api__' . strtr($controller, ['.' => '_']);
 
         if (!$controller || !method_exists($this, $_controller)) {
-            throw new rex_api_exception("Controller '{$controller}' doesn't exist");
+            throw new ApiException("Controller '{$controller}' doesn't exist");
         }
         try {
             $this->$_controller();
         }
         catch (ErrorException $ex) {
-            throw new rex_api_exception($ex->getMessage());
+            throw new ApiException($ex->getMessage());
         }
         $this->response['controller'] = strtolower($controller);
         return new rex_api_result($this->success, $this->response);
@@ -45,7 +45,7 @@ class rex_api_simpleshop_api extends rex_api_function
         $product     = \FriendsOfREDAXO\Simpleshop\Product::getProductByKey($product_key);
 
         if (!$product) {
-            throw new rex_api_exception("No Product found for key = " . $product_key);
+            throw new ApiException("No Product found for key = " . $product_key);
         }
         $fragment = new rex_fragment();
         $fragment->setVar('product', $product);
@@ -64,7 +64,7 @@ class rex_api_simpleshop_api extends rex_api_function
 
         foreach ($products as $product) {
             $result['total'] += $product->getPrice(true) * $product->getValue('cart_quantity');
-            $fragment = new rex_fragment();
+            $fragment        = new rex_fragment();
             $fragment->setVar('product', $product);
             $fragment->setVar('class', 'cart-item-preview');
             $fragment->setVar('has_quantity_control', false);
@@ -85,7 +85,7 @@ class rex_api_simpleshop_api extends rex_api_function
         $extras      = rex_post('extras', 'array', []);
 
         if (!$product_key) {
-            throw new rex_api_exception("Invalid request arguments");
+            throw new ApiException("Invalid request arguments");
         }
 
         try {
@@ -94,7 +94,7 @@ class rex_api_simpleshop_api extends rex_api_function
             \FriendsOfREDAXO\Simpleshop\Session::setProductData($product_key, 1, $extras);
             $this->api__cart_getpopupcontent();
         }
-        catch (ApiExtension $ex) {
+        catch (ApiException $ex) {
             $this->success = false;
             $this->getErrorPopup($ex->getLabelByCode());
         }
@@ -108,7 +108,7 @@ class rex_api_simpleshop_api extends rex_api_function
         $extras      = rex_post('extras', 'array', []);
 
         if (!$product_key || ($quantity < 1 && $exact_qty < 1)) {
-            throw new rex_api_exception("Invalid request arguments");
+            throw new ApiException("Invalid request arguments");
         }
 
         if ($exact_qty) {
@@ -126,7 +126,7 @@ class rex_api_simpleshop_api extends rex_api_function
         $quantity    = rex_post('quantity', 'int');
 
         if (!$product_key || $quantity < 1) {
-            throw new rex_api_exception("Invalid request arguments");
+            throw new ApiException("Invalid request arguments");
         }
         \FriendsOfREDAXO\Simpleshop\Session::setProductData($product_key, $quantity);
         $this->api__cart_getpopupcontent();
@@ -137,7 +137,7 @@ class rex_api_simpleshop_api extends rex_api_function
         $product_key = rex_post('product_key', 'string', null);
 
         if (!$product_key) {
-            throw new rex_api_exception("Invalid request arguments");
+            throw new ApiException("Invalid request arguments");
         }
         \FriendsOfREDAXO\Simpleshop\Session::removeProduct($product_key);
         $this->api__cart_getcartcontent();
@@ -151,7 +151,13 @@ class rex_api_simpleshop_api extends rex_api_function
     }
 }
 
-class ApiExtension extends Exception
+class ApiException extends rex_api_exception
 {
+    public function __construct($message, Exception $previous = null)
+    {
+        parent::__construct($message, $previous);
+        rex_logger::logException($this);
+    }
+
     public function getLabelByCode() { }
 }
