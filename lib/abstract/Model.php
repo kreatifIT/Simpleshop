@@ -95,7 +95,7 @@ abstract class Model extends \rex_yform_manager_dataset
 
         $query = $stmt->getQuery();
 
-        if (count($params['having'])) {
+        if (isset($params['having']) && count($params['having'])) {
             $query = strtr($query, ['ORDER BY' => ' HAVING ' . implode(' AND ', $params['having']) . ' ORDER BY']);
         }
 
@@ -137,7 +137,7 @@ abstract class Model extends \rex_yform_manager_dataset
 
     public static function fetchColumn($ignoreOffline = true, $params = [], $debug = 0)
     {
-        $params['singleField'] = $params['singleField'] ?: 'id';
+        $params['singleField'] = isset($params['singleField']) ? $params['singleField'] : 'id';
 
         $results = self::prepareQuery($ignoreOffline, $params, $debug);
 
