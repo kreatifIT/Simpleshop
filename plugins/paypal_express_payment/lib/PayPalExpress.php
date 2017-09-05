@@ -60,10 +60,10 @@ class PayPalExpress extends PaymentAbstract
             'cancelUrl' => rex_getFullUrl(null, null, ['action' => 'cancelled']),
 
             'PAYMENTREQUEST_0_PAYMENTREQUESTID' => $order_id,
-            'PAYMENTREQUEST_0_AMT'              => $total_amount, // total payment (including tax + shipping)
+            'PAYMENTREQUEST_0_AMT'              => (float) $total_amount, // total payment (including tax + shipping)
             'PAYMENTREQUEST_0_CURRENCYCODE'     => 'EUR',
             'L_PAYMENTREQUEST_0_NAME0'          => $order_descr,
-            'L_PAYMENTREQUEST_0_AMT0'           => $total_amount,
+            'L_PAYMENTREQUEST_0_AMT0'           => (float) $total_amount,
             'NOSHIPPING'                        => 1,
             'ALLOWNOTE'                         => 0,
             'L_PAYMENTTYPE0'                    => 'InstantOnly',
@@ -124,7 +124,7 @@ class PayPalExpress extends PaymentAbstract
             'PWD'       => $api_pwd,
             'SIGNATURE' => $api_signature,
 
-            'PAYMENTREQUEST_0_AMT'          => $total_amount,
+            'PAYMENTREQUEST_0_AMT'          => (float) $total_amount,
             'PAYMENTREQUEST_0_CURRENCYCODE' => 'EUR',
         ];
 

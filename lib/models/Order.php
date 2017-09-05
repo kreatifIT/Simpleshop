@@ -281,6 +281,8 @@ class Order extends Model
 
     private function calculatePrices($promotions, $net_prices)
     {
+        Utils::setCalcLocale();
+
         $taxes       = [];
         $errors      = [];
         $_promotions = [];
@@ -336,6 +338,8 @@ class Order extends Model
 
         $this->setValue('taxes', $taxes);
         $this->setValue('total', $this->shipping_costs + array_sum($this->net_prices) + array_sum($taxes));
+
+        Utils::resetLocale();
 
         return [$errors, $_promotions];
     }
