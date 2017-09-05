@@ -15,8 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Sprog\Wildcard;
 
-// set local for paypal
-setlocale(LC_ALL, 'en_US');
+Utils::setCalcLocale();
 
 $errors   = [];
 $Order    = $this->getVar('Order');
@@ -56,6 +55,8 @@ catch (WSConnectorException $ex)
             break;
     }
 }
+
+Utils::resetLocale();
 
 if (count($errors)): ?>
     <div class="row column">

@@ -191,8 +191,7 @@ class Order extends Model
 
     public function recalculateDocument($products = [], $promotions = [])
     {
-        $locale = setlocale(LC_NUMERIC, 0);
-        setlocale(LC_NUMERIC, 'en_US.utf8');
+        Utils::setCalcLocale();
 
         $net_prices           = [];
         $this->quantity       = 0;
@@ -275,7 +274,7 @@ class Order extends Model
             $this->setValue('total', $this->total);
         }
 
-        setlocale(LC_NUMERIC, $locale);
+        Utils::resetLocale();
 
         return $errors;
     }
