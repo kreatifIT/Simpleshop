@@ -53,7 +53,6 @@ foreach ($include_files as $include_file) {
     include_once $include_file;
 }
 
-
 if (\rex::isBackend()) {
     $include_files = glob($this->getPath('inc/backend/*.inc.php'));
 
