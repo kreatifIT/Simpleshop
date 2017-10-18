@@ -27,6 +27,7 @@ label.resend_email = Bestellungs-Email an Kunde senden
 label.recalculate_sums = Werte neu berechnen
 label.msg_resend_email = Email wurde versendet
 label.msg_recalculate_sums = Werte wurden aktualisiert
+label.invoice_num = Rechn.-Nr
 
 
 action.manage_variants = Varianten verwalten

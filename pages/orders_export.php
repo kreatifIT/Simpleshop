@@ -50,7 +50,7 @@ if ($_FUNC == 'export' && count($order_ids)) {
     exit;
 }
 
-$orders = Order::query()->where('createdate', "{$year}-{$month}-01", '>=')->where('createdate', date('Y-m-d', strtotime("{$year}-{$month} next month -1 day")), '<=')->orderBy('id');
+$orders = Order::query()->where('createdate', "{$year}-{$month}-01", '>=')->where('createdate', date('Y-m-d 23:59:59', strtotime("{$year}-{$month} next month -1 day")), '<=')->orderBy('id');
 
 if ($status != '') {
     $orders->where('status', $status);
@@ -100,6 +100,7 @@ $sections .= $fragment->parse('core/page/section.php');
 
 $fragment = new \rex_fragment();
 $fragment->setVar('Addon', $this);
+$fragment->setVar('Settings', \rex::getConfig('simpleshop.Settings'));
 $fragment->setVar('orders', $orders);
 $fragment->setVar('order_ids', $order_ids);
 $fragment->setVar('statuses', $statuses);

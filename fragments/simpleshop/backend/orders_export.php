@@ -13,10 +13,11 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-
-$Addon    = $this->getVar('Addon');
-$orders   = $this->getVar('orders');
-$statuses = $this->getVar('statuses');
+$Addon      = $this->getVar('Addon');
+$Settings   = $this->getVar('Settings');
+$orders     = $this->getVar('orders');
+$statuses   = $this->getVar('statuses');
+$useInvoice = from_array($Settings, 'use_invoicing') == 1;
 
 ?>
 <fieldset>
@@ -26,6 +27,9 @@ $statuses = $this->getVar('statuses');
     <table class="table">
         <tr>
             <th></th>
+            <?php if ($useInvoice): ?>
+                <th><?= $Addon->i18n('label.invoice_num'); ?></th>
+            <?php endif; ?>
             <th><?= $Addon->i18n('label.order_no'); ?></th>
             <th><?= $Addon->i18n('label.customer'); ?></th>
             <th><?= $Addon->i18n('label.order_sum'); ?></th>
@@ -40,6 +44,9 @@ $statuses = $this->getVar('statuses');
                 ?>
                 <tr>
                     <td><input type="checkbox" name="orders[]" value="<?= $order->getValue('id') ?>" checked="checked"/></td>
+                    <?php if ($useInvoice): ?>
+                        <td><?= $order->getValue('invoice_num'); ?></td>
+                    <?php endif; ?>
                     <td><?= $order->getValue('id') ?></td>
                     <td><?= $Customer ? $Customer->getName() : '<i>unknown</i>' ?></td>
                     <td><?= format_price($order->getValue('total')) ?></td>
