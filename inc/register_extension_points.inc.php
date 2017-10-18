@@ -25,18 +25,12 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 \rex_extension::register('simpleshop.Order.applyDiscounts', ['\FriendsOfREDAXO\Simpleshop\DiscountGroup', 'ext_applyDiscounts']);
 
-// yform/usability extensions
-\rex_extension::register('yform/usability.addStatusToggle', function ($params)
-{
-    $table   = $params->getParam('table');
-    return $table->getTableName() != Order::TABLE;
-});
 \rex_extension::register('yform/usability.addDragNDropSort.filters', function ($params)
 {
     $subject = $params->getSubject();
     $params  = $params->getParam('list_params');
 
-    if ($params['params']['table']->getTableName() == Category::TABLE)
+    if (is_object($params['params']['table']) && $params['params']['table']->getTableName() == Category::TABLE)
     {
         $_filter = rex_get('rex_yform_filter', 'array');
 

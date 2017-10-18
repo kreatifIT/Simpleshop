@@ -164,5 +164,23 @@ table.table {
                 margin-bottom: 3px;
             }
         }
+
+        .status-select {
+            &.rex-status-OP {
+                color: #e08600;
+            }
+            &.rex-status-IP {
+                color: #4b9ad9;
+            }
+            &.rex-status-FA {
+                color: #d9534f;
+            }
+            &.rex-status-CA {
+                color: #324050;
+            }
+            &.rex-status-CL {
+                color: #3bb594;
+            }
+        }
     }
 }
