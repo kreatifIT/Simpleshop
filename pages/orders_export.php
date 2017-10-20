@@ -29,8 +29,16 @@ $_options     = explode(',', \rex_yform_manager_table::get(Order::TABLE)->getVal
 foreach ($_options as $option) {
     list ($value, $key) = explode('=', $option);
     $statuses[trim($key)] = trim($value);
-    $_status_opts[] = '<option value="'. $key .'" '. ($key == $status ? 'selected="selected"' : '') .'>'. trim($value) .'</option>';
+    $_status_opts[]       = '<option value="' . $key . '" ' . ($key == $status ? 'selected="selected"' : '') . '>' . trim($value) . '</option>';
 }
+
+$_FUNC = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.orders_export.export', $_FUNC, [
+    'month'     => $month,
+    'year'      => $year,
+    'order_ids' => $order_ids,
+    'statuses'  => $statuses,
+    'output'    => $output,
+]));
 
 if ($_FUNC == 'export' && count($order_ids)) {
     ob_clean();
@@ -74,26 +82,11 @@ foreach ($daterange as $date) {
 }
 krsort($ym_options);
 
-$content  = "
-    <div class='row'>
-        <div class='col-sm-1'><label>{$this->i18n('label.filter')}:</label></div>
-        <div class='col-sm-2'>
-            <div class='rex-select-style'><select name='year-month' class='form-control'>" . implode('', $ym_options) . "</select></div>
-        </div>
-        <div class='col-sm-2'>
-            <div class='rex-select-style'><select name='status' class='form-control'>
-                <option value=''>- {$this->i18n('label.all')} -</option>
-                ". implode('', $_status_opts) ."
-            </select></div>
-        </div>
-        <div class='col-sm-5'>
-            <button class='btn btn-default float-left' type='submit' name='func' value='filter'>{$this->i18n('update')}</button>&nbsp;&nbsp;&nbsp;
-            <button class='btn btn-apply float-left' type='submit' name='func' value='export'>" . \rex_i18n::msg('action.export') . "</button>
-        </div>
-        <div class='col-sm-2'>
-        </div>
-    </div>
-";
+$fragment = new \rex_fragment();
+$fragment->setVar('status_options', $_status_opts, false);
+$fragment->setVar('months', $ym_options, false);
+$content = $fragment->parse('simpleshop/backend/export/action_bar.php');
+
 $fragment = new \rex_fragment();
 $fragment->setVar('body', $content, false);
 $sections .= $fragment->parse('core/page/section.php');
