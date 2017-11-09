@@ -37,6 +37,7 @@ class CartController extends Controller
             }
         }
         else if ($_func == 'remove') {
+            \rex_response::cleanOutputBuffers();
             Session::removeProduct(rex_get('key'));
             header('Location: ' . rex_getUrl());
             exit();
@@ -45,6 +46,12 @@ class CartController extends Controller
         if (count($products) == 0) {
             try {
                 $products = Session::getCartItems(false, $this->params['check_cart']);
+
+                if (strlen($this->params['ahead_url'])) {
+                    \rex_response::cleanOutputBuffers();
+                    header('Location: ' . $this->params['ahead_url']);
+                    exit();
+                }
             }
             catch (CartException $ex) {
                 if ($ex->getCode() == 1) {
