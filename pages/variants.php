@@ -19,13 +19,11 @@ $_FUNC      = \rex_request('func', 'string');
 $product_id = rex_get('data_id', 'int');
 $product    = \FriendsOfREDAXO\Simpleshop\Product::get($product_id);
 
-if ($_FUNC == 'rm-variants')
-{
+if ($_FUNC == 'rm-variants') {
     $sql = \rex_sql::factory();
-    $sql->setQuery("DELETE FROM ". Variant::TABLE ." WHERE product_id = :product_id", ['product_id' => $product_id]);
+    $sql->setQuery("DELETE FROM " . Variant::TABLE . " WHERE product_id = :product_id", ['product_id' => $product_id]);
 }
-if ($_FUNC == 'apply-features')
-{
+if ($_FUNC == 'apply-features') {
     $features_ids = explode(',', rex_get('feature_ids', 'string'));
     $current_fids = explode(',', $product->getValue('features'));
     $product->setValue('features', implode(',', array_unique(array_filter(array_merge($features_ids, $current_fids)))));
@@ -41,24 +39,19 @@ $product_url = \rex_url::backendPage('yform/manager/data_edit', [
 ]);
 
 
-if (!$product)
-{
+if (!$product) {
     echo \rex_view::warning($this->i18n('error.no_product_choosen'));
     return;
 }
-else if (!$features && Variant::query()->where('product_id', $product_id)->count())
-{
+else if (!$features && Variant::query()->where('product_id', $product_id)->count()) {
     $features = [];
     $variants = Variant::query()->where('product_id', $product_id)->find();
 
-    foreach ($variants as $variant)
-    {
+    foreach ($variants as $variant) {
         $_features = explode('|', $variant->getValue('variant_key'));
 
-        foreach ($_features as $feature_id)
-        {
-            if (!isset($features[$feature_id]))
-            {
+        foreach ($_features as $feature_id) {
+            if (!isset($features[$feature_id])) {
                 $features[$feature_id] = FeatureValue::get($feature_id)->getValue(sprogfield('name'));
             }
         }
@@ -70,50 +63,41 @@ else if (!$features && Variant::query()->where('product_id', $product_id)->count
         ['field' => '<a class="btn btn-apply" href="' . \rex_url::currentBackendPage(['table_name' => Variant::TABLE, 'data_id' => $product_id, 'func' => 'rm-variants']) . '">' . $this->i18n('action.remove_all_variants') . '</a>',],
     ];
     $fragment     = new \rex_fragment();
-    $fragment->setVar('elements', $formElements, FALSE);
+    $fragment->setVar('elements', $formElements, false);
     $buttons = $fragment->parse('core/form/submit.php');
 
     echo '<form action="" method="post">';
     $fragment = new \rex_fragment();
-    $fragment->setVar('class', 'edit', FALSE);
+    $fragment->setVar('class', 'edit', false);
     $fragment->setVar('title', $this->i18n('label.what_u_want_todo'));
-    $fragment->setVar('buttons', $buttons, FALSE);
+    $fragment->setVar('buttons', $buttons, false);
     echo $fragment->parse('core/page/section.php');
     echo '</form>';
     return;
 }
-else if (!$features)
-{
+else if (!$features) {
     echo \rex_view::info(strtr($this->i18n('error.product_has_attribute'), [
         '{{link}}'  => '<a href="' . $product_url . '" class="btn btn-info btn-sm">',
         '{{/link}}' => '</a>',
     ]));
     return;
 }
-if ($_FUNC == 'save')
-{
+if ($_FUNC == 'save') {
     $saved_keys = [];
     $data       = rex_post('FORM', 'array');
 
-    foreach ($data as $key => $values)
-    {
-        $variant = Variant::query()
-            ->where('variant_key', $key)
-            ->where('product_id', $product_id)
-            ->findOne();
+    foreach ($data as $key => $values) {
+        $variant = Variant::query()->where('variant_key', $key)->where('product_id', $product_id)->findOne();
 
-        if (!$variant)
-        {
+        if (!$variant) {
             $variant = Variant::create();
             $variant->setValue('variant_key', $key);
             $variant->setValue('product_id', $product_id);
         }
-        else
-        {
+        else {
             $variant->setValue('updatedate', date('Y-m-d H:i:s'));
         }
-        foreach ($values as $name => $value)
-        {
+        foreach ($values as $name => $value) {
             $variant->setValue($name, $value);
         }
         $variant->save();
@@ -133,13 +117,11 @@ $feature_ids = [];
 $rows        = [];
 
 // load all yform fields to place them into columns
-foreach ($columns as $column)
-{
+foreach ($columns as $column) {
     $type = $column->getTypeName();
     $name = $column->getName();
 
-    if ($name == 'variant_key' || in_array($type, ['be_manager_relation', 'datestamp']))
-    {
+    if ($name == 'variant_key' || in_array($type, ['be_manager_relation', 'datestamp'])) {
         continue;
     }
     $values      = [$type];
@@ -147,80 +129,70 @@ foreach ($columns as $column)
     $field       = new $class();
     $definitions = $field->getDefinitions();
 
-    foreach ($definitions['values'] as $key => $_)
-    {
+    foreach ($definitions['values'] as $key => $_) {
         $values[] = $column->getElement($key);
     }
     $notice = '';
 
-    if (count($values) > 4)
-    {
+    if (count($values) > 4) {
         $notice                     = $values[count($values) - 1];
         $values[count($values) - 1] = '';
     }
     $field->loadParams($params, $values);
     $fields[] = $field;
-    $labels[] = [
-        'label'  => $field->getLabel(),
-        'notice' => $notice,
-    ];
+
+    if ($type != 'hidden_input') {
+        $labels[] = [
+            'label'  => $field->getLabel(),
+            'notice' => $notice,
+        ];
+    }
 }
 
 // calculate the possible variants
-foreach ($features as $feature)
-{
+foreach ($features as $feature) {
     $values    = $feature->values;
     $_variants = $variants;
     $variants  = [];
 
-    if (count($_variants) == 0)
-    {
+    if (count($_variants) == 0) {
         $_variants[] = '';
     }
-    foreach ($values as $value)
-    {
+    foreach ($values as $value) {
         $feature_ids[$value->getValue('id')] = $value->getValue('name_1');
 
-        foreach ($_variants as $variant)
-        {
+        foreach ($_variants as $variant) {
             $variants[] = ltrim($variant . ',' . $value->getValue('id'), ',');
         }
     }
 }
 
 // apply fields/columns to variants
-foreach ($variants as $variant_key)
-{
+foreach ($variants as $variant_key) {
     $_ids    = explode(',', $variant_key);
     $type    = '';
     $_name   = [];
     $_fields = [];
-    $variant = Variant::query()
-        ->where('product_id', $product_id)
-        ->where('variant_key', $variant_key)
-        ->findOne();
+    $variant = Variant::query()->where('product_id', $product_id)->where('variant_key', $variant_key)->findOne();
 
-    foreach ($_ids as $id)
-    {
+    foreach ($_ids as $id) {
         $_name[] = $feature_ids[$id];
     }
-    foreach ($fields as $field)
-    {
+    foreach ($fields as $field) {
         $field->params['this']->setObjectparams('form_name', $variant_key);
         $field->setId($field->name);
         $field->init();
         $field->setLabel('');
-        $field->setValue($variant ? $variant->getValue($field->name) : NULL);
+        $field->setValue($variant ? $variant->getValue($field->name) : null);
         $field->enterObject();
         $_fields[] = $field->params['form_output'][$field->getId()];
 
-        if ($field->name == 'type')
-        {
+        if ($field->name == 'type') {
             $type = $field->getValue();
         }
     }
     $fragment = new \rex_fragment();
-    $fragment->setVar('fields', $_fields, FALSE);
+    $fragment->setVar('fields', $_fields, false);
     $fragment->setVar('name', $_name);
     $fragment->setVar('type', $type);
     $rows[] = $fragment->parse('simpleshop/backend/variants/row_item.php');
@@ -228,7 +200,7 @@ foreach ($variants as $variant_key)
 
 $fragment = new \rex_fragment();
 $fragment->setVar('labels', $labels);
-$fragment->setVar('rows', $rows, FALSE);
+$fragment->setVar('rows', $rows, false);
 $content = $fragment->parse('simpleshop/backend/variants/grid.php');
 
 $formElements = [
@@ -237,14 +209,14 @@ $formElements = [
     ['field' => '<button class="btn btn-apply rex-form-aligned" type="submit" name="func" value="save">' . \rex_i18n::msg('form_save') . '</button>',],
 ];
 $fragment     = new \rex_fragment();
-$fragment->setVar('elements', $formElements, FALSE);
+$fragment->setVar('elements', $formElements, false);
 $buttons = $fragment->parse('core/form/submit.php');
 
 echo '<form action="" method="post">';
 $fragment = new \rex_fragment();
-$fragment->setVar('class', 'edit', FALSE);
+$fragment->setVar('class', 'edit', false);
 $fragment->setVar('title', $product->getValue('name_1') . ' [' . $product_id . ']');
-$fragment->setVar('content', $content, FALSE);
-$fragment->setVar('buttons', $buttons, FALSE);
+$fragment->setVar('content', $content, false);
+$fragment->setVar('buttons', $buttons, false);
 echo $fragment->parse('core/page/section.php');
 echo '</form>';

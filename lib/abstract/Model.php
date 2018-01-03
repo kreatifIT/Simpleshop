@@ -164,6 +164,14 @@ abstract class Model extends \rex_yform_manager_dataset
         return count(self::prepareQuery($ignoreOffline, $params, $debug));
     }
 
+    public static function getOne($ignoreOffline = true, $params = [], $debug = 0)
+    {
+        $params['limit'] = 1;
+
+        $rows = self::prepareQuery($ignoreOffline, $params, $debug);
+        return isset($rows[0]) ? $rows[0] : null;
+    }
+
     public function getValue($key, $lang_id = false, $default = '')
     {
         if ($lang_id) {
