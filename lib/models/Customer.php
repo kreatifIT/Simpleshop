@@ -10,6 +10,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace FriendsOfREDAXO\Simpleshop;
 
 
@@ -114,7 +115,9 @@ class Customer extends Model
                 // logged in
                 $_SESSION['customer']['user'] = ['id' => $user->getValue('id')];
                 // update login timestamp
-                $user->setValue('lastlogin', date('Y-m-d H:i:s'))->save();
+                $user->setValue('lastlogin', date('Y-m-d H:i:s'));
+                $user->setValue('lang_id', \rex_clang::getCurrentId());
+                $user->save();
 
                 $result = \rex_extension::registerPoint(new \rex_extension_point('Customer.logged_in', $user, [
                     'password' => $password,

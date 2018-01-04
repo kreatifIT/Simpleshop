@@ -1,23 +1,19 @@
 <?php
 
-$products = \FriendsOfREDAXO\Simpleshop\Session::getCartItems(true);
-$fragment = new rex_fragment();
+$products = \FriendsOfREDAXO\Simpleshop\Session::getCartItems();
 
 ?>
-<div id="cart" class="padding-top padding-large-bottom">
+<div id="cart" class="section-wrapper margin-large-top margin-large-bottom">
     <div class="row">
-        <div class="column padding-top">
+        <div class="column">
             <?php
-            if (count($products)) {
-                echo \FriendsOfREDAXO\Simpleshop\CartController::execute([
-                    'config' => ['has_image' => true],
-                ]);
-            }
-            else {
-                echo $fragment->parse('simpleshop/cart/empty.php');
-            }
+            $Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute([
+                'config'   => ['has_image' => true],
+                'products' => $products,
+            ]);
+            echo $Controller->parse();
             ?>
+            <a href="#" class="button">###action.go_ahead###</a>
         </div>
-        <a href="#" class="button">###action.go_ahead###</a>
     </div>
 </div>

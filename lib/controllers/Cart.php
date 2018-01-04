@@ -43,7 +43,7 @@ class CartController extends Controller
             exit();
         }
 
-        if (count($products) == 0) {
+        if (count($products)) {
             try {
                 $products = Session::getCartItems(false, $this->params['check_cart']);
 

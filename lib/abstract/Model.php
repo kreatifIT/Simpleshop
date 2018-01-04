@@ -441,4 +441,16 @@ abstract class Model extends \rex_yform_manager_dataset
         }
         return $data;
     }
+
+    public static function getAllYformFields($filter = [])
+    {
+        $table = self::create();
+        return $table->getFields($filter);
+    }
+
+    public static function getYformFieldByName($name)
+    {
+        $fields = self::getAllYformFields(['name' => $name]);
+        return array_shift($fields);
+    }
 }

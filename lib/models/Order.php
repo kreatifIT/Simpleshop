@@ -10,6 +10,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace FriendsOfREDAXO\Simpleshop;
 
 
@@ -43,12 +44,10 @@ class Order extends Model
         $products = OrderProduct::getAll(false, [
             'filter'  => [['order_id', $this->getId()]],
             'orderBy' => 'id',
-        ]);
-        if (!$raw) {
-            $_products = $products;
-            $products  = [];
+        ])->toArray();
 
-            foreach ($_products as $product) {
+        if (!$raw) {
+            foreach ($products as $index => &$product) {
                 $_product = $product->getValue('data');
                 $_data    = $product->getData();
                 $_pdata   = $_product->getData();
@@ -58,7 +57,7 @@ class Order extends Model
                         $_product->setValue($key, $value);
                     }
                 }
-                $products[] = $_product;
+                $product = clone $_product;
             }
         }
         return $products;
@@ -124,7 +123,6 @@ class Order extends Model
 
             $order_id   = $this->getValue('id');
             $promotions = $this->getValue('promotions');
-            $products   = Session::getCartItems(false, false);
 
             if (self::$_finalizeOrder && isset ($promotions['coupon'])) {
                 // relate coupon
@@ -157,11 +155,12 @@ class Order extends Model
             // clear all products first
             \rex_sql::factory()->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$order_id}");
 
+            $products = Session::getCartItems(false, false);
+
             // set order products
             foreach ($products as $product) {
                 $prod_data = Model::prepare($product);
                 $quantity  = $product->getValue('cart_quantity');
-
 
                 foreach ($prod_data as $name => $value) {
                     $product->setValue($name, $value);
@@ -206,8 +205,8 @@ class Order extends Model
             $tax_perc = Tax::get($product->getValue('tax'))->getValue('tax');
 
             $net_prices[$tax_perc] += (float) $product->getPrice() * $quantity;
-            $this->initial_total += (float) $product->getPrice(true) * $quantity;
-            $this->quantity += $quantity;
+            $this->initial_total   += (float) $product->getPrice(true) * $quantity;
+            $this->quantity        += $quantity;
         }
         // get shipping costs
         try {
@@ -244,13 +243,13 @@ class Order extends Model
                 $_ndiscount = $manual_discount / (100 + $tax_perc) * 100;
 
                 if ($_ndiscount <= $net_price) {
-                    $netto_discount += $_ndiscount;
+                    $netto_discount  += $_ndiscount;
                     $manual_discount = 0;
                 }
                 else {
-                    $_bdiscount = $_ndiscount * (1 + $tax_perc / 100);
+                    $_bdiscount      = $_ndiscount * (1 + $tax_perc / 100);
                     $manual_discount -= $_bdiscount;
-                    $netto_discount += $net_price;
+                    $netto_discount  += $net_price;
                 }
             }
 
@@ -301,16 +300,16 @@ class Order extends Model
                             break;
                         }
                         if ($__promotion < $net_price) {
-                            $net_price -= $__promotion;
+                            $net_price      -= $__promotion;
                             $this->discount -= $__promotion;
-                            $__promotion = 0;
-                            $promotion   = $_promotion;
+                            $__promotion    = 0;
+                            $promotion      = $_promotion;
                         }
                         else {
-                            $__promotion -= $net_price;
+                            $__promotion    -= $net_price;
                             $this->discount -= $net_price;
-                            $promotion += $net_price;
-                            $net_price = 0;
+                            $promotion      += $net_price;
+                            $net_price      = 0;
                         }
                     }
                 }
@@ -331,7 +330,7 @@ class Order extends Model
             $taxes[$tax] += (float) $net_price / 100 * $tax;
         }
         if ($this->shipping_costs) {
-            $tax = $this->shipping->getTaxPercentage();
+            $tax         = $this->shipping->getTaxPercentage();
             $taxes[$tax] += (float) $this->shipping_costs / 100 * $tax;
         }
         ksort($taxes);

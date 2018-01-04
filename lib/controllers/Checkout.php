@@ -10,6 +10,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace FriendsOfREDAXO\Simpleshop;
 
 
@@ -104,6 +105,7 @@ class CheckoutController extends Controller
 
         // add vars
         $Mail->setVar('Order', $this->Order);
+        $Mail->setVar('primary_color', $this->params['primary_color']);
         $Mail->setVar('config', array_merge([
             'is_order_complete' => true,
             'is_email'          => true,
@@ -128,8 +130,8 @@ class CheckoutController extends Controller
     protected function getCompleteView()
     {
         // finally save order - DONE / COMPLETE
-        $this->Order->save();
-        $this->sendMail();
+        $this->Order->completeOrder();
+        $this->sendMail($this->params['debug']);
 
         // CLEAR THE SESSION
         Session::clearCheckout();
@@ -140,7 +142,7 @@ class CheckoutController extends Controller
 
     protected function initPayment()
     {
-        $payment = $this->Order->getValue('payment');
+        $payment             = $this->Order->getValue('payment');
         $this->fragment_path = 'simpleshop/payment/' . $payment->getValue('plugin_name') . '/payment_init.php';
     }
 

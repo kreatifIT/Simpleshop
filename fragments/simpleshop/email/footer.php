@@ -13,6 +13,8 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+$prim_color = $this->getVar('primary_color', 'green');
+
 ?>
 <!-- rule -->
 <table class="row"
@@ -30,7 +32,8 @@ namespace FriendsOfREDAXO\Simpleshop;
                             <tr style="padding:0;text-align:left;vertical-align:top">
                                 <td height="20px"
                                     style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;hyphens:auto;line-height:20px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word">
-                                    &#xA0;</td>
+                                    &#xA0;
+                                </td>
                             </tr>
                             </tbody>
                         </table>
@@ -68,15 +71,15 @@ namespace FriendsOfREDAXO\Simpleshop;
                 <tr style="padding:0;text-align:left;vertical-align:top">
                     <th style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left">
                         ###label.phone### & ###label.fax###:
-                        <a href="tel:###company.phone###" style="Margin:0;color:#00913e;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none">
+                        <a href="tel:###company.phone###" style="Margin:0;color:<?= $prim_color ?>;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none">
                             ###company.phone###</a>
                         <br>
                         ###label.website###:
-                        <a href="http://###company.website###" target="_blank" style="Margin:0;color:#00913e;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none">
+                        <a href="http://###company.website###" target="_blank" style="Margin:0;color:<?= $prim_color ?>;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none">
                             ###company.website###</a>
                         <br>
                         ###label.email###:
-                        <a href="mailto:###company.email###" style="Margin:0;color:#00913e;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none">
+                        <a href="mailto:###company.email###" style="Margin:0;color:<?= $prim_color ?>;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none">
                             ###company.email###
                         </a>
                         <br>

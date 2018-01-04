@@ -12,6 +12,8 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Whoops\Exception\ErrorException;
+
 abstract class Controller
 {
     protected $params        = [];
