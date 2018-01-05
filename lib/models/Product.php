@@ -10,6 +10,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace FriendsOfREDAXO\Simpleshop;
 
 
@@ -37,8 +38,8 @@ class Product extends Model
 
     public function getPrice($includeTax = false, $use_reduced = true)
     {
-        $type     = $this->getValue('type');
-        $price    = $this->getValue('price');
+        $type  = $this->getValue('type');
+        $price = $this->getValue('price');
 
         if ($type == 'giftcard') {
             $includeTax = false;
@@ -283,7 +284,8 @@ class Product extends Model
     public function generatePath($lang_id, $path = '')
     {
         $_paths   = [];
-        $category = Category::get($this->getValue('category_id'));
+        $catId    = $this->getValue('category_id');
+        $category = $catId ? Category::get($this->getValue('category_id')) : null;
 
         if ($category) {
             $parents = $category->getParentTree();
@@ -291,8 +293,8 @@ class Product extends Model
             foreach ($parents as $parent) {
                 $_paths[] = Url::getRewriter()->normalize($parent->getValue('name_' . $lang_id));
             }
-            $_paths[] = $path;
         }
+        $_paths[] = $path;
         return implode('/', $_paths);
     }
 
