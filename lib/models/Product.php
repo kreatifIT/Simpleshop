@@ -161,10 +161,20 @@ class Product extends Model
         return $this->__feature_data;
     }
 
-    public function getAllVariants()
+    public function getAllVariants($filter = [])
     {
         if ($this->__variants === null) {
-            $_variants = Variant::query()->resetSelect()->select('id')->select('variant_key')->where('product_id', $this->getValue('id'))->where('type', 'NE', '!=')->find();
+            $stmt = Variant::query()
+                ->resetSelect()
+                ->select('id')
+                ->select('variant_key')
+                ->where('product_id', $this->getValue('id'))
+                ->where('type', 'NE', '!=');
+
+            foreach ($filter as $data) {
+                $stmt->where($data[0], $data[1], $data[2] ?: '=');
+            }
+            $_variants = $stmt->find();
 
             $this->__feature_data = [
                 'features' => [],

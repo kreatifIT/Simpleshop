@@ -118,6 +118,8 @@ class rex_api_simpleshop_api extends rex_api_function
             \FriendsOfREDAXO\Simpleshop\Session::addProduct($product_key, $quantity, $extras);
         }
         $this->api__cart_getpopupcontent();
+        $this->response['cart_items']    = \FriendsOfREDAXO\Simpleshop\Session::getCartItems(true);
+        $this->response['cart_item_cnt'] = count($this->response['cart_items']);
     }
 
     private function api__cart_setproductquantity()
