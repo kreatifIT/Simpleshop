@@ -14,6 +14,7 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $email    = $this->getVar('email');
+$addText  = $this->getVar('additional_text', '');
 $password = $this->getVar('password');
 $url      = $this->getVar('url');
 $config   = array_merge([], $this->getVar('config', []));
@@ -26,3 +27,7 @@ $config   = array_merge([], $this->getVar('config', []));
     ###label.email###: <?= $email ?><br/>
     ###label.password###: <?= $password ?>
 </p>
+
+<?php if (strlen($addText)): ?>
+    <p><?= $addText ?></p>
+<?php endif; ?>

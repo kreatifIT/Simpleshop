@@ -36,9 +36,9 @@ class Mail extends \rex_mailer
         $this->fragment->setVar('fragment_path', $fragment_path);
     }
 
-    public function setVar($key, $value)
+    public function setVar($key, $value, $escape = true)
     {
-        $this->fragment->setVar($key, $value);
+        $this->fragment->setVar($key, $value, $escape);
     }
 
     public function getVar($key, $default = null)

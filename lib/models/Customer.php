@@ -88,7 +88,7 @@ class Customer extends Model
             $Mail->setVar('password', $password);
             $Mail->AddAddress($email);
 
-            \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.sendRegistrationEmail', $do_send, [
+            $do_send = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.sendRegistrationEmail', $do_send, [
                 'Mail'     => $Mail,
                 'User'     => $_this,
                 'password' => $password,
