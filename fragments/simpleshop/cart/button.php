@@ -20,6 +20,8 @@ $config = array_merge([
     'has_add_to_cart_button' => false,
     'has_request_button'     => false,
     'has_detail_button'      => false,
+    'has_qty_ctr_minus_attr' => '',
+    'has_qty_ctr_plus_attr'  => '',
 ], $this->getVar('config', []));
 
 $extras       = $this->getVar('extras', []);
@@ -32,9 +34,9 @@ $prod_req_url = $this->getVar('product_request_url', '');
 <div class="quantity-ctrl-button">
     <?php if ($config['has_quantity_control']): ?>
         <div class="amount-increment clearfix">
-            <span class="button minus float-left">-</span>
+            <span class="button minus float-left" <?= $config['has_qty_ctr_minus_attr'] ?>>-</span>
             <input type="text" class="float-left" value="<?= $quantity ?>" name="quantity[<?= $product_key ?>]" readonly>
-            <span class="button plus float-left">+</span>
+            <span class="button plus float-left" <?= $config['has_qty_ctr_plus_attr'] ?>>+</span>
             <?php if ($config['has_refresh_button']): ?>
                 <button class="button secondary refresh float-left" type="submit" name="func" value="update"><i class="fa fa-refresh" aria-hidden="true"></i></button>
             <?php endif; ?>
