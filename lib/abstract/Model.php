@@ -44,7 +44,7 @@ abstract class Model extends \rex_yform_manager_dataset
             'singleField' => null,
         ], $params);
 
-        $stmt = self::query(static::TABLE)->alias('m')->orderByRaw($params['orderBy'], $params['order']);
+        $stmt = self::query(static::TABLE)->alias('m');
 
         if ($params['offset'] && $params['limit']) {
             $stmt->limit($params['offset'], $params['limit']);
@@ -78,6 +78,16 @@ abstract class Model extends \rex_yform_manager_dataset
                 }
             }
         }
+
+        if ($params['orderBy'] == 'RAND') {
+            $orderBy = 'RAND()';
+            $stmt->resetOrderBy();
+        }
+        else {
+            $orderBy = $params['orderBy'];
+        }
+        $order = !in_array(strtoupper($params['order']), ['ASC', 'DESC']) ? 'ASC' : $params['order'];
+        $stmt->orderByRaw($orderBy, $order);
 
         if (count($params['joins'])) {
             foreach ($params['joins'] as $join) {
@@ -170,6 +180,11 @@ abstract class Model extends \rex_yform_manager_dataset
 
         $rows = self::prepareQuery($ignoreOffline, $params, $debug);
         return isset($rows[0]) ? $rows[0] : null;
+    }
+
+    public function getRawValue($key)
+    {
+        return parent::getValue($key);
     }
 
     public function getValue($key, $lang_id = false, $default = '')
