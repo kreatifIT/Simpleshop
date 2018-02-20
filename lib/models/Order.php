@@ -14,6 +14,8 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
+use PHPMailer\PHPMailer\Exception;
+
 class Order extends Model
 {
     const TABLE = 'rex_shop_order';
@@ -366,18 +368,6 @@ class Order extends Model
         $this->setValue('ip_address', rex_server('REMOTE_ADDR', 'string', 'notset'));
 
         return $this->recalculateDocument($products, $promotions);
-    }
-
-    public static function ext_yform_saved($params)
-    {
-        $result = $params->getSubject();
-
-        if ($result !== false && $params->getParam('table') == self::TABLE) {
-            $dataset = $params->getParam('form')->getParam('manager_dataset');
-            if (!$dataset) {
-                $dataset = rex_yform_manager_dataset::getRaw($params->getParam('id'), $table->getTableName());
-            }
-        }
     }
 
     public static function ext_yform_data_delete($params)

@@ -10,6 +10,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace FriendsOfREDAXO\Simpleshop;
 
 
@@ -22,10 +23,11 @@ class CartController extends Controller
             'check_cart' => true,
             'ahead_url'  => '',
             'products'   => [],
+            'errors'     => [],
             'config'     => [],
         ], $this->params);
 
-        $errors   = [];
+        $errors   = $this->params['errors'];
         $products = $this->params['products'];
         $_func    = rex_request('func', 'string');
 
