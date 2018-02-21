@@ -49,17 +49,17 @@ class Order extends Model
         ])->toArray();
 
         if (!$raw) {
-            foreach ($products as $index => &$product) {
-                $_product = $product->getValue('data');
-                $_data    = $product->getData();
-                $_pdata   = $_product->getData();
+            foreach ($products as $index => &$orderProduct) {
+                $Product     = clone $orderProduct->getValue('data');
+                $orderPData  = $orderProduct->getData();
+                $productData = $Product->getData();
 
-                foreach ($_data as $key => $value) {
-                    if (!array_key_exists($key, $_pdata)) {
-                        $_product->setValue($key, $value);
+                foreach ($orderPData as $key => $value) {
+                    if (!array_key_exists($key, $productData)) {
+                        $Product->setValue($key, $value);
                     }
                 }
-                $product = clone $_product;
+                $orderProduct = $Product;
             }
         }
         return $products;
@@ -184,7 +184,19 @@ class Order extends Model
                         Coupon::createGiftcard($this, $product);
                     }
                 }
-                OrderProduct::create()->setValue('order_id', $order_id)->setValue('product_id', $product->getValue('id'))->setValue('code', $product->getValue('code'))->setValue('quantity', $quantity)->setValue('data', $product)->setValue('createdate', $date_now)->save(true);
+                $OrderProduct = OrderProduct::create();
+                $OrderProduct->setValue('order_id', $order_id);
+                $OrderProduct->setValue('product_id', $product->getValue('id'));
+                $OrderProduct->setValue('code', $product->getValue('code'));
+                $OrderProduct->setValue('quantity', $quantity);
+                $OrderProduct->setValue('data', $product);
+                $OrderProduct->setValue('createdate', $date_now);
+
+                $OrderProduct = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.saveOrderProduct', $OrderProduct, [
+                    'Order' => $this,
+                ]));
+
+                $OrderProduct->save(true);
             }
         }
         return $result;

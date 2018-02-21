@@ -116,6 +116,17 @@ class CheckoutController extends Controller
         $Mail->AddAddress($Customer->getValue('email'));
         $Mail->AddAddress(from_array($Settings, 'order_notification_email'));
 
+        if (isset($this->params['addAddress'])) {
+            foreach (explode(',', $this->params['addAddress']) as $_add) {
+                $Mail->AddAddress($_add);
+            }
+        }
+        if (isset($this->params['addCC'])) {
+            foreach (explode(',', $this->params['addCC']) as $_add) {
+                $Mail->addCC($_add);
+            }
+        }
+
         $do_send = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.orderComplete', $do_send, [
             'Mail'  => $Mail,
             'User'  => $Customer,
