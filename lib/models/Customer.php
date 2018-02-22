@@ -27,6 +27,14 @@ class Customer extends Model
         return self::query()->where('email', $email)->findOne();
     }
 
+    public function save($prepare = false)
+    {
+        $type   = $this->getId() ? 'update' : 'insert';
+        $result = parent::save($prepare);
+        $result = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.preSave', $result, ['type' => $type, 'Customer' => $this]));
+        return $result;
+    }
+
     public static function getCurrentUser()
     {
         $result = null;
