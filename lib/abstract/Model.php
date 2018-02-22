@@ -57,17 +57,27 @@ abstract class Model extends \rex_yform_manager_dataset
             foreach ($params['filter'] as $filter_index => $filter) {
                 if (isset($filter[2])) {
                     if ($filter[2] == '1n') {
-                        $stmt->whereRaw("(
-                            {$filter[0]} = :fw1{$filter_index}
-                            OR {$filter[0]} LIKE :fw2{$filter_index}
-                            OR {$filter[0]} LIKE :fw3{$filter_index}
-                            OR {$filter[0]} LIKE :fw4{$filter_index}
-                        )", [
-                            "fw1{$filter_index}" => $filter[1],
-                            "fw2{$filter_index}" => "{$filter[1]},%",
-                            "fw3{$filter_index}" => "%,{$filter[1]},%",
-                            "fw4{$filter_index}" => "%,{$filter[1]}",
-                        ]);
+                        $_where     = [];
+                        $_whereVals = [];
+                        $in_vals    = (array) $filter[1];
+
+                        foreach ($in_vals as $val_index => $in_val) {
+                            $_where[]   = "(
+                                {$filter[0]} = :fw1{$filter_index}{$val_index}
+                                OR {$filter[0]} LIKE :fw2{$filter_index}{$val_index}
+                                OR {$filter[0]} LIKE :fw3{$filter_index}{$val_index}
+                                OR {$filter[0]} LIKE :fw4{$filter_index}{$val_index}
+                            )";
+                            $_whereVals = array_merge($_whereVals, [
+                                "fw1{$filter_index}{$val_index}" => $in_val,
+                                "fw2{$filter_index}{$val_index}" => "{$in_val},%",
+                                "fw3{$filter_index}{$val_index}" => "%,{$in_val},%",
+                                "fw4{$filter_index}{$val_index}" => "%,{$in_val}",
+                            ]);
+                        }
+                        if (count($_where)) {
+                            $stmt->whereRaw('(' . implode(' OR ', $_where) . ')', $_whereVals);
+                        }
                     }
                     else {
                         $stmt->where($filter[0], $filter[1], $filter[2]);
