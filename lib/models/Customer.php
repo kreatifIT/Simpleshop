@@ -32,6 +32,11 @@ class Customer extends Model
         $result = null;
         if (!empty($_SESSION['customer']['user']) && (int) $_SESSION['customer']['user']['id'] > 0) {
             $result = parent::get($_SESSION['customer']['user']['id']);
+
+            if (!$result) {
+                self::logout();
+                rex_redirect(\rex_article::getCurrentId());
+            }
         }
         return $result;
     }
