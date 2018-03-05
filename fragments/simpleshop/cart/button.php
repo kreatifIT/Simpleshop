@@ -14,6 +14,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 $config = array_merge([
     'has_quantity'           => true,
+    'quantity_is_writeable'  => false,
     'is_disabled'            => false,
     'has_refresh_button'     => false,
     'has_quantity_control'   => false,
@@ -35,7 +36,7 @@ $prod_req_url = $this->getVar('product_request_url', '');
     <?php if ($config['has_quantity_control']): ?>
         <div class="amount-increment clearfix">
             <span class="button minus float-left" <?= $config['has_qty_ctr_minus_attr'] ?>>-</span>
-            <input type="text" class="float-left" value="<?= $quantity ?>" name="quantity[<?= $product_key ?>]" readonly>
+            <input type="text" class="float-left" value="<?= $quantity ?>" name="quantity[<?= $product_key ?>]" <?= $config['quantity_is_writeable'] ? '' : 'readonly' ?>>
             <span class="button plus float-left" <?= $config['has_qty_ctr_plus_attr'] ?>>+</span>
             <?php if ($config['has_refresh_button']): ?>
                 <button class="button secondary refresh float-left" type="submit" name="func" value="update"><i class="fa fa-refresh" aria-hidden="true"></i></button>
