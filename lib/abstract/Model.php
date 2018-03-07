@@ -416,7 +416,7 @@ abstract class Model extends \rex_yform_manager_dataset
 
                     if (class_exists($value['class'])) {
                         if (isset ($data['id'])) {
-                            $Object = call_user_func_array([$value['class'], 'get'], [$data['id']]);
+                            $Object = clone call_user_func_array([$value['class'], 'get'], [$data['id']]);
                         }
                         if (!isset($Object)) {
                             $Object = call_user_func([$value['class'], 'create']);
