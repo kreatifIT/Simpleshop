@@ -60,6 +60,20 @@ $Settings = $this->getVar('Settings');
     </dl>
     <?php endif; ?>
 
+    <legend><?= $Addon->i18n('settings.page_mapping'); ?></legend>
+    <dl class="rex-form-group form-group">
+        <dt>Kunden-Dashboard</dt>
+        <dd>
+            <?= \rex_var_link::getWidget('linklist_dashboard', 'linklist[dashboard]', $Settings['linklist']['dashboard']) ?>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
+        <dt>Warenkorb</dt>
+        <dd>
+            <?= \rex_var_link::getWidget('linklist_cart', 'linklist[cart]', $Settings['linklist']['cart']) ?>
+        </dd>
+    </dl>
+
     <!--    <br/>-->
     <!---->
     <!--    <legend>--><? //= $Addon->i18n('url_settings');

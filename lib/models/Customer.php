@@ -77,7 +77,10 @@ class Customer extends Model
         foreach ($attributes as $attr => $value) {
             $_this->setValue($attr, $value);
         }
-        $_this->setValue('email', $email)->setValue('password', $password)->setValue('status', 1)->setValue('created', date('Y-m-d H:i:s'));
+        $_this->setValue('email', $email);
+        $_this->setValue('password', $password);
+        $_this->setValue('status', 1);
+        $_this->setValue('created', date('Y-m-d H:i:s'));
         $success  = $_this->save();
         $messages = $_this->getMessages();
 

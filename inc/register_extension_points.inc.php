@@ -23,21 +23,17 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 \rex_extension::register('simpleshop.Order.applyDiscounts', ['\FriendsOfREDAXO\Simpleshop\DiscountGroup', 'ext_applyDiscounts']);
 
-\rex_extension::register('yform/usability.addDragNDropSort.filters', function ($params)
-{
+\rex_extension::register('yform/usability.addDragNDropSort.filters', function ($params) {
     $subject = $params->getSubject();
     $params  = $params->getParam('list_params');
 
-    if (is_object($params['params']['table']) && $params['params']['table']->getTableName() == Category::TABLE)
-    {
+    if (is_object($params['params']['table']) && $params['params']['table']->getTableName() == Category::TABLE) {
         $_filter = rex_get('rex_yform_filter', 'array');
 
-        if(isset($_filter['parent_id']))
-        {
-            $subject[] = 'parent_id='. (int) $_filter['parent_id'];
+        if (isset($_filter['parent_id'])) {
+            $subject[] = 'parent_id=' . (int) $_filter['parent_id'];
         }
-        else
-        {
+        else {
             $subject[] = 'parent_id=0';
         }
     }

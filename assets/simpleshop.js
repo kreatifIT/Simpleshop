@@ -1,37 +1,14 @@
-var Simpleshop = (function () {
+var Simpleshop = (function ($) {
+    'use strict';
 
-    cloneInput = function(el, length) {
-        var $this = $(el),
-            name = $this.prop('name');
+    var result = {
+        toggleAuth: function(_this, selector) {
+            var $this = $(_this),
+                $wrapper = $this.parents('.auth-wrapper');
 
-        if (name.match(/[a-z\d]+\[[a-z\d]+\]\[[a-z\d]\]/i)) {
-            name = name.replace(/([a-z\d]+)\[([a-z\d]+)\]\[([a-z\d]+)\]/i, '$1[$2]['+ length +']');
+            $wrapper.children('div').addClass('hide');
+            $wrapper.children(selector).removeClass('hide');
         }
-        $this.prop('name', name);
     };
-
-    return {
-        addShippingPackage: function (el) {
-            var $this = $(el),
-                $tr = $this.parents('tr'),
-                $pallett = $tr.find('.pallett:last'),
-                $weights = $tr.find('.weights:last'),
-                $dimensions = $tr.find('.dimensions:last'),
-                index = $tr.find('.dimensions').length;
-
-            var __dimensions = $dimensions.clone(),
-                __weights = $weights.clone(),
-                __pallett = $pallett.clone();
-
-            __dimensions.find('input').val('').each(function () { cloneInput(this, index); });
-            __weights.find('input').val('').each(function () { cloneInput(this, index); });
-            __pallett.find('input').removeAttr('checked').each(function () { cloneInput(this, index); });
-
-            $dimensions.after(__dimensions);
-            $pallett.after(__pallett);
-            $weights.after(__weights);
-
-            return false;
-        }
-    }
-})();
+    return result;
+})(jQuery);
