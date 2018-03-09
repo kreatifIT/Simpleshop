@@ -13,18 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$_config = $this->getVar('config', []);
-$Config  = array_merge([
-    'has_registration'      => true,
-    'has_password_recovery' => true,
-], $_config);
-
-$Config['css_class'] = array_merge([
-    'wrapper' => 'margin-large-top margin-large-bottom',
-    'buttons' => 'expanded margin-bottom',
-], (array) $_config['css_class']);
-
-
+$Config   = FragmentConfig::getValue('auth');
 $errors   = [];
 $id       = 'auth-' . \rex_article::getCurrentId();
 $sid      = "form-{$id}";

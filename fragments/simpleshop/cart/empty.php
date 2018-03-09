@@ -11,6 +11,6 @@
  * file that was distributed with this source code.
  */
 ?>
-<div class="margin-bottom margin-top">
-    <p class="text-center padding-bottom">###shop.no_products_in_cart###</p>
+<div class="margin-large-bottom margin-top padding-large-bottom">
+    <p class="text-center padding-large-bottom">###shop.no_products_in_cart###</p>
 </div>

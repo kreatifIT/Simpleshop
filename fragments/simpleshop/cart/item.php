@@ -24,43 +24,33 @@ $product_url = $product->getUrl();
 $is_giftcard = $product->getValue('type') == 'giftcard';
 $extras      = $product->getValue('extras');
 
-$Category = Category::get($product->getValue('category_id'));
+$Category = $product->valueIsset('category_id') ? Category::get($product->getValue('category_id')) : null;
 
-$config = array_merge([
-    'class'                => '',
-    'email_tpl_styles'     => [],
-    'has_image'            => true,
-    'has_remove_button'    => true,
-    'has_refresh_button'   => true,
-    'has_quantity_control' => $is_giftcard ? false : $this->getVar('has_quantity_control', true),
-], $this->getVar('config', []));
+$config = FragmentConfig::getValue('cart');
+$styles = FragmentConfig::getValue('styles');
 
-$styles = array_merge([
-    'tr'   => '',
-    'td'   => '',
-    'h3'   => '',
-    'p'    => '',
-    'code' => '',
-], $config['email_tpl_styles']);
+if ($is_giftcard) {
+    $config['has_quantity_control'] = false;
+}
 
 ?>
-<tr class="cart-item <?= $config['class'] ?>" <?= $styles['tr'] ? 'style="'. $styles['tr'] .'"' : '' ?>>
+<tr class="cart-item" <?= $styles['tr'] ?>>
     <?php if ($config['has_image']): ?>
-        <td class="product-image" <?= $styles['td'] ? 'style="'. $styles['td'] .'"' : '' ?>>
+        <td class="product-image" <?= $styles['td'] ?>>
             <a href="<?= $product_url ?>"><?= Utils::getImageTag($picture, 'cart-list-element-main') ?></a>
         </td>
     <?php endif; ?>
-    <td class="description" <?= $styles['td'] ? 'style="'. $styles['td'] .'"' : '' ?>>
-        <h3 <?= $styles['h2'] ? 'style="'. $styles['h3'] .'"' : '' ?>>
+    <td class="description" <?= $styles['td'] ?>>
+        <h3 <?= $styles['h2'] ?>>
             <?= $product->getName() ?>
         </h3>
-        <?php if (!$is_giftcard): ?>
-            <p <?= $styles['p'] ? 'style="'. $styles['p'] .'"' : '' ?>>
+        <?php if ($Category && !$is_giftcard): ?>
+            <p <?= $styles['p'] ?>>
                 <?= $Category->getName() ?>
             </p>
         <?php elseif ($extras['coupon_code']): ?>
             <br/>
-            <code <?= $styles['code'] ? 'style="'. $styles['code'] .'"' : '' ?>>
+            <code <?= $styles['code'] ?>>
                 Code: <?= $extras['coupon_code'] ?>
             </code>
         <?php endif; ?>
@@ -70,19 +60,18 @@ $styles = array_merge([
             <?php endforeach; ?>
         <?php endif; ?>
     </td>
-    <td class="price-single" <?= $styles['td'] ? 'style="'. $styles['td'] .'"' : '' ?>>
+    <td class="price-single" <?= $styles['td'] ?>>
         &euro; <?= format_price($price) ?>
     </td>
-    <td class="amount" <?= $styles['td'] ? 'style="'. $styles['td'] .'"' : '' ?>>
+    <td class="amount" <?= $styles['td'] ?>>
         <?php
         $fragment = new \rex_fragment();
-        $fragment->setVar('config', $config);
         $fragment->setVar('cart-quantity', $quantity);
         $fragment->setVar('product_key', $key);
         echo $fragment->parse('simpleshop/cart/button.php');
         ?>
     </td>
-    <td class="price-total" <?= $styles['td'] ? 'style="'. $styles['td'] .'"' : '' ?>>
+    <td class="price-total" <?= $styles['td'] ?>>
         &euro; <?= format_price($price * $quantity) ?>
     </td>
     <?php if ($config['has_remove_button']): ?>

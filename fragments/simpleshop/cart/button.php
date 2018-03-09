@@ -12,19 +12,7 @@
  */
 namespace FriendsOfREDAXO\Simpleshop;
 
-$config = array_merge([
-    'has_quantity'           => true,
-    'quantity_is_writeable'  => false,
-    'is_disabled'            => false,
-    'has_refresh_button'     => false,
-    'has_quantity_control'   => false,
-    'has_add_to_cart_button' => false,
-    'has_request_button'     => false,
-    'has_detail_button'      => false,
-    'has_qty_ctr_minus_attr' => '',
-    'has_qty_ctr_plus_attr'  => '',
-], $this->getVar('config', []));
-
+$config       = FragmentConfig::getValue('cart.button');
 $extras       = $this->getVar('extras', []);
 $quantity     = $this->getVar('cart-quantity', 1);
 $product_key  = $this->getVar('product_key');
@@ -35,12 +23,9 @@ $prod_req_url = $this->getVar('product_request_url', '');
 <div class="quantity-ctrl-button">
     <?php if ($config['has_quantity_control']): ?>
         <div class="amount-increment clearfix">
-            <span class="button minus float-left" <?= $config['has_qty_ctr_minus_attr'] ?>>-</span>
-            <input type="text" class="float-left" value="<?= $quantity ?>" name="quantity[<?= $product_key ?>]" <?= $config['quantity_is_writeable'] ? '' : 'readonly' ?>>
-            <span class="button plus float-left" <?= $config['has_qty_ctr_plus_attr'] ?>>+</span>
-            <?php if ($config['has_refresh_button']): ?>
-                <button class="button secondary refresh float-left" type="submit" name="func" value="update"><i class="fa fa-refresh" aria-hidden="true"></i></button>
-            <?php endif; ?>
+            <button class="amount-increment-minus button secondary float-left" type="button" onclick="Simpleshop.changeCartAmount(this, '<?= $product_key ?>');">-</button>
+            <input type="text" class="amount-input float-left" value="<?= $quantity ?>" name="quantity[<?= $product_key ?>]" <?= $config['quantity_is_writeable'] ? 'onblur="Simpleshop.changeCartAmount(this, \'' . $product_key . '\');"' : 'readonly' ?>>
+            <button class="amount-increment-plus button secondary float-left" type="button" onclick="Simpleshop.changeCartAmount(this, '<?= $product_key ?>');">+</button>
         </div>
     <?php elseif ($config['has_quantity']): ?>
         <?= $quantity ?>

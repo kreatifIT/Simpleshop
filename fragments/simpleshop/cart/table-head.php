@@ -12,22 +12,19 @@
  */
 namespace FriendsOfREDAXO\Simpleshop;
 
-$config = $this->getVar('config', []);
-$styles = array_merge([
-    'tr' => '',
-    'th' => '',
-], $config['email_tpl_styles']);
+$config = FragmentConfig::getValue('cart');
+$styles = FragmentConfig::getValue('styles.table-header');
 
 ?>
-<tr class="cart-header" <?= $styles['tr'] ? 'style="'. $styles['tr'] .'"' : '' ?>>
+<tr class="cart-header" <?= $styles['tr'] ?>>
     <?php if ($config['has_image']): ?>
-        <th <?= $styles['th'] ? 'style="'. $styles['th'] .'"' : '' ?>>###label.preview###</th>
+        <th <?= $styles['th'] ?>>###label.preview###</th>
     <?php endif; ?>
-    <th <?= $styles['th'] ? 'style="'. $styles['th'] .'"' : '' ?>>###label.product###</th>
-    <th <?= $styles['th'] ? 'style="'. $styles['th'] .'"' : '' ?>>###label.single_price###</th>
-    <th <?= $styles['th'] ? 'style="'. $styles['th'] .'"' : '' ?>>###label.amount###</th>
-    <th <?= $styles['th'] ? 'style="'. $styles['th'] .'"' : '' ?>>###label.total###</th>
+    <th <?= $styles['th'] ?>>###label.product###</th>
+    <th <?= $styles['th'] ?>>###label.single_price###</th>
+    <th <?= $styles['th'] ?>>###label.amount###</th>
+    <th <?= $styles['th'] ?>>###label.total###</th>
     <?php if ($config['has_remove_button']): ?>
-        <th <?= $styles['th'] ? 'style="'. $styles['th'] .'"' : '' ?>>&nbsp;</th>
+        <th <?= $styles['th'] ?>>&nbsp;</th>
     <?php endif; ?>
 </tr>
