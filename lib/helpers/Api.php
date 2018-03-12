@@ -41,20 +41,21 @@ class rex_api_simpleshop_api extends rex_api_function
 
     private function api__cart_getcartcontent()
     {
-        $products = \FriendsOfREDAXO\Simpleshop\Session::getCartItems(false, false);
-        $result   = [
+        $Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute();
+        $products   = $Controller->getProducts();
+        $result     = [
             'total' => 0,
-            'html'  => '',
+            'html'  => $Controller->parse(),
             'count' => count($products),
         ];
 
         if (count($products) == 0) {
-            $fragment = new rex_fragment();
+            $fragment       = new rex_fragment();
             $result['html'] = $fragment->parse('simpleshop/cart/empty.php');
         }
         $result = rex_extension::registerPoint(new rex_extension_point('Api.Cart.getCartContent', $result, ['products' => $products]));
 
-        $this->response['cart_html']      = $result['html'];
+        $this->response['cart_html']      = \Sprog\Wildcard::parse($result['html']);
         $this->response['total']          = $result['total'];
         $this->response['count']          = $result['count'];
         $this->response['total_formated'] = format_price($result['total']);
@@ -64,12 +65,10 @@ class rex_api_simpleshop_api extends rex_api_function
     {
         $product_key = rex_post('product_key', 'string', null);
         $extras      = rex_post('extras', 'array', []);
-        $fragment    = new rex_fragment();
 
         if (!$product_key) {
             throw new ApiException("Invalid request arguments");
         }
-
         try {
             rex_extension::registerPoint(new rex_extension_point('Api.Cart.addGiftcard.PRE_ADD', $product_key, ['extras' => $extras]));
 
@@ -78,8 +77,7 @@ class rex_api_simpleshop_api extends rex_api_function
         catch (ApiException $ex) {
             $this->success = false;
         }
-        $fragment->setVar('product', \FriendsOfREDAXO\Simpleshop\Product::getProductByKey($product_key, $this->response['cart_items'][$product_key]['quantity'], $extras));
-        $this->response['cart_item_html'] = $fragment->parse('simpleshop/cart/item.php');
+        $this->api__cart_getcartcontent();
     }
 
     private function api__cart_addproduct()
@@ -88,12 +86,10 @@ class rex_api_simpleshop_api extends rex_api_function
         $quantity    = rex_post('quantity', 'int', 1);
         $exact_qty   = rex_post('exact_qty', 'int', 0);
         $extras      = rex_post('extras', 'array', []);
-        $fragment    = new rex_fragment();
 
         if (!$product_key || ($quantity < 1 && $exact_qty < 1)) {
             throw new ApiException("Invalid request arguments");
         }
-
         if ($exact_qty) {
             \FriendsOfREDAXO\Simpleshop\Session::setProductData($product_key, $exact_qty, $extras);
         }
@@ -103,23 +99,20 @@ class rex_api_simpleshop_api extends rex_api_function
         $this->response['cart_items']    = \FriendsOfREDAXO\Simpleshop\Session::getCartItems(true);
         $this->response['cart_item_cnt'] = count($this->response['cart_items']);
 
-        $fragment->setVar('product', \FriendsOfREDAXO\Simpleshop\Product::getProductByKey($product_key, $this->response['cart_items'][$product_key]['quantity'], $extras));
-        $this->response['cart_item_html'] = $fragment->parse('simpleshop/cart/item.php');
+        $this->api__cart_getcartcontent();
     }
 
     private function api__cart_setproductquantity()
     {
         $product_key = rex_post('product_key', 'string', null);
         $quantity    = rex_post('quantity', 'int');
-        $fragment    = new rex_fragment();
 
         if (!$product_key || $quantity < 1) {
             throw new ApiException("Invalid request arguments");
         }
         \FriendsOfREDAXO\Simpleshop\Session::setProductData($product_key, $quantity);
 
-        $fragment->setVar('product', \FriendsOfREDAXO\Simpleshop\Product::getProductByKey($product_key, $this->response['cart_items'][$product_key]['quantity'], $extras));
-        $this->response['cart_item_html'] = $fragment->parse('simpleshop/cart/item.php');
+        $this->api__cart_getcartcontent();
     }
 
     private function api__cart_removeproduct()

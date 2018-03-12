@@ -13,6 +13,7 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $products = $this->getVar('products', []);
+$settings = \rex::getConfig('simpleshop.Settings');
 $config   = FragmentConfig::getValue('cart.table-wrapper');
 
 ?>
@@ -31,11 +32,13 @@ $config   = FragmentConfig::getValue('cart.table-wrapper');
 </table>
 
 <div class="cart-buttons clearfix">
-    <a href="<?= $config['back_url'] ?>" class="cart-button-back button">
-        ###action.continue_shopping###
-    </a>
+    <?php if ($config['back_url']): ?>
+        <a href="<?= $config['back_url'] ?>" class="cart-button-back button">
+            ###action.continue_shopping###
+        </a>
+    <?php endif; ?>
 
-    <a href="<?= $config['ahead_url'] ?>" class="cart-button-proceed button <?= $config['btn_ahead_class'] ?>">
+    <a href="<?= rex_getUrl($settings['linklist']['checkout']) ?>" class="cart-button-proceed button <?= $config['btn_ahead_class'] ?>">
         ###action.proceed_to_checkout###
     </a>
 </div>

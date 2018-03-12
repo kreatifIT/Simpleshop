@@ -203,7 +203,7 @@ class Product extends Model
         return $this->__variants;
     }
 
-    public static function getProductByKey($key, $cart_quantity = null, $extras = [])
+    public static function getProductByKey($key, $cart_quantity = null, $extras = [], $throwErrors = true)
     {
         if (!strlen($key)) {
             return false;
@@ -236,26 +236,31 @@ class Product extends Model
             foreach ($feature_ids as $feature_id) {
                 // get variants
                 $feature = FeatureValue::query()->where('id', $feature_id)->where('status', 1)->findOne();
-                if (!$feature) {
-                    throw new ProductException("No feature with ID = " . $feature_id . " exists --key:{$key}", 2);
-                }
-                else if ($_this->getValue('amount') <= 0) {
-                    // make some availabilty checks
-                    throw new ProductException("Product not available any more --key:{$key}", 4);
-                }
-                else if ($_this->getValue('inventory') == 'F' && $_this->getValue('amount') < $_this->getValue('cart_quantity')) {
-                    throw new ProductException("Amount of product is lower than cart quantity --key:{$key}", 5);
+
+                if ($throwErrors) {
+                    if (!$feature) {
+                        throw new ProductException("No feature with ID = " . $feature_id . " exists --key:{$key}", 2);
+                    }
+                    else if ($_this->getValue('amount') <= 0) {
+                        // make some availabilty checks
+                        throw new ProductException("Product not available any more --key:{$key}", 4);
+                    }
+                    else if ($_this->getValue('amount') < $_this->getValue('cart_quantity')) {
+                        throw new ProductException("Amount of product is lower than cart quantity --key:{$key}", 5);
+                    }
                 }
                 $features[] = $feature;
             }
         }
         else {
-            if ($_this->getValue('amount') <= 0) {
-                // make some availabilty checks
-                throw new ProductException("Product not available any more --key:{$key}", 4);
-            }
-            else if ($_this->getValue('inventory') == 'F' && $_this->getValue('amount') < $_this->getValue('cart_quantity')) {
-                throw new ProductException("Amount of product is lower than cart quantity --key:{$key}", 5);
+            if ($throwErrors) {
+                if ($_this->getValue('amount') <= 0) {
+                    // make some availabilty checks
+                    throw new ProductException("Product not available any more --key:{$key}", 4);
+                }
+                else if ($_this->getValue('amount') < $_this->getValue('cart_quantity')) {
+                    throw new ProductException("Amount of product is lower than cart quantity --key:{$key}", 5);
+                }
             }
         }
         $_this->features = $features;
@@ -271,7 +276,6 @@ class Product extends Model
                 }
             }
             elseif ($key == 'amount') {
-                //                if ($this->getValue('inventory') == 'F' && $value != '')
                 if ($value != '') {
                     $this->setValue($key, $value);
                 }

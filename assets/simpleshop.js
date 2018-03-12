@@ -36,11 +36,11 @@ var Simpleshop = (function ($) {
             var $this = $(_this),
                 $row = $this.parents(rowSelector || '.cart-item'),
                 $container = $row.parents('.cart-container'),
-                css = $row.offset(),
+                css = $container.offset(),
                 $loading = $(rex.simpleshop.loadingDiv);
 
-            css.height = $row.outerHeight();
-            css.width = $row.outerWidth();
+            css.height = $container.outerHeight();
+            css.width = $container.outerWidth();
             $('body').append($loading.addClass('show').css(css));
 
             $.ajax({
@@ -53,18 +53,11 @@ var Simpleshop = (function ($) {
                 }
             })
                 .done(function (resp) {
-                    if (resp.succeeded) {
-                        if (resp.message.count == 0) {
-                            $container.html(resp.message.cart_html);
-                        }
-                        else {
-                            $row.remove();
-                        }
-                    }
+                    $container.html(resp.message.cart_html);
                     $loading.remove();
                 });
         },
-        changeCartAmount: function (_this, vkey, rowSelector, _max) {
+        changeCartAmount: function (_this, vkey, _max, rowSelector) {
             var $this = $(_this),
                 max = _max || 999,
                 $row = $this.parents(rowSelector || '.cart-item'),
@@ -96,11 +89,11 @@ var Simpleshop = (function ($) {
             $input.val(num);
 
             if (vkey) {
-                var css = $row.offset(),
+                var css = $container.offset(),
                     $loading = $(rex.simpleshop.loadingDiv);
 
-                css.height = $row.outerHeight();
-                css.width = $row.outerWidth();
+                css.height = $container.outerHeight();
+                css.width = $container.outerWidth();
                 $('body').append($loading.addClass('show').css(css));
 
                 $.ajax({
@@ -115,7 +108,7 @@ var Simpleshop = (function ($) {
                     }
                 })
                     .done(function (resp) {
-                        $row.replaceWith(resp.message.cart_item_html);
+                        $container.html(resp.message.cart_html);
                         $loading.remove();
                     });
             }

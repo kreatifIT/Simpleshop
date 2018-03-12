@@ -26,13 +26,27 @@ class CheckoutController extends Controller
         $this->products = Session::getCartItems(true);
         $this->Order    = Session::getCurrentOrder();
 
-        $this->verifyParams(['cart_page_id', 'action']);
         $this->setVar('Order', $this->Order);
+        $this->verifyParams(['action']);
+
+        if (!Customer::isLoggedIn() && (!isset($this->params['no-login-check']) || !$this->params['no-login-check'])) {
+            $this->fragment_path[] = 'simpleshop/customer/auth/login.php';
+        }
 
         if (count($this->products)) {
             switch ($this->params['action']) {
-                case 'show-summary':
-                    return $this->getSummaryView();
+                default:
+                    $stepsDone = \rex::getConfig('simpleshop.CheckoutSteps', []);
+                    $nextSteps = array_diff(FragmentConfig::getValue('checkout.steps'), $stepsDone);
+                    $nextStep  = array_shift($nextSteps);
+
+                    switch ($nextStep) {
+                        case 'address':
+                            return $this->getAddressView();
+                        case 'show-summary':
+                            return $this->getSummaryView();
+                    }
+                    break;
 
                 case 'cancelled':
                     return $this->cancelPayment();
@@ -50,7 +64,7 @@ class CheckoutController extends Controller
         }
         else {
             // no products - redirect to shopping cart
-            rex_redirect($this->params['cart_page_id']);
+            rex_redirect($this->settings['linklist']['cart']);
         }
     }
 
@@ -65,7 +79,12 @@ class CheckoutController extends Controller
         $this->Order->setValue('status', 'CA');
         $this->Order->save();
 
-        rex_redirect($this->params['cart_page_id'], null, $_GET);
+        rex_redirect($this->settings['linklist']['cart'], null, $_GET);
+    }
+
+    protected function getAddressView()
+    {
+        $this->fragment_path[] = 'simpleshop/checkout/customer/addresses.php';
     }
 
     protected function getSummaryView()
@@ -87,10 +106,10 @@ class CheckoutController extends Controller
             $errors[] = Wildcard::get('shop.error_summary_no_product_available');
         }
 
-        $this->fragment_path = 'simpleshop/checkout/summary/wrapper.php';
+        $this->fragment_path[] = 'simpleshop/checkout/summary/wrapper.php';
         $this->setVar('errors', $errors);
         $this->setVar('warnings', $warnings);
-        $this->setVar('cart_url', rex_getUrl($this->params['cart_page_id']));
+        $this->setVar('cart_url', rex_getUrl($this->settings['linklist']['cart']));
     }
 
     public function sendMail($debug = false)
@@ -148,18 +167,18 @@ class CheckoutController extends Controller
         Session::clearCheckout();
         Session::clearCart();
 
-        $this->fragment_path = 'simpleshop/checkout/complete.php';
+        $this->fragment_path[] = 'simpleshop/checkout/complete.php';
     }
 
     protected function initPayment()
     {
-        $payment             = $this->Order->getValue('payment');
-        $this->fragment_path = 'simpleshop/payment/' . $payment->getValue('plugin_name') . '/payment_init.php';
+        $payment               = $this->Order->getValue('payment');
+        $this->fragment_path[] = 'simpleshop/payment/' . $payment->getValue('plugin_name') . '/payment_init.php';
     }
 
     protected function doPay()
     {
-        $payment             = $this->Order->getValue('payment');
-        $this->fragment_path = 'simpleshop/payment/' . $payment->getValue('plugin_name') . '/payment_process.php';
+        $payment               = $this->Order->getValue('payment');
+        $this->fragment_path[] = 'simpleshop/payment/' . $payment->getValue('plugin_name') . '/payment_process.php';
     }
 }

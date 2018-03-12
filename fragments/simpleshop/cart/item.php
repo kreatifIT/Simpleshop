@@ -61,7 +61,7 @@ if ($is_giftcard) {
         <?php endif; ?>
     </td>
     <td class="price-single" <?= $styles['td'] ?>>
-        &euro; <?= format_price($price) ?>
+        &euro;&nbsp;<?= format_price($price) ?>
     </td>
     <td class="amount" <?= $styles['td'] ?>>
         <?php
@@ -72,7 +72,7 @@ if ($is_giftcard) {
         ?>
     </td>
     <td class="price-total" <?= $styles['td'] ?>>
-        &euro; <?= format_price($price * $quantity) ?>
+        &euro;&nbsp;<?= format_price($price * $quantity) ?>
     </td>
     <?php if ($config['has_remove_button']): ?>
         <td class="remove-product">

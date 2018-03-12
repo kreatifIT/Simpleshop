@@ -17,7 +17,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 class FragmentConfig
 {
     public static $data = [
-        'auth' => [
+        'auth'     => [
             'has_registration'      => true,
             'has_password_recovery' => true,
             'css_class'             => [
@@ -25,7 +25,7 @@ class FragmentConfig
                 'buttons' => 'expanded margin-bottom',
             ],
         ],
-        'cart' => [
+        'cart'     => [
             'has_remove_button' => true,
             'has_image'         => true,
             'button'            => [
@@ -55,6 +55,14 @@ class FragmentConfig
                 'css_class' => [
                     'table' => '',
                 ],
+            ],
+        ],
+        'checkout' => [
+            'steps' => [
+                'address',
+                'payment',
+                'shipping-payment',
+                'show-summary'
             ],
         ],
 

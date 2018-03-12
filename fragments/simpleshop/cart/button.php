@@ -16,6 +16,7 @@ $config       = FragmentConfig::getValue('cart.button');
 $extras       = $this->getVar('extras', []);
 $quantity     = $this->getVar('cart-quantity', 1);
 $product_key  = $this->getVar('product_key');
+$max_amount   = $this->getVar('max_amount', 1);
 $prod_url     = $this->getVar('product_url', '#');
 $prod_req_url = $this->getVar('product_request_url', '');
 
@@ -23,9 +24,9 @@ $prod_req_url = $this->getVar('product_request_url', '');
 <div class="quantity-ctrl-button">
     <?php if ($config['has_quantity_control']): ?>
         <div class="amount-increment clearfix">
-            <button class="amount-increment-minus button secondary float-left" type="button" onclick="Simpleshop.changeCartAmount(this, '<?= $product_key ?>');">-</button>
-            <input type="text" class="amount-input float-left" value="<?= $quantity ?>" name="quantity[<?= $product_key ?>]" <?= $config['quantity_is_writeable'] ? 'onblur="Simpleshop.changeCartAmount(this, \'' . $product_key . '\');"' : 'readonly' ?>>
-            <button class="amount-increment-plus button secondary float-left" type="button" onclick="Simpleshop.changeCartAmount(this, '<?= $product_key ?>');">+</button>
+            <button class="amount-increment-minus button secondary float-left" type="button" onclick="Simpleshop.changeCartAmount(this, '<?= $product_key ?>', <?= (int) $max_amount ?>);">-</button>
+            <input type="text" class="amount-input float-left" value="<?= $quantity ?>" name="quantity[<?= $product_key ?>]" <?= $config['quantity_is_writeable'] ? 'onblur="Simpleshop.changeCartAmount(this, \'' . $product_key . '\', ' . (int) $max_amount . ');"' : 'readonly' ?>>
+            <button class="amount-increment-plus button secondary float-left" type="button" onclick="Simpleshop.changeCartAmount(this, '<?= $product_key ?>', <?= (int) $max_amount ?>);">+</button>
         </div>
     <?php elseif ($config['has_quantity']): ?>
         <?= $quantity ?>

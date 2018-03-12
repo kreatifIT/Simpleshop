@@ -16,13 +16,16 @@ use Whoops\Exception\ErrorException;
 
 abstract class Controller
 {
+    protected $output        = '';
     protected $params        = [];
-    protected $fragment_path = '';
+    protected $fragment_path = [];
     protected $fragment      = null;
+    protected $settings      = [];
 
     protected abstract function _execute();
 
-    public function __construct() {
+    public function __construct()
+    {
         if ($this->fragment === null) {
             $this->fragment = new \rex_fragment();
         }
@@ -33,7 +36,8 @@ abstract class Controller
         $name = get_called_class();
         $inst = new $name();
 
-        $inst->params = $params;
+        $inst->params   = $params;
+        $inst->settings = \rex::getConfig('simpleshop.Settings');
 
         foreach ($inst->params as $key => $value) {
             $inst->setVar($key, $value);
@@ -59,7 +63,7 @@ abstract class Controller
         }
         $this->fragment->setVar($key, $value, $escape);
     }
-    
+
     public function getVar($key, $default = null)
     {
         return $this->fragment->getVar($key, $default);
@@ -67,6 +71,14 @@ abstract class Controller
 
     public function parse($fragment_path = null, $delete_whitespaces = true)
     {
-        return $this->fragment->parse($fragment_path ?: $this->fragment_path, $delete_whitespaces);
+        if ($fragment_path) {
+            array_pop($this->fragment_path);
+            $this->fragment_path[] = $fragment_path;
+        }
+
+        foreach ($this->fragment_path as $path) {
+            $this->output .= $this->fragment->parse($path, $delete_whitespaces);
+        }
+        return $this->output;
     }
 }

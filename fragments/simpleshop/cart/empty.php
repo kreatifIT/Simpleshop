@@ -12,5 +12,5 @@
  */
 ?>
 <div class="margin-large-bottom margin-top padding-large-bottom">
-    <p class="text-center padding-large-bottom">###shop.no_products_in_cart###</p>
+    <p class="text-center padding-large-bottom">###simpleshop.no_products_in_cart###</p>
 </div>

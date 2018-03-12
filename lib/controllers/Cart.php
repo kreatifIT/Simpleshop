@@ -16,71 +16,51 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 class CartController extends Controller
 {
+    protected $products = [];
 
     public function _execute()
     {
         $this->params = array_merge([
             'check_cart' => true,
-            'ahead_url'  => '',
-            'products'   => [],
-            'errors'     => [],
-            'config'     => [],
         ], $this->params);
 
-        $errors   = $this->params['errors'];
-        $products = $this->params['products'];
-        $_func    = rex_request('func', 'string');
+        $errors = [];
 
-
-        if ($_func == 'update') {
-            $__products = rex_post('quantity', 'array', []);
-            foreach ($__products as $key => $quantity) {
-                Session::setProductData($key, $quantity);
-            }
+        try {
+            $this->products = Session::getCartItems(false, $this->params['check_cart']);
         }
-        else if ($_func == 'remove') {
-            \rex_response::cleanOutputBuffers();
-            Session::removeProduct(rex_get('key'));
-            header('Location: ' . rex_getUrl());
-            exit();
-        }
-
-        if (!count($products)) {
-            try {
-                $products = Session::getCartItems(false, $this->params['check_cart']);
-
-                if (strlen($this->params['ahead_url'])) {
-                    \rex_response::cleanOutputBuffers();
-                    header('Location: ' . $this->params['ahead_url']);
-                    exit();
-                }
+        catch (CartException $ex) {
+            if ($ex->getCode() == 1) {
+                $errors = Session::$errors;
             }
-            catch (CartException $ex) {
-                if ($ex->getCode() == 1) {
-                    $errors   = Session::$errors;
-                    $products = Session::getCartItems();
-                }
-            }
+            $this->products = Session::getCartItems();
         }
 
         if (count($errors)) {
+            ob_start();
             foreach ($errors as $error): ?>
                 <div class="callout alert">
                     <p><?= isset($error['replace']) ? strtr($error['label'], ['{{replace}}' => $error['replace']]) : $error['label'] ?></p>
                 </div>
             <?php endforeach;
+            $this->output .= ob_get_clean();
         }
 
         foreach ($this->params as $key => $value) {
             $this->setVar($key, $value);
         }
 
-        if (count($products)) {
-            $this->setVar('products', $products);
-            $this->fragment_path = 'simpleshop/cart/table-wrapper.php';
+        if (count($this->products)) {
+            $this->setVar('products', $this->products);
+            $this->fragment_path[] = 'simpleshop/cart/table-wrapper.php';
         }
         else {
-            $this->fragment_path = 'simpleshop/cart/empty.php';
+            $this->fragment_path[] = 'simpleshop/cart/empty.php';
         }
+    }
+
+    public function getProducts()
+    {
+        return $this->products;
     }
 }
