@@ -243,7 +243,7 @@ class Product extends Model
                     // make some availabilty checks
                     throw new ProductException("Product not available any more --key:{$key}", 4);
                 }
-                else if ($_this->getValue('inventory') == 'F' && $_this->getValue('amount') < $_this->getValue('cart_quantity')) {
+                else if ($_this->getValue('amount') < $_this->getValue('cart_quantity')) {
                     throw new ProductException("Amount of product is lower than cart quantity --key:{$key}", 5);
                 }
                 $features[] = $feature;
