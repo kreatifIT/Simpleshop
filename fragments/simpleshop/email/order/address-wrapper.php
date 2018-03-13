@@ -3,13 +3,10 @@
 $config   = $this->getVar('config', []);
 $shipping = $this->getVar('shipping_address', null);
 $invoice  = $this->getVar('invoice_address', null);
-$styles   = array_merge([
-    'th'            => '',
-    'tr'            => '',
-    'body'          => '',
-    'callout'       => '',
-    'callout_inner' => '',
-], $config['email_tpl_styles']);
+$styles   = \FriendsOfREDAXO\Simpleshop\FragmentConfig::getValue('email_styles');
+
+pr($shipping);
+pr($invoice);
 
 if ($invoice):
     ?>
@@ -26,7 +23,7 @@ if ($invoice):
                                     <th style="<?= $styles['th'] ?>">
                                         <?php
                                         $this->setVar('address', $invoice);
-                                        $this->setVar('title', '###shop.invoice_address###');
+                                        $this->setVar('title', '###label.invoice_address###');
                                         $this->subfragment('simpleshop/checkout/summary/address_item.php');
                                         ?>
                                     </th>
@@ -42,7 +39,7 @@ if ($invoice):
                                             <?php
                                             $this->setVar('address', $shipping);
                                             $this->setVar('type', 'shipping');
-                                            $this->setVar('title', '###shop.shipping_address###');
+                                            $this->setVar('title', '###label.shipping_address###');
                                             $this->subfragment('simpleshop/checkout/summary/address_item.php');
                                             ?>
                                         </th>

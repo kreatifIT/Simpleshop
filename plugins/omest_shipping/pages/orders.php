@@ -68,13 +68,13 @@ if ($_FUNC == 'submit' && count($order_ids)) {
     catch (WSConnectorException $ex) {
         switch ($ex->getCode()) {
             case 1:
-                $error = checkstr(strtr(Wildcard::get('error.ws_not_available'), ['{{service}}' => 'Omest OLC']), $ex->getMessage());
+                $error = strtr(Wildcard::get('error.ws_not_available'), ['{{service}}' => 'Omest OLC']);
                 break;
             case 2:
-                $error = checkstr(strtr(Wildcard::get('error.ws_not_reachable'), ['{{service}}' => 'Omest OLC']), $ex->getMessage());
+                $error = strtr(Wildcard::get('error.ws_not_reachable'), ['{{service}}' => 'Omest OLC']);
                 break;
             case 3:
-                $error = checkstr(strtr(Wildcard::get('error.ws_wrong_response_status'), ['{{service}}' => 'Omest OLC']), $ex->getMessage());
+                $error = strtr(Wildcard::get('error.ws_wrong_response_status'), ['{{service}}' => 'Omest OLC']);
                 break;
             default:
                 $error = $ex->getMessage();

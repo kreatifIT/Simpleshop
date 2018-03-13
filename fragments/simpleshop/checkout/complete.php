@@ -13,32 +13,30 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$Order = $this->getVar('Order');
-$Payment = $Order->getValue('payment');
-$Shipping = $Order->getValue('shipping');
-
-?>
-
-    <div class="row column">
-        <h2 class="text-center margin-small-bottom">###shop.order_placed###</h2>
-    </div>
-
-
-    <?php
-
-if ($Order->getValue('total') > 0)
-{
-    $this->subfragment('simpleshop/payment/' . $Payment->plugin_name . '/order_complete.php');
-}
-if ($Shipping)
-{
-    $this->subfragment('simpleshop/shipping/' . $Shipping->plugin_name . '/order_complete.php');
-}
-
+$Order           = $this->getVar('Order');
+$Payment         = $Order->getValue('payment');
+$Shipping        = $Order->getValue('shipping');
 $additional_info = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.checkout.complete_additional_info', ''));
 
-if (strlen($additional_info)): ?>
-<div class="row column text-center margin-bottom">
-    <p><?= $additional_info ?></p>
+?>
+<div class="order-complete margin-large-top margin-large-bottom">
+    <div class="row column">
+        <h2 class="text-center margin-bottom">###simpleshop.order_placed###</h2>
+    </div>
+    <?php
+    if ($Order->getValue('total') > 0) {
+        $this->subfragment('simpleshop/payment/' . $Payment->plugin_name . '/order_complete.php');
+    }
+    if ($Shipping) {
+        $this->subfragment('simpleshop/shipping/' . $Shipping->plugin_name . '/order_complete.php');
+    }
+    ?>
+
+    <?php if (strlen($additional_info)): ?>
+        <div class="row column text-center margin-bottom">
+            <p><?= $additional_info ?></p>
+        </div>
+    <?php endif; ?>
 </div>
-<?php endif;
+
+

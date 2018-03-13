@@ -18,8 +18,8 @@ $Order = $this->getVar('Order');
 
 ?>
 <div class="row column margin-bottom">
-    <p class="text-center"><?= checkstr(strtr(Wildcard::get('shop.cash_order_complete_text'), [
+    <p class="text-center"><?= strtr(Wildcard::get('shop.cash_order_complete_text'), [
             '{{total}}' => '<strong>&euro; '. format_price($Order->getValue('total')) .'</strong>',
             '{{order_id}}' => $Order->getValue('id'),
-    ]), 'translate:shop.cash_order_complete_text'); ?></p>
+    ]); ?></p>
 </div>

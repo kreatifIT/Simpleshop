@@ -15,6 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 
 $fields           = $this->getVar('additional_fields', []);
+$back_url         = $this->getVar('back_url', '');
 $show_save_btn    = $this->getVar('show_save_btn', true);
 $callback_on_save = $this->getVar('callback_on_save', null);
 $btn_label        = $this->getVar('btn_label', ucfirst(\Wildcard::get('action.save')));
@@ -45,11 +46,16 @@ $form->setValueField('html', ['', '<input type="hidden" name="yform-id" value="'
 if ($show_save_btn) {
     // Submit
     $form->setValueField('html', ['', '<div class="column margin-small-top">']);
+
+    if ($back_url) {
+        $form->setValueField('html', ['', '<a href="'. $back_url .'" class="button">###action.go_back###</a>']);
+    }
+
     $form->setValueField('submit', [
         'name'        => 'submit-' . $sid,
         'no_db'       => 'no_db',
         'labels'      => $btn_label,
-        'css_classes' => 'button float-right',
+        'css_classes' => 'button secondary float-right',
     ]);
     $form->setValueField('html', ['', '</div>']);
 }

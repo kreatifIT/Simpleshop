@@ -17,6 +17,7 @@ $Settings   = \rex::getConfig('simpleshop.Settings');
 $Config     = FragmentConfig::getValue('checkout');
 $Order      = $this->getVar('Order');
 $errors     = $this->getVar('errors', []);
+$back_url   = $this->getVar('back_url');
 $warnings   = $this->getVar('warnings', []);
 $promotions = $Order->getValue('promotions');
 $payment    = $Order->getValue('payment');
@@ -53,14 +54,14 @@ $shipping   = $Order->getValue('shipping');
 
     <?php if (count($errors) == 0): ?>
 
-    <?php
-    $this->subfragment('simpleshop/checkout/summary/address_wrapper.php');
-    ?>
-
-    <?php if ($shipping || $payment): ?>
-    <div class="row margin-bottom">
-        <?php endif; ?>
         <?php
+        $this->subfragment('simpleshop/checkout/summary/address_wrapper.php');
+        ?>
+
+        <?php
+        if ($shipping || $payment) {
+            echo '<div class="row margin-bottom">';
+        }
         if ($shipping) {
             $this->setVar('shipping', $shipping);
             $this->subfragment('simpleshop/checkout/summary/shipping.php');
@@ -70,79 +71,83 @@ $shipping   = $Order->getValue('shipping');
             $this->setVar('payment', $payment);
             $this->subfragment('simpleshop/checkout/summary/payment.php');
         }
-        ?>
-        <?php if ($shipping || $payment): ?>
-    </div>
-<?php endif; ?>
-</div>
+        if ($shipping || $payment) {
+            echo '</div>';
+        } ?>
 
-<?php
-if ($Config['has_coupons']) // coupons
-{
-    $this->subfragment('simpleshop/checkout/summary/coupon.php');
-}
-?>
-
-<?php if ($promotions): ?>
-    <div class="discounts row column margin-bottom">
-
-        <h3>###shop.promotions###</h3>
-        <p>###shop.applied_promotion_text###</p>
         <?php
-        foreach ($promotions as $promotion) {
-            $this->setVar('promotion', $promotion);
-            $this->subfragment('simpleshop/checkout/summary/discount_item.php');
+        if ($Config['has_coupons']) // coupons
+        {
+            $this->subfragment('simpleshop/checkout/summary/coupon.php');
         }
         ?>
-    </div>
-<?php endif; ?>
 
-<!-- Warenkorb -->
-    <div class="shop row column">
+        <?php if ($promotions): ?>
+            <div class="discounts row column margin-bottom">
 
-        <!--            --><? //= CartController::execute([
-        //                'config' => [
-        //                    'has_quantity_control' => false,
-        //                    'has_quantity'         => true,
-        //                    'has_remove_button'    => false,
-        //                ],
-        //            ]); ?>
-
-    </div>
-
-<!-- Summe -->
-<?php
-//        $this->subfragment('simpleshop/checkout/summary/conclusion.php');
-?>
-
-
-    <form action="" method="post">
-        <!-- AGB -->
-        <div class="terms-of-service row column">
-            <div class="custom-checkbox margin-small-bottom">
-                <label>
-                    * ###label.tos###
-                    <input name="tos_accepted" value="1" type="checkbox"/>
-                    <span class="checkbox"></span>
-                </label>
+                <h3>###simpleshop.promotions###</h3>
+                <p>###simpleshop.applied_promotion_text###</p>
+                <?php
+                foreach ($promotions as $promotion) {
+                    $this->setVar('promotion', $promotion);
+                    $this->subfragment('simpleshop/checkout/summary/discount_item.php');
+                }
+                ?>
             </div>
-            <div class="custom-checkbox">
-                <label>
-                    * ###label.cancellation_terms###
-                    <input name="rma_accepted" value="1" type="checkbox"/>
-                    <span class="checkbox"></span>
-                </label>
-            </div>
+        <?php endif; ?>
+
+        <!-- Warenkorb -->
+        <div class="summary-items row column">
+            <?php
+            $Controller = CartController::execute([
+                'cart_config'               => array_merge(FragmentConfig::getValue('cart'), [
+                    'has_remove_button' => false,
+                ]),
+                'cart_button_config'        => array_merge(FragmentConfig::getValue('cart.button'), [
+                    'has_quantity_control' => false,
+                    'has_quantity'         => true,
+                ]),
+                'cart_table_wrapper_config' => array_merge(FragmentConfig::getValue('cart.table-wrapper'), [
+                    'has_go_ahead' => false,
+                ]),
+            ]);
+            echo $Controller->parse();
+            ?>
         </div>
 
-        <div class="row buttons-checkout margin-bottom">
-            <div class="medium-6 medium-offset-6 columns">
-                <button type="submit" name="action" value="place_order" class="button button-checkout">
-                    ###action.place_order###
-                </button>
-            </div>
+        <!-- Summe -->
+        <?php
+        $this->subfragment('simpleshop/checkout/summary/conclusion.php');
+        ?>
+
+        <div class="summary-footer">
+            <form action="" method="post">
+                <!-- AGB -->
+                <div class="terms-of-service row column text-right">
+                    <div class="custom-checkbox align-right margin-small-bottom">
+                        <label>
+                            *&nbsp;###label.tos###
+                            <input name="tos_accepted" value="1" type="checkbox"/>
+                            <span class="checkbox"></span>
+                        </label>
+                    </div>
+                    <div class="custom-checkbox align-right margin-bottom">
+                        <label>
+                            *&nbsp;###simpleshop.cancellation_terms###
+                            <input name="rma_accepted" value="1" type="checkbox"/>
+                            <span class="checkbox"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="row column margin-top margin-large-bottom">
+                    <a href="<?= $back_url ?>" class="button">###action.go_back###</a>
+                    <button type="submit" name="action" value="place_order" class="margin-bottom secondary button float-right">
+                        ###action.place_order###
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
-<?php endif; ?>
+    <?php endif; ?>
 
 </div>

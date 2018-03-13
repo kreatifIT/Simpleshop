@@ -22,11 +22,10 @@ $quantity    = $product->getValue('cart_quantity');
 $key         = $product->getValue('key');
 $product_url = $product->getUrl();
 $is_giftcard = $product->getValue('type') == 'giftcard';
-$extras      = $product->getValue('extras');
 
 $Category = $product->valueIsset('category_id') ? Category::get($product->getValue('category_id')) : null;
 
-$config = FragmentConfig::getValue('cart');
+$config = $this->getVar('cart_config', FragmentConfig::getValue('cart'));
 $styles = FragmentConfig::getValue('styles');
 
 if ($is_giftcard) {
@@ -48,11 +47,6 @@ if ($is_giftcard) {
             <p <?= $styles['p'] ?>>
                 <?= $Category->getName() ?>
             </p>
-        <?php elseif ($extras['coupon_code']): ?>
-            <br/>
-            <code <?= $styles['code'] ?>>
-                Code: <?= $extras['coupon_code'] ?>
-            </code>
         <?php endif; ?>
         <?php if (count($features)): ?>
             <?php foreach ($features as $feature): ?>
@@ -68,6 +62,8 @@ if ($is_giftcard) {
         $fragment = new \rex_fragment();
         $fragment->setVar('cart-quantity', $quantity);
         $fragment->setVar('product_key', $key);
+        $fragment->setVar('max_amount', $product->getValue('amount'));
+        $fragment->setVar('config', $this->getVar('cart_button_config'));
         echo $fragment->parse('simpleshop/cart/button.php');
         ?>
     </td>

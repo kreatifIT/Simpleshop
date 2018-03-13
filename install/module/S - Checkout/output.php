@@ -151,7 +151,7 @@ else if ($CHECKOUT['step'] >= 4 && $action == 'complete')
     $do_send       = TRUE;
     $Mail          = new Simpleshop\Mail();
     $Settings      = rex::getConfig('simpleshop.Settings');
-    $Mail->Subject = '###shop.email.order_complete###';
+    $Mail->Subject = '###simpleshop.email.order_complete###';
     $Mail->setFragmentPath('order/complete');
     // add vars
     $Mail->setVar('Order', $Order);

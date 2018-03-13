@@ -16,6 +16,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 $shippings = $this->getVar('shippings');
 $payments  = $this->getVar('payments');
 $Order     = $this->getVar('Order');
+$back_url  = $this->getVar('back_url');
 
 $shipping = $Order->getValue('shipping');
 $payment  = $Order->getValue('payment');
@@ -59,7 +60,7 @@ $this->setVar('payment', $payment ?: $payments[0]);
         </div>
 
         <div class="row column margin-large-bottom">
-            <a href="#" class="button margin-bottom">###action.go_back###</a>
+            <a href="<?= $back_url ?>" class="button margin-bottom">###action.go_back###</a>
             <button type="submit" class="button margin-bottom secondary float-right" name="action" value="set-shipping-payment">###action.go_ahead###</button>
         </div>
 

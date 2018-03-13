@@ -17,7 +17,7 @@ use Sprog\Wildcard;
 
 class Omest extends ShippingAbstract
 {
-    const NAME         = 'shop.omest_shipping';
+    const NAME         = 'simpleshop.omest_shipping';
     const OLC_URL      = 'https://olc.omest.com/services';
     const OLC_TEST_URL = 'http://debug.olc.omest.com/services';
 
@@ -48,7 +48,7 @@ class Omest extends ShippingAbstract
     public function getName()
     {
         if ($this->name == '') {
-            $this->name = checkstr(Wildcard::get(self::NAME), self::NAME);
+            $this->name = Wildcard::get(self::NAME);
         }
         return parent::getName();
     }
@@ -219,20 +219,20 @@ class OmestShippingException extends \Exception
     {
         switch ($this->getCode()) {
             case 1:
-                $errors = '###shop.error.order_has_no_product###';
+                $errors = '###simpleshop.error.order_has_no_product###';
                 break;
             case 2:
                 $msg = $this->getMessage();
 
                 if (preg_match('/zipcode (.*) invalid/', $msg)) {
-                    $errors = '###shop.error.shipping_zipcode_not_valid###';
+                    $errors = '###simpleshop.error.shipping_zipcode_not_valid###';
                 }
                 else {
                     $errors = $this->getMessage();
                 }
                 break;
             case 3:
-                $errors = '###shop.error.shipping_no_price###';
+                $errors = '###simpleshop.error.shipping_no_price###';
                 break;
             default:
                 $errors = $this->getMessage();

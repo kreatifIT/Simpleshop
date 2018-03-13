@@ -19,7 +19,7 @@ $url      = $this->getVar('url');
 $config   = array_merge([], $this->getVar('config', []));
 
 ?>
-<p>###shop.email.password_reset_text###</p>
+<p>###simpleshop.email.password_reset_text###</p>
 
 <p>
     <?php if (strlen($url)): ?>###label.website###: <a href="<?= $url ?>" style="color:<?= $config['primary_color'] ?>"><?= $url ?></a><?php endif; ?><br/>

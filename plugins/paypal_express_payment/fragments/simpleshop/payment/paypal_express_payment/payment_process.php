@@ -34,7 +34,7 @@ catch (PaypalException $ex)
     switch ($ex->getCode())
     {
         case 11607:
-            $errors[] = checkstr(strtr(Wildcard::get('error.token_already_used_for_transaction'), ['{{service}}' => 'Paypal']), $ex->getMessage());
+            $errors[] = strtr(Wildcard::get('error.token_already_used_for_transaction'), ['{{service}}' => 'Paypal']);
             break;
         default:
             $errors[] = $ex->getMessage();
@@ -46,13 +46,13 @@ catch (WSConnectorException $ex)
     switch ($ex->getCode())
     {
         case 1:
-            $errors[] = checkstr(strtr(Wildcard::get('error.ws_not_available'), ['{{service}}' => 'Paypal']), $ex->getMessage());
+            $errors[] = strtr(Wildcard::get('error.ws_not_available'), ['{{service}}' => 'Paypal']);
             break;
         case 2:
-            $errors[] = checkstr(strtr(Wildcard::get('error.ws_not_reachable'), ['{{service}}' => 'Paypal']), $ex->getMessage());
+            $errors[] = strtr(Wildcard::get('error.ws_not_reachable'), ['{{service}}' => 'Paypal']);
             break;
         case 3:
-            $errors[] = checkstr(strtr(Wildcard::get('error.ws_wrong_response_status'), ['{{service}}' => 'Paypal']), $ex->getMessage());
+            $errors[] = strtr(Wildcard::get('error.ws_wrong_response_status'), ['{{service}}' => 'Paypal']);
             break;
         default:
             $errors[] = $ex->getMessage();

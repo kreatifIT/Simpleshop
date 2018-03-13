@@ -17,13 +17,13 @@ use Sprog\Wildcard;
 
 class DefaultShipping extends ShippingAbstract
 {
-    const NAME = 'shop.shipping_default';
+    const NAME = 'simpleshop.shipping_default';
 
     public function getName()
     {
         if ($this->name == '')
         {
-            $this->name = checkstr(Wildcard::get(self::NAME), self::NAME);
+            $this->name = Wildcard::get(self::NAME);
         }
         return parent::getName();
     }

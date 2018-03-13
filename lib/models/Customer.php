@@ -100,7 +100,7 @@ class Customer extends Model
         if ($success) {
             $Mail          = new Mail();
             $do_send       = true;
-            $Mail->Subject = '###shop.email.user_registration_subject###';
+            $Mail->Subject = '###simpleshop.email.user_registration_subject###';
             $Mail->setFragmentPath('customer/registration');
 
             // add vars
@@ -160,7 +160,7 @@ class Customer extends Model
 
             $Mail          = new Mail();
             $do_send       = true;
-            $Mail->Subject = '###shop.email.user_password_reset###';
+            $Mail->Subject = '###simpleshop.email.user_password_reset###';
             $Mail->setFragmentPath('customer/password_reset');
 
             // add vars
@@ -184,8 +184,6 @@ class Customer extends Model
     public static function logout()
     {
         $_SESSION['customer']['user'] = [];
-        session_regenerate_id(true);
-        session_destroy();
     }
 
     public static function getPasswordHash($password, $func = 'sha1')

@@ -30,23 +30,32 @@ class CheckoutController extends Controller
         $this->setVar('Order', $this->Order);
         $this->verifyParams(['action']);
 
-        if (!Customer::isLoggedIn() && (!isset($this->params['no-login-check']) || !$this->params['no-login-check'])) {
+        if (!Customer::isLoggedIn()) {
             $this->fragment_path[] = 'simpleshop/customer/auth/login.php';
-
-            if (!Customer::isLoggedIn()) {
-                return $this;
-            }
+            return $this;
         }
 
         if (count($this->products)) {
             switch ($this->params['action']) {
                 default:
                     $currentStep = $this->getCurrentStep();
+                    $doneSteps   = $this->getDoneSteps();
+                    $backStep    = $doneSteps[array_search($currentStep, $doneSteps) - 1];
+
+                    if (strlen($backStep)) {
+                        $back_url = rex_getUrl(null, null, ['step' => $backStep]);
+                    }
+                    else {
+                        $Settings = \rex::getConfig('simpleshop.Settings');
+                        $back_url = rex_getUrl($Settings['linklist']['cart']);
+                    }
+
+                    $this->setVar('back_url', $back_url);
 
                     switch ($currentStep) {
-                        case 'address':
+                        case 'shipping_address':
                             return $this->getAddressView();
-                        case 'shipping-payment':
+                        case 'shipping||payment':
                             return $this->getShippingPaymentView();
                         case 'show-summary':
                             return $this->getSummaryView();
@@ -75,7 +84,7 @@ class CheckoutController extends Controller
 
     public static function getDoneSteps()
     {
-        $doneSteps = \rex::getConfig('simpleshop.CheckoutStepsDone', []);
+        $doneSteps = Session::getCheckoutData('steps_done', []);
 
         if (empty($doneSteps)) {
             $steps       = FragmentConfig::getValue('checkout.steps', []);
@@ -107,12 +116,12 @@ class CheckoutController extends Controller
 
     public static function setDoneStep($step)
     {
-        $doneSteps = \rex::getConfig('simpleshop.CheckoutStepsDone', []);
+        $doneSteps = Session::getCheckoutData('steps_done', []);
 
         if (!in_array($step, $doneSteps)) {
             $doneSteps[] = $step;
         }
-        \rex::setConfig('simpleshop.CheckoutStepsDone', $doneSteps);
+        Session::setCheckoutData('steps_done', $doneSteps);
     }
 
     public function setOrder(Order $Order)
@@ -148,12 +157,14 @@ class CheckoutController extends Controller
             try {
                 $this->Order->setValue('shipping', Shipping::get(rex_post('shipment', 'string')));
             }
-            catch (RuntimeException $ex) {}
+            catch (RuntimeException $ex) {
+            }
 
             try {
                 $this->Order->setValue('payment', Payment::get(rex_post('payment', 'string')));
             }
-            catch (RuntimeException $ex) {}
+            catch (RuntimeException $ex) {
+            }
 
             Session::setCheckoutData('Order', $this->Order);
 
@@ -169,11 +180,39 @@ class CheckoutController extends Controller
 
     protected function getSummaryView()
     {
-        $errors   = [];
-        $warnings = [];
+        $errors     = [];
+        $warnings   = [];
+        $postAction = rex_post('action', 'string');
+
+        switch ($postAction) {
+            case 'redeem_coupon':
+                try {
+                    $code   = rex_post('coupon', 'string');
+                    $coupon = Coupon::redeem($code);
+                    $this->setVar('code', $code);
+                    // save coupon to apply it also on page refresh
+                    Session::setCheckoutData('coupon_code', $code);
+                }
+                catch (CouponException $ex) {
+                    $warnings[] = ['label' => $ex->getLabelByCode()];
+                }
+                break;
+
+            case 'place_order':
+                $tos_accepted = rex_post('tos_accepted', 'int');
+                $rma_accepted = rex_post('rma_accepted', 'int');
+
+                if ($tos_accepted && $rma_accepted) {
+                    rex_redirect(null, null, ['action' => 'init-payment']);
+                }
+                else {
+                    $warnings[] = ['label' => '###simpleshop.error.tos_rma_not_accepted###'];
+                }
+                break;
+        }
 
         try {
-            $warnings = $this->Order->calculateDocument($this);
+            $warnings = array_merge($warnings, $this->Order->calculateDocument($this));
         }
         catch (OrderException $ex) {
             $errors[] = $ex->getMessage();
@@ -197,9 +236,9 @@ class CheckoutController extends Controller
         $do_send  = true;
         $Mail     = new \FriendsOfREDAXO\Simpleshop\Mail();
         $Settings = \rex::getConfig('simpleshop.Settings');
-        $Customer = $this->Order->getInvoiceAddress();
+        $Customer = Customer::get($this->Order->getValue('customer_id'));
 
-        $Mail->Subject = '###shop.email.order_complete###';
+        $Mail->Subject = '###simpleshop.email.order_complete###';
         $Mail->setFragmentPath('order/complete');
 
         // add vars
@@ -241,11 +280,13 @@ class CheckoutController extends Controller
     {
         // finally save order - DONE / COMPLETE
         $this->Order->completeOrder();
-        $this->sendMail($this->params['debug']);
+        //        $this->sendMail($this->params['debug']);
+        ob_clean();
+        $this->sendMail(true);
 
         // CLEAR THE SESSION
-        Session::clearCheckout();
-        Session::clearCart();
+        //        Session::clearCheckout();
+        //        Session::clearCart();
 
         $this->fragment_path[] = 'simpleshop/checkout/complete.php';
     }

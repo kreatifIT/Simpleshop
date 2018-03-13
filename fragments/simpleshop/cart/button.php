@@ -12,7 +12,7 @@
  */
 namespace FriendsOfREDAXO\Simpleshop;
 
-$config       = FragmentConfig::getValue('cart.button');
+$config       = $this->getVar('config', FragmentConfig::getValue('cart.button'));
 $extras       = $this->getVar('extras', []);
 $quantity     = $this->getVar('cart-quantity', 1);
 $product_key  = $this->getVar('product_key');
@@ -35,7 +35,7 @@ $prod_req_url = $this->getVar('product_request_url', '');
         <?php if ($config['is_disabled']): ?>
             <a class="add-to-cart disabled">
                 <i class="fa fa-exclamation" aria-hidden="true"></i>
-                <span>###shop.product_not_available###</span>
+                <span>###simpleshop.product_not_available###</span>
             </a>
         <?php else: ?>
             <a class="add-to-cart fbox" href="#shop-modal" data-product_key="<?= $product_key ?>"

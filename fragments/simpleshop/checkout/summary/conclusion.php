@@ -13,28 +13,31 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$Order      = $this->getVar('order');
-$taxes      = $Order->getTaxTotal();
+$Order      = $this->getVar('Order');
 $shipping   = $Order->getValue('initial_shipping_costs');
 $subtotal   = $Order->getValue('initial_total');
 $total      = $Order->getValue('total');
-$promotions = $Order->getValue('promotions');
+$taxes      = $Order->getValue('taxes');
+$taxTotal   = $Order->getTaxTotal();
+$promotions = (array) $Order->getValue('promotions');
 
 ?>
-<div class="row column">
-    <div class="order-total">
+<div class="order-total margin-bottom">
+    <div class="row column text-right">
         <?php if ($subtotal != $total): ?>
             <div class="subtotal">
-                <span>&euro; <?= format_price($subtotal) ?></span>
-                <span>###label.subtotal###</span>
+                ###label.subtotal###
+                <span class="price">&euro;&nbsp;<?= format_price($subtotal) ?></span>
             </div>
         <?php endif; ?>
+
         <?php if ($shipping > 0): ?>
-            <div class="subtotal ">
-                <span>&euro; <?= format_price($shipping) ?></span>
-                <span>###label.shipment_cost###</span>
+            <div class="shipping">
+                ###label.shipment_cost###
+                <span class="price">&euro;&nbsp;<?= format_price($shipping) ?></span>
             </div>
         <?php endif; ?>
+
         <?php foreach ($promotions as $promotion):
             $percent = $promotion->getValue('discount_percent');
             $_value = $promotion->getValue('discount_value');
@@ -42,21 +45,22 @@ $promotions = $Order->getValue('promotions');
 
             if ($value != 0):
                 ?>
-                <div class="subtotal ">
-                    <span>&euro; -<?= format_price($value) ?></span>
+                <div class="promotions ">
+                    <span>&euro;&nbsp;-<?= format_price($value) ?></span>
                     <span><?= $promotion->getName() ?></span>
                 </div>
             <?php endif; ?>
         <?php endforeach; ?>
+
         <?php foreach ($taxes as $percent => $tax): ?>
-            <div class="subtotal">
-                <span>&euro; <?= format_price($tax) ?></span>
-                <span>###label.tax_included### <?= $percent ?>%</span>
+            <div class="taxes">
+                ###label.tax_included### <?= $percent ?>%
+                <span class="price">&euro;&nbsp;<?= format_price($tax) ?></span>
             </div>
         <?php endforeach; ?>
-        <div class="subtotal total">
-            <span>&euro; <?= format_price($total) ?></span>
-            <span>###label.total_sum###</span>
+        <div class="total">
+            ###label.total_sum###
+            <span class="price">&euro;&nbsp;<?= format_price($total) ?></span>
         </div>
     </div>
 </div>

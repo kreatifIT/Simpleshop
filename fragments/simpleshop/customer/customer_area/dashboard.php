@@ -15,7 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 
 $User  = $this->getVar('User');
-$title = $this->getVar('title', '###shop.account_data###');
+$title = $this->getVar('title', '###label.account_data###');
 $text  = $this->getVar('text');
 
 ?>

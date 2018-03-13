@@ -17,13 +17,13 @@ use Sprog\Wildcard;
 
 class BankTransfer extends PaymentAbstract
 {
-    const NAME = 'shop.bank_transfer';
+    const NAME = 'simpleshop.bank_transfer';
 
     public function getName()
     {
         if ($this->name == '')
         {
-            $this->name = checkstr(Wildcard::get(self::NAME), self::NAME);
+            $this->name = Wildcard::get(self::NAME);
         }
         return parent::getName();
     }

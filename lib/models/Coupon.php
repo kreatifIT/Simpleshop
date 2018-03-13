@@ -143,16 +143,16 @@ class CouponException extends \Exception
     {
         switch ($this->getCode()) {
             case 1:
-                $errors = '###shop.error.coupon_not_exists###';
+                $errors = '###simpleshop.error.coupon_not_exists###';
                 break;
             case 2:
-                $errors = '###shop.error.coupon_consumed###';
+                $errors = '###simpleshop.error.coupon_consumed###';
                 break;
             case 3:
-                $errors = '###shop.error.coupon_not_yet_valid###';
+                $errors = '###simpleshop.error.coupon_not_yet_valid###';
                 break;
             case 4:
-                $errors = '###shop.error.coupon_not_valid_anymore###';
+                $errors = '###simpleshop.error.coupon_not_valid_anymore###';
                 break;
             default:
                 $errors = $this->getMessage();

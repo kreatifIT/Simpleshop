@@ -10,6 +10,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace FriendsOfREDAXO\Simpleshop;
 
 
@@ -25,17 +26,7 @@ class Session extends Model
 
     public static function cleanupSessions()
     {
-        $sessions = [];
-        $sql      = \rex_sql::factory();
-        //        $_this         = parent::create();
-        //        $session_files = glob(ini_get('session.save_path') . '/*');
-        //        // call getSession to merge possible duplicate sessions
-        //        self::getSession();
-        //        foreach ($session_files as $_session)
-        //        {
-        //            list ($path, $session) = explode('/sess_', $_session);
-        //            $sessions[] = $session;
-        //        }
+        $sql = \rex_sql::factory();
         $sql->setQuery("DELETE FROM " . self::TABLE . " WHERE lastupdate < '" . date('Y-m-d H:i:s', strtotime('-30 Days')) . "'");
     }
 
@@ -70,20 +61,33 @@ class Session extends Model
     public static function getSession()
     {
         if (self::$session === null) {
+            \rex_login::startSession();
+
             $session_id    = session_id();
             $User          = Customer::getCurrentUser();
             $session       = parent::query()->where('session_id', $session_id)->findOne();
             self::$session = $session ?: parent::create();
 
             if ($User) {
-                $user_session = parent::query()->where('customer_id', $User->getId())->where('session_id', $session_id, '!=')->findOne();
+                $user_session = parent::query()
+                    ->where('customer_id', $User->getId())
+                    ->where('session_id', $session_id, '!=')
+                    ->orderBy('lastupdate', 'DESC')
+                    ->findOne();
 
                 if ($user_session) {
                     // merge sessions because we found to sessions for the same user
                     $cart_items = (array) $user_session->getValue('cart_items') + (array) self::$session->getValue('cart_items');
                     unset($cart_items[0]);
+
                     self::$session = $user_session;
                     self::$session->setValue('session_id', $session_id);
+
+                    \rex_sql::factory()
+                        ->setTable(self::TABLE)
+                        ->setWhere('customer_id = :cid OR session_id = :sid', ['cid' => $User->getId(), 'sid' => $session_id])
+                        ->delete();
+
                     self::$session->writeSession(['cart_items' => $cart_items]);
                 }
             }
@@ -167,7 +171,7 @@ class Session extends Model
                     case 3:
                         // variant-combination does not exist
                         Session::removeProduct($key);
-                        self::$errors['cart_product_not_exists']['label'] = checkstr(Wildcard::get('simpleshop.error.cart_product_not_exists'), '###simpleshop.error.cart_product_not_exists###');
+                        self::$errors['cart_product_not_exists']['label']   = Wildcard::get('simpleshop.error.cart_product_not_exists');
                         self::$errors['cart_product_not_exists']['replace'] += 1;
                         break;
 
@@ -176,7 +180,7 @@ class Session extends Model
                         Session::removeProduct($key);
                         list ($product_id, $feature_ids) = explode('|', trim($key, '|'));
                         $product        = Product::get($product_id);
-                        $label          = strtr(checkstr(Wildcard::get('simpleshop.error.cart_product_not_available'), '###simpleshop.error.cart_product_not_available###'), ['{{replace}}' => $product->getName()]);
+                        $label          = strtr(Wildcard::get('simpleshop.error.cart_product_not_available'), ['{{replace}}' => $product->getName()]);
                         self::$errors[] = ['label' => $label];
                         break;
 
@@ -185,7 +189,7 @@ class Session extends Model
                         $product = Product::getProductByKey($key, 0);
                         // update cart
                         Session::setProductData($key, $product->getValue('amount'));
-                        $label          = strtr(checkstr(Wildcard::get('simpleshop.error.cart_product_not_enough_amount'), '###simpleshop.error.cart_product_not_enough_amount###'), [
+                        $label          = strtr(Wildcard::get('simpleshop.error.cart_product_not_enough_amount'), [
                             '{{replace}}' => $product->getName(),
                             '{{count}}'   => $product->getValue('amount'),
                         ]);

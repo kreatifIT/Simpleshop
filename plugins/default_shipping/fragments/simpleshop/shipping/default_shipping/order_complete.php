@@ -15,5 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 ?>
 <div class="row column margin-bottom">
-    <p class="text-center margin-bottom">###shop.order_complete_pickup_text###</p>
+    <p class="text-center margin-bottom">
+        ###simpleshop.order_complete_default_shipping_text###
+    </p>
 </div>

@@ -47,7 +47,7 @@ foreach ($_products as $product)
 
     <?php
     $this->setVar('address', $address_1);
-    $this->setVar('title', '###shop.invoice_address###');
+    $this->setVar('title', '###label.invoice_address###');
     $this->setVar('has_edit_link', FALSE);
     $this->subfragment('simpleshop/checkout/summary/address_item.php');
     ?>
@@ -61,7 +61,7 @@ foreach ($_products as $product)
     {
         $this->setVar('address', $address_1);
     }
-    $this->setVar('title', '###shop.shipping_address###');
+    $this->setVar('title', '###label.shipping_address###');
     $this->setVar('has_edit_link', FALSE);
     $this->subfragment('simpleshop/checkout/summary/address_item.php');
     ?>

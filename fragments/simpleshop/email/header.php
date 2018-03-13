@@ -76,7 +76,7 @@ $imgMethod = method_exists('\Kreatif\Resource', 'getImgTag') ? 'getImgTag' : 'ge
                 <tr style="padding:0;text-align:left;vertical-align:top">
                     <th style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left">
                         <p class="text-right header-address"
-                           style="Margin:0;Margin-bottom:10px;color:#8a8a8a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:700;line-height:1.6;margin:0;margin-bottom:10px;padding:0;text-align:right">
+                           style="Margin:0;Margin-bottom:10px;color:#8a8a8a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;margin-bottom:10px;padding:0;text-align:right">
                             ###company.street###<br>
                             ###company.postal### ###company.location###<br>
                             ###company.region### ###company.province###<br>

@@ -50,7 +50,7 @@ class DiscountGroupException extends \Exception
     {
         switch ($this->getCode()) {
             case 1:
-                $errors = '###shop.error.discountgroup_not_applyable_anymore###';
+                $errors = '###simpleshop.error.discountgroup_not_applyable_anymore###';
                 break;
             default:
                 $errors = $this->getMessage();
