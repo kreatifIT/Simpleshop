@@ -13,6 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+$referer  = $this->getVar('referer');
 $Config   = FragmentConfig::getValue('auth');
 $errors   = [];
 $id       = 'auth-' . \rex_article::getCurrentId();
@@ -20,32 +21,49 @@ $sid      = "form-{$id}";
 $action   = rex_request('action', 'string');
 $Settings = \rex::getConfig('simpleshop.Settings');
 
-
 if (rex_post('action', 'string') == 'login') {
     if (Customer::login(rex_post('uname', 'string'), rex_post('pwd', 'string'))) {
         $referer = rex_session('login_referer', 'string');
         rex_unset_session('login_referer');
 
-        if (strlen($referer)) {
-            header('Location: ' . $referer);
-            exit;
+        unset($_GET['action']);
+
+        switch ($referer) {
+            case 'account':
+                rex_redirect($Settings['linklist']['dashboard']);
+                break;
+            default:
+                if ($referer == '') {
+                    rex_redirect(\rex_article::getCurrentId(), null, $_GET);
+                }
+                else if (strlen($referer)) {
+                    header('Location: ' . $referer);
+                    exit;
+                }
+                break;
         }
-        rex_redirect($Settings['linklist']['dashboard']);
     }
     else {
         $errors[] = '###error.login_failed###';
     }
 }
-if (rex_get('return', 'int') == 1) {
+if (rex_get('referer', 'string') == 'return') {
     rex_set_session('login_referer', rex_server('HTTP_REFERER'));
 }
+else if (rex_get('referer', 'string') == 'account') {
+    rex_set_session('login_referer', 'account');
+}
+else if (strlen($referer)) {
+    rex_set_session('login_referer', $referer);
+}
 
+unset($_GET['action'])
 
 ?>
 <div id="<?= $sid ?>" class="auth-wrapper <?= $Config['css_class']['wrapper'] ?>">
     <div class="login-form <?= $action == 'recover' || $action == 'register' ? 'hide' : '' ?>">
         <div class="row column">
-            <form action="<?= rex_getUrl($Settings['linklist']['dashboard']) ?>#-<?= $sid ?>" method="post" class="padding-small-top padding-small-bottom">
+            <form action="<?= rex_getUrl(null, null, $_GET) ?>#-<?= $sid ?>" method="post" class="padding-small-top padding-small-bottom">
                 <h2 class="margin-small-bottom heading"><?= ucfirst(\Sprog\Wildcard::get('action.login')) ?></h2>
 
                 <?php if (count($errors)): ?>
@@ -94,7 +112,7 @@ if (rex_get('return', 'int') == 1) {
                 <?php if ($recoverySuccess): ?>
                     <div class="callout success">###notif.password_reset_msg###</div>
                 <?php else: ?>
-                    <form action="<?= rex_getUrl($Settings['linklist']['dashboard']) ?>#-<?= $sid ?>" method="post">
+                    <form action="#-<?= $sid ?>" method="post">
                         <input type="text" name="uname" placeholder="###label.email###" value="<?= rex_post('uname', 'string'); ?>">
                         <button type="submit" class="button <?= $Config['css_class']['buttons'] ?>" name="action" value="recover">
                             ###action.reset###
@@ -164,16 +182,19 @@ if (rex_get('return', 'int') == 1) {
 
         $customerError = false;
         $formOutput    = $form->getForm();
-        $values        = $form->getFormEmailValues();
 
-        // register customer
-        try {
-            Customer::register($values['email'], $values['password'], $values);
-            Customer::login($values['email'], $values['password']);
-        }
-        catch (CustomerException $ex) {
-            $customerError = true;
-            $formOutput    = '<div class="callout alert">' . $ex->getMessage() . '</div>' . $formOutput;
+        if (rex_post('action', 'string') == 'register') {
+            $values = $form->getFormEmailValues();
+
+            // register customer
+            try {
+                Customer::register($values['email'], $values['password'], $values);
+                Customer::login($values['email'], $values['password']);
+            }
+            catch (CustomerException $ex) {
+                $customerError = true;
+                $formOutput    = '<div class="callout alert">' . $ex->getMessage() . '</div>' . $formOutput;
+            }
         }
 
         ?>

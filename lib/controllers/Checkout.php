@@ -15,6 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 
 use Sprog\Wildcard;
+use Symfony\Component\Yaml\Exception\RuntimeException;
 
 class CheckoutController extends Controller
 {
@@ -31,18 +32,22 @@ class CheckoutController extends Controller
 
         if (!Customer::isLoggedIn() && (!isset($this->params['no-login-check']) || !$this->params['no-login-check'])) {
             $this->fragment_path[] = 'simpleshop/customer/auth/login.php';
+
+            if (!Customer::isLoggedIn()) {
+                return $this;
+            }
         }
 
         if (count($this->products)) {
             switch ($this->params['action']) {
                 default:
-                    $stepsDone = \rex::getConfig('simpleshop.CheckoutSteps', []);
-                    $nextSteps = array_diff(FragmentConfig::getValue('checkout.steps'), $stepsDone);
-                    $nextStep  = array_shift($nextSteps);
+                    $currentStep = $this->getCurrentStep();
 
-                    switch ($nextStep) {
+                    switch ($currentStep) {
                         case 'address':
                             return $this->getAddressView();
+                        case 'shipping-payment':
+                            return $this->getShippingPaymentView();
                         case 'show-summary':
                             return $this->getSummaryView();
                     }
@@ -68,6 +73,48 @@ class CheckoutController extends Controller
         }
     }
 
+    public static function getDoneSteps()
+    {
+        $doneSteps = \rex::getConfig('simpleshop.CheckoutStepsDone', []);
+
+        if (empty($doneSteps)) {
+            $steps       = FragmentConfig::getValue('checkout.steps', []);
+            $step        = array_shift($steps);
+            $doneSteps[] = $step;
+            self::setDoneStep($step);
+        }
+        return $doneSteps;
+    }
+
+    public static function getCurrentStep()
+    {
+        $doneSteps   = self::getDoneSteps();
+        $currentStep = rex_get('step', 'string', $doneSteps[0]);
+
+        if (!in_array($currentStep, $doneSteps)) {
+            $currentStep = array_pop($doneSteps);
+        }
+        return $currentStep;
+    }
+
+    public static function getNextStep()
+    {
+        $currentStep = self::getCurrentStep();
+        $nextSteps   = FragmentConfig::getValue('checkout.steps');
+        $index       = array_search($currentStep, FragmentConfig::getValue('checkout.steps'));
+        return $nextSteps[$index + 1];
+    }
+
+    public static function setDoneStep($step)
+    {
+        $doneSteps = \rex::getConfig('simpleshop.CheckoutStepsDone', []);
+
+        if (!in_array($step, $doneSteps)) {
+            $doneSteps[] = $step;
+        }
+        \rex::setConfig('simpleshop.CheckoutStepsDone', $doneSteps);
+    }
+
     public function setOrder(Order $Order)
     {
         $this->Order = $Order;
@@ -85,6 +132,39 @@ class CheckoutController extends Controller
     protected function getAddressView()
     {
         $this->fragment_path[] = 'simpleshop/checkout/customer/addresses.php';
+    }
+
+    protected function getShippingPaymentView()
+    {
+        $shippings = Shipping::getAll();
+        $payments  = Payment::getAll();
+
+        if (empty($shippings) && empty($payments)) {
+            $nextStep = CheckoutController::getNextStep();
+            CheckoutController::setDoneStep($nextStep);
+            rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
+        }
+        else if (rex_post('action', 'string') == 'set-shipping-payment') {
+            try {
+                $this->Order->setValue('shipping', Shipping::get(rex_post('shipment', 'string')));
+            }
+            catch (RuntimeException $ex) {}
+
+            try {
+                $this->Order->setValue('payment', Payment::get(rex_post('payment', 'string')));
+            }
+            catch (RuntimeException $ex) {}
+
+            Session::setCheckoutData('Order', $this->Order);
+
+            $nextStep = CheckoutController::getNextStep();
+            CheckoutController::setDoneStep($nextStep);
+            rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
+        }
+
+        $this->setVar('shippings', $shippings);
+        $this->setVar('payments', $payments);
+        $this->fragment_path[] = 'simpleshop/checkout/shipping_and_payment/wrapper.php';
     }
 
     protected function getSummaryView()

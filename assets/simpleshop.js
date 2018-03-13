@@ -36,12 +36,7 @@ var Simpleshop = (function ($) {
             var $this = $(_this),
                 $row = $this.parents(rowSelector || '.cart-item'),
                 $container = $row.parents('.cart-container'),
-                css = $container.offset(),
-                $loading = $(rex.simpleshop.loadingDiv);
-
-            css.height = $container.outerHeight();
-            css.width = $container.outerWidth();
-            $('body').append($loading.addClass('show').css(css));
+                $loading = addLoading($container);
 
             $.ajax({
                 url: rex.simpleshop.ajax_url,
@@ -89,12 +84,7 @@ var Simpleshop = (function ($) {
             $input.val(num);
 
             if (vkey) {
-                var css = $container.offset(),
-                    $loading = $(rex.simpleshop.loadingDiv);
-
-                css.height = $container.outerHeight();
-                css.width = $container.outerWidth();
-                $('body').append($loading.addClass('show').css(css));
+                var $loading = addLoading($container);
 
                 $.ajax({
                     url: rex.simpleshop.ajax_url,
@@ -114,5 +104,17 @@ var Simpleshop = (function ($) {
             }
         }
     };
+
+    function addLoading($container) {
+        var css = $container.offset(),
+            $loading = $(rex.simpleshop.loadingDiv);
+
+        css.height = $container.outerHeight();
+        css.width = $container.outerWidth();
+        $('body').append($loading.addClass('show').css(css));
+
+        return $loading;
+    }
+
     return result;
 })(jQuery);

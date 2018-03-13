@@ -73,6 +73,12 @@ $Settings = $this->getVar('Settings');
             <?= \rex_var_link::getWidget('linklist_cart', 'linklist[cart]', $Settings['linklist']['cart']) ?>
         </dd>
     </dl>
+    <dl class="rex-form-group form-group">
+        <dt>Checkout</dt>
+        <dd>
+            <?= \rex_var_link::getWidget('linklist_checkout', 'linklist[checkout]', $Settings['linklist']['checkout']) ?>
+        </dd>
+    </dl>
 
     <!--    <br/>-->
     <!---->

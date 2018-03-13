@@ -25,6 +25,11 @@ class FragmentConfig
                 'buttons' => 'expanded margin-bottom',
             ],
         ],
+        'customer' => [
+            'css_class' => [
+                'form_fields' => 'medium-6'
+            ]
+        ],
         'cart'     => [
             'has_remove_button' => true,
             'has_image'         => true,
@@ -58,10 +63,11 @@ class FragmentConfig
             ],
         ],
         'checkout' => [
+            'has_coupons' => true,
             'steps' => [
                 'address',
-                'payment',
                 'shipping-payment',
+//                'payment',
                 'show-summary'
             ],
         ],

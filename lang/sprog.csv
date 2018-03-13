@@ -1,0 +1,13 @@
+Wildcard
+label.shipping_method
+label.payment_method
+simpleshop.no_products_in_cart
+simpleshop.error.cart_product_not_enough_amount
+simpleshop.data_saved
+simpleshop.summary_order
+simpleshop.coupon
+
+shop.shipping_default
+shop.shipping_pickup_point
+shop.bank_transfer
+shop.paypal_express

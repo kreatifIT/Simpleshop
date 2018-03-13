@@ -13,9 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$template = $this->getVar('template');
-
 ?>
-<div class="customer-area margin-top margin-large-bottom">
-    <?= $this->subfragment('simpleshop/customer/customer_area/'. $template); ?>
+<div class="row column margin-bottom">
+    <p class="text-center margin-bottom">###shop.order_complete_pickup_text###</p>
 </div>

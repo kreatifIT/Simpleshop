@@ -13,65 +13,55 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$shippings    = Shipping::getAll();
-$payments     = Payment::getAll();
-$has_shipping = $this->getVar('has_shipping');
+$shippings = $this->getVar('shippings');
+$payments  = $this->getVar('payments');
+$Order     = $this->getVar('Order');
 
-if (Session::getCheckoutData('Order'))
-{
-    $Order = Session::getCurrentOrder();
-    $this->setVar('shipping', $Order->getValue('shipping'));
-    $this->setVar('payment', $Order->getValue('payment'));
-}
+$shipping = $Order->getValue('shipping');
+$payment  = $Order->getValue('payment');
 
-$this->setVar('class', 'medium-6 columns margin-bottom');
+$this->setVar('shipping', $shipping ?: $shippings[0]);
+$this->setVar('payment', $payment ?: $payments[0]);
 
 ?>
-<form action="" method="post">
-    <div class="radio-panels row column margin-top">
+<div class="shipping-payment">
+    <form action="" method="post">
 
-        <?php if ($has_shipping): ?>
-        <!-- Shipment -->
-        <h3>###label.shipment###</h3>
+        <div class="shippings margin-top margin-large-bottom">
+            <!-- Shipment -->
+            <div class="row column margin-small-bottom">
+                <h2>###label.shipping_method###</h2>
+            </div>
 
-        <fieldset class="row">
             <?php
-
-
-            foreach ($shippings as $shipping)
-            {
+            foreach ($shippings as $shipping) {
                 $this->setVar('name', $shipping->getName());
                 $this->setVar('plugin_name', $shipping->getPluginName());
                 echo $this->subfragment('simpleshop/checkout/shipping_and_payment/shipping_item.php');
             }
             ?>
-        </fieldset>
+        </div>
 
-        <span class="horizontal-rule large-rule margin-bottom"></span>
-        <?php endif; ?>
+        <div class="payments margin-top margin-large-bottom">
+            <!-- Payment -->
+            <div class="row column margin-small-bottom">
+                <h2>###label.payment_method###</h2>
+            </div>
 
-        <!-- Payment -->
-        <h3>###label.payment###</h3>
-
-        <fieldset class="row">
 
             <?php
-            foreach ($payments as $payment)
-            {
+            foreach ($payments as $payment) {
                 $this->setVar('name', $payment->getName());
                 $this->setVar('plugin_name', $payment->getPluginName());
                 echo $this->subfragment('simpleshop/checkout/shipping_and_payment/payment_item.php');
             }
             ?>
+        </div>
 
-        </fieldset>
-    </div>
-    <div class="row buttons-checkout margin-bottom">
-        <div class="medium-6 columns">
-            <a href="<?= rex_getUrl(NULL, NULL, ['step' => 2]) ?>" class="button button-gray">###action.go_back###</a>
+        <div class="row column margin-large-bottom">
+            <a href="#" class="button margin-bottom">###action.go_back###</a>
+            <button type="submit" class="button margin-bottom secondary float-right" name="action" value="set-shipping-payment">###action.go_ahead###</button>
         </div>
-        <div class="medium-6 columns">
-            <button type="submit" name="action" value="process_shipping_and_payment" class="button button-checkout">###action.go_ahead###</button>
-        </div>
-    </div>
-</form>
+
+    </form>
+</div>

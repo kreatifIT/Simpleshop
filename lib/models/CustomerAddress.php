@@ -19,7 +19,15 @@ class CustomerAddress extends Model
 
     public function getName($lang_id = null)
     {
-        return $this->getValue('firstname') . ' ' . $this->getValue('lastname');
+        $name = [];
+
+        if ($this->valueIsset('company_name')) {
+            $name[] = trim($this->getValue('company_name'));
+        }
+        if ($this->valueIsset('firstname') || $this->valueIsset('lastname')) {
+            $name[] = trim($this->getValue('firstname') . ' ' . $this->getValue('lastname'));
+        }
+        return implode(' - ', $name);
     }
 
     /**

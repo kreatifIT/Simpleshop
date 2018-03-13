@@ -57,7 +57,7 @@ abstract class Plugin
     public static function getAll()
     {
         $result = [];
-        foreach (self::$classes[static::$type] as $class => $data)
+        foreach ((array) self::$classes[static::$type] as $class => $data)
         {
             $result[] = self::getByClass($class);
         }
@@ -70,9 +70,9 @@ abstract class PluginAbstract
 {
     public $plugin_name;
 
-    public abstract static function get();
     public abstract function getName();
 
+    public static function get() {}
     public static function create()
     {
         return static::get();

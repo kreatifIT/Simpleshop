@@ -13,11 +13,18 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-?>
-<div class="large-4 columns margin-bottom box-checkout">
-    <div>
-        <h3>###action.shop_as_guest###</h3>
-        <p>###shop.buy_as_guest_text###</p>
-        <a href="<?= rex_getUrl(NULL, NULL, ['action' => 'guest-checkout']) ?>" class="button expanded">###action.continue_as_guest###</a>
-    </div>
-</div>
+use Sprog\Wildcard;
+
+class DefaultShipping extends ShippingAbstract
+{
+    const NAME = 'shop.shipping_default';
+
+    public function getName()
+    {
+        if ($this->name == '')
+        {
+            $this->name = checkstr(Wildcard::get(self::NAME), self::NAME);
+        }
+        return parent::getName();
+    }
+}

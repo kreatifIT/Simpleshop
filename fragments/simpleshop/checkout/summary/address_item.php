@@ -13,28 +13,24 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$type     = $this->getVar('type', 'invoice');
-$title    = $this->getVar('title');
-$edit_url = $this->getVar('edit_url');
-$address  = $this->getVar('address');
+$title   = $this->getVar('title');
+$address = $this->getVar('address');
 
 ?>
-<div class="medium-6 columns margin-bottom">
-    <div class="address-panel">
-        <?php if (strlen($edit_url)): ?>
-            <a href="<?= $edit_url ?>" class="edit">
-                <i class="fa fa-pencil hide-for-large" aria-hidden="true"></i>
-                <span class="show-for-large">###action.edit###</span>
-            </a>
-        <?php endif; ?>
+<div class="column margin-bottom">
+    <div class="address">
         <h4><?= $title ?></h4>
         <p>
-            <?= $address->getValue('firstname') ?> <?= $address->getValue('lastname') ?><?php if (strlen($address->getValue('additional'))) echo ' - ' . $address->getValue('additional') ?>
+            <?= $address->getName() ?>
             <br/>
             <?= $address->getValue('street') ?><br>
-            <?= $address->getValue('zip') ?> <?= $address->getValue('location') ?> - <br>
-            <br>
-            <?= $address->getValue('fiscal_code') ?>
+            <?php
+            if ($address->valueIsset('street_additional')) {
+                echo $address->getValue('street_additional') .'<br/>';
+            }
+            ?>
+            <?= $address->getValue('postal') ?>
+            <?= $address->getValue('location') ?> - <?= $address->getValue('province') ?><br>
         </p>
     </div>
 </div>
