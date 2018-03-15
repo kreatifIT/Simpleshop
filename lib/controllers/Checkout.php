@@ -145,12 +145,26 @@ class CheckoutController extends Controller
 
     protected function getShippingAddressView()
     {
-        $Address = $this->Order->getValue('shipping_address');
+        $Address      = $this->Order->getValue('shipping_address');
+        $useShAddress = Session::getCheckoutData('use_shipping_address', false);
+        $Customer     = Customer::getCurrentUser();
+
+        if (!$Address) {
+            $addresses = CustomerAddress::getAll(true, [
+                'filter'  => [['customer_id', $Customer->getId()]],
+                'limit'   => 1,
+                'orderBy' => 'id',
+                'order'   => 'desc',
+            ])->toArray();
+            $Address   = array_shift($addresses);
+        }
 
         if (!empty($_POST)) {
-            $noShipping = rex_post('shipping_address_is_idem', 'int', 0);
+            $notUseShAddress = rex_post('shipping_address_is_idem', 'int', 0);
 
-            if ($noShipping) {
+            Session::setCheckoutData('use_shipping_address', !$notUseShAddress);
+
+            if ($notUseShAddress) {
                 $nextStep = CheckoutController::getNextStep();
                 $Order    = Session::getCurrentOrder();
 
@@ -160,12 +174,10 @@ class CheckoutController extends Controller
                 CheckoutController::setDoneStep($nextStep);
                 rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
             }
-            else {
-                $Address = $Address ?: CustomerAddress::create();
-            }
         }
 
-        $this->setVar('Address', $Address);
+        $this->setVar('use_shipping_address', $useShAddress);
+        $this->setVar('Address', $Address ?: CustomerAddress::create());
 
         \rex_extension::register('YFORM_DATA_ADDED', ['\FriendsOfREDAXO\Simpleshop\CheckoutController', 'shippingAddressCallback']);
         \rex_extension::register('YFORM_DATA_UPDATED', ['\FriendsOfREDAXO\Simpleshop\CheckoutController', 'shippingAddressCallback']);
@@ -205,12 +217,12 @@ class CheckoutController extends Controller
                 'filter'  => [['customer_id', $Customer->getId()]],
                 'limit'   => 1,
                 'orderBy' => 'id',
-                'order'   => 'desc',
+                'order'   => 'asc',
             ])->toArray();
             $Address   = array_shift($addresses);
         }
 
-        $this->setVar('Address', $Address);
+        $this->setVar('Address', $Address ?: CustomerAddress::create());
 
         \rex_extension::register('YFORM_DATA_ADDED', ['\FriendsOfREDAXO\Simpleshop\CheckoutController', 'invoiceAddressCallback']);
         \rex_extension::register('YFORM_DATA_UPDATED', ['\FriendsOfREDAXO\Simpleshop\CheckoutController', 'invoiceAddressCallback']);

@@ -15,8 +15,9 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 $this->setVar('btn_label', '###action.go_ahead###');
 
-$Address  = $this->getVar('Address', null);
-$back_url = $this->getVar('back_url');
+$useShAddress = $this->getVar('use_shipping_address', false);
+$Address      = $this->getVar('Address', null);
+$back_url     = $this->getVar('back_url');
 
 ?>
 <div class="addresses-grid margin-top margin-large-bottom">
@@ -27,13 +28,13 @@ $back_url = $this->getVar('back_url');
             <div class="address-toggle row column margin-top margin-large-bottom">
                 <div class="custom-checkbox">
                     <label class="custom-checkbox">
-                        <input type="checkbox" name="shipping_address_is_idem" value="1" <?= $Address ? '' : 'checked="checked"' ?> onchange="Simpleshop.toggleShipping(this, '.shipping-form|.address-wrapper')"/>
+                        <input type="checkbox" name="shipping_address_is_idem" value="1" <?= $useShAddress ? '' : 'checked="checked"' ?> onchange="Simpleshop.toggleShipping(this, '.shipping-form|.address-wrapper')"/>
                         ###simpleshop.shipping_address_is_idem###
                         <span class="checkbox"></span>
                     </label>
                 </div>
             </div>
-            <div class="address-wrapper <?= $Address ? '' : 'hide' ?>">
+            <div class="address-wrapper <?= $useShAddress ? '' : 'hide' ?>">
                 <?php
                 $this->setVar('only_fields', true);
                 $this->setVar('show_save_btn', false);
