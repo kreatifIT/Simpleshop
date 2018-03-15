@@ -115,15 +115,29 @@ class FragmentConfig
 
         'yform_fields' => [
             'rex_shop_customer_address' => [
+                '_fieldDefaults'  => ['css_class' => 'column medium-6'],
                 '_excludedFields' => ['status', 'customer_id'],
                 'country'         => [
                     'just_names' => true,
                 ],
             ],
             'rex_shop_customer'         => [
+                '_fieldDefaults'  => ['css_class' => 'column medium-6'],
                 '_excludedFields' => ['lang_id', 'addresses', 'status', 'lastlogin', 'updatedate', 'created'],
                 'ctype'           => [
-                    'css_class' => 'column" onchange="Simpleshop.changeCType(this, \'\')"',
+                    'select_class' => '" onchange="Simpleshop.changeCType(this, \'form\')"',
+                ],
+                'company_name'    => [
+                    'css_class' => 'column medium-6 company-field',
+                ],
+                'vat_num'         => [
+                    'css_class' => 'column medium-6 company-field',
+                ],
+                'firstname'       => [
+                    'css_class' => 'column medium-6 person-field',
+                ],
+                'lastname'        => [
+                    'css_class' => 'column medium-6 person-field',
                 ],
             ],
         ],

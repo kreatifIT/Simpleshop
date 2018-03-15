@@ -24,7 +24,17 @@ var Simpleshop = (function ($) {
             }
         },
         changeCType: function (_this, selector) {
-            alert('Ja');
+            var $this = $(_this),
+                $container = $(selector);
+
+            if ($this.val() == 'person') {
+                $container.find('.company-field').addClass('hide');
+                $container.find('.person-field').removeClass('hide');
+            }
+            else {
+                $container.find('.person-field').addClass('hide');
+                $container.find('.company-field').removeClass('hide');
+            }
         },
         addToCart: function (_this, vkey, amount, selector) {
             if (parseInt(amount) <= 0) {
@@ -130,6 +140,14 @@ var Simpleshop = (function ($) {
 
         return $loading;
     }
+
+    $(window).on('load', function (e) {
+        var $ctype = $('select[name=ctype]');
+
+        if ($ctype.length) {
+            $ctype.trigger('change');
+        }
+    });
 
     return result;
 })(jQuery);
