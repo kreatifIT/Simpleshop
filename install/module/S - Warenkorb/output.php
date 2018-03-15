@@ -1,6 +1,17 @@
 <?php
 
-$products = \FriendsOfREDAXO\Simpleshop\Session::getCartItems();
+/**
+ * This file is part of the Simpleshop package.
+ *
+ * @author FriendsOfREDAXO
+ * @author a.platter@kreatif.it
+ * @author jan.kristinus@yakamara.de
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+use FriendsOfREDAXO\Simpleshop;
 
 ?>
 <div class="row column margin-large-top margin-large-bottom">
@@ -9,9 +20,7 @@ $products = \FriendsOfREDAXO\Simpleshop\Session::getCartItems();
     <div class="row">
         <div class="column cart-container">
             <?php
-            $Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute([
-                'products' => $products,
-            ]);
+            $Controller = Simpleshop\CartController::execute();
             echo $Controller->parse();
             ?>
         </div>
