@@ -8,6 +8,13 @@ label.coupon
 label.tax
 label.tax_included
 
+error.insert_company_name
+error.insert_firstname
+error.insert_lastname
+error.insert_street
+error.insert_location
+error.insert_postal
+
 simpleshop.product_not_available
 simpleshop.no_products_in_cart
 simpleshop.error.cart_product_not_enough_amount

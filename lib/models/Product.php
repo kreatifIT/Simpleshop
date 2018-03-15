@@ -38,8 +38,9 @@ class Product extends Model
 
     public function getPrice($includeTax = false, $use_reduced = true)
     {
-        $type  = $this->getValue('type');
-        $price = $this->getValue('price');
+        $type     = $this->getValue('type');
+        $price    = $this->getValue('price');
+        $Settings = \rex::getConfig('simpleshop.Settings');
 
         if ($type == 'giftcard') {
             $includeTax = false;
@@ -53,7 +54,7 @@ class Product extends Model
         if ($includeTax) {
             $tax = Tax::get($this->getValue('tax'))->getValue('tax');
 
-            if ($this->getSetting('brutto_prices')) {
+            if ($Settings['brutto_prices']) {
                 $this->__tax = ($price / ($tax + 100)) * $tax;
             }
             else {
@@ -61,7 +62,7 @@ class Product extends Model
                 $price       = $price + $this->__tax;
             }
         }
-        else if ($this->getSetting('brutto_prices')) {
+        else if ($Settings['brutto_prices']) {
             $tax = Tax::get($this->getValue('tax'))->getValue('tax');
 
             $this->__tax = ($price / ($tax + 100)) * $tax;
@@ -164,12 +165,7 @@ class Product extends Model
     public function getAllVariants($filter = [])
     {
         if ($this->__variants === null) {
-            $stmt = Variant::query()
-                ->resetSelect()
-                ->select('id')
-                ->select('variant_key')
-                ->where('product_id', $this->getValue('id'))
-                ->where('type', 'NE', '!=');
+            $stmt = Variant::query()->resetSelect()->select('id')->select('variant_key')->where('product_id', $this->getValue('id'))->where('type', 'NE', '!=');
 
             foreach ($filter as $data) {
                 $stmt->where($data[0], $data[1], $data[2] ?: '=');

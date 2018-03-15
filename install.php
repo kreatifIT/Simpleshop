@@ -48,6 +48,12 @@ if (!$this->hasConfig()) {
 
 
     // import tables
+    $content = file_get_contents($this->getPath('install') . "/country_tableset.json");
+    \rex_yform_manager_table_api::importTablesets($content);
+
+    $content = file_get_contents($this->getPath('install') . "/country.sql");
+    $sql->setQuery($content);
+
     $content = file_get_contents($this->getPath('install') . "/tableset.json");
     \rex_yform_manager_table_api::importTablesets($content);
 }

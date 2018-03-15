@@ -161,32 +161,36 @@ class CheckoutController extends Controller
                 rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
             }
             else {
-                $Address = CustomerAddress::create();
+                $Address = $Address ?: CustomerAddress::create();
             }
         }
 
         $this->setVar('Address', $Address);
 
-        \rex_extension::register('YFORM_DATA_UPDATED', function (\rex_extension_point $Ep) {
-            $yform = $Ep->getSubject();
-            $table = $Ep->getParam('table')->getTableName();
-
-            if (!\rex::isBackend() && $table == CustomerAddress::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
-                $Object   = $Ep->getParam('data');
-                $nextStep = CheckoutController::getNextStep();
-                $Order    = Session::getCurrentOrder();
-
-                // NEEDED! to get data
-                $Object->getValue('createdate');
-                $Order->setShippingAddress($Object);
-                Session::setCheckoutData('Order', $Order);
-
-                CheckoutController::setDoneStep($nextStep);
-                rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
-            }
-            return $yform;
-        });
+        \rex_extension::register('YFORM_DATA_ADDED', ['\FriendsOfREDAXO\Simpleshop\CheckoutController', 'shippingAddressCallback']);
+        \rex_extension::register('YFORM_DATA_UPDATED', ['\FriendsOfREDAXO\Simpleshop\CheckoutController', 'shippingAddressCallback']);
         $this->fragment_path[] = 'simpleshop/checkout/customer/shipping_address.php';
+    }
+
+    public static function shippingAddressCallback(\rex_extension_point $Ep)
+    {
+        $yform = $Ep->getSubject();
+        $table = $Ep->getParam('table')->getTableName();
+
+        if (!\rex::isBackend() && $table == CustomerAddress::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
+            $Object   = $Ep->getParam('data');
+            $nextStep = CheckoutController::getNextStep();
+            $Order    = Session::getCurrentOrder();
+
+            // NEEDED! to get data
+            $Object->getValue('createdate');
+            $Order->setShippingAddress($Object);
+            Session::setCheckoutData('Order', $Order);
+
+            CheckoutController::setDoneStep($nextStep);
+            rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
+        }
+        return $yform;
     }
 
     protected function getInvoiceAddressView()
@@ -208,47 +212,51 @@ class CheckoutController extends Controller
 
         $this->setVar('Address', $Address);
 
-        \rex_extension::register('YFORM_DATA_UPDATED', function (\rex_extension_point $Ep) {
-            $yform = $Ep->getSubject();
-            $table = $Ep->getParam('table')->getTableName();
-
-            if (!\rex::isBackend() && $table == Customer::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
-                CheckoutController::$callbackCheck['invoice'] = true;
-
-                $Object   = $Ep->getParam('data');
-                $Order    = Session::getCurrentOrder();
-                $nextStep = CheckoutController::getNextStep();
-
-                // NEEDED! to get data
-                $Object->getValue('createdate');
-                $Order->setValue('customer_data', $Object);
-                Session::setCheckoutData('Order', $Order);
-
-                if (CheckoutController::$callbackCheck['shipping']) {
-                    CheckoutController::setDoneStep($nextStep);
-                    rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
-                }
-            }
-            else if (!\rex::isBackend() && $table == CustomerAddress::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
-                CheckoutController::$callbackCheck['shipping'] = true;
-
-                $Object   = $Ep->getParam('data');
-                $Order    = Session::getCurrentOrder();
-                $nextStep = CheckoutController::getNextStep();
-
-                // NEEDED! to get data
-                $Object->getValue('createdate');
-                $Order->setInvoiceAddress($Object);
-                Session::setCheckoutData('Order', $Order);
-
-                if (CheckoutController::$callbackCheck['invoice']) {
-                    CheckoutController::setDoneStep($nextStep);
-                    rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
-                }
-            }
-            return $yform;
-        });
+        \rex_extension::register('YFORM_DATA_ADDED', ['\FriendsOfREDAXO\Simpleshop\CheckoutController', 'invoiceAddressCallback']);
+        \rex_extension::register('YFORM_DATA_UPDATED', ['\FriendsOfREDAXO\Simpleshop\CheckoutController', 'invoiceAddressCallback']);
         $this->fragment_path[] = 'simpleshop/checkout/customer/invoice_address.php';
+    }
+
+    public static function invoiceAddressCallback(\rex_extension_point $Ep)
+    {
+        $yform = $Ep->getSubject();
+        $table = $Ep->getParam('table')->getTableName();
+
+        if (!\rex::isBackend() && $table == Customer::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
+            CheckoutController::$callbackCheck['invoice'] = true;
+
+            $Object   = $Ep->getParam('data');
+            $Order    = Session::getCurrentOrder();
+            $nextStep = CheckoutController::getNextStep();
+
+            // NEEDED! to get data
+            $Object->getValue('createdate');
+            $Order->setValue('customer_data', $Object);
+            Session::setCheckoutData('Order', $Order);
+
+            if (CheckoutController::$callbackCheck['shipping']) {
+                CheckoutController::setDoneStep($nextStep);
+                rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
+            }
+        }
+        else if (!\rex::isBackend() && $table == CustomerAddress::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
+            CheckoutController::$callbackCheck['shipping'] = true;
+
+            $Object   = $Ep->getParam('data');
+            $Order    = Session::getCurrentOrder();
+            $nextStep = CheckoutController::getNextStep();
+
+            // NEEDED! to get data
+            $Object->getValue('createdate');
+            $Order->setInvoiceAddress($Object);
+            Session::setCheckoutData('Order', $Order);
+
+            if (CheckoutController::$callbackCheck['invoice']) {
+                CheckoutController::setDoneStep($nextStep);
+                rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
+            }
+        }
+        return $yform;
     }
 
     protected function getShippingPaymentView()

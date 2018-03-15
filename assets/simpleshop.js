@@ -11,10 +11,25 @@ var Simpleshop = (function ($) {
             $wrapper.children('div').addClass('hide');
             $wrapper.children(selector).removeClass('hide');
         },
+        toggleShipping: function (_this, selector) {
+            var $this = $(_this),
+                chunks = selector.split('|'),
+                $address = $this.parents(chunks[0]).find(chunks[1]);
+
+            if ($this.is(':checked')) {
+                $address.addClass('hide');
+            }
+            else {
+                $address.removeClass('hide');
+            }
+        },
+        changeCType: function (_this, selector) {
+            alert('Ja');
+        },
         addToCart: function (_this, vkey, amount, selector) {
             if (parseInt(amount) <= 0) {
                 var chunks = selector.split('|');
-                amount = (_this).parents(chunks[0]).find(chunks[0]).val();
+                amount = $(_this).parents(chunks[0]).find(chunks[1]).val();
             }
 
             $.ajax({

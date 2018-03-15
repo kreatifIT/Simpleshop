@@ -111,9 +111,25 @@ class FragmentConfig
             'callout'       => 'Margin-bottom:16px;border-collapse:collapse;border-spacing:0;margin-bottom:16px;padding:0;text-align:left;vertical-align:top;width:100%;',
             'callout_inner' => 'Margin:0;background:#f3f3f3;border:1px solid #cacaca;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:10px;text-align:left;width:100%;',
         ],
+
+
+        'yform_fields' => [
+            'rex_shop_customer_address' => [
+                '_excludedFields' => ['status', 'customer_id'],
+                'country'         => [
+                    'just_names' => true,
+                ],
+            ],
+            'rex_shop_customer'         => [
+                '_excludedFields' => ['lang_id', 'addresses', 'status', 'lastlogin', 'updatedate', 'created'],
+                'ctype'           => [
+                    'css_class' => 'column" onchange="Simpleshop.changeCType(this, \'\')"',
+                ],
+            ],
+        ],
     ];
 
-    public static function getValue($selector)
+    public static function getValue($selector, $default = null)
     {
         $result = self::$data;
         $keys   = explode('.', $selector);
@@ -123,7 +139,7 @@ class FragmentConfig
                 $result = $result[$key];
             }
             else {
-                $result = null;
+                $result = $default;
                 break;
             }
         }

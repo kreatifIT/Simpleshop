@@ -203,48 +203,6 @@ class Customer extends Model
     {
         return $this->getValue('status') == 1;
     }
-
-    public function getForm($yform = null, $excludedFields = [])
-    {
-        if (\rex::isBackend()) {
-            $form = parent::getForm();
-        }
-        else {
-            \rex_extension::register('YFORM_DATASET_FORM_SETVALIDATEFIELD', function (\rex_extension_point $Ep) {
-                $subject = $Ep->getSubject();
-                $Object  = $Ep->getParam('object');
-
-                if (!\rex::isBackend() && $Object->getTable()->getTableName() == self::TABLE) {
-                    $excluded = (array) $Ep->getParam('special_fields');
-
-                    if (in_array($subject[0], $excluded)) {
-                        $subject = false;
-                    }
-                }
-                return $subject;
-            });
-            \rex_extension::register('YFORM_DATASET_FORM_SETVALUEFIELD', function (\rex_extension_point $Ep) {
-                $subject = $Ep->getSubject();
-                $Object  = $Ep->getParam('object');
-
-                if (!\rex::isBackend() && $Object->getTable()->getTableName() == self::TABLE) {
-                    $type           = $Ep->getParam('type_name');
-                    $excludesFields = ['lang_id', 'addresses', 'status', 'lastlogin', 'created', 'updatedate'];
-                    $excludesFields = array_merge($excludesFields, (array) $Ep->getParam('special_fields'));
-
-                    if ($type == 'hidden_field' || in_array($subject[0], $excludesFields)) {
-                        $subject = false;
-                    }
-                    else {
-                        $subject['css_class'] = 'column ' . FragmentConfig::getValue('customer.css_class');
-                    }
-                }
-                return $subject;
-            });
-            $form = parent::getForm($yform, $excludedFields);
-        }
-        return $form;
-    }
 }
 
 class CustomerException extends \Exception

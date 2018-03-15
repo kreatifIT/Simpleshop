@@ -38,36 +38,6 @@ class CustomerAddress extends Model
             $form = parent::getForm();
         }
         else {
-            \rex_extension::register('YFORM_DATASET_FORM_SETVALIDATEFIELD', function (\rex_extension_point $Ep) {
-                $subject = $Ep->getSubject();
-                $Object  = $Ep->getParam('object');
-
-                if (!\rex::isBackend() && $Object->getTable()->getTableName() == self::TABLE) {
-                    $excluded = array_merge(['customer_id'], (array) $Ep->getParam('special_fields'));
-
-                    if (in_array($subject[0], $excluded)) {
-                        $subject = false;
-                    }
-                }
-                return $subject;
-            });
-            \rex_extension::register('YFORM_DATASET_FORM_SETVALUEFIELD', function (\rex_extension_point $Ep) {
-                $subject = $Ep->getSubject();
-                $Object  = $Ep->getParam('object');
-
-                if (!\rex::isBackend() && $Object->getTable()->getTableName() == self::TABLE) {
-                    $type     = $Ep->getParam('type_name');
-                    $excluded = array_merge(['status', 'customer_id'], (array) $Ep->getParam('special_fields'));
-
-                    if ($type == 'hidden_field' || in_array($subject[0], $excluded)) {
-                        $subject = false;
-                    }
-                    else {
-                        $subject['css_class'] = 'column ' . FragmentConfig::getValue('customer.css_class');
-                    }
-                }
-                return $subject;
-            });
             $form = parent::getForm($yform, $excludedFields);
             $form->setValueField('hidden', ['customer_id', $customerId]);
         }
