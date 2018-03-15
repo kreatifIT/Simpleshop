@@ -14,8 +14,6 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-use PHPMailer\PHPMailer\Exception;
-
 class Order extends Model
 {
     const TABLE = 'rex_shop_order';
@@ -33,22 +31,22 @@ class Order extends Model
 
     public function getShippingAddress()
     {
-        return $this->valueIsset('address_2') ? $this->getValue('address_2') : $this->getValue('address_1');
+        return $this->valueIsset('shipping_address') ? $this->getValue('shipping_address') : $this->getValue('invoice_address');
     }
 
     public function setShippingAddress($address)
     {
-        $this->setValue('address_2', $address);
+        $this->setValue('shipping_address', $address);
     }
 
     public function getInvoiceAddress()
     {
-        return $this->getValue('address_1');
+        return $this->getValue('invoice_address');
     }
 
     public function setInvoiceAddress($address)
     {
-        $this->setValue('address_1', $address);
+        $this->setValue('invoice_address', $address);
     }
 
     public function getProducts($raw = true)

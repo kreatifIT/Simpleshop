@@ -29,6 +29,7 @@ simpleshop.banktransfer_order_complete_text
 simpleshop.order_complete_default_shipping_text
 simpleshop.omest_shipping_text
 simpleshop.order_complete_pickup_text
+simpleshop.shipping_address_is_idem
 
 simpleshop.error.tos_rma_not_accepted
 simpleshop.error.coupon_not_exists

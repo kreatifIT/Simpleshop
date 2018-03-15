@@ -14,6 +14,7 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
+use Kreatif\Project\Settings;
 use Sprog\Wildcard;
 use Symfony\Component\Yaml\Exception\RuntimeException;
 
@@ -21,6 +22,8 @@ class CheckoutController extends Controller
 {
     protected $products = [];
     protected $Order    = null;
+
+    public static $callbackCheck = null;
 
     protected function _execute()
     {
@@ -53,8 +56,10 @@ class CheckoutController extends Controller
                     $this->setVar('back_url', $back_url);
 
                     switch ($currentStep) {
+                        case 'invoice_address':
+                            return $this->getInvoiceAddressView();
                         case 'shipping_address':
-                            return $this->getAddressView();
+                            return $this->getShippingAddressView();
                         case 'shipping||payment':
                             return $this->getShippingPaymentView();
                         case 'show-summary':
@@ -138,9 +143,112 @@ class CheckoutController extends Controller
         rex_redirect($this->settings['linklist']['cart'], null, $_GET);
     }
 
-    protected function getAddressView()
+    protected function getShippingAddressView()
     {
-        $this->fragment_path[] = 'simpleshop/checkout/customer/addresses.php';
+        $Address = $this->Order->getValue('shipping_address');
+
+        if (!empty($_POST)) {
+            $noShipping = rex_post('shipping_address_is_idem', 'int', 0);
+
+            if ($noShipping) {
+                $nextStep = CheckoutController::getNextStep();
+                $Order    = Session::getCurrentOrder();
+
+                $Order->setShippingAddress(null);
+                Session::setCheckoutData('Order', $Order);
+
+                CheckoutController::setDoneStep($nextStep);
+                rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
+            }
+            else {
+                $Address = CustomerAddress::create();
+            }
+        }
+
+        $this->setVar('Address', $Address);
+
+        \rex_extension::register('YFORM_DATA_UPDATED', function (\rex_extension_point $Ep) {
+            $yform = $Ep->getSubject();
+            $table = $Ep->getParam('table')->getTableName();
+
+            if (!\rex::isBackend() && $table == CustomerAddress::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
+                $Object   = $Ep->getParam('data');
+                $nextStep = CheckoutController::getNextStep();
+                $Order    = Session::getCurrentOrder();
+
+                // NEEDED! to get data
+                $Object->getValue('createdate');
+                $Order->setShippingAddress($Object);
+                Session::setCheckoutData('Order', $Order);
+
+                CheckoutController::setDoneStep($nextStep);
+                rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
+            }
+            return $yform;
+        });
+        $this->fragment_path[] = 'simpleshop/checkout/customer/shipping_address.php';
+    }
+
+    protected function getInvoiceAddressView()
+    {
+        $Address  = $this->Order->getInvoiceAddress();
+        $Customer = Customer::getCurrentUser();
+
+        CheckoutController::$callbackCheck = ['invoice' => false, 'shipping' => false];
+
+        if (!$Address) {
+            $addresses = CustomerAddress::getAll(true, [
+                'filter'  => [['customer_id', $Customer->getId()]],
+                'limit'   => 1,
+                'orderBy' => 'id',
+                'order'   => 'desc',
+            ])->toArray();
+            $Address   = array_shift($addresses);
+        }
+
+        $this->setVar('Address', $Address);
+
+        \rex_extension::register('YFORM_DATA_UPDATED', function (\rex_extension_point $Ep) {
+            $yform = $Ep->getSubject();
+            $table = $Ep->getParam('table')->getTableName();
+
+            if (!\rex::isBackend() && $table == Customer::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
+                CheckoutController::$callbackCheck['invoice'] = true;
+
+                $Object   = $Ep->getParam('data');
+                $Order    = Session::getCurrentOrder();
+                $nextStep = CheckoutController::getNextStep();
+
+                // NEEDED! to get data
+                $Object->getValue('createdate');
+                $Order->setValue('customer_data', $Object);
+                Session::setCheckoutData('Order', $Order);
+
+                if (CheckoutController::$callbackCheck['shipping']) {
+                    CheckoutController::setDoneStep($nextStep);
+                    rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
+                }
+            }
+            else if (!\rex::isBackend() && $table == CustomerAddress::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
+                CheckoutController::$callbackCheck['shipping'] = true;
+
+                $Object   = $Ep->getParam('data');
+                $Order    = Session::getCurrentOrder();
+                $nextStep = CheckoutController::getNextStep();
+
+                // NEEDED! to get data
+                $Object->getValue('createdate');
+                $Order->setInvoiceAddress($Object);
+                Session::setCheckoutData('Order', $Order);
+
+                if (CheckoutController::$callbackCheck['invoice']) {
+                    CheckoutController::setDoneStep($nextStep);
+                    rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
+                }
+            }
+            return $yform;
+        });
+        $this->fragment_path[] = 'simpleshop/checkout/customer/invoice_address.php';
     }
 
     protected function getShippingPaymentView()
@@ -243,12 +351,8 @@ class CheckoutController extends Controller
 
         // add vars
         $Mail->setVar('Order', $this->Order);
-        $Mail->setVar('primary_color', $this->params['primary_color']);
-        $Mail->setVar('config', array_merge([
-            'is_order_complete' => true,
-            'is_email'          => true,
-            'use_invoicing'     => from_array($Settings, 'use_invoicing'),
-        ], $this->getVar('config', [])));
+        $Mail->setVar('primary_color', Settings::getValue('extended__mail__primary_color', 'red'));
+        $Mail->setVar('config', []);
 
         // set order notification email
         $Mail->AddAddress($Customer->getValue('email'));
@@ -281,7 +385,6 @@ class CheckoutController extends Controller
         // finally save order - DONE / COMPLETE
         $this->Order->completeOrder();
         //        $this->sendMail($this->params['debug']);
-        ob_clean();
         $this->sendMail(true);
 
         // CLEAR THE SESSION

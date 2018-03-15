@@ -13,7 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$prim_color = $this->getVar('primary_color', 'green');
+$primary_color = $this->getVar('primary_color');
 
 ?>
 <!-- rule -->
@@ -71,15 +71,15 @@ $prim_color = $this->getVar('primary_color', 'green');
                 <tr style="padding:0;text-align:left;vertical-align:top">
                     <th style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left">
                         ###label.phone### & ###label.fax###:
-                        <a href="tel:###company.phone###" style="Margin:0;color:<?= $prim_color ?>;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none">
+                        <a href="tel:###company.phone###" style="Margin:0;color:<?= $primary_color ?>;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none">
                             ###company.phone###</a>
                         <br>
                         ###label.website###:
-                        <a href="http://###company.website###" target="_blank" style="Margin:0;color:<?= $prim_color ?>;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none">
+                        <a href="http://###company.website###" target="_blank" style="Margin:0;color:<?= $primary_color ?>;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none">
                             ###company.website###</a>
                         <br>
                         ###label.email###:
-                        <a href="mailto:###company.email###" style="Margin:0;color:<?= $prim_color ?>;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none">
+                        <a href="mailto:###company.email###" style="Margin:0;color:<?= $primary_color ?>;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none">
                             ###company.email###
                         </a>
                         <br>

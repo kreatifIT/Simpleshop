@@ -14,14 +14,6 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $fragment_path = $this->getVar('fragment_path');
-$prim_color    = $this->getVar('primary_color', 'green');
-
-$config = array_merge([
-    'primary_color' => $prim_color,
-], $this->getVar('config', []));
-
-$this->setVar('config', $config);
-
 
 if (!$fragment_path) {
     throw new \phpmailerException('No fragment_path set!');

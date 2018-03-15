@@ -204,87 +204,44 @@ class Customer extends Model
         return $this->getValue('status') == 1;
     }
 
-    public static function getAccountFieldForm(\rex_yform $form, $Customer = null, $type = 'account', $additionalFields = [])
+    public function getForm($yform = null, $excludedFields = [])
     {
-        $includedFields = [];
-        $excludesFields = ['lang_id', 'addresses', 'status', 'lastlogin', 'created', 'updatedate'];
-
-        if ($type == 'account') {
-            $excludesFields = array_merge($excludesFields, $additionalFields, ['password']);
+        if (\rex::isBackend()) {
+            $form = parent::getForm();
         }
-        else if ($type == 'registration') {
-            $includedFields = array_merge(['firstname', 'lastname', 'email', 'password'], $additionalFields);
-        }
-        else if ($type == 'invoice') {
-            $includedFields = array_merge($includedFields, ['ctype', 'company_name', 'firstname', 'lastname', 'fiscal_code', 'vat_num']);
-        }
-        $fields = Customer::getAllYformFields();
-        $config = FragmentConfig::getValue('customer.css_class');
+        else {
+            \rex_extension::register('YFORM_DATASET_FORM_SETVALIDATEFIELD', function (\rex_extension_point $Ep) {
+                $subject = $Ep->getSubject();
+                $Object  = $Ep->getParam('object');
 
-        $form->setObjectparams('main_table', Customer::TABLE);
-        $form->setObjectparams('submit_btn_show', false);
-        $form->setObjectparams('real_field_names', false);
-        $form->setObjectparams('form_ytemplate', 'custom,foundation,bootstrap');
-        $form->setObjectparams('error_class', 'form-warning');
-        $form->setObjectparams('form_showformafterupdate', true);
+                if (!\rex::isBackend() && $Object->getTable()->getTableName() == self::TABLE) {
+                    $excluded = (array) $Ep->getParam('special_fields');
 
-        if ($Customer) {
-            $form->setObjectparams('main_id', $Customer->getId());
-            $form->setObjectparams('main_where', "id = {$Customer->getId()}");
-            $form->setObjectparams('getdata', true);
-        }
-        return self::getPrepareFieldForm($form, $fields, $config, $excludesFields, $includedFields);
-    }
-
-    public static function getAddressFieldForm(\rex_yform $form, $customerId, $Address = null, $_excludesFields = [])
-    {
-        $excludesFields = array_merge($_excludesFields, ['customer_id', 'status']);
-
-        $fields = CustomerAddress::getAllYformFields();
-        $config = FragmentConfig::getValue('customer.css_class');
-
-        $form->setObjectparams('main_table', CustomerAddress::TABLE);
-        $form->setObjectparams('submit_btn_show', false);
-        $form->setObjectparams('real_field_names', false);
-        $form->setObjectparams('form_ytemplate', 'custom,foundation,bootstrap');
-        $form->setObjectparams('error_class', 'form-warning');
-        $form->setObjectparams('form_showformafterupdate', true);
-
-        $form->setValueField('hidden', ['customer_id', $customerId]);
-
-        if ($Address) {
-            $form->setObjectparams('main_id', $Address->getId());
-            $form->setObjectparams('main_where', "id = {$Address->getId()}");
-            $form->setObjectparams('getdata', true);
-            $form->setActionField('db', [CustomerAddress::TABLE, "id = {$Address->getId()}"]);
-        }
-        return self::getPrepareFieldForm($form, $fields, $config, $excludesFields);
-    }
-
-    private static function getPrepareFieldForm($form, $fields, $config, $excludesFields = [], $includedFields = [])
-    {
-        foreach ($fields as $index => $field) {
-            // exclude types
-            if ($field->getElement('type_name') == 'hidden_field' || in_array($field->getElement('name'), $excludesFields)) {
-                continue;
-            }
-            else if (count($includedFields) && !in_array($field->getElement('name'), $includedFields)) {
-                continue;
-            }
-
-            if ($field->getElement('type_id') == 'value') {
-                $params = array_merge($field->toArray(), [
-                    'css_class' => 'column ' . $config['form_fields'],
-                ]);
-
-                if ($field->getElement('type_name') == 'be_manager_relation') {
-                    $params['field'] = strtr($params['field'], ['_1' => '_' . \rex_clang::getCurrentId()]);
+                    if (in_array($subject[0], $excluded)) {
+                        $subject = false;
+                    }
                 }
-                $form->setValueField($field->getElement('type_name'), $params);
-            }
-            else if ($field->getElement('type_id') == 'validate') {
-                $form->setValidateField($field->getElement('type_name'), $field->toArray());
-            }
+                return $subject;
+            });
+            \rex_extension::register('YFORM_DATASET_FORM_SETVALUEFIELD', function (\rex_extension_point $Ep) {
+                $subject = $Ep->getSubject();
+                $Object  = $Ep->getParam('object');
+
+                if (!\rex::isBackend() && $Object->getTable()->getTableName() == self::TABLE) {
+                    $type           = $Ep->getParam('type_name');
+                    $excludesFields = ['lang_id', 'addresses', 'status', 'lastlogin', 'created', 'updatedate'];
+                    $excludesFields = array_merge($excludesFields, (array) $Ep->getParam('special_fields'));
+
+                    if ($type == 'hidden_field' || in_array($subject[0], $excludesFields)) {
+                        $subject = false;
+                    }
+                    else {
+                        $subject['css_class'] = 'column ' . FragmentConfig::getValue('customer.css_class');
+                    }
+                }
+                return $subject;
+            });
+            $form = parent::getForm($yform, $excludedFields);
         }
         return $form;
     }

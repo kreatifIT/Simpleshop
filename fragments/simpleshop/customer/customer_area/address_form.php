@@ -14,41 +14,45 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-$fields           = $this->getVar('additional_fields', []);
+$fields           = $this->getVar('excluded_fields', []);
+$form             = $this->getVar('Form', null);
 $back_url         = $this->getVar('back_url', '');
 $show_save_btn    = $this->getVar('show_save_btn', true);
-$callback_on_save = $this->getVar('callback_on_save', null);
+$real_field_names = $this->getVar('real_field_names', false);
+$only_fields      = $this->getVar('only_fields', false);
 $btn_label        = $this->getVar('btn_label', ucfirst(\Wildcard::get('action.save')));
+$Address          = $this->getVar('Address', CustomerAddress::create());
 $Customer         = Customer::getCurrentUser();
-$addresses        = CustomerAddress::getAll(true, [
-    'filter'  => [['customer_id', $Customer->getId()]],
-    'limit'   => 1,
-    'orderBy' => 'id',
-    'order'   => 'desc',
-])->toArray();
-$address          = array_shift($addresses);
 
 
-if ($Customer->getValue('ctype') == 'company') {
-    $fields = array_merge($fields, ['firstname', 'lastname']);
-}
-else {
+$id  = 'form-data-' . \rex_article::getCurrentId();
+$sid = "form-{$id}";
+
+if ($Customer->getValue('ctype') != 'company') {
     $fields = array_merge($fields, ['company_name']);
 }
 
-$id   = 'address-data-' . \rex_article::getCurrentId();
-$sid  = "form-{$id}";
-$form = Customer::getAddressFieldForm(\Kreatif\Form::factory(), $Customer->getId(), $address, $fields);
+$form = $Address->getForm($form, $fields, $Customer->getId());
+
+$form->setObjectparams('debug', false);
+$form->setObjectparams('submit_btn_show', false);
+$form->setObjectparams('real_field_names', $real_field_names);
+$form->setObjectparams('form_ytemplate', 'custom,foundation,bootstrap');
+$form->setObjectparams('error_class', 'form-warning');
+$form->setObjectparams('form_showformafterupdate', true);
+$form->setObjectparams('getdata', $Address->getId() > 0);
 $form->setObjectparams('form_anchor', '-' . $sid);
 $form->setObjectparams('form_name', $sid);
-$form->setValueField('html', ['', '<input type="hidden" name="yform-id" value="' . $sid . '">']);
+$form->setObjectparams('form_class', 'row medium-up-2');
+$form->setObjectparams('form_action', '');
+$form->setObjectparams('only_fields', $only_fields);
 
 if ($show_save_btn) {
     // Submit
-    $form->setValueField('html', ['', '<div class="column margin-small-top">']);
+    $form->setValueField('html', ['', '<div class="row"><div class="column margin-small-top"><div class="column">']);
 
     if ($back_url) {
-        $form->setValueField('html', ['', '<a href="'. $back_url .'" class="button">###action.go_back###</a>']);
+        $form->setValueField('html', ['', '<a href="' . $back_url . '" class="button">###action.go_back###</a>']);
     }
 
     $form->setValueField('submit', [
@@ -57,23 +61,12 @@ if ($show_save_btn) {
         'labels'      => $btn_label,
         'css_classes' => 'button secondary float-right',
     ]);
-    $form->setValueField('html', ['', '</div>']);
+    $form->setValueField('html', ['', '</div></div></div>']);
 }
 
-$formOutput = $form->getForm();
-
-if ($form->isSend() && !$form->hasWarnings()) {
-    if ($callback_on_save) {
-        $formOutput = call_user_func_array($callback_on_save, [$formOutput, $form]);
-    }
-    $formOutput = '<div class="column"><div class="callout success">###simpleshop.data_saved###</div></div> ' . $formOutput;
-}
+$formOutput = $Address->executeForm($form);
 
 ?>
 <div class="account-data margin-small-top margin-bottom">
-    <div class="row">
-
-        <?= $formOutput ?>
-
-    </div>
+    <?= $formOutput ?>
 </div>

@@ -14,6 +14,8 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
+use Kreatif\Project\Settings;
+
 class FragmentConfig
 {
     public static $data = [
@@ -66,6 +68,7 @@ class FragmentConfig
         'checkout' => [
             'has_coupons' => true,
             'steps'       => [
+                'invoice_address',
                 'shipping_address',
                 'shipping||payment',
                 'show-summary',
