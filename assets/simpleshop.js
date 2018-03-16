@@ -43,6 +43,9 @@ var Simpleshop = (function ($) {
                 amount = $(_this).parents(chunks[0]).find(chunks[1]).val();
             }
 
+            var $this = $(_this),
+                $loading = addLoading($this);
+
             $.ajax({
                 url: rex.simpleshop.ajax_url,
                 method: 'POST',
@@ -55,6 +58,7 @@ var Simpleshop = (function ($) {
                 }
             })
                 .done(function (resp) {
+                    $loading.remove();
                     $(document).trigger('simpleshop.addedToCart', resp, _this, selector);
                 });
         },
