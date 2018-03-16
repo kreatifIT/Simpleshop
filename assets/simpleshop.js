@@ -80,8 +80,9 @@ var Simpleshop = (function ($) {
         changeCartAmount: function (_this, vkey, _max, rowSelector) {
             var $this = $(_this),
                 max = _max || 999,
-                $row = $this.parents(rowSelector || '.cart-item'),
-                $container = $row.parents('.cart-container'),
+                chunks = rowSelector ? rowSelector.split('|') : ['.cart-container', '.cart-item'],
+                $container = $this.parents(chunks[0]),
+                $row = $this.parents(chunks[1]),
                 $input = $this.parents('.amount-increment').find('input');
 
             if (!$row.length) {

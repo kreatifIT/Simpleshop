@@ -13,7 +13,6 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $config       = $this->getVar('config', FragmentConfig::getValue('cart.button'));
-$extras       = $this->getVar('extras', []);
 $quantity     = $this->getVar('cart-quantity', 1);
 $product_key  = $this->getVar('product_key');
 $max_amount   = $this->getVar('max_amount', 1);
@@ -38,9 +37,8 @@ $prod_req_url = $this->getVar('product_request_url', '');
                 <span>###simpleshop.product_not_available###</span>
             </a>
         <?php else: ?>
-            <a class="add-to-cart fbox" href="#shop-modal" data-product_key="<?= $product_key ?>"
-               data-quantity="<?= $quantity ?>" <?php if (count($extras)): ?>data-extras="<?= htmlspecialchars(json_encode($extras), ENT_QUOTES, 'UTF-8'); ?><?php endif; ?>">
-                <i class="fa fa-cart-plus" aria-hidden="true"></i>
+            <a class="add-to-cart <?= $config['css_class']['button'] ?>" href="javascript:;" onclick="Simpleshop.addToCart(this, '<?= $product_key ?>', <?= $quantity ?>)">
+                <i class="icon-add-shopping-cart"></i>
                 <span>###action.add_to_cart###</span>
             </a>
         <?php endif; ?>

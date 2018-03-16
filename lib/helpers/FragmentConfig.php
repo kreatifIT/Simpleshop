@@ -41,6 +41,9 @@ class FragmentConfig
                 'has_add_to_cart_button' => false,
                 'has_request_button'     => false,
                 'has_detail_button'      => false,
+                'css_class'              => [
+                    'button' => 'button',
+                ],
             ],
             'table-wrapper'     => [
                 'has_go_ahead'    => true,
