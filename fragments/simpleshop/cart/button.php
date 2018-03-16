@@ -23,9 +23,9 @@ $prod_req_url = $this->getVar('product_request_url', '');
 <div class="quantity-ctrl-button">
     <?php if ($config['has_quantity_control']): ?>
         <div class="amount-increment clearfix">
-            <button class="amount-increment-minus button secondary float-left" type="button" onclick="Simpleshop.changeCartAmount(this, '<?= $product_key ?>', <?= (int) $max_amount ?>);">-</button>
-            <input type="text" class="amount-input float-left" value="<?= $quantity ?>" name="quantity[<?= $product_key ?>]" <?= $config['quantity_is_writeable'] ? 'onblur="Simpleshop.changeCartAmount(this, \'' . $product_key . '\', ' . (int) $max_amount . ');"' : 'readonly' ?>>
-            <button class="amount-increment-plus button secondary float-left" type="button" onclick="Simpleshop.changeCartAmount(this, '<?= $product_key ?>', <?= (int) $max_amount ?>);">+</button>
+            <button class="amount-increment-minus button secondary float-left" type="button" onclick="Simpleshop.changeCartAmount(this, '<?= $config['has_add_to_cart_button'] ? '' : $product_key ?>', <?= (int) $max_amount ?>);">-</button>
+            <input type="text" class="amount-input float-left" value="<?= $quantity ?>" name="quantity[<?= $product_key ?>]" onblur="Simpleshop.changeCartAmount(this, '<?= $config['has_add_to_cart_button'] ? '' : $product_key ?>', <?= (int) $max_amount ?>);">
+            <button class="amount-increment-plus button secondary float-left" type="button" onclick="Simpleshop.changeCartAmount(this, '<?= $config['has_add_to_cart_button'] ? '' : $product_key ?>', <?= (int) $max_amount ?>);">+</button>
         </div>
     <?php elseif ($config['has_quantity']): ?>
         <?= $quantity ?>
@@ -37,7 +37,7 @@ $prod_req_url = $this->getVar('product_request_url', '');
                 <span>###simpleshop.product_not_available###</span>
             </a>
         <?php else: ?>
-            <a class="add-to-cart <?= $config['css_class']['button'] ?>" href="javascript:;" onclick="Simpleshop.addToCart(this, '<?= $product_key ?>', <?= $quantity ?>)">
+            <a class="add-to-cart <?= $config['css_class']['button'] ?>" href="javascript:;" onclick="Simpleshop.addToCart(this, '<?= $product_key ?>', <?= $config['has_quantity_control'] ? 0 : $quantity ?>)">
                 <i class="icon-add-shopping-cart"></i>
                 <span>###action.add_to_cart###</span>
             </a>

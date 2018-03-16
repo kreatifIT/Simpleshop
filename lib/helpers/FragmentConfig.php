@@ -36,7 +36,6 @@ class FragmentConfig
             'button'            => [
                 'has_quantity_control'   => true,
                 'has_quantity'           => true,
-                'quantity_is_writeable'  => true,
                 'is_disabled'            => false,
                 'has_add_to_cart_button' => false,
                 'has_request_button'     => false,

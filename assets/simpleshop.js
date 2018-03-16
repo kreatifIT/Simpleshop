@@ -38,7 +38,8 @@ var Simpleshop = (function ($) {
         },
         addToCart: function (_this, vkey, amount, selector) {
             if (parseInt(amount) <= 0) {
-                var chunks = selector.split('|');
+                var selector = selector || '.quantity-ctrl-button|.amount-input',
+                    chunks = selector.split('|');
                 amount = $(_this).parents(chunks[0]).find(chunks[1]).val();
             }
 
@@ -85,13 +86,6 @@ var Simpleshop = (function ($) {
                 $row = $this.parents(chunks[1]),
                 $input = $this.parents('.amount-increment').find('input');
 
-            if (!$row.length) {
-                alert('Cart row class not found [default = .cart-item]');
-            }
-            else if (!$container.length) {
-                alert('Cart container class not found [default = .cart-container]');
-            }
-
             if ($this.hasClass('amount-increment-minus')) {
                 $input.val(parseInt($input.val()) - 1);
             }
@@ -110,6 +104,13 @@ var Simpleshop = (function ($) {
             $input.val(num);
 
             if (vkey) {
+                if (!$row.length) {
+                    alert('Cart row class not found [default = .cart-item]');
+                }
+                else if (!$container.length) {
+                    alert('Cart container class not found [default = .cart-container]');
+                }
+
                 var $loading = addLoading($container);
 
                 $.ajax({
