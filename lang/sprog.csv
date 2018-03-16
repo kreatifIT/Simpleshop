@@ -10,6 +10,7 @@ label.tax_included
 label.keep_password_notice
 label.status
 label.products
+label.similar_products
 
 error.insert_company_name
 error.insert_firstname

@@ -36,6 +36,11 @@ class Product extends Model
         return $this->__features;
     }
 
+    public function hasReducedPrice()
+    {
+        return $this->getValue('reduced_price') > 0;
+    }
+
     public function getPrice($includeTax = true, $use_reduced = true)
     {
         $type     = $this->getValue('type');
