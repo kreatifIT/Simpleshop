@@ -149,7 +149,7 @@ unset($_GET['action'])
 
         foreach ($fields as $index => $field) {
             // exclude types
-            if ($field->getElement('name') == 'hidden_fields' || in_array($field->getElement('name'), $excludesFields)) {
+            if (in_array($field->getElement('name'), $excludesFields)) {
                 continue;
             }
 

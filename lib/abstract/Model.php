@@ -45,7 +45,7 @@ abstract class Model extends \Kreatif\Model
                 $fieldConfig = array_merge(FragmentConfig::getValue("yform_fields.{$table}._fieldDefaults", []), FragmentConfig::getValue("yform_fields.{$table}.{$subject[0]}", []));
                 $excluded    = array_merge(FragmentConfig::getValue("yform_fields.{$table}._excludedFields", []), $_excludeds);
 
-                if ($type == 'hidden_field' || in_array($subject[0], $excluded)) {
+                if (in_array($subject[0], $excluded)) {
                     $subject = false;
                 }
                 else if ($subject) {
