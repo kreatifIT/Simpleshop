@@ -198,6 +198,11 @@ class Customer extends Model
     {
         return (!empty($_SESSION['customer']['user']) && (int) $_SESSION['customer']['user']['id'] > 0);
     }
+
+    public function isCompany()
+    {
+        return $this->getValue('ctype') == 'company';
+    }
 }
 
 class CustomerException extends \Exception

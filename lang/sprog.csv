@@ -48,6 +48,7 @@ simpleshop.shipping_costs
 simpleshop.subtotal
 simpleshop.total_sum
 simpleshop.amount
+simpleshop.tax_included_value
 
 simpleshop.error.tos_rma_not_accepted
 simpleshop.error.coupon_not_exists
