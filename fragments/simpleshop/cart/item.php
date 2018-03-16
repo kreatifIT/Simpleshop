@@ -16,8 +16,8 @@ use Kreatif\Resource;
 
 $product = $this->getVar('product');
 
-$images      = $product->getArrayValue('pictures');
-$picture     = $images[0];
+$images      = $product->getArrayValue('images');
+$picture     = array_shift($images);
 $price       = $product->getPrice(true);
 $features    = $product->getValue('features');
 $quantity    = $product->getValue('cart_quantity');

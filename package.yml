@@ -26,8 +26,9 @@ page:
 
 
 requires:
-    redaxo: '>=5.2'
+    redaxo: '>=5.3'
     packages:
-        yform: '>=1.1-beta1'
-        yform/manager: '>=2.0'
-        sprog: '>=1.0.0-beta4'
+        yform: '^2.3'
+        yform/manager: '^2.3'
+        sprog: '^1.0'
+        kreatif: '^3.0'
