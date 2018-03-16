@@ -7,6 +7,9 @@ label.payment_method
 label.coupon
 label.tax
 label.tax_included
+label.keep_password_notice
+label.status
+label.products
 
 error.insert_company_name
 error.insert_firstname
@@ -14,6 +17,9 @@ error.insert_lastname
 error.insert_street
 error.insert_location
 error.insert_postal
+error.insert_email
+error.email_not_valid
+error.email_already_exists
 
 simpleshop.product_not_available
 simpleshop.no_products_in_cart
@@ -37,6 +43,11 @@ simpleshop.order_complete_default_shipping_text
 simpleshop.omest_shipping_text
 simpleshop.order_complete_pickup_text
 simpleshop.shipping_address_is_idem
+simpleshop.invoice_num
+simpleshop.shipping_costs
+simpleshop.subtotal
+simpleshop.total_sum
+simpleshop.amount
 
 simpleshop.error.tos_rma_not_accepted
 simpleshop.error.coupon_not_exists
