@@ -168,7 +168,7 @@ class CheckoutController extends Controller
                 $nextStep = CheckoutController::getNextStep();
                 $Order    = Session::getCurrentOrder();
 
-                $Order->setShippingAddress(null);
+                $Order->setValue('shipping_address', null);
                 Session::setCheckoutData('Order', $Order);
 
                 CheckoutController::setDoneStep($nextStep);
@@ -196,7 +196,7 @@ class CheckoutController extends Controller
 
             // NEEDED! to get data
             $Object->getValue('createdate');
-            $Order->setShippingAddress($Object);
+            $Order->setValue('shipping_address', $Object);
             Session::setCheckoutData('Order', $Order);
 
             CheckoutController::setDoneStep($nextStep);
@@ -260,7 +260,7 @@ class CheckoutController extends Controller
 
             // NEEDED! to get data
             $Object->getValue('createdate');
-            $Order->setInvoiceAddress($Object);
+            $Order->setValue('invoice_address', $Object);
             Session::setCheckoutData('Order', $Order);
 
             if (CheckoutController::$callbackCheck['invoice']) {

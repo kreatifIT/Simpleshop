@@ -12,6 +12,8 @@
  */
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Kreatif\Resource;
+
 $product = $this->getVar('product');
 
 $images      = $product->getArrayValue('pictures');
@@ -36,7 +38,7 @@ if ($is_giftcard) {
 <tr class="cart-item" <?= $styles['tr'] ?>>
     <?php if ($config['has_image']): ?>
         <td class="product-image" <?= $styles['td'] ?>>
-            <a href="<?= $product_url ?>"><?= Utils::getImageTag($picture, 'cart-list-element-main') ?></a>
+            <a href="<?= $product_url ?>"><?= Resource::getImgTag($picture, 'cart-list-element-main') ?></a>
         </td>
     <?php endif; ?>
     <td class="description" <?= $styles['td'] ?>>

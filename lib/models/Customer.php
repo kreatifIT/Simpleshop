@@ -127,7 +127,7 @@ class Customer extends Model
         $result = null;
         $user   = self::getUserByEmail($email);
 
-        if ($user && $user->isActive()) {
+        if ($user && $user->getValue('status') == 1) {
             $pwd = $user->getValue('password_hash');
             // prevent login for empty passwords!
             // and verify hash
@@ -197,11 +197,6 @@ class Customer extends Model
     public static function isLoggedIn()
     {
         return (!empty($_SESSION['customer']['user']) && (int) $_SESSION['customer']['user']['id'] > 0);
-    }
-
-    public function isActive()
-    {
-        return $this->getValue('status') == 1;
     }
 }
 

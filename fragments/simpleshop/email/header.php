@@ -13,8 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$imgMethod = method_exists('\Kreatif\Resource', 'getImgTag') ? 'getImgTag' : 'getImageTag';
-
 ?>
 <!-- spacer -->
 <table class="row"
@@ -58,7 +56,7 @@ $imgMethod = method_exists('\Kreatif\Resource', 'getImgTag') ? 'getImgTag' : 'ge
                         <?php
                         $logo_path = $this->getVar('logo_path', 'resources/img/email/logo.png');
                         if (strlen($logo_path)):
-                            echo \Kreatif\Resource::{$imgMethod}($logo_path, '', [
+                            echo \Kreatif\Resource::getImgTag($logo_path, '', [
                                 'alt' => "###company.name###",
                                 'style' => "-ms-interpolation-mode:bicubic;clear:both;display:block;max-width:100%;outline:0;text-decoration:none;width:auto",
                             ]);

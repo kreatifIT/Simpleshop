@@ -56,8 +56,8 @@ class PayPalExpress extends PaymentAbstract
             'PWD'       => $api_pwd,
             'SIGNATURE' => $api_signature,
 
-            'returnUrl' => rex_getFullUrl(null, null, ['action' => 'pay_process']),
-            'cancelUrl' => rex_getFullUrl(null, null, ['action' => 'cancelled']),
+            'returnUrl' => rex_getUrl(null, null, ['action' => 'pay_process']),
+            'cancelUrl' => rex_getUrl(null, null, ['action' => 'cancelled']),
 
             'PAYMENTREQUEST_0_PAYMENTREQUESTID' => $order_id,
             'PAYMENTREQUEST_0_AMT'              => (float) $total_amount, // total payment (including tax + shipping)

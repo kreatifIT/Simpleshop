@@ -31,7 +31,6 @@ $this->setProperty('table_classes', [
     Package::TABLE         => Package::class,
     PackageCategory::TABLE => PackageCategory::class,
     Product::TABLE         => Product::class,
-    Category::TABLE        => Category::class,
     Session::TABLE         => Session::class,
     Tax::TABLE             => Tax::class,
     Variant::TABLE         => Variant::class,

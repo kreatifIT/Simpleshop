@@ -14,8 +14,6 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-use Kreatif\Project\Settings;
-
 class FragmentConfig
 {
     public static $data = [
@@ -113,6 +111,7 @@ class FragmentConfig
         ],
 
 
+        // FIELD DEFINITIONS
         'yform_fields' => [
             'rex_shop_customer_address' => [
                 '_fieldDefaults'  => ['css_class' => 'column medium-6'],
@@ -145,7 +144,10 @@ class FragmentConfig
 
     public static function getValue($selector, $default = null)
     {
-        $result = self::$data;
+        $result = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.FragmentConfig.getValue', self::$data, [
+            'selector' => $selector,
+            'default'  => $default,
+        ]));
         $keys   = explode('.', $selector);
 
         foreach ($keys as $key) {
