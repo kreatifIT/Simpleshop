@@ -129,6 +129,35 @@ var Simpleshop = (function ($) {
                         $loading.remove();
                     });
             }
+        },
+        loadMore: function (_this, container, fragment, event) {
+            var $this = $(_this),
+                $fragment = $(fragment),
+                $container = $(container),
+                $loading = addLoading($container);
+
+            if (typeof KreatifPjax == 'undefined') {
+                alert('KreatifPjax is not defined - Gruntfile?');
+                return false;
+            }
+            else if ($fragment.length == 0) {
+                alert('Element container "' + fragment + '" is not set!');
+                return false;
+            }
+            else if ($container.length == 0) {
+                alert('Load-More container "' + container + '" is not set!');
+                return false;
+            }
+
+            KreatifPjax.submit(event, {
+                url: $this.attr('href'),
+                fragment: fragment,
+                container: container
+            }, function (event, xhr, options) {
+                $loading.remove();
+                $(document).trigger('simpleshop:loadMoreDone');
+            });
+            return false;
         }
     };
 

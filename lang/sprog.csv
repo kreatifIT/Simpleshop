@@ -11,6 +11,7 @@ label.keep_password_notice
 label.status
 label.products
 label.similar_products
+label.load_more
 
 error.insert_company_name
 error.insert_firstname
