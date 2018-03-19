@@ -23,7 +23,11 @@ class CheckoutController extends Controller
 
     protected function _execute()
     {
-        $this->products = Session::getCartItems(true);
+        $this->params = array_merge([
+            'verifyAmount' => true,
+        ], $this->params);
+
+        $this->products = Session::getCartItems(true, true, $this->params['verifyAmount']);
         $this->Order    = Session::getCurrentOrder();
 
         $this->verifyParams(['cart_page_id', 'action']);
@@ -81,7 +85,7 @@ class CheckoutController extends Controller
         }
 
         // verify product existance
-        $product_cnt = count(Session::getCartItems(true));
+        $product_cnt = count(Session::getCartItems(true, true, $this->params['verifyAmount']));
 
         if ($product_cnt < 1) {
             $errors[] = Wildcard::get('shop.error_summary_no_product_available');

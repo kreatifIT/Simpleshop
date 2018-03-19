@@ -203,7 +203,7 @@ class Product extends Model
         return $this->__variants;
     }
 
-    public static function getProductByKey($key, $cart_quantity = null, $extras = [])
+    public static function getProductByKey($key, $cart_quantity = null, $extras = [], $verifyAmount = true)
     {
         if (!strlen($key)) {
             return false;
@@ -243,7 +243,7 @@ class Product extends Model
                     // make some availabilty checks
                     throw new ProductException("Product not available any more --key:{$key}", 4);
                 }
-                else if ($_this->getValue('amount') < $_this->getValue('cart_quantity')) {
+                else if ($verifyAmount && $_this->getValue('amount') < $_this->getValue('cart_quantity')) {
                     throw new ProductException("Amount of product is lower than cart quantity --key:{$key}", 5);
                 }
                 $features[] = $feature;

@@ -113,7 +113,7 @@ class Session extends Model
         $this->save();
     }
 
-    private static function _getCartItems($raw = false, $throwErrors = false)
+    private static function _getCartItems($raw = false, $throwErrors = false, $verifyAmount = true)
     {
         $session    = self::getSession();
         $cart_items = (array) $session->getValue('cart_items');
@@ -126,7 +126,7 @@ class Session extends Model
             foreach ($cart_items as $key => $item) {
                 if (is_array($item)) {
                     try {
-                        $product            = Product::getProductByKey($key, $item['quantity'], $item['extras']);
+                        $product            = Product::getProductByKey($key, $item['quantity'], $item['extras'], $verifyAmount);
                         self::$has_shipping = self::$has_shipping || $product->getValue('type') == 'product';
                     }
                     catch (ProductException $ex) {
@@ -144,13 +144,13 @@ class Session extends Model
         return $cart_items;
     }
 
-    public static function getCartItems($raw = false, $throwErrors = true)
+    public static function getCartItems($raw = false, $throwErrors = true, $verifyAmount = true)
     {
         self::$errors = [];
 
         do {
             try {
-                $products = self::_getCartItems($raw, $throwErrors);
+                $products = self::_getCartItems($raw, $throwErrors, $verifyAmount);
                 $retry    = false;
             }
             catch (ProductException $ex) {
@@ -215,16 +215,16 @@ class Session extends Model
         return $product_id . '|' . implode(',', $feature_value_ids);
     }
 
-    public static function addProduct($product_key, $quantity = 1, $extras = [])
+    public static function addProduct($product_key, $quantity = 1, $extras = [], $verifyAmount = true)
     {
-        $cart_items = self::_getCartItems(true, false);
+        $cart_items = self::_getCartItems(true, false, $verifyAmount);
         self::setProductData($product_key, $cart_items[$product_key]['quantity'] + $quantity, $extras);
     }
 
-    public static function setProductData($product_key, $quantity, $extras = [])
+    public static function setProductData($product_key, $quantity, $extras = [], $verifyAmount = true)
     {
         $session    = self::getSession();
-        $cart_items = self::_getCartItems(true, false);
+        $cart_items = self::_getCartItems(true, false, $verifyAmount);
         // update the quantity
         $cart_items[$product_key]['quantity'] = $quantity;
         // update extras

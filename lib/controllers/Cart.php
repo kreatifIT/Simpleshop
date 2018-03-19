@@ -20,11 +20,12 @@ class CartController extends Controller
     public function _execute()
     {
         $this->params = array_merge([
-            'check_cart' => true,
-            'ahead_url'  => '',
-            'products'   => [],
-            'errors'     => [],
-            'config'     => [],
+            'check_cart'    => true,
+            'verify_amount' => true,
+            'ahead_url'     => '',
+            'products'      => [],
+            'errors'        => [],
+            'config'        => [],
         ], $this->params);
 
         $errors   = $this->params['errors'];
@@ -47,7 +48,7 @@ class CartController extends Controller
 
         if (!count($products)) {
             try {
-                $products = Session::getCartItems(false, $this->params['check_cart']);
+                $products = Session::getCartItems(false, $this->params['check_cart'], $this->params['verify_amount']);
 
                 if (strlen($this->params['ahead_url'])) {
                     \rex_response::cleanOutputBuffers();
@@ -58,7 +59,7 @@ class CartController extends Controller
             catch (CartException $ex) {
                 if ($ex->getCode() == 1) {
                     $errors   = Session::$errors;
-                    $products = Session::getCartItems();
+                    $products = Session::getCartItems(false, $this->params['check_cart'], $this->params['verify_amount']);
                 }
             }
         }
