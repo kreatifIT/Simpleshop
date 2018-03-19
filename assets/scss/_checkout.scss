@@ -1,0 +1,56 @@
+.checkout-radio-panel {
+    position: relative;
+    border-radius: $global-radius;
+    background: $light-gray;
+    background: linear-gradient(to bottom, #fefefe 0%, #e4e5e6 100%);
+    border: 1px solid $medium-gray;
+    padding: rem-calc(40);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    & > svg {
+        height: rem-calc(40);
+        margin: rem-calc(5);
+    }
+    .custom-radio {
+        margin-top: rem-calc(10);
+        label {
+            display: inline-block;
+            font-weight: 400;
+        }
+    }
+    .edit {
+        display: block;
+        position: absolute;
+        top: rem-calc(10);
+        right: rem-calc(20);
+        color: $white;
+        font-weight: 600;
+        font-size: rem-calc(12);
+        i {
+            font-size: rem-calc(16);
+        }
+        @include breakpoint(large) {
+            text-decoration: underline;
+        }
+    }
+    &:hover, &.selected {
+        background: $primary-color;
+        color: $white;
+        i {
+            color: $white;
+        }
+        .custom-radio {
+            label {
+                color: $white;
+            }
+            span {
+                background: $black;
+                &:before {
+                    background: $light-gray;
+                }
+            }
+        }
+    }
+}

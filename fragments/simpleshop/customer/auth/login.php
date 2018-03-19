@@ -62,31 +62,33 @@ unset($_GET['action'])
 ?>
 <div id="<?= $sid ?>" class="auth-wrapper <?= $Config['css_class']['wrapper'] ?>">
     <div class="login-form <?= $action == 'recover' || $action == 'register' ? 'hide' : '' ?>">
-        <div class="row column">
-            <form action="<?= rex_getUrl(null, null, $_GET) ?>#-<?= $sid ?>" method="post" class="padding-small-top padding-small-bottom">
-                <h2 class="margin-small-bottom heading"><?= ucfirst(\Sprog\Wildcard::get('action.login')) ?></h2>
+        <div class="row medium-6 large-4 medium-centered">
+            <div class="column">
+                <form action="<?= rex_getUrl(null, null, $_GET) ?>#-<?= $sid ?>" method="post" class="padding-small-top padding-small-bottom">
+                    <h2 class="margin-small-bottom heading"><?= ucfirst(\Sprog\Wildcard::get('action.login')) ?></h2>
 
-                <?php if (count($errors)): ?>
-                    <div class="callout alert">
-                        <?= implode('<br/>', $errors) ?>
+                    <?php if (count($errors)): ?>
+                        <div class="callout alert">
+                            <?= implode('<br/>', $errors) ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="input-group">
+                        <input type="text" class="input-group-field" name="uname" value="<?= rex_post('uname', 'string') ?>" placeholder="###label.email###" tabindex="103"/>
                     </div>
-                <?php endif; ?>
+                    <div class="input-group">
+                        <input type="password" class="input-group-field" name="pwd" value="" placeholder="###label.password###" tabindex="104"/>
+                    </div>
+                    <button type="submit" class="button <?= $Config['css_class']['buttons'] ?>" tabindex="105" name="action" value="login"><?= ucfirst(\Sprog\Wildcard::get('action.login')) ?></button>
 
-                <div class="input-group">
-                    <input type="text" class="input-group-field" name="uname" value="<?= rex_post('uname', 'string') ?>" placeholder="###label.email###" tabindex="103"/>
-                </div>
-                <div class="input-group">
-                    <input type="password" class="input-group-field" name="pwd" value="" placeholder="###label.password###" tabindex="104"/>
-                </div>
-                <button type="submit" class="button <?= $Config['css_class']['buttons'] ?>" tabindex="105" name="action" value="login"><?= ucfirst(\Sprog\Wildcard::get('action.login')) ?></button>
-
-                <?php if ($Config['has_password_recovery']): ?>
-                    <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.recovery-form')">###action.reset_password###.</a>
-                <?php endif; ?>
-                <?php if ($Config['has_registration']): ?>
-                    ###label.no_login_data###: <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.register-form')">###label.register_now###</a>
-                <?php endif; ?>
-            </form>
+                    <?php if ($Config['has_password_recovery']): ?>
+                        <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.recovery-form')">###action.reset_password###.</a>
+                    <?php endif; ?>
+                    <?php if ($Config['has_registration']): ?>
+                        ###label.no_login_data###: <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.register-form')">###label.register_now###</a>
+                    <?php endif; ?>
+                </form>
+            </div>
         </div>
     </div>
 

@@ -1,9 +1,89 @@
+.pjax-loading {
+    transition: $global-transition;
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background: rgba(255, 255, 255, 0.8);
+    &.show {
+        opacity: 1;
+        z-index: 999;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 40px;
+        text-align: center;
+        font-size: 10px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        &.top20 {
+            top: 20%;
+        }
+    }
+
+    .spinner > div {
+        background-color: #333;
+        height: 100%;
+        width: 6px;
+        display: inline-block;
+
+        -webkit-animation: sk-stretchdelay 1.2s infinite ease-in-out;
+        animation: sk-stretchdelay 1.2s infinite ease-in-out;
+    }
+
+    .spinner .rect2 {
+        -webkit-animation-delay: -1.1s;
+        animation-delay: -1.1s;
+    }
+
+    .spinner .rect3 {
+        -webkit-animation-delay: -1.0s;
+        animation-delay: -1.0s;
+    }
+
+    .spinner .rect4 {
+        -webkit-animation-delay: -0.9s;
+        animation-delay: -0.9s;
+    }
+
+    .spinner .rect5 {
+        -webkit-animation-delay: -0.8s;
+        animation-delay: -0.8s;
+    }
+
+    @-webkit-keyframes sk-stretchdelay {
+        0%, 40%, 100% {
+            -webkit-transform: scaleY(0.4)
+        }
+        20% {
+            -webkit-transform: scaleY(1.0)
+        }
+    }
+
+    @keyframes sk-stretchdelay {
+        0%, 40%, 100% {
+            transform: scaleY(0.4);
+            -webkit-transform: scaleY(0.4);
+        }
+        20% {
+            transform: scaleY(1.0);
+            -webkit-transform: scaleY(1.0);
+        }
+    }
+}
+
 .text-center {
     text-align: center;
 }
 
 .nested-panel {
-    margin-top:-15px;
+    margin-top: -15px;
     padding-top: 15px;
     margin-bottom: 20px;
     background-color: #e9ecf2;
@@ -99,11 +179,11 @@ fieldset {
 
 //Packing list styles
 .packing-list-page {
-    font-size:12px;
+    font-size: 12px;
     max-width: 630px;
     margin: 0 auto;
     > div {
-        padding:10px;
+        padding: 10px;
         background: #fff;
 
         h3 {
@@ -112,40 +192,41 @@ fieldset {
         .address {
             margin: 20px 0 40px 0;
             .panel-body {
-                font-size:10px;
+                font-size: 10px;
             }
         }
         .product-list {
             table td {
-                font-size:10px;
+                font-size: 10px;
 
                 &.small {
-                    width:90px;
+                    width: 90px;
                 }
                 &.xs-small {
-                    width:60px;
+                    width: 60px;
                 }
                 &.xxs-small {
-                    width:30px;
+                    width: 30px;
                 }
                 .description {
-                    padding-bottom:4px;
+                    padding-bottom: 4px;
                 }
             }
         }
     }
 }
+
 table.table {
     td {
-        >.form-group {
+        > .form-group {
             margin: 0 0 3px 0;
             select.form-control {
                 line-height: 26px;
                 height: 26px;
             }
         }
-        >label.form-label {
-            line-height:24px;
+        > label.form-label {
+            line-height: 24px;
         }
         .dimensions, .weights {
             input {

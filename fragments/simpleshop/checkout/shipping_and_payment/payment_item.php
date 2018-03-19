@@ -20,12 +20,14 @@ $is_active = is_object($payment) && $payment->getPluginName() == $plugin;
 
 ?>
 <div class="row column">
-    <div class="custom-radio">
-        <label>
-            <?= $this->subfragment('simpleshop/payment/' . $plugin . '/icon.svg') ?>
-            <?= $name ?>
-            <input type="radio" name="payment" value="<?= $plugin ?>" <?= $is_active ?  'checked="checked"' : ''  ?>/>
-            <span class="radio"></span>
-        </label>
+    <div class="checkout-radio-panel">
+        <?= $this->subfragment('simpleshop/payment/' . $plugin . '/icon.svg') ?>
+        <div class="custom-radio">
+            <label>
+                <?= $name ?>
+                <input type="radio" name="payment" value="<?= $plugin ?>" <?= $is_active ? 'checked="checked"' : '' ?>/>
+                <span class="radio"></span>
+            </label>
+        </div>
     </div>
 </div>
