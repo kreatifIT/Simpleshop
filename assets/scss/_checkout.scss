@@ -8,7 +8,6 @@
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-
     & > svg {
         height: rem-calc(40);
         margin: rem-calc(5);
@@ -36,21 +35,6 @@
         }
     }
     &:hover, &.selected {
-        background: $primary-color;
-        color: $white;
-        i {
-            color: $white;
-        }
-        .custom-radio {
-            label {
-                color: $white;
-            }
-            span {
-                background: $black;
-                &:before {
-                    background: $light-gray;
-                }
-            }
-        }
+        background: $secondary-color;
     }
 }

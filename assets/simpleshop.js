@@ -165,6 +165,19 @@ var Simpleshop = (function ($) {
         }
     };
 
+    $('.checkout-radio-panel').on('click', function () {
+        var $radio = $(this).find('input');
+        if ($radio.is(':checked') === false) {
+            $radio.prop('checked', true);
+            $(this).addClass('selected');
+        }
+        $('.checkout-radio-panel').each(function () {
+            if ($(this).find('input').is(':checked') === false) {
+                $(this).removeClass('selected');
+            }
+        });
+    });
+
     function addLoading($container) {
         var css = $container.offset(),
             $loading = $(rex.simpleshop.loadingDiv);
@@ -186,3 +199,4 @@ var Simpleshop = (function ($) {
 
     return result;
 })(jQuery);
+

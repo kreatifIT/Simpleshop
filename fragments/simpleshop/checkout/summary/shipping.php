@@ -15,7 +15,7 @@ $shipping = $this->getVar('shipping');
 
 ?>
 <div class="medium-6 column margin-bottom">
-    <h3>###label.shipping_method###</h3>
+    <h3 class="heading small">###label.shipping_method###</h3>
 
     <?php
     $this->setVar('name', $shipping->getName());

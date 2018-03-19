@@ -15,7 +15,7 @@ $payment = $this->getVar('payment');
 
 ?>
 <div class="medium-6 column margin-bottom">
-    <h3>###label.payment_method###</h3>
+    <h3 class="heading small">###label.payment_method###</h3>
 
     <?php
     $this->setVar('name', $payment->getName());

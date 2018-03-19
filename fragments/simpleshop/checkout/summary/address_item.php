@@ -19,14 +19,20 @@ $address = $this->getVar('address');
 ?>
 <div class="column margin-bottom">
     <div class="address">
-        <h4><?= $title ?></h4>
+        <h4 class="heading small"><?= $title ?></h4>
         <p>
-            <?= $address->getName() ?>
-            <br/>
-            <?= $address->getValue('street') ?><br>
             <?php
+
+            if ($address->getName()) {
+                echo $address->getName() . '<br>';
+            }
+
+            if ($address->valueIsset('street')) {
+                echo $address->getValue('street') . '<br>';
+            }
+
             if ($address->valueIsset('street_additional')) {
-                echo $address->getValue('street_additional') .'<br/>';
+                echo $address->getValue('street_additional') . '<br>';
             }
             ?>
             <?= $address->getValue('postal') ?>
