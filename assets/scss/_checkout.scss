@@ -38,3 +38,88 @@
         background: $secondary-color;
     }
 }
+
+// Steps
+.checkout-steps {
+    @include clearfix();
+    position: relative;
+    font-size: rem-calc(16);
+    @include breakpoint(large) {
+        &:before {
+            content: "";
+            display: block;
+            border-bottom: 1px solid $medium-gray;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            z-index: -1;
+        }
+    }
+}
+
+.checkout-step-wrapper {
+    position: relative;
+    margin-bottom: rem-calc(20);
+    @include breakpoint(medium) {
+        float: left;
+        margin-bottom: 0;
+    }
+    &:first-child {
+        .checkout-step {
+            padding-left: 0;
+        }
+    }
+
+    &:last-child {
+        @include breakpoint(medium) {
+            float: right;
+        }
+    }
+
+}
+
+.checkout-step {
+    @include clearfix();
+    display: block;
+    background: $white;
+    @include breakpoint(large) {
+        padding-left: rem-calc(15);
+        margin-right: rem-calc(15);
+    }
+    &.active {
+        .checkout-step-number {
+            border-color: $secondary-color;
+            background-color: $secondary-color;
+        }
+    }
+    &.disabled {
+        .checkout-step-number {
+            background-color: $light-gray;
+            color: $medium-gray;
+        }
+        .checkout-step-name {
+            color: $medium-gray;
+        }
+    }
+}
+
+.checkout-step-number {
+    float: left;
+    display: block;
+    width: rem-calc(30);
+    height: rem-calc(30);
+    line-height: rem-calc(30);
+    border: 1px solid $medium-gray;
+    border-radius: 50%;
+    text-align: center;
+}
+
+.checkout-step-name {
+    float: left;
+    display: block;
+    color: $black;
+    height: rem-calc(30);
+    line-height: rem-calc(30);
+    margin: rem-calc(0 15);
+}

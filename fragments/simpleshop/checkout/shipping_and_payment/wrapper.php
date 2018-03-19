@@ -25,6 +25,14 @@ $this->setVar('shipping', $shipping ?: $shippings[0]);
 $this->setVar('payment', $payment ?: $payments[0]);
 
 ?>
+
+
+<?php
+$this->setVar('current_step', 2);
+echo $this->subfragment('simpleshop/checkout/steps.php');
+?>
+
+
 <div class="shipping-payment">
     <form action="" method="post">
 
