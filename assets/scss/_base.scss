@@ -196,3 +196,16 @@ table.table {
         }
     }
 }
+
+.login-form-passwort-reset {
+    margin-bottom: 1em;
+    .link {
+        font-weight: $global-weight-bold;
+    }
+}
+
+.login-form-register {
+    .link {
+        font-weight: $global-weight-bold;
+    }
+}

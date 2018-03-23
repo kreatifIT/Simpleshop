@@ -64,6 +64,7 @@ unset($_GET['action'])
     <div class="login-form <?= $action == 'recover' || $action == 'register' ? 'hide' : '' ?>">
         <div class="row medium-6 large-4 medium-centered">
             <div class="column">
+
                 <form action="<?= rex_getUrl(null, null, $_GET) ?>#-<?= $sid ?>" method="post" class="padding-small-top padding-small-bottom">
                     <h2 class="margin-small-bottom heading"><?= ucfirst(\Sprog\Wildcard::get('action.login')) ?></h2>
 
@@ -79,13 +80,19 @@ unset($_GET['action'])
                     <div class="input-group">
                         <input type="password" class="input-group-field" name="pwd" value="" placeholder="###label.password###" tabindex="104"/>
                     </div>
-                    <button type="submit" class="button <?= $Config['css_class']['buttons'] ?>" tabindex="105" name="action" value="login"><?= ucfirst(\Sprog\Wildcard::get('action.login')) ?></button>
+                    <button type="submit" class="button <?= $Config['css_class']['buttons'] ?>" tabindex="105" name="action"
+                            value="login"><?= ucfirst(\Sprog\Wildcard::get('action.login')) ?></button>
 
                     <?php if ($Config['has_password_recovery']): ?>
-                        <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.recovery-form')">###action.reset_password###.</a>
+                        <div class="login-form-passwort-reset">
+                            <a class="link" href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.recovery-form')">###action.reset_password###.</a>
+                        </div>
                     <?php endif; ?>
                     <?php if ($Config['has_registration']): ?>
-                        ###label.no_login_data###: <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.register-form')">###label.register_now###</a>
+                        <div class="login-form-register">
+                            <span class="label">###label.no_login_data###:</span class="login-form-register-label">
+                            <a class="link" href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.register-form')">###label.register_now###</a>
+                        </div>
                     <?php endif; ?>
                 </form>
             </div>
