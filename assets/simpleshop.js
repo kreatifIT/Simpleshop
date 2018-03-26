@@ -25,9 +25,9 @@ var Simpleshop = (function ($) {
         },
         changeCType: function (_this, selector) {
             var $this = $(_this),
-                $container = $(selector);
+                $container = $this.parents(selector);
 
-            if ($this.val() == 'person') {
+            if ($this.val() === 'person') {
                 $container.find('.company-field').addClass('hide');
                 $container.find('.person-field').removeClass('hide');
             }

@@ -13,6 +13,8 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Kreatif\Form;
+
 $referer  = $this->getVar('referer');
 $Config   = FragmentConfig::getValue('auth');
 $errors   = [];
@@ -143,14 +145,18 @@ unset($_GET['action'])
         <?php
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // REGISTRATION
-        $excludesFields = ['lang_id', 'addresses', 'status', 'lastlogin', 'created'];
-        $fields         = Customer::getAllYformFields();
-        $form           = \Kreatif\Form::factory();
+        $fields    = Customer::getAllYformFields();
+        $form      = Form::factory();
+        $Config    = FragmentConfig::getValue('yform_fields.rex_shop_customer');
+        $excFields = array_merge($Config['_excludedFields'], [
+            'fiscal_code',
+            'vat_num',
+        ]);
 
         // Options
         $form->setObjectparams('form_anchor', '-' . $sid);
         $form->setObjectparams('submit_btn_show', false);
-        $form->setObjectparams('real_field_names', false);
+        $form->setObjectparams('real_field_names', true);
         $form->setObjectparams('form_ytemplate', 'custom,foundation,bootstrap');
         $form->setObjectparams('error_class', 'form-warning');
         $form->setObjectparams('form_showformafterupdate', true);
@@ -158,14 +164,16 @@ unset($_GET['action'])
 
         foreach ($fields as $index => $field) {
             // exclude types
-            if (in_array($field->getElement('name'), $excludesFields)) {
+            if (in_array($field->getElement('name'), $excFields)) {
                 continue;
             }
 
             if ($field->getElement('type_id') == 'value') {
-                $params = array_merge($field->toArray(), [
-                    'css_class' => 'column small-12',
+                $params = array_merge($field->toArray(), (array) $Config[$field->getElement('name')], [
+                    'notice' => null,
                 ]);
+
+                $params['css_class'] .= ' column medium-6';
 
                 if ($field->getElement('type_name') == 'be_manager_relation') {
                     $params['field'] = strtr($params['field'], ['_1' => '_' . \rex_clang::getCurrentId()]);
@@ -178,13 +186,22 @@ unset($_GET['action'])
         }
 
 
+        // validate empty password
+        $form->setValidateField('empty', [
+            'type_id'   => 'validate',
+            'type_name' => 'empty',
+            'name'      => 'password',
+            'message'      => '###error.password_policy###',
+        ]);
+
+
         // Submit
         $form->setValueField('html', ['', '<div class="column margin-small-top">']);
         $form->setValueField('submit', [
             'name'        => 'submit',
             'no_db'       => 'no_db',
-            'labels'      => strtoupper(\Wildcard::get('action.save')),
-            'css_classes' => 'button ' . $Config['css_class']['buttons'],
+            'labels'      => strtoupper(\Wildcard::get('action.register')),
+            'css_classes' => 'button expanded ' . $Config['css_class']['buttons'],
         ]);
         $form->setValueField('html', ['', '</div>']);
         $form->setValueField('html', ['', '<input type="hidden" name="action" value="register">']);
@@ -192,7 +209,7 @@ unset($_GET['action'])
         $customerError = false;
         $formOutput    = $form->getForm();
 
-        if (rex_post('action', 'string') == 'register') {
+        if (rex_post('action', 'string') == 'register' && $form->isSend() && !$form->hasWarnings()) {
             $values = $form->getFormEmailValues();
 
             // register customer
@@ -225,7 +242,7 @@ unset($_GET['action'])
                     <div class="callout success">###label.registration_sucessfull###</div>
                 <?php else: ?>
                     <?= $formOutput ?>
-                    <div class="column">
+                    <div class="column margin-small-top">
                         <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.login-form')">###action.back_to_login###</a>.
                     </div>
                 <?php endif; ?>

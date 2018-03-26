@@ -69,13 +69,6 @@ class Customer extends Model
         if ($User) {
             throw new CustomerException("User with given email already exist", 1);
         }
-        // verify the password length
-        else if (self::MIN_PWD_LEN > strlen($password)) {
-            throw new CustomerException("Password must have at least " . self::MIN_PWD_LEN . " characters", 2);
-        }
-        else if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
-            throw new CustomerException("Email not valid", 3);
-        }
         $_this = parent::create();
 
         foreach ($attributes as $attr => $value) {

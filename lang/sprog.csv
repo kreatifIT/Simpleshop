@@ -1,4 +1,7 @@
 Wildcard
+
+action.register
+
 label.shipping_method
 label.shipping_address
 label.invoice_address
@@ -19,6 +22,7 @@ error.insert_lastname
 error.insert_street
 error.insert_location
 error.insert_postal
+error.password_policy
 error.insert_email
 error.email_not_valid
 error.email_already_exists
@@ -61,6 +65,8 @@ simpleshop.error.discountgroup_not_applyable_anymore
 simpleshop.error.order_has_no_product
 simpleshop.error.shipping_zipcode_not_valid
 simpleshop.error.shipping_no_price
+simpleshop.error.fiscal_code_invalid
+simpleshop.error.vatnum_invalid
 
 simpleshop.email.user_registration_subject
 simpleshop.email.user_password_reset
