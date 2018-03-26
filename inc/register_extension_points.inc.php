@@ -20,7 +20,9 @@ namespace FriendsOfREDAXO\Simpleshop;
 \rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Tax', 'ext_yform_data_delete']);
 \rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Order', 'ext_yform_data_delete']);
 \rex_extension::register('CACHE_DELETED', ['\FriendsOfREDAXO\Simpleshop\Utils', 'ext_register_tables']);
-\rex_extension::register('PACKAGES_INCLUDED', function(\rex_extension_point $Ep) {
+\rex_extension::register('project.layoutBottom', ['\FriendsOfREDAXO\Simpleshop\CartController', 'ext_project_layoutBottom']);
+
+\rex_extension::register('PACKAGES_INCLUDED', function (\rex_extension_point $Ep) {
     if (rex_get('action', 'string') == 'logout') {
         Customer::logout();
     }
