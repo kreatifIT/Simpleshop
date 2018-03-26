@@ -33,7 +33,6 @@ $products = $this->getVar('products', []);
 
         ?>
 
-
         <div class="offcanvas-cart-item">
             <a class="image" href="<?= $product_url ?>">
                 <?= Resource::getImgTag($picture, 'cart-list-element-main') ?>

@@ -14,7 +14,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Kreatif\Resource;
 
-$picture  = null;
+$picture = null;
 $ctrlTpl = '';
 
 $Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute();
@@ -36,7 +36,7 @@ if (count($Controller->getProducts())) {
     <div class="offcanvas-cart-prices">
         <div class="price">
             <span class="label">Total</span>
-            <span class="amount">1.775,07 €</span>
+            <span class="amount"><?= Session::getTotal() ?></span>
         </div>
     </div>
     <div class="offcanvas-cart-buttons">
