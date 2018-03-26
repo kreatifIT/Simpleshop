@@ -27,6 +27,10 @@ class CheckoutController extends Controller
 
     protected function _execute()
     {
+        $this->params = array_merge([
+            'show_steps_fragment' => true,
+        ], $this->params);
+
         $this->products = Session::getCartItems(true);
         $this->Order    = Session::getCurrentOrder();
 
@@ -39,6 +43,7 @@ class CheckoutController extends Controller
         }
 
         if (count($this->products)) {
+
             switch ($this->params['action']) {
                 default:
                     $currentStep = $this->getCurrentStep();
@@ -51,6 +56,11 @@ class CheckoutController extends Controller
                     else {
                         $Settings = \rex::getConfig('simpleshop.Settings');
                         $back_url = rex_getUrl($Settings['linklist']['cart']);
+                    }
+
+                    if ($this->params['show_steps_fragment']) {
+                        $this->setVar('current_step', $currentStep);
+                        $this->fragment_path[] = 'simpleshop/checkout/steps.php';
                     }
 
                     $this->setVar('back_url', $back_url);

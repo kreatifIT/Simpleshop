@@ -13,7 +13,8 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$step = $this->getVar('current_step');
+$step = rex_get('step', 'string');
+pr($step);
 
 ?>
 <div class="row column margin-top margin-large-bottom">
