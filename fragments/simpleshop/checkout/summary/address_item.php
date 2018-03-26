@@ -13,8 +13,10 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$title   = $this->getVar('title');
-$address = $this->getVar('address');
+$title    = $this->getVar('title');
+$address  = $this->getVar('address');
+$Customer = $this->getVar('customer');
+$Country  = $address->valueIsset('country') ? Country::get($address->getValue('country')) : null;
 
 ?>
 <div class="column margin-bottom">
@@ -22,21 +24,34 @@ $address = $this->getVar('address');
         <h4 class="heading small"><?= $title ?></h4>
         <p>
             <?php
-
-            if ($address->getName()) {
+            if ($Customer) {
+                echo $Customer->getName() . '<br>';
+            }
+            else {
                 echo $address->getName() . '<br>';
             }
 
             if ($address->valueIsset('street')) {
                 echo $address->getValue('street') . '<br>';
             }
-
             if ($address->valueIsset('street_additional')) {
                 echo $address->getValue('street_additional') . '<br>';
             }
             ?>
             <?= $address->getValue('postal') ?>
-            <?= $address->getValue('location') ?> - <?= $address->getValue('province') ?><br>
+            <?= $address->getValue('location') ?> <?= $address->valueIsset('province') ? '- ' . $address->getValue('province') : '' ?><br>
+            <?= $Country->getName() ?><br>
+
+            <?php
+            if ($Customer) {
+                if ($Customer->valueIsset('fiscal_code')) {
+                    echo $Customer->getValue('fiscal_code') .'<br/>';
+                }
+                if ($Customer->getValue('ctype') == 'company') {
+                    echo '###label.vat_short###: '. $Customer->getValue('vat_num') .'<br/>';
+                }
+            }
+            ?>
         </p>
     </div>
 </div>

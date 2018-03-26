@@ -40,6 +40,13 @@ class CustomerAddress extends Model
         else {
             $form = parent::getForm($yform, $excludedFields);
             $form->setValueField('hidden', ['customer_id', $customerId]);
+
+            if (in_array('firstname', $excludedFields)) {
+                $form->setValueField('hidden', ['firstname', rex_post('firstname', 'string')]);
+            }
+            if (in_array('lastname', $excludedFields)) {
+                $form->setValueField('hidden', ['lastname', rex_post('firstname', 'string')]);
+            }
         }
         return $form;
     }
