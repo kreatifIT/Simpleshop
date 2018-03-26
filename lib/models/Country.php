@@ -16,5 +16,5 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 class Country extends Model
 {
-    const TABLE = 'rex_country';
+    const TABLE = 'rex_prj_country';
 }
