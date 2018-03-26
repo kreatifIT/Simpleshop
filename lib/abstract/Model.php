@@ -176,4 +176,30 @@ abstract class Model extends \Kreatif\Model
         }
         return $data;
     }
+
+    public static function customValidateField($label, $value, $params, $field)
+    {
+        $params = json_decode($params, true);
+
+        switch ($params['method']) {
+            case 'empty-if':
+                if ($field->getValueObject($params['field'])->getValue() == $params['value'] && trim($value) == '') {
+                    return true;
+                }
+                break;
+
+            case 'fiscal_code':
+                if ((empty($params['field']) || $field->getValueObject($params['field'])->getValue() == $params['value']) && trim($value) == '') {
+                    return true;
+                }
+                break;
+
+            case 'vat_num':
+                if ((empty($params['field']) || $field->getValueObject($params['field'])->getValue() == $params['value']) && trim($value) == '') {
+                    return true;
+                }
+                break;
+        }
+        return false;
+    }
 }
