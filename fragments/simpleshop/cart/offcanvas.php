@@ -14,7 +14,14 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Kreatif\Resource;
 
-$picture = '';
+$picture  = null;
+$ctrlTpl = '';
+
+$Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute();
+
+if (count($Controller->getProducts())) {
+    $ctrlTpl = 'simpleshop/cart/offcanvas-list.php';
+}
 
 ?>
 <div class="offcanvas-cart">
@@ -24,28 +31,9 @@ $picture = '';
         <span class="description">Der Artikel wurde erfolgreich in den Warenkorb gelegt</span>
     </div>
 
-    <div class="offcanvas-cart-items">
-        <div class="offcanvas-cart-item">
-            <a class="image" href="#">
-                <?= Resource::getImgTag($picture, 'cart-list-element-main') ?>
-            </a>
-            <div class="description">
-                <span class="amount">2x </span>
-                <span class="name">Lorem ipsum dolor sit amet.</span>
-                <span class="price">1400.00 €</span>
-            </div>
-            <div class="remove"></div>
-        </div>
-    </div>
+    <?= $Controller->parse($ctrlTpl) ?>
+
     <div class="offcanvas-cart-prices">
-        <div class="price">
-            <span class="label">Zwischensumme</span>
-            <span class="amount">1.631,08 €</span>
-        </div>
-        <div class="price">
-            <span class="label">Shipping costs</span>
-            <span class="amount">143,99 €</span>
-        </div>
         <div class="price">
             <span class="label">Total</span>
             <span class="amount">1.775,07 €</span>

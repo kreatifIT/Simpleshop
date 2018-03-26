@@ -183,11 +183,13 @@
         border-bottom: 1px solid $light-gray;
     }
     .image {
-
+        display: block;
+        width: rem-calc(40);
+        float: left;
     }
 
     .description {
-        .amount {
+        .quantity {
             font-weight: $global-weight-bold;
         }
 

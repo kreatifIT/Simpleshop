@@ -16,14 +16,18 @@ use Kreatif\Resource;
 
 $product = $this->getVar('product');
 
+$Customer   = Customer::getCurrentUser();
+$isCompany = $Customer ? $Customer->isCompany() : false;
+
 $images      = $product->getArrayValue('images');
 $picture     = array_shift($images);
-$price       = $product->getPrice(true);
+$price       = $product->getPrice(!$isCompany);
 $features    = $product->getValue('features');
 $quantity    = $product->getValue('cart_quantity');
 $key         = $product->getValue('key');
 $product_url = $product->getUrl();
 $is_giftcard = $product->getValue('type') == 'giftcard';
+$extras      = $product->getValue('extras');
 
 $Category = $product->valueIsset('category_id') ? Category::get($product->getValue('category_id')) : null;
 
@@ -37,18 +41,25 @@ if ($is_giftcard) {
 ?>
 <tr class="cart-item" <?= $styles['tr'] ?>>
     <?php if ($config['has_image']): ?>
-        <td class="product-image" <?= $styles['td'] ?>>
-            <a href="<?= $product_url ?>"><?= Resource::getImgTag($picture, 'cart-list-element-main') ?></a>
+        <td class="cart-item-image-wrapper" <?= $styles['td'] ?>>
+            <a href="<?= $product_url ?>" class="cart-item-image">
+                <?= Resource::getImgTag($picture, 'product_thumb') ?>
+            </a>
         </td>
     <?php endif; ?>
-    <td class="description" <?= $styles['td'] ?>>
-        <h3 <?= $styles['h2'] ?>>
+    <td class="cart-item-name-wrapper" <?= $styles['td'] ?>>
+        <h3 class="cart-item-name" <?= $styles['h2'] ?>>
             <?= $product->getName() ?>
         </h3>
         <?php if ($Category && !$is_giftcard): ?>
-            <p <?= $styles['p'] ?>>
+            <span class="cart-item-description" <?= $styles['p'] ?>>
                 <?= $Category->getName() ?>
-            </p>
+            </span>
+        <?php elseif ($extras['coupon_code']): ?>
+            <br/>
+            <code <?= $styles['code'] ?>>
+                Code: <?= $extras['coupon_code'] ?>
+            </code>
         <?php endif; ?>
         <?php if (count($features)): ?>
             <?php foreach ($features as $feature): ?>
@@ -56,25 +67,25 @@ if ($is_giftcard) {
             <?php endforeach; ?>
         <?php endif; ?>
     </td>
-    <td class="price-single" <?= $styles['td'] ?>>
-        &euro;&nbsp;<?= format_price($price) ?>
+    <td class="cart-item-price-wrapper" <?= $styles['td'] ?>>
+        <span class="hide-for-large">###label.price###: </span><strong>&euro;&nbsp;<?= format_price($price) ?></strong>
     </td>
-    <td class="amount" <?= $styles['td'] ?>>
+    <td class="cart-item-amount-wrapper" <?= $styles['td'] ?>>
         <?php
         $fragment = new \rex_fragment();
         $fragment->setVar('cart-quantity', $quantity);
         $fragment->setVar('product_key', $key);
-        $fragment->setVar('max_amount', $product->getValue('amount'));
         $fragment->setVar('config', $this->getVar('cart_button_config'));
+        $fragment->setVar('max_amount', $product->getValue('amount'));
         echo $fragment->parse('simpleshop/cart/button.php');
         ?>
     </td>
-    <td class="price-total" <?= $styles['td'] ?>>
-        &euro;&nbsp;<?= format_price($price * $quantity) ?>
+    <td class="cart-item-total-wrapper" <?= $styles['td'] ?>>
+        <span class="hide-for-large">###label.total###: </span><strong>&euro;&nbsp;<?= format_price($price * $quantity) ?></strong>
     </td>
     <?php if ($config['has_remove_button']): ?>
-        <td class="remove-product">
-            <a href="<?= rex_getUrl(null, null, ['func' => 'remove', 'key' => $key]) ?>" class="remove">X</a>
+        <td class="cart-item-remove-wrapper">
+            <button class="cart-item-remove" type="button" onclick="Simpleshop.removeCartItem(this, '<?= $key ?>')"></button>
         </td>
     <?php endif; ?>
 </tr>
