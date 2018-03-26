@@ -13,31 +13,53 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$step = rex_get('step', 'string');
-pr($step);
+$current_step = $this->getVar('current_step');
+$step_number  = 0;
+switch ($current_step) {
+    case 'invoice_address' :
+        $step_number = 1;
+        break;
+    case 'shipping_address' :
+        $step_number = 2;
+        break;
+    case 'shipping||payment' :
+        $step_number = 3;
+        break;
+    case 'show-summary' :
+        $step_number = 4;
+        break;
+}
 
 ?>
 <div class="row column margin-top margin-large-bottom">
     <div class="checkout-steps">
         <div class="checkout-step-wrapper">
-            <a href="<?= rex_getUrl(\Kreatif\Project\Settings::CART_PAGE_ID) ?>" class="checkout-step">
+            <a href="<?= rex_getUrl(null, null, ['step' => 'invoice_address']) ?>" class="checkout-step <?= $step_number == 1 ? 'active' : '' ?>">
                 <span class="checkout-step-number">1</span>
-                <span class="checkout-step-name">###label.cart###</span>
-            </a>
-        </div>
-        <div class="checkout-step-wrapper">
-            <a href="<?= rex_getUrl(null, null, ['step' => 2]) ?>" class="checkout-step <?= $step == 2 ? 'active' : '' ?>">
-                <span class="checkout-step-number">2</span>
                 <span class="checkout-step-name">###label.invoice_address###</span>
             </a>
         </div>
         <div class="checkout-step-wrapper">
-            <a <?php if ($step >= 3) {
-                echo 'href="' . rex_getUrl(null, null, ['step' => 3]) . '"';
-            } ?> class="checkout-step <?php if ($step == 3) {
+            <a <?php if ($step_number >= 2) {
+                echo 'href="' . rex_getUrl(null, null, ['step' => 'shipping_address']) . '"';
+            } ?> class="checkout-step <?php if ($step_number == 2) {
                 echo 'active';
             }
-            elseif ($step < 3) {
+            elseif ($step_number < 2) {
+                echo 'disabled';
+            } ?>">
+                <span class="checkout-step-number">2</span>
+                <span class="checkout-step-name">###label.shipping_address###</span>
+            </a>
+        </div>
+        <div class="checkout-step-wrapper">
+
+            <a <?php if ($step_number >= 3) {
+                echo 'href="' . rex_getUrl(null, null, ['step' => 'shipping||payment']) . '"';
+            } ?> class="checkout-step <?php if ($step_number == 3) {
+                echo 'active';
+            }
+            elseif ($step_number < 3) {
                 echo 'disabled';
             } ?>">
                 <span class="checkout-step-number">3</span>
@@ -45,12 +67,12 @@ pr($step);
             </a>
         </div>
         <div class="checkout-step-wrapper">
-            <a <?php if ($step >= 4) {
-                echo 'href="' . rex_getUrl(null, null, ['step' => 4]) . '"';
-            } ?> class="checkout-step <?php if ($step == 4) {
+            <a <?php if ($step_number == 4) {
+                echo 'href="' . rex_getUrl(null, null, ['step' => 'show-summary']) . '"';
+            } ?> class="checkout-step <?php if ($step_number == 4) {
                 echo 'active';
             }
-            elseif ($step < 4) {
+            elseif ($step_number < 4) {
                 echo 'disabled';
             } ?>">
                 <span class="checkout-step-number">4</span>
