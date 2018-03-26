@@ -64,9 +64,11 @@ class CartController extends Controller
         return $this->products;
     }
 
-    public static function ext_project_layoutBottom(\rex_extension_point $ep) {
-        $subject = $ep->getSubject();
+    public static function ext_project_layoutBottom(\rex_extension_point $ep)
+    {
+        $subject  = $ep->getSubject();
         $fragment = new \rex_fragment();
+
         $subject .= $fragment->parse('simpleshop/cart/offcanvas.php');
         return $subject;
     }

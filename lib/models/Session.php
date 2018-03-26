@@ -69,11 +69,7 @@ class Session extends Model
             self::$session = $session ?: parent::create();
 
             if ($User) {
-                $user_session = parent::query()
-                    ->where('customer_id', $User->getId())
-                    ->where('session_id', $session_id, '!=')
-                    ->orderBy('lastupdate', 'DESC')
-                    ->findOne();
+                $user_session = parent::query()->where('customer_id', $User->getId())->where('session_id', $session_id, '!=')->orderBy('lastupdate', 'DESC')->findOne();
 
                 if ($user_session) {
                     // merge sessions because we found to sessions for the same user
@@ -83,10 +79,7 @@ class Session extends Model
                     self::$session = $user_session;
                     self::$session->setValue('session_id', $session_id);
 
-                    \rex_sql::factory()
-                        ->setTable(self::TABLE)
-                        ->setWhere('customer_id = :cid OR session_id = :sid', ['cid' => $User->getId(), 'sid' => $session_id])
-                        ->delete();
+                    \rex_sql::factory()->setTable(self::TABLE)->setWhere('customer_id = :cid OR session_id = :sid', ['cid' => $User->getId(), 'sid' => $session_id])->delete();
 
                     self::$session->writeSession(['cart_items' => $cart_items]);
                 }
@@ -217,6 +210,20 @@ class Session extends Model
     {
         $feature_value_ids = !is_array($feature_value_ids) ? [$feature_value_ids] : $feature_value_ids;
         return $product_id . '|' . implode(',', $feature_value_ids);
+    }
+
+    public static function getTotal()
+    {
+        $products  = self::_getCartItems($raw, $throwErrors);
+        $Customer  = Customer::getCurrentUser();
+        $isCompany = $Customer ? $Customer->isCompany() : false;
+        $total     = 0;
+        foreach ($products as $product) {
+            $cart_quantity = $product->getValue('cart_quantity');
+            $price         = $product->getPrice(!$isCompany);
+            $total         += ($cart_quantity * $price);
+        }
+        return $total;
     }
 
     public static function addProduct($product_key, $quantity = 1, $extras = [])
