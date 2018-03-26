@@ -115,7 +115,7 @@ class Customer extends Model
         return $result;
     }
 
-    public static function login($email, $password)
+    public static function login($email, $password, $pwdMethod = 'sha1')
     {
         $result = null;
         $user   = self::getUserByEmail($email);
@@ -124,7 +124,7 @@ class Customer extends Model
             $pwd = $user->getValue('password_hash');
             // prevent login for empty passwords!
             // and verify hash
-            if (strlen($pwd) >= self::MIN_PWD_LEN && self::getPasswordHash($password) == $pwd) {
+            if (strlen($pwd) >= self::MIN_PWD_LEN && strtoupper(self::getPasswordHash($password, $pwdMethod)) == strtoupper($pwd)) {
                 // logged in
                 $_SESSION['customer']['user'] = ['id' => $user->getValue('id')];
                 // update login timestamp
