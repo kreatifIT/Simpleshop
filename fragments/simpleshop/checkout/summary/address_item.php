@@ -24,9 +24,13 @@ $Country  = $address->valueIsset('country') ? Country::get($address->getValue('c
         <h4 class="heading small"><?= $title ?></h4>
         <p>
             <?php
-            if ($address->getName()) {
+            if ($Customer) {
+                echo $Customer->getName() . '<br>';
+            }
+            else {
                 echo $address->getName() . '<br>';
             }
+
             if ($address->valueIsset('street')) {
                 echo $address->getValue('street') . '<br>';
             }
