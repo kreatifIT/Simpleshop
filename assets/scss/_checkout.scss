@@ -123,3 +123,59 @@
     line-height: rem-calc(30);
     margin: rem-calc(0 15);
 }
+
+// Summary
+.checkout-summary-total {
+    border-bottom: 1px solid $light-gray;
+    text-align: right;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    font-size: rem-calc(16);
+    .label,
+    .price {
+        display: inline-block;
+    }
+    .label {
+
+    }
+
+    .price {
+        font-weight: $global-weight-bold;
+        min-width: rem-calc(80);
+        text-align: right;
+        @include breakpoint(large) {
+            min-width: rem-calc(120);
+        }
+    }
+
+    .subtotal {
+
+    }
+
+    .shipping {
+
+    }
+
+    .promotions {
+
+    }
+
+    .taxes {
+
+    }
+
+    .total {
+        margin-top: 1em;
+        font-size: rem-calc(18);
+        font-weight: $global-weight-bold;
+        @include breakpoint(large) {
+            font-size: rem-calc(24);
+        }
+    }
+}
+
+.checkout-summary-items {
+    .cart {
+        border-bottom: 1px solid $light-gray;
+    }
+}

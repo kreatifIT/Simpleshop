@@ -21,43 +21,45 @@ $taxTotal   = $Order->getTaxTotal();
 $promotions = (array) $Order->getValue('promotions');
 
 ?>
-<div class="order-total margin-bottom">
-    <div class="row column text-right">
+<div class="margin-bottom">
+    <div class="row column">
+        <div class="checkout-summary-total">
             <div class="subtotal">
-                ###simpleshop.brutto_total###
+                <span class="label">###simpleshop.brutto_total###</span>
                 <span class="price">&euro;&nbsp;<?= format_price($total - $taxTotal) ?></span>
             </div>
 
-        <?php if ($shipping > 0): ?>
-            <div class="shipping">
-                ###label.shipment_cost###
-                <span class="price">&euro;&nbsp;<?= format_price($shipping) ?></span>
-            </div>
-        <?php endif; ?>
-
-        <?php foreach ($promotions as $promotion):
-            $percent = $promotion->getValue('discount_percent');
-            $_value = $promotion->getValue('discount_value');
-            $value = $percent ? $percent . '%' : ($_value > $total ? $total : $_value);
-
-            if ($value != 0):
-                ?>
-                <div class="promotions ">
-                    <span>&euro;&nbsp;-<?= format_price($value) ?></span>
-                    <span><?= $promotion->getName() ?></span>
+            <?php if ($shipping > 0): ?>
+                <div class="shipping">
+                    <span class="label">###label.shipment_cost###</span>
+                    <span class="price">&euro;&nbsp;<?= format_price($shipping) ?></span>
                 </div>
             <?php endif; ?>
-        <?php endforeach; ?>
 
-        <?php foreach ($taxes as $percent => $tax): ?>
-            <div class="taxes">
-                <?= $percent ?>% ###label.tax###
-                <span class="price">&euro;&nbsp;<?= format_price($tax) ?></span>
+            <?php foreach ($promotions as $promotion):
+                $percent = $promotion->getValue('discount_percent');
+                $_value = $promotion->getValue('discount_value');
+                $value = $percent ? $percent . '%' : ($_value > $total ? $total : $_value);
+
+                if ($value != 0):
+                    ?>
+                    <div class="promotions ">
+                        <span>&euro;&nbsp;-<?= format_price($value) ?></span>
+                        <span><?= $promotion->getName() ?></span>
+                    </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+
+            <?php foreach ($taxes as $percent => $tax): ?>
+                <div class="taxes">
+                    <span class="label"><?= $percent ?>% ###label.tax###</span>
+                    <span class="price">&euro;&nbsp;<?= format_price($tax) ?></span>
+                </div>
+            <?php endforeach; ?>
+            <div class="total">
+                <span class="label">###label.total_sum###</span>
+                <span class="price">&euro;&nbsp;<?= format_price($total) ?></span>
             </div>
-        <?php endforeach; ?>
-        <div class="total">
-            ###label.total_sum###
-            <span class="price">&euro;&nbsp;<?= format_price($total) ?></span>
         </div>
     </div>
 </div>

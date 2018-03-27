@@ -97,7 +97,7 @@ $shipping   = $Order->getValue('shipping');
         <?php endif; ?>
 
         <!-- Warenkorb -->
-        <div class="summary-items row column">
+        <div class="checkout-summary-items row column margin-bottom">
             <?php
             $Controller = CartController::execute([
                 'cart_config'               => array_merge(FragmentConfig::getValue('cart'), [
@@ -108,7 +108,8 @@ $shipping   = $Order->getValue('shipping');
                     'has_quantity'         => true,
                 ]),
                 'cart_table_wrapper_config' => array_merge(FragmentConfig::getValue('cart.table-wrapper'), [
-                    'has_go_ahead' => false,
+                    'has_remove_button' => false,
+                    'has_go_ahead'      => false,
                 ]),
             ]);
             echo $Controller->parse();

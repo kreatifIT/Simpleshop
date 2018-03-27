@@ -12,7 +12,7 @@
  */
 namespace FriendsOfREDAXO\Simpleshop;
 
-$config = FragmentConfig::getValue('cart');
+$config = $this->getVar('cart_config', FragmentConfig::getValue('cart'));
 $styles = FragmentConfig::getValue('styles.table-header');
 
 ?>
