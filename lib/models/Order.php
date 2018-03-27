@@ -204,6 +204,7 @@ class Order extends Model
     {
         Utils::setCalcLocale();
 
+        $Customer             = $this->getValue('customer_data');
         $net_prices           = [];
         $this->quantity       = 0;
         $this->discount       = 0;
@@ -217,7 +218,7 @@ class Order extends Model
             $tax_perc = Tax::get($product->getValue('tax'))->getValue('tax');
 
             $net_prices[$tax_perc] += (float) $product->getPrice() * $quantity;
-            $this->initial_total   += (float) $product->getPrice(true) * $quantity;
+            $this->initial_total   += (float) $product->getPrice(!$Customer->isCompany()) * $quantity;
             $this->quantity        += $quantity;
         }
         // get shipping costs
@@ -297,6 +298,7 @@ class Order extends Model
         $taxes       = [];
         $errors      = [];
         $_promotions = [];
+        $Settings    = \rex::getConfig('simpleshop.Settings');
 
         foreach ($promotions as $name => $_promotion) {
             $promotion = null;
@@ -339,16 +341,22 @@ class Order extends Model
 
         // set tax values
         foreach ($this->net_prices as $tax => $net_price) {
-            $taxes[$tax] += (float) $net_price / 100 * $tax;
+            $taxes[$tax] += (float) $net_price / (100 + $tax) * $tax;
         }
         if ($this->shipping_costs) {
             $tax         = $this->shipping->getTaxPercentage();
-            $taxes[$tax] += (float) $this->shipping_costs / 100 * $tax;
+            $taxes[$tax] += (float) $this->shipping_costs / (100 + $tax) * $tax;
         }
         ksort($taxes);
 
         $this->setValue('taxes', $taxes);
-        $this->setValue('total', $this->shipping_costs + array_sum($this->net_prices) + array_sum($taxes));
+
+        if ($Settings['brutto_prices']) {
+            $this->setValue('total', $this->shipping_costs + array_sum($this->net_prices));
+        }
+        else {
+            $this->setValue('total', $this->shipping_costs + array_sum($this->net_prices) + array_sum($taxes));
+        }
 
         Utils::resetLocale();
 

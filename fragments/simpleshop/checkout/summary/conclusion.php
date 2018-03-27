@@ -15,7 +15,6 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 $Order      = $this->getVar('Order');
 $shipping   = $Order->getValue('initial_shipping_costs');
-$subtotal   = $Order->getValue('initial_total');
 $total      = $Order->getValue('total');
 $taxes      = $Order->getValue('taxes');
 $taxTotal   = $Order->getTaxTotal();
@@ -24,12 +23,10 @@ $promotions = (array) $Order->getValue('promotions');
 ?>
 <div class="order-total margin-bottom">
     <div class="row column text-right">
-        <?php if ($subtotal != $total): ?>
             <div class="subtotal">
-                ###label.subtotal###
-                <span class="price">&euro;&nbsp;<?= format_price($subtotal) ?></span>
+                ###simpleshop.brutto_total###
+                <span class="price">&euro;&nbsp;<?= format_price($total - $taxTotal) ?></span>
             </div>
-        <?php endif; ?>
 
         <?php if ($shipping > 0): ?>
             <div class="shipping">
@@ -54,7 +51,7 @@ $promotions = (array) $Order->getValue('promotions');
 
         <?php foreach ($taxes as $percent => $tax): ?>
             <div class="taxes">
-                ###label.tax_included### <?= $percent ?>%
+                <?= $percent ?>% ###label.tax###
                 <span class="price">&euro;&nbsp;<?= format_price($tax) ?></span>
             </div>
         <?php endforeach; ?>

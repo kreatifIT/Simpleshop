@@ -14,14 +14,12 @@ $tax            = $this->getVar('tax', null);
 ?>
 <table class="<?= $config['css_class']['table'] ?>" <?= $styles['table'] ?>>
 
-    <?php if ($initial_total != $total): ?>
-        <tr <?= $styles['tr'] ?>>
-            <td <?= $styles['td'] ?>>###label.subtotal###</td>
-            <td class="text-right" <?= $styles['td'] ?>>
-                &euro; <?= format_price($initial_total) ?>
-            </td>
-        </tr>
-    <?php endif; ?>
+    <tr <?= $styles['tr'] ?>>
+        <td <?= $styles['td'] ?>>###simpleshop.brutto_total###</td>
+        <td class="text-right" <?= $styles['td'] ?>>
+            &euro; <?= format_price($initial_total) ?>
+        </td>
+    </tr>
 
     <?php if ($shipping_costs !== null): ?>
         <tr <?= $styles['tr'] ?>>
