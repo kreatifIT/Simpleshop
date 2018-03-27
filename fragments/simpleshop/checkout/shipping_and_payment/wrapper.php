@@ -35,7 +35,7 @@ $this->setVar('payment', $payment ?: $payments[0]);
             </div>
 
             <div class="row medium-up-2">
-                <?php foreach ($shippings as $shipping) : ?>
+                <?php foreach ($shippings as $index => $shipping) : ?>
                     <div class="column grid-item">
                         <?php
                         $this->setVar('name', $shipping->getName());
@@ -54,7 +54,7 @@ $this->setVar('payment', $payment ?: $payments[0]);
             </div>
 
             <div class="row medium-up-2">
-                <?php foreach ($payments as $payment) : ?>
+                <?php foreach ($payments as $index => $payment) : ?>
                     <div class="column grid-item">
                         <?php
                         $this->setVar('name', $payment->getName());

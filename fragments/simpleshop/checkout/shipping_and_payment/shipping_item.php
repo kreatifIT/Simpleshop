@@ -19,7 +19,7 @@ $shipment  = $this->getVar('shipping');
 $is_active = is_object($shipment) && $shipment->getPluginName() == $plugin;
 
 ?>
-<div class="checkout-radio-panel">
+<div class="checkout-radio-panel <?= $is_active ? 'selected' : '' ?>">
     <?= $this->subfragment('simpleshop/shipping/' . $plugin . '/icon.svg') ?>
     <div class="custom-radio">
         <label>

@@ -3,6 +3,7 @@ var Simpleshop = (function ($) {
 
     var lang_id = $('html:first').data('lang-id');
     var $offcanvasCart = $('.offcanvas-cart'),
+        $body = $('body'),
         $continueShoppingButton = $('.offcanvas-cart-continue-shopping'),
         $offcanvasCartSuccess = $('.offcanvas-cart-success');
 
@@ -19,6 +20,7 @@ var Simpleshop = (function ($) {
 
     $continueShoppingButton.on('click', function () {
         $offcanvasCart.removeClass('expanded');
+        $body.removeClass('offcanvas-cart-open');
         $offcanvasCartSuccess.fadeOut();
     });
 
@@ -34,6 +36,31 @@ var Simpleshop = (function ($) {
         }
         $(document).trigger('simpleshop.updateCart', response);
     }
+
+    $('.checkout-radio-panel').on('click', function () {
+        var $radio = $(this).find('input');
+        if ($radio.is(':checked') === false) {
+            $radio.prop('checked', true);
+            $(this).addClass('selected');
+        }
+        $('.checkout-radio-panel').each(function () {
+            if ($(this).find('input').is(':checked') === false) {
+                $(this).removeClass('selected');
+            }
+        });
+    });
+
+    $('.offcanvas-cart-continue-shopping').on('click', function () {
+        $(this).parent().removeClass('expanded');
+    });
+
+    $(window).on('load', function (e) {
+        var $ctype = $('select[name=ctype]');
+
+        if ($ctype.length) {
+            $ctype.trigger('change');
+        }
+    });
 
     var result = {
         toggleAuth: function (_this, selector) {
@@ -95,6 +122,7 @@ var Simpleshop = (function ($) {
             }).done(function (resp) {
                 updateCart(resp, $itemsContainer, $totalContainer, $loading);
                 $offcanvasCart.addClass('expanded');
+                $body.addClass('offcanvas-cart-open');
                 $offcanvasCartSuccess.fadeIn();
             });
         },
@@ -203,31 +231,6 @@ var Simpleshop = (function ($) {
             return false;
         }
     };
-
-    $('.checkout-radio-panel').on('click', function () {
-        var $radio = $(this).find('input');
-        if ($radio.is(':checked') === false) {
-            $radio.prop('checked', true);
-            $(this).addClass('selected');
-        }
-        $('.checkout-radio-panel').each(function () {
-            if ($(this).find('input').is(':checked') === false) {
-                $(this).removeClass('selected');
-            }
-        });
-    });
-
-    $('.offcanvas-cart-continue-shopping').on('click', function () {
-        $(this).parent().removeClass('expanded');
-    });
-
-    $(window).on('load', function (e) {
-        var $ctype = $('select[name=ctype]');
-
-        if ($ctype.length) {
-            $ctype.trigger('change');
-        }
-    });
 
     return result;
 })(jQuery);

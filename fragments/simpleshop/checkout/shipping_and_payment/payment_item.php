@@ -19,7 +19,7 @@ $payment   = $this->getVar('payment');
 $is_active = is_object($payment) && $payment->getPluginName() == $plugin;
 
 ?>
-<div class="checkout-radio-panel">
+<div class="checkout-radio-panel <?= $is_active ? 'selected' : '' ?>">
     <?= $this->subfragment('simpleshop/payment/' . $plugin . '/icon.svg') ?>
     <div class="custom-radio">
         <label>
