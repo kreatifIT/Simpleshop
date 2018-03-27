@@ -43,7 +43,7 @@ $products = $this->getVar('products', []);
                     <span class="quantity"><?= $quantity ?> x </span>
                 <?php endif; ?>
                 <span class="name"><?= $product->getName() ?></span>
-                <span class="price"><?= $price ?></span>
+                <span class="price">&euro;&nbsp;<?= $price ?></span>
             </div>
             <div class="remove" onclick="Simpleshop.removeOffcanvasCartItem(this, <?= $key ?>, '.offcanvas-cart-item', '.offcanvas-cart-items')"></div>
         </div>

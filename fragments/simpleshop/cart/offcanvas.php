@@ -13,10 +13,10 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 use Kreatif\Project\Settings;
-use Kreatif\Resource;
 
-$picture = null;
-$ctrlTpl = '';
+$ctrlTpl  = '';
+$picture  = null;
+$Settings = \rex::getConfig('simpleshop.Settings');
 
 $Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute();
 
@@ -37,11 +37,10 @@ if (count($Controller->getProducts())) {
     <div class="offcanvas-cart-prices">
         <div class="price">
             <span class="label">###label.total###</span>
-            <span class="amount"><?= format_price(Session::getTotal()) ?></span>
+            <span class="amount">&euro;&nbsp;<?= format_price(Session::getTotal()) ?></span>
         </div>
     </div>
     <div class="offcanvas-cart-buttons">
-        <a href="<?= rex_getUrl(Settings::NEWS_PAGE_ID) ?>" class="button secondary expanded margin-small-bottom">###action.proceed_to_checkout###</a>
-        <a href="<?= rex_getUrl(Settings::CART_PAGE_ID) ?>" class="button expanded">###action.action.shop_edit_cart###</a>
+        <a href="<?= rex_getUrl($Settings['linklist']['cart']) ?>" class="button secondary expanded margin-small-bottom">###action.proceed_to_checkout###</a>
     </div>
 </div>
