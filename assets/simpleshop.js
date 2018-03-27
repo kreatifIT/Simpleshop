@@ -17,7 +17,7 @@ var Simpleshop = (function ($) {
         return $loading;
     }
 
-    $continueShoppingButton.on('click', function() {
+    $continueShoppingButton.on('click', function () {
         $offcanvasCart.removeClass('expanded');
         $offcanvasCartSuccess.fadeOut();
     });
@@ -32,6 +32,7 @@ var Simpleshop = (function ($) {
         if ($loading.length !== 0) {
             $loading.remove();
         }
+        $(document).trigger('simpleshop.updateCart', response);
     }
 
     var result = {
@@ -93,7 +94,6 @@ var Simpleshop = (function ($) {
                 }
             }).done(function (resp) {
                 updateCart(resp, $itemsContainer, $totalContainer, $loading);
-                $(document).trigger('simpleshop.addedToCart', resp, _this, selector);
                 $offcanvasCart.addClass('expanded');
                 $offcanvasCartSuccess.fadeIn();
             });

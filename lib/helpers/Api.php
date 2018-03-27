@@ -102,8 +102,9 @@ class rex_api_simpleshop_api extends rex_api_function
         else {
             \FriendsOfREDAXO\Simpleshop\Session::addProduct($product_key, $quantity, $extras);
         }
-        $this->response['cart_items']    = \FriendsOfREDAXO\Simpleshop\Session::getCartItems(true);
-        $this->response['cart_item_cnt'] = count($this->response['cart_items']);
+        $this->response['cart_items']       = \FriendsOfREDAXO\Simpleshop\Session::getCartItems(true);
+        $this->response['cart_product_cnt'] = count($this->response['cart_items']);
+        $this->response['cart_item_cnt']    = \FriendsOfREDAXO\Simpleshop\Session::getCartItemCount();
 
         $this->api__cart_getcartcontent($layout);
     }
@@ -131,6 +132,10 @@ class rex_api_simpleshop_api extends rex_api_function
             throw new ApiException("Invalid request arguments");
         }
         \FriendsOfREDAXO\Simpleshop\Session::removeProduct($product_key);
+
+        $this->response['cart_items']       = \FriendsOfREDAXO\Simpleshop\Session::getCartItems(true);
+        $this->response['cart_product_cnt'] = count($this->response['cart_items']);
+        $this->response['cart_item_cnt']    = \FriendsOfREDAXO\Simpleshop\Session::getCartItemCount();
 
         $this->api__cart_getcartcontent($layout);
     }
