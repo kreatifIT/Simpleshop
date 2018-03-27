@@ -18,9 +18,12 @@ class FragmentConfig
 {
     public static $data = [
         'auth'     => [
-            'has_registration'      => true,
-            'has_password_recovery' => true,
-            'css_class'             => [
+            'has_registration'         => true,
+            'has_password_recovery'    => true,
+            'registration_excl_fields' => [
+                'fiscal_code',
+            ],
+            'css_class'                => [
                 'wrapper' => 'margin-large-top margin-large-bottom',
                 'buttons' => 'expanded margin-bottom',
             ],

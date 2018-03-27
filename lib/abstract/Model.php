@@ -189,14 +189,31 @@ abstract class Model extends \Kreatif\Model
                 break;
 
             case 'fiscal_code':
-                if ((empty($params['field']) || $field->getValueObject($params['field'])->getValue() == $params['value']) && trim($value) == '') {
-                    return true;
+                if (empty($params['field']) || $field->getValueObject($params['field'])->getValue() == $params['value']) {
+                    try {
+                        FiscalcodeCheck::validateField($value);
+                    }
+                    catch (\ErrorException $ex) {
+                        return true;
+                    }
                 }
                 break;
 
             case 'vat_num':
-                if ((empty($params['field']) || $field->getValueObject($params['field'])->getValue() == $params['value']) && trim($value) == '') {
-                    return true;
+                if (empty($params['field']) || $field->getValueObject($params['field'])->getValue() == $params['value']) {
+                    $value  = trim($value);
+                    $prefix = substr($value, 0, 2);
+                    $num    = substr($value, 2);
+
+                    try {
+                        VatCheck::validateField($prefix, $num);
+                    }
+                    catch (\SoapFault $ex) {
+                        return true;
+                    }
+                    catch (\ErrorException $ex) {
+                        return true;
+                    }
                 }
                 break;
         }

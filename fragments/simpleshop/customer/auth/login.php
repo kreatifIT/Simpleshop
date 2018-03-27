@@ -148,10 +148,7 @@ unset($_GET['action'])
         $fields    = Customer::getAllYformFields();
         $form      = Form::factory();
         $Config    = FragmentConfig::getValue('yform_fields.rex_shop_customer');
-        $excFields = array_merge($Config['_excludedFields'], [
-            'fiscal_code',
-            'vat_num',
-        ]);
+        $excFields = array_merge($Config['_excludedFields'], FragmentConfig::getValue('auth.registration_excl_fields'));
 
         // Options
         $form->setObjectparams('form_anchor', '-' . $sid);
