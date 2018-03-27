@@ -29,16 +29,16 @@ error.password_policy
 error.insert_email
 error.email_not_valid
 error.email_already_exists
+error.field.fiscal_code_not_valid
+error.field.vat_not_valid
 
 simpleshop.product_not_available
 simpleshop.no_products_in_cart
 simpleshop.error.cart_product_not_enough_amount
-simpleshop.data_saved
 simpleshop.summary_order
 simpleshop.redeem_coupon
 simpleshop.shipping_default
 simpleshop.bank_transfer
-simpleshop.cash
 simpleshop.order_placed
 simpleshop.promotions
 simpleshop.applied_promotion_text
@@ -68,8 +68,6 @@ simpleshop.error.discountgroup_not_applyable_anymore
 simpleshop.error.order_has_no_product
 simpleshop.error.shipping_zipcode_not_valid
 simpleshop.error.shipping_no_price
-simpleshop.error.fiscal_code_invalid
-simpleshop.error.vatnum_invalid
 
 simpleshop.email.user_registration_subject
 simpleshop.email.user_password_reset
