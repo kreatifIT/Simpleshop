@@ -157,7 +157,7 @@ class Order extends Model
             // clear all products first
             \rex_sql::factory()->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$order_id}");
 
-            $products = Session::getCartItems(false, false);
+            $products = Session::getCartItems(false, false, false);
 
             // set order products
             foreach ($products as $product) {
