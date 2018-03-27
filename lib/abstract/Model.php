@@ -19,46 +19,6 @@ abstract class Model extends \Kreatif\Model
 
     public function getForm($form = null, $excludedFields = [])
     {
-        if (!\rex::isBackend()) {
-            \rex_extension::register('YFORM_DATASET_FORM_SETVALIDATEFIELD', function (\rex_extension_point $Ep) {
-                $subject = $Ep->getSubject();
-                $Object  = $Ep->getParam('object');
-
-                if (!\rex::isBackend()) {
-                    $table      = $Object->getTable()->getTableName();
-                    $_excludeds = (array) $Ep->getParam('excluded_fields');
-                    $excluded   = array_merge(FragmentConfig::getValue("yform_fields.{$table}._excludedFields", []), $_excludeds);
-
-                    if (in_array($subject[0], $excluded)) {
-                        $subject = false;
-                    }
-                }
-                return $subject;
-            });
-            \rex_extension::register('YFORM_DATASET_FORM_SETVALUEFIELD', function (\rex_extension_point $Ep) {
-                $subject = $Ep->getSubject();
-                $Object  = $Ep->getParam('object');
-
-                if (!\rex::isBackend()) {
-                    $type        = $Ep->getParam('type_name');
-                    $table       = $Object->getTable()->getTableName();
-                    $_excludeds  = (array) $Ep->getParam('excluded_fields');
-                    $fieldConfig = array_merge(FragmentConfig::getValue("yform_fields.{$table}._fieldDefaults", []), FragmentConfig::getValue("yform_fields.{$table}.{$subject[0]}", []));
-                    $excluded    = array_merge(FragmentConfig::getValue("yform_fields.{$table}._excludedFields", []), $_excludeds);
-
-                    if (in_array($subject[0], $excluded)) {
-                        $subject = false;
-                    }
-                    else if ($subject) {
-                        if ($type == 'be_manager_relation') {
-                            $subject[3] = strtr($subject[3], ['_1' => '_' . \rex_clang::getCurrentId()]);
-                        }
-                        $subject = array_merge($subject, $fieldConfig);
-                    }
-                }
-                return $subject;
-            });
-        }
         return parent::getForm($form, $excludedFields);
     }
 
@@ -218,5 +178,46 @@ abstract class Model extends \Kreatif\Model
                 break;
         }
         return false;
+    }
+
+    public static function ext_setValueField(\rex_extension_point $Ep)
+    {
+        if (!\rex::isBackend()) {
+            $subject     = $Ep->getSubject();
+            $Object      = $Ep->getParam('object');
+            $type        = $Ep->getParam('type_name');
+            $table       = $Object->getTable()->getTableName();
+            $_excludeds  = (array) $Ep->getParam('excluded_fields');
+            $fieldConfig = array_merge(FragmentConfig::getValue("yform_fields.{$table}._fieldDefaults", []), FragmentConfig::getValue("yform_fields.{$table}.{$subject[0]}", []));
+            $excluded    = array_merge(FragmentConfig::getValue("yform_fields.{$table}._excludedFields", []), $_excludeds);
+
+            if (in_array($subject[0], $excluded)) {
+                $subject = false;
+            }
+            else if ($subject) {
+                if ($type == 'be_manager_relation') {
+                    $subject[3] = strtr($subject[3], ['_1' => '_' . \rex_clang::getCurrentId()]);
+                }
+                $subject = array_merge($subject, $fieldConfig);
+            }
+        }
+        return $subject;
+    }
+
+    public static function ext_setValidateField(\rex_extension_point $Ep)
+    {
+        if (!\rex::isBackend()) {
+            $subject = $Ep->getSubject();
+            $Object  = $Ep->getParam('object');
+            $table   = $Object->getTable()->getTableName();
+
+            $_excludeds = (array) $Ep->getParam('excluded_fields');
+            $excluded   = array_merge(FragmentConfig::getValue("yform_fields.{$table}._excludedFields", []), $_excludeds);
+
+            if (in_array($subject[0], $excluded)) {
+                $subject = false;
+            }
+        }
+        return $subject;
     }
 }

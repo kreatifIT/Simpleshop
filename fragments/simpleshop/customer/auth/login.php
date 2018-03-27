@@ -147,8 +147,12 @@ unset($_GET['action'])
         // REGISTRATION
         $fields    = Customer::getAllYformFields();
         $form      = Form::factory();
-        $Config    = FragmentConfig::getValue('yform_fields.rex_shop_customer');
-        $excFields = array_merge($Config['_excludedFields'], FragmentConfig::getValue('auth.registration_excl_fields'));
+        $excFields = FragmentConfig::getValue('yform_fields.rex_shop_customer._excludedFields');
+        $excFields = array_merge($excFields, FragmentConfig::getValue('auth.registration_excl_fields'));
+
+        FragmentConfig::$data['yform_fields']['rex_shop_customer']['_excludedFields'] = $excFields;
+
+        $Config = FragmentConfig::getValue('yform_fields.rex_shop_customer');
 
         // Options
         $form->setObjectparams('form_anchor', '-' . $sid);
@@ -188,7 +192,7 @@ unset($_GET['action'])
             'type_id'   => 'validate',
             'type_name' => 'empty',
             'name'      => 'password',
-            'message'      => '###error.password_policy###',
+            'message'   => '###error.password_policy###',
         ]);
 
 

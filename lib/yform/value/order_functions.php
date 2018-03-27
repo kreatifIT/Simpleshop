@@ -42,7 +42,9 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                     $promotions     = $Order->getValue('promotions', false, []);
 
                     foreach ($order_products as $order_product) {
-                        $products[] = $order_product->getValue('data');
+                        $product = $order_product->getValue('data');
+                        $product->setValue('cart_quantity', $order_product->getValue('quantity'));
+                        $products[] = $product;
                     }
 
                     $Order->recalculateDocument($products, $promotions);
