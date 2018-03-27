@@ -12,6 +12,7 @@
  */
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Kreatif\Project\Settings;
 use Kreatif\Resource;
 
 $picture = null;
@@ -28,19 +29,19 @@ if (count($Controller->getProducts())) {
     <button class="offcanvas-cart-continue-shopping" type="button">###label.continue_shopping###</button>
     <div class="offcanvas-cart-success">
         <span class="check">✔</span>
-        <span class="description">Der Artikel wurde erfolgreich in den Warenkorb gelegt</span>
+        <span class="description">###simpleshop.add_to_cart_success###</span>
     </div>
 
     <?= $Controller->parse($ctrlTpl) ?>
 
     <div class="offcanvas-cart-prices">
         <div class="price">
-            <span class="label">Total</span>
-            <span class="amount"><?= Session::getTotal() ?></span>
+            <span class="label">###label.total###</span>
+            <span class="amount"><?= format_price(Session::getTotal()) ?></span>
         </div>
     </div>
     <div class="offcanvas-cart-buttons">
-        <a href="" class="button secondary expanded margin-small-bottom">###action.proceed_to_checkout###</a>
-        <a href="" class="button expanded">###action.action.shop_edit_cart###</a>
+        <a href="<?= rex_getUrl(Settings::NEWS_PAGE_ID) ?>" class="button secondary expanded margin-small-bottom">###action.proceed_to_checkout###</a>
+        <a href="<?= rex_getUrl(Settings::CART_PAGE_ID) ?>" class="button expanded">###action.action.shop_edit_cart###</a>
     </div>
 </div>

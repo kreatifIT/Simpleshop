@@ -22,7 +22,7 @@ $products = $this->getVar('products', []);
 
         <?php
 
-        $Customer   = Customer::getCurrentUser();
+        $Customer  = Customer::getCurrentUser();
         $isCompany = $Customer ? $Customer->isCompany() : false;
 
         $images      = $product->getArrayValue('images');
@@ -30,12 +30,13 @@ $products = $this->getVar('products', []);
         $price       = $product->getPrice(!$isCompany);
         $quantity    = $product->getValue('cart_quantity');
         $product_url = $product->getUrl();
+        $key         = $product->getValue('key');
 
         ?>
 
         <div class="offcanvas-cart-item">
             <a class="image" href="<?= $product_url ?>">
-                <?= Resource::getImgTag($picture, 'cart-list-element-main') ?>
+                <?= Resource::getImgTag($picture, 'product_gallery_thumb') ?>
             </a>
             <div class="description">
                 <?php if ($quantity) : ?>
@@ -44,7 +45,7 @@ $products = $this->getVar('products', []);
                 <span class="name"><?= $product->getName() ?></span>
                 <span class="price"><?= $price ?></span>
             </div>
-            <div class="remove"></div>
+            <div class="remove" onclick="Simpleshop.removeOffcanvasCartItem(this, <?= $key ?>, '.offcanvas-cart-item', '.offcanvas-cart-items')"></div>
         </div>
     <?php endforeach; ?>
 </div>

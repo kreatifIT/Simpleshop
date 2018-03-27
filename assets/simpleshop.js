@@ -56,17 +56,21 @@ var Simpleshop = (function ($) {
                     'product_key': vkey,
                     'quantity': parseInt(amount)
                 }
-            })
-                .done(function (resp) {
-                    $loading.remove();
-                    $(document).trigger('simpleshop.addedToCart', resp, _this, selector);
-                });
+            }).done(function (resp) {
+                console.log('Done');
+                $loading.remove();
+                $(document).trigger('simpleshop.addedToCart', resp, _this, selector);
+                $('.offcanvas-cart').addClass('expanded');
+            });
         },
-        removeCartItem: function (_this, vkey, rowSelector) {
-            var $this = $(_this),
-                $row = $this.parents(rowSelector || '.cart-item'),
-                $container = $row.parents('.cart-container'),
-                $loading = addLoading($container);
+        removeCartItem: function (_this, vkey, rowSelector, containerSelector) {
+            var $this = $(_this);
+            var $row = $this.parents(rowSelector || '.cart-item'),
+                $container = $row.parents(containerSelector || '.cart-container');
+
+            if ($container.length !== 0) {
+                var $loading = addLoading($container);
+            }
 
             $.ajax({
                 url: rex.simpleshop.ajax_url,
@@ -76,11 +80,35 @@ var Simpleshop = (function ($) {
                     'rex-api-call': 'simpleshop_api',
                     'product_key': vkey
                 }
-            })
-                .done(function (resp) {
+            }).done(function (resp) {
+                if ($container.length !== 0) {
                     $container.html(resp.message.cart_html);
                     $loading.remove();
-                });
+                }
+            });
+        },
+        removeOffcanvasCartItem: function (_this, vkey, itemSelector, containerSelector) {
+            var $this = $(_this);
+            var $row = $this.parents(itemSelector || '.cart-item'),
+                $container = $row.parents(containerSelector || '.cart-container');
+
+            if ($container.length !== 0) {
+                var $loading = addLoading($container);
+            }
+            $.ajax({
+                url: rex.simpleshop.ajax_url,
+                method: 'POST',
+                data: {
+                    'controller': 'Cart.removeProduct',
+                    'rex-api-call': 'simpleshop_api',
+                    'product_key': vkey
+                }
+            }).done(function (resp) {
+                if ($container.length !== 0) {
+                    $container.html(resp.message.cart_html);
+                    $loading.remove();
+                }
+            });
         },
         changeCartAmount: function (_this, vkey, _max, rowSelector) {
             var $this = $(_this),
@@ -127,11 +155,10 @@ var Simpleshop = (function ($) {
                         'exact_qty': num,
                         'product_key': vkey
                     }
-                })
-                    .done(function (resp) {
-                        $container.html(resp.message.cart_html);
-                        $loading.remove();
-                    });
+                }).done(function (resp) {
+                    $container.html(resp.message.cart_html);
+                    $loading.remove();
+                });
             }
         },
         loadMore: function (_this, container, fragment, event) {
@@ -176,6 +203,10 @@ var Simpleshop = (function ($) {
                 $(this).removeClass('selected');
             }
         });
+    });
+
+    $('.offcanvas-cart-continue-shopping').on('click', function () {
+        $(this).parent().removeClass('expanded');
     });
 
     function addLoading($container) {
