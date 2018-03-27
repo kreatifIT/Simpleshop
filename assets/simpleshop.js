@@ -2,6 +2,37 @@ var Simpleshop = (function ($) {
     'use strict';
 
     var lang_id = $('html:first').data('lang-id');
+    var $offcanvasCart = $('.offcanvas-cart'),
+        $continueShoppingButton = $('.offcanvas-cart-continue-shopping'),
+        $offcanvasCartSuccess = $('.offcanvas-cart-success');
+
+    function addLoading($container) {
+        var css = $container.offset(),
+            $loading = $(rex.simpleshop.loadingDiv);
+
+        css.height = $container.outerHeight();
+        css.width = $container.outerWidth();
+        $('body').append($loading.addClass('show').css(css));
+
+        return $loading;
+    }
+
+    $continueShoppingButton.on('click', function() {
+        $offcanvasCart.removeClass('expanded');
+        $offcanvasCartSuccess.fadeOut();
+    });
+
+    function updateCart(response, $itemsContainer, $totalContainer, $loading) {
+        if ($itemsContainer.length !== 0) {
+            $itemsContainer.html(response.message.cart_html);
+        }
+        if ($totalContainer.length !== 0) {
+            $totalContainer.html(response.message.total_formatted);
+        }
+        if ($loading.length !== 0) {
+            $loading.remove();
+        }
+    }
 
     var result = {
         toggleAuth: function (_this, selector) {
@@ -46,8 +77,8 @@ var Simpleshop = (function ($) {
 
             var $this = $(_this),
                 $loading = addLoading($this),
-                $offcanvasCart = $('.offcanvas-cart'),
-                $container = $offcanvasCart.find('[data-cart-item-container]');
+                $itemsContainer = $offcanvasCart.find('[data-cart-item-container]'),
+                $totalContainer = $offcanvasCart.find('[data-cart-item-total]');
 
             $.ajax({
                 url: rex.simpleshop.ajax_url,
@@ -61,21 +92,20 @@ var Simpleshop = (function ($) {
                     'layout': layout
                 }
             }).done(function (resp) {
-                if ($container.length !== 0) {
-                    $container.html(resp.message.cart_html);
-                }
-                $loading.remove();
+                updateCart(resp, $itemsContainer, $totalContainer, $loading);
                 $(document).trigger('simpleshop.addedToCart', resp, _this, selector);
-                $('.offcanvas-cart').addClass('expanded');
+                $offcanvasCart.addClass('expanded');
+                $offcanvasCartSuccess.fadeIn();
             });
         },
         removeCartItem: function (_this, vkey, layout) {
             var $this = $(_this);
             var $item = $this.parents('[data-cart-item]'),
-                $container = $item.parents('[data-cart-item-container]');
+                $itemsContainer = $item.parents('[data-cart-item-container]'),
+                $totalContainer = $offcanvasCart.find('[data-cart-item-total]');
 
-            if ($container.length !== 0) {
-                var $loading = addLoading($container);
+            if ($itemsContainer.length !== 0) {
+                var $loading = addLoading($itemsContainer);
             }
 
             $.ajax({
@@ -88,11 +118,8 @@ var Simpleshop = (function ($) {
                     'layout': layout
                 }
             }).done(function (resp) {
-                console.log(resp);
-                if ($container.length !== 0) {
-                    $container.html(resp.message.cart_html);
-                    $loading.remove();
-                }
+                updateCart(resp, $itemsContainer, $totalContainer, $loading);
+                $offcanvasCartSuccess.fadeOut();
             });
         },
         changeCartAmount: function (_this, vkey, _max, rowSelector) {
@@ -193,17 +220,6 @@ var Simpleshop = (function ($) {
     $('.offcanvas-cart-continue-shopping').on('click', function () {
         $(this).parent().removeClass('expanded');
     });
-
-    function addLoading($container) {
-        var css = $container.offset(),
-            $loading = $(rex.simpleshop.loadingDiv);
-
-        css.height = $container.outerHeight();
-        css.width = $container.outerWidth();
-        $('body').append($loading.addClass('show').css(css));
-
-        return $loading;
-    }
 
     $(window).on('load', function (e) {
         var $ctype = $('select[name=ctype]');

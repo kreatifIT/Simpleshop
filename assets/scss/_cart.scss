@@ -146,7 +146,7 @@
     border-left: 1px solid $light-gray;
     width: rem-calc(300);
     font-size: rem-calc(16);
-    //transform: translateX(100%);
+    transform: translateX(100%);
     transition: all 0.3s ease;
     &.expanded {
         transform: translateX(0);
@@ -159,6 +159,7 @@
     position: relative;
     color: $white;
     font-size: rem-calc(14);
+    display: none;
     .check {
         display: block;
         width: rem-calc(40);
@@ -184,6 +185,11 @@
     padding: rem-calc(20);
     width: 100%;
     border-radius: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    &:hover {
+        background-color: scale_color($primary-color, $lightness: -15%);
+    }
 }
 
 .offcanvas-cart-items {

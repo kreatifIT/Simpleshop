@@ -60,10 +60,10 @@ class rex_api_simpleshop_api extends rex_api_function
         }
         $result = rex_extension::registerPoint(new rex_extension_point('Api.Cart.getCartContent', $result, ['products' => $products]));
 
-        $this->response['cart_html']      = \Sprog\Wildcard::parse($result['html']);
-        $this->response['total']          = $result['total'];
-        $this->response['count']          = $result['count'];
-        $this->response['total_formated'] = format_price($result['total']);
+        $this->response['cart_html']       = \Sprog\Wildcard::parse($result['html']);
+        $this->response['total']           = $result['total'];
+        $this->response['count']           = $result['count'];
+        $this->response['total_formatted'] = format_price(\FriendsOfREDAXO\Simpleshop\Session::getTotal());
     }
 
     private function api__cart_addgiftcard()
@@ -126,6 +126,7 @@ class rex_api_simpleshop_api extends rex_api_function
     {
         $layout      = rex_post('layout', 'string', 'cart');
         $product_key = rex_post('product_key', 'string', null);
+
         if (!$product_key) {
             throw new ApiException("Invalid request arguments");
         }

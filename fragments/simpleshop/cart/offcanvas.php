@@ -39,7 +39,9 @@ if (count($Controller->getProducts())) {
     <div class="offcanvas-cart-prices">
         <div class="price">
             <span class="label">###label.total###</span>
-            <span class="amount">&euro;&nbsp;<?= format_price(Session::getTotal()) ?></span>
+            <div class="amount">&euro;&nbsp;
+                <span data-cart-item-total=""><?= format_price(Session::getTotal()) ?></span>
+            </div>
         </div>
     </div>
     <div class="offcanvas-cart-buttons">
