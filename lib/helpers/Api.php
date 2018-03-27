@@ -39,26 +39,31 @@ class rex_api_simpleshop_api extends rex_api_function
         return new rex_api_result($this->success, $this->response);
     }
 
-    private function api__cart_getcartcontent()
+    private function api__cart_getcartcontent($layout)
     {
+        $ctrlTpl  = '';
+        $emptyTpl = 'simpleshop/cart/empty.php';
+        if ($layout == 'offcanvas_cart') {
+            $ctrlTpl  = 'simpleshop/cart/offcanvas-list.php';
+            $emptyTpl = 'simpleshop/cart/offcanvas-empty.php';
+        }
         $Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute();
         $products   = $Controller->getProducts();
         $result     = [
             'total' => 0,
-            'html'  => $Controller->parse(),
+            'html'  => $Controller->parse($ctrlTpl),
             'count' => count($products),
         ];
-
         if (count($products) == 0) {
             $fragment       = new rex_fragment();
-            $result['html'] = $fragment->parse('simpleshop/cart/empty.php');
+            $result['html'] = $fragment->parse($emptyTpl);
         }
         $result = rex_extension::registerPoint(new rex_extension_point('Api.Cart.getCartContent', $result, ['products' => $products]));
 
-        $this->response['cart_html']      = \Sprog\Wildcard::parse($result['html']);
-        $this->response['total']          = $result['total'];
-        $this->response['count']          = $result['count'];
-        $this->response['total_formated'] = format_price($result['total']);
+        $this->response['cart_html']       = \Sprog\Wildcard::parse($result['html']);
+        $this->response['total']           = $result['total'];
+        $this->response['count']           = $result['count'];
+        $this->response['total_formatted'] = format_price(\FriendsOfREDAXO\Simpleshop\Session::getTotal());
     }
 
     private function api__cart_addgiftcard()
@@ -83,6 +88,7 @@ class rex_api_simpleshop_api extends rex_api_function
     private function api__cart_addproduct()
     {
         $product_key = rex_post('product_key', 'string', null);
+        $layout      = rex_post('layout', 'string', 'cart');
         $quantity    = rex_post('quantity', 'int', 1);
         $exact_qty   = rex_post('exact_qty', 'int', 0);
         $extras      = rex_post('extras', 'array', []);
@@ -96,14 +102,16 @@ class rex_api_simpleshop_api extends rex_api_function
         else {
             \FriendsOfREDAXO\Simpleshop\Session::addProduct($product_key, $quantity, $extras);
         }
-        $this->response['cart_items']    = \FriendsOfREDAXO\Simpleshop\Session::getCartItems(true);
-        $this->response['cart_item_cnt'] = count($this->response['cart_items']);
+        $this->response['cart_items']       = \FriendsOfREDAXO\Simpleshop\Session::getCartItems(true);
+        $this->response['cart_product_cnt'] = count($this->response['cart_items']);
+        $this->response['cart_item_cnt']    = \FriendsOfREDAXO\Simpleshop\Session::getCartItemCount();
 
-        $this->api__cart_getcartcontent();
+        $this->api__cart_getcartcontent($layout);
     }
 
     private function api__cart_setproductquantity()
     {
+        $layout      = rex_post('layout', 'string', 'cart');
         $product_key = rex_post('product_key', 'string', null);
         $quantity    = rex_post('quantity', 'int');
 
@@ -112,18 +120,24 @@ class rex_api_simpleshop_api extends rex_api_function
         }
         \FriendsOfREDAXO\Simpleshop\Session::setProductData($product_key, $quantity);
 
-        $this->api__cart_getcartcontent();
+        $this->api__cart_getcartcontent($layout);
     }
 
     private function api__cart_removeproduct()
     {
+        $layout      = rex_post('layout', 'string', 'cart');
         $product_key = rex_post('product_key', 'string', null);
 
         if (!$product_key) {
             throw new ApiException("Invalid request arguments");
         }
         \FriendsOfREDAXO\Simpleshop\Session::removeProduct($product_key);
-        $this->api__cart_getcartcontent();
+
+        $this->response['cart_items']       = \FriendsOfREDAXO\Simpleshop\Session::getCartItems(true);
+        $this->response['cart_product_cnt'] = count($this->response['cart_items']);
+        $this->response['cart_item_cnt']    = \FriendsOfREDAXO\Simpleshop\Session::getCartItemCount();
+
+        $this->api__cart_getcartcontent($layout);
     }
 }
 

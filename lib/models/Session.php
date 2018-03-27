@@ -206,6 +206,18 @@ class Session extends Model
         return array_filter($products);
     }
 
+    public static function getCartItemCount()
+    {
+        $cartItems   = self::getCartItems(true);
+        $cartItemCnt = 0;
+        if ($cartItems) {
+            foreach ($cartItems as $item) {
+                $cartItemCnt += $item['quantity'];
+            }
+        }
+        return $cartItemCnt;
+    }
+
     public static function getProductKey($product_id, $feature_value_ids = [])
     {
         $feature_value_ids = !is_array($feature_value_ids) ? [$feature_value_ids] : $feature_value_ids;

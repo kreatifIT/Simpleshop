@@ -2,6 +2,38 @@ var Simpleshop = (function ($) {
     'use strict';
 
     var lang_id = $('html:first').data('lang-id');
+    var $offcanvasCart = $('.offcanvas-cart'),
+        $continueShoppingButton = $('.offcanvas-cart-continue-shopping'),
+        $offcanvasCartSuccess = $('.offcanvas-cart-success');
+
+    function addLoading($container) {
+        var css = $container.offset(),
+            $loading = $(rex.simpleshop.loadingDiv);
+
+        css.height = $container.outerHeight();
+        css.width = $container.outerWidth();
+        $('body').append($loading.addClass('show').css(css));
+
+        return $loading;
+    }
+
+    $continueShoppingButton.on('click', function () {
+        $offcanvasCart.removeClass('expanded');
+        $offcanvasCartSuccess.fadeOut();
+    });
+
+    function updateCart(response, $itemsContainer, $totalContainer, $loading) {
+        if ($itemsContainer.length !== 0) {
+            $itemsContainer.html(response.message.cart_html);
+        }
+        if ($totalContainer.length !== 0) {
+            $totalContainer.html(response.message.total_formatted);
+        }
+        if ($loading.length !== 0) {
+            $loading.remove();
+        }
+        $(document).trigger('simpleshop.updateCart', response);
+    }
 
     var result = {
         toggleAuth: function (_this, selector) {
@@ -36,15 +68,18 @@ var Simpleshop = (function ($) {
                 $container.find('.company-field').removeClass('hide');
             }
         },
-        addToCart: function (_this, vkey, amount, selector) {
+        addToCart: function (_this, vkey, amount, layout) {
+
             if (parseInt(amount) <= 0) {
-                var selector = selector || '.quantity-ctrl-button|.amount-input',
+                var selector = '.quantity-ctrl-button|.amount-input',
                     chunks = selector.split('|');
                 amount = $(_this).parents(chunks[0]).find(chunks[1]).val();
             }
 
             var $this = $(_this),
-                $loading = addLoading($this);
+                $loading = addLoading($this),
+                $itemsContainer = $offcanvasCart.find('[data-cart-item-container]'),
+                $totalContainer = $offcanvasCart.find('[data-cart-item-total]');
 
             $.ajax({
                 url: rex.simpleshop.ajax_url,
@@ -54,22 +89,23 @@ var Simpleshop = (function ($) {
                     'rex-api-call': 'simpleshop_api',
                     'lang': lang_id,
                     'product_key': vkey,
-                    'quantity': parseInt(amount)
+                    'quantity': parseInt(amount),
+                    'layout': layout
                 }
             }).done(function (resp) {
-                console.log('Done');
-                $loading.remove();
-                $(document).trigger('simpleshop.addedToCart', resp, _this, selector);
-                $('.offcanvas-cart').addClass('expanded');
+                updateCart(resp, $itemsContainer, $totalContainer, $loading);
+                $offcanvasCart.addClass('expanded');
+                $offcanvasCartSuccess.fadeIn();
             });
         },
-        removeCartItem: function (_this, vkey, rowSelector, containerSelector) {
+        removeCartItem: function (_this, vkey, layout) {
             var $this = $(_this);
-            var $row = $this.parents(rowSelector || '.cart-item'),
-                $container = $row.parents(containerSelector || '.cart-container');
+            var $item = $this.parents('[data-cart-item]'),
+                $itemsContainer = $item.parents('[data-cart-item-container]'),
+                $totalContainer = $offcanvasCart.find('[data-cart-item-total]');
 
-            if ($container.length !== 0) {
-                var $loading = addLoading($container);
+            if ($itemsContainer.length !== 0) {
+                var $loading = addLoading($itemsContainer);
             }
 
             $.ajax({
@@ -78,36 +114,12 @@ var Simpleshop = (function ($) {
                 data: {
                     'controller': 'Cart.removeProduct',
                     'rex-api-call': 'simpleshop_api',
-                    'product_key': vkey
+                    'product_key': vkey,
+                    'layout': layout
                 }
             }).done(function (resp) {
-                if ($container.length !== 0) {
-                    $container.html(resp.message.cart_html);
-                    $loading.remove();
-                }
-            });
-        },
-        removeOffcanvasCartItem: function (_this, vkey, itemSelector, containerSelector) {
-            var $this = $(_this);
-            var $row = $this.parents(itemSelector || '.cart-item'),
-                $container = $row.parents(containerSelector || '.cart-container');
-
-            if ($container.length !== 0) {
-                var $loading = addLoading($container);
-            }
-            $.ajax({
-                url: rex.simpleshop.ajax_url,
-                method: 'POST',
-                data: {
-                    'controller': 'Cart.removeProduct',
-                    'rex-api-call': 'simpleshop_api',
-                    'product_key': vkey
-                }
-            }).done(function (resp) {
-                if ($container.length !== 0) {
-                    $container.html(resp.message.cart_html);
-                    $loading.remove();
-                }
+                updateCart(resp, $itemsContainer, $totalContainer, $loading);
+                $offcanvasCartSuccess.fadeOut();
             });
         },
         changeCartAmount: function (_this, vkey, _max, rowSelector) {
@@ -208,17 +220,6 @@ var Simpleshop = (function ($) {
     $('.offcanvas-cart-continue-shopping').on('click', function () {
         $(this).parent().removeClass('expanded');
     });
-
-    function addLoading($container) {
-        var css = $container.offset(),
-            $loading = $(rex.simpleshop.loadingDiv);
-
-        css.height = $container.outerHeight();
-        css.width = $container.outerWidth();
-        $('body').append($loading.addClass('show').css(css));
-
-        return $loading;
-    }
 
     $(window).on('load', function (e) {
         var $ctype = $('select[name=ctype]');
