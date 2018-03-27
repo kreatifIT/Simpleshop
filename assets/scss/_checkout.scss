@@ -2,7 +2,7 @@
     position: relative;
     border-radius: $global-radius;
     background: $light-gray;
-    background: linear-gradient(to bottom, #fefefe 0%, #e4e5e6 100%);
+    background: linear-gradient(to bottom, $white 0%, $light-gray 100%);
     border: 1px solid $medium-gray;
     padding: rem-calc(40);
     text-align: center;
@@ -36,6 +36,9 @@
     }
     &:hover, &.selected {
         background: $secondary-color;
+    }
+    &.selected {
+        cursor: default;
     }
 }
 
@@ -148,22 +151,6 @@
         }
     }
 
-    .subtotal {
-
-    }
-
-    .shipping {
-
-    }
-
-    .promotions {
-
-    }
-
-    .taxes {
-
-    }
-
     .total {
         margin-top: 1em;
         font-size: rem-calc(18);
@@ -177,5 +164,11 @@
 .checkout-summary-items {
     .cart {
         border-bottom: 1px solid $light-gray;
+    }
+}
+
+.checkout-summary-footer {
+    .required-fields-hint {
+        font-size: rem-calc(14);
     }
 }

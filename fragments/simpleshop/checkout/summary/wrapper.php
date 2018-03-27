@@ -121,24 +121,25 @@ $shipping   = $Order->getValue('shipping');
         $this->subfragment('simpleshop/checkout/summary/conclusion.php');
         ?>
 
-        <div class="summary-footer">
+        <div class="checkout-summary-footer">
             <form action="" method="post">
                 <!-- AGB -->
                 <div class="terms-of-service row column text-right">
                     <div class="custom-checkbox align-right margin-small-bottom">
                         <label>
-                            *&nbsp;###label.tos###
+                            *&nbsp;###simpleshop.accept_tos###
                             <input name="tos_accepted" value="1" type="checkbox"/>
                             <span class="checkbox"></span>
                         </label>
                     </div>
-                    <div class="custom-checkbox align-right margin-bottom">
+                    <div class="custom-checkbox align-right margin-small-bottom">
                         <label>
                             *&nbsp;###simpleshop.cancellation_terms###
                             <input name="rma_accepted" value="1" type="checkbox"/>
                             <span class="checkbox"></span>
                         </label>
                     </div>
+                    <span class="required-fields-hint">* ###label.are_required_fields###</span>
                 </div>
 
                 <div class="row column margin-top margin-large-bottom">
