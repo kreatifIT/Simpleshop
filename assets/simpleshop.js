@@ -36,15 +36,18 @@ var Simpleshop = (function ($) {
                 $container.find('.company-field').removeClass('hide');
             }
         },
-        addToCart: function (_this, vkey, amount, selector) {
+        addToCart: function (_this, vkey, amount, layout) {
+
             if (parseInt(amount) <= 0) {
-                var selector = selector || '.quantity-ctrl-button|.amount-input',
+                var selector = '.quantity-ctrl-button|.amount-input',
                     chunks = selector.split('|');
                 amount = $(_this).parents(chunks[0]).find(chunks[1]).val();
             }
 
             var $this = $(_this),
-                $loading = addLoading($this);
+                $loading = addLoading($this),
+                $offcanvasCart = $('.offcanvas-cart'),
+                $container = $offcanvasCart.find('[data-cart-item-container]');
 
             $.ajax({
                 url: rex.simpleshop.ajax_url,
@@ -54,19 +57,22 @@ var Simpleshop = (function ($) {
                     'rex-api-call': 'simpleshop_api',
                     'lang': lang_id,
                     'product_key': vkey,
-                    'quantity': parseInt(amount)
+                    'quantity': parseInt(amount),
+                    'layout': layout
                 }
             }).done(function (resp) {
-                console.log('Done');
+                if ($container.length !== 0) {
+                    $container.html(resp.message.cart_html);
+                }
                 $loading.remove();
                 $(document).trigger('simpleshop.addedToCart', resp, _this, selector);
                 $('.offcanvas-cart').addClass('expanded');
             });
         },
-        removeCartItem: function (_this, vkey, rowSelector, containerSelector) {
+        removeCartItem: function (_this, vkey, layout) {
             var $this = $(_this);
-            var $row = $this.parents(rowSelector || '.cart-item'),
-                $container = $row.parents(containerSelector || '.cart-container');
+            var $item = $this.parents('[data-cart-item]'),
+                $container = $item.parents('[data-cart-item-container]');
 
             if ($container.length !== 0) {
                 var $loading = addLoading($container);
@@ -78,32 +84,11 @@ var Simpleshop = (function ($) {
                 data: {
                     'controller': 'Cart.removeProduct',
                     'rex-api-call': 'simpleshop_api',
-                    'product_key': vkey
+                    'product_key': vkey,
+                    'layout': layout
                 }
             }).done(function (resp) {
-                if ($container.length !== 0) {
-                    $container.html(resp.message.cart_html);
-                    $loading.remove();
-                }
-            });
-        },
-        removeOffcanvasCartItem: function (_this, vkey, itemSelector, containerSelector) {
-            var $this = $(_this);
-            var $row = $this.parents(itemSelector || '.cart-item'),
-                $container = $row.parents(containerSelector || '.cart-container');
-
-            if ($container.length !== 0) {
-                var $loading = addLoading($container);
-            }
-            $.ajax({
-                url: rex.simpleshop.ajax_url,
-                method: 'POST',
-                data: {
-                    'controller': 'Cart.removeProduct',
-                    'rex-api-call': 'simpleshop_api',
-                    'product_key': vkey
-                }
-            }).done(function (resp) {
+                console.log(resp);
                 if ($container.length !== 0) {
                     $container.html(resp.message.cart_html);
                     $loading.remove();

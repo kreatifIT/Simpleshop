@@ -39,7 +39,7 @@ if ($is_giftcard) {
 }
 
 ?>
-<tr class="cart-item" <?= $styles['tr'] ?>>
+<tr class="cart-item" <?= $styles['tr'] ?> data-cart-item="">
     <?php if ($config['has_image']): ?>
         <td class="cart-item-image-wrapper" <?= $styles['td'] ?>>
             <a href="<?= $product_url ?>" class="cart-item-image">

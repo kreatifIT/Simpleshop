@@ -32,7 +32,9 @@ if (count($Controller->getProducts())) {
         <span class="description">###simpleshop.add_to_cart_success###</span>
     </div>
 
-    <?= $Controller->parse($ctrlTpl) ?>
+    <div class="offcanvas-cart-items" data-cart-item-container="">
+        <?= $Controller->parse($ctrlTpl) ?>
+    </div>
 
     <div class="offcanvas-cart-prices">
         <div class="price">
