@@ -13,7 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-
 class FragmentConfig
 {
     public static $data = [
@@ -78,7 +77,6 @@ class FragmentConfig
             ],
             'email'       => [
                 'is_order_complete'         => true,
-                'use_invoicing'             => true,
                 'has_image'                 => false,
                 'has_remove_button'         => false,
                 'has_quantity_control'      => false,
@@ -104,15 +102,23 @@ class FragmentConfig
         ],
 
         'email_styles' => [
-            'body'          => 'border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%;',
-            'tr'            => 'padding:0;text-align:left;vertical-align:top;',
-            'th'            => 'Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left;',
-            'td'            => '-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border:1px solid #cacaca;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:1.6;margin:0;padding:10px;text-align:left;vertical-align:top;word-wrap:break-word;',
-            'h3'            => 'Margin:0;Margin-bottom:10px;color:inherit;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left;word-wrap:normal;',
-            'p'             => 'Margin:0;Margin-bottom:10px;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left;',
-            'code'          => 'font-family:Consolas,"Liberation Mono",Courier,monospace;background:#f9f9f9;border:1px solid #cacaca;padding:5px 8px;margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;text-align:left;',
-            'callout'       => 'Margin-bottom:16px;border-collapse:collapse;border-spacing:0;margin-bottom:16px;padding:0;text-align:left;vertical-align:top;width:100%;',
-            'callout_inner' => 'Margin:0;background:#f3f3f3;border:1px solid #cacaca;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:10px;text-align:left;width:100%;',
+            'use_mail_styles' => false,
+            'table'           => 'style="border:none;border-collapse:collapse;width:100%;"',
+            'body'            => 'style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%;"',
+            'tr'              => 'style="padding:0;text-align:left;vertical-align:top;"',
+            'th'              => 'style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left;"',
+            'td'              => 'style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:1.6;margin:0;padding:10px;text-align:left;vertical-align:top;word-wrap:break-word;"',
+            'prod-th'         => 'style="Margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.6;margin:0;padding:0;text-align:left;"',
+            'prod-tr'         => 'style="padding:0;text-align:left;vertical-align:top;"',
+            'prod-td'         => 'style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-top:1px solid #cacaca;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:1.6;margin:0;padding:10px 0;text-align:left;vertical-align:top;word-wrap:break-word;"',
+            'sum-td'          => 'style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:1.6;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word;"',
+            'sum-td-right'    => 'style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:2;margin:0;padding:0;text-align:right;vertical-align:top;word-wrap:break-word;"',
+            'h2'              => 'style="Margin:0;Margin-bottom:10px;color:inherit;font-family:Helvetica,Arial,sans-serif;font-size:18px;font-weight:600;line-height:1.6;margin:0;padding:0;text-align:left;word-wrap:normal;"',
+            'h3'              => 'style="Margin:0;Margin-bottom:10px;color:inherit;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left;word-wrap:normal;"',
+            'p'               => 'style="Margin:0;Margin-bottom:10px;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left;"',
+            'code'            => 'style="font-family:Consolas,"Liberation Mono",Courier,monospace;background:#f9f9f9;border:1px solid #cacaca;padding:5px 8px;margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;text-align:left;"',
+            'callout'         => 'style="Margin-bottom:16px;border-collapse:collapse;border-spacing:0;margin-bottom:16px;padding:0;text-align:left;vertical-align:top;width:100%;"',
+            'callout_inner'   => 'style="Margin:0;background:#f3f3f3;border:1px solid #cacaca;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:10px;text-align:left;width:100%;"',
         ],
 
 
@@ -157,6 +163,9 @@ class FragmentConfig
 
         foreach ($keys as $key) {
             if (array_key_exists($key, $result)) {
+                if ($key == 'styles' && self::$data['email_styles']['use_mail_styles']) {
+                    $key = 'email_styles';
+                }
                 $result = $result[$key];
             }
             else {

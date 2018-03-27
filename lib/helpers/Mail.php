@@ -28,6 +28,8 @@ class Mail extends \rex_mailer
         $this->fragment->setVar('base_url', \rex_yrewrite::getFullPath());
         $this->fragment->setVar('logo_path', 'resources/img/email/logo.png');
         $this->IsHTML(TRUE);
+
+        FragmentConfig::$data['email_styles']['use_mail_styles'] = true;
         return $this;
     }
 

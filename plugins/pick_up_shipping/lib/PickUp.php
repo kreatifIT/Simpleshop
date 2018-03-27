@@ -19,10 +19,11 @@ class PickUp extends ShippingAbstract
 {
     const NAME = 'simpleshop.shipping_pickup_point';
 
+    protected $hasCosts = false;
+
     public function getName()
     {
-        if ($this->name == '')
-        {
+        if ($this->name == '') {
             $this->name = Wildcard::get(self::NAME);
         }
         return parent::getName();

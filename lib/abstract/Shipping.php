@@ -23,6 +23,7 @@ abstract class ShippingAbstract extends PluginAbstract
 {
     public    $plugin_name;
     protected $name           = '';
+    protected $hasCosts       = true;
     protected $price          = 0;
     protected $tax            = 0;
     protected $tax_percentage = 0;
@@ -31,6 +32,11 @@ abstract class ShippingAbstract extends PluginAbstract
     public function getName()
     {
         return $this->name;
+    }
+
+    public function hasCosts()
+    {
+        return $this->hasCosts;
     }
 
     public function setParcels($parcels)

@@ -14,10 +14,11 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 $products = $this->getVar('products', []);
 $config   = $this->getVar('cart_table_wrapper_config', FragmentConfig::getValue('cart.table-wrapper'));
+$styles   = FragmentConfig::getValue('styles');
 $settings = \rex::getConfig('simpleshop.Settings');
 
 ?>
-<table class="cart <?= $config['class'] ?>" data-cart-item-container="">
+<table class="cart <?= $config['class'] ?>" data-cart-item-container="" <?= $styles['table'] ?>>
     <thead>
     <?= $this->subfragment('simpleshop/cart/table-head.php'); ?>
     </thead>

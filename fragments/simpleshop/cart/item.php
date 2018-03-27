@@ -16,7 +16,7 @@ use Kreatif\Resource;
 
 $product = $this->getVar('product');
 
-$Customer   = Customer::getCurrentUser();
+$Customer  = Customer::getCurrentUser();
 $isCompany = $Customer ? $Customer->isCompany() : false;
 
 $images      = $product->getArrayValue('images');
@@ -31,24 +31,25 @@ $extras      = $product->getValue('extras');
 
 $Category = $product->valueIsset('category_id') ? Category::get($product->getValue('category_id')) : null;
 
-$config = $this->getVar('cart_config', FragmentConfig::getValue('cart'));
-$styles = FragmentConfig::getValue('styles');
+$config         = $this->getVar('cart_config', FragmentConfig::getValue('cart'));
+$styles         = FragmentConfig::getValue('styles');
+$useEmailStyles = FragmentConfig::getValue('email_styles.use_mail_styles');
 
 if ($is_giftcard) {
     $config['has_quantity_control'] = false;
 }
 
 ?>
-<tr class="cart-item" <?= $styles['tr'] ?> data-cart-item="">
+<tr class="cart-item" <?= $styles['prod-tr'] ?> data-cart-item="">
     <?php if ($config['has_image']): ?>
-        <td class="cart-item-image-wrapper" <?= $styles['td'] ?>>
+        <td class="cart-item-image-wrapper" <?= $styles['prod-td'] ?>>
             <a href="<?= $product_url ?>" class="cart-item-image">
-                <?= Resource::getImgTag($picture, 'product_thumb') ?>
+                <?= Resource::getImgTag($picture, FragmentConfig::getValue('email_styles.use_mail_styles', false) ? 'email_product_thumb' : 'product_thumb') ?>
             </a>
         </td>
     <?php endif; ?>
-    <td class="cart-item-name-wrapper" <?= $styles['td'] ?>>
-        <h3 class="cart-item-name" <?= $styles['h2'] ?>>
+    <td class="cart-item-name-wrapper" <?= $styles['prod-td'] ?>>
+        <h3 class="cart-item-name" <?= $styles['h3'] ?>>
             <?= $product->getName() ?>
         </h3>
         <?php if ($Category && !$is_giftcard): ?>
@@ -67,10 +68,13 @@ if ($is_giftcard) {
             <?php endforeach; ?>
         <?php endif; ?>
     </td>
-    <td class="cart-item-price-wrapper" <?= $styles['td'] ?>>
-        <span class="hide-for-large">###label.price###: </span><strong>&euro;&nbsp;<?= format_price($price) ?></strong>
+    <td class="cart-item-price-wrapper" <?= $styles['prod-td'] ?>>
+        <?php if (!$useEmailStyles): ?>
+            <span class="hide-for-large">###label.price###: </span>
+        <?php endif; ?>
+        <strong>&euro;&nbsp;<?= format_price($price) ?></strong>
     </td>
-    <td class="cart-item-amount-wrapper" <?= $styles['td'] ?>>
+    <td class="cart-item-amount-wrapper" <?= $styles['prod-td'] ?>>
         <?php
         $fragment = new \rex_fragment();
         $fragment->setVar('cart-quantity', $quantity);
@@ -80,8 +84,11 @@ if ($is_giftcard) {
         echo $fragment->parse('simpleshop/cart/button.php');
         ?>
     </td>
-    <td class="cart-item-total-wrapper" <?= $styles['td'] ?>>
-        <span class="hide-for-large">###label.total###: </span><strong>&euro;&nbsp;<?= format_price($price * $quantity) ?></strong>
+    <td class="cart-item-total-wrapper" <?= $styles['prod-td'] ?>>
+        <?php if (!$useEmailStyles): ?>
+            <span class="hide-for-large">###label.total###: </span>
+        <?php endif; ?>
+        <strong>&euro;&nbsp;<?= format_price($price * $quantity) ?></strong>
     </td>
     <?php if ($config['has_remove_button']): ?>
         <td class="cart-item-remove-wrapper">
