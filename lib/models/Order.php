@@ -341,11 +341,11 @@ class Order extends Model
 
         // set tax values
         foreach ($this->net_prices as $tax => $net_price) {
-            $taxes[$tax] += (float) $net_price / 100 * $tax;
+            $taxes[$tax] += (float) $net_price / (100 + $tax) * $tax;
         }
         if ($this->shipping_costs) {
             $tax         = $this->shipping->getTaxPercentage();
-            $taxes[$tax] += (float) $this->shipping_costs / 100 * $tax;
+            $taxes[$tax] += (float) $this->shipping_costs / (100 + $tax) * $tax;
         }
         ksort($taxes);
 
