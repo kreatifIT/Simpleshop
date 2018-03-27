@@ -44,8 +44,8 @@ class rex_api_simpleshop_api extends rex_api_function
         $ctrlTpl  = '';
         $emptyTpl = 'simpleshop/cart/empty.php';
         if ($layout == 'offcanvas_cart') {
-            $ctrlTpl  = 'simpleshop/cart/offcanvas-list.php';
-            $emptyTpl = 'simpleshop/cart/offcanvas-empty.php';
+            $ctrlTpl  = 'simpleshop/cart/offcanvas/items.php';
+            $emptyTpl = 'simpleshop/cart/offcanvas/empty.php';
         }
         $Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute();
         $products   = $Controller->getProducts();
