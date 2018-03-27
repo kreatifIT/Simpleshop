@@ -74,6 +74,11 @@ class Customer extends Model
         foreach ($attributes as $attr => $value) {
             $_this->setValue($attr, $value);
         }
+
+        $exclFields = array_diff(FragmentConfig::getValue('yform_fields.rex_shop_customer._excludedFields'), ['created', 'updatedate', 'status']);
+
+        FragmentConfig::$data['yform_fields']['rex_shop_customer']['_excludedFields'] = $exclFields;
+
         $_this->setValue('email', $email);
         $_this->setValue('password', $password);
         $_this->setValue('status', 1);
