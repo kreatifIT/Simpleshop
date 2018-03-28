@@ -11,17 +11,19 @@
     .cart-item {
         border-top: 1px solid $light-gray;
         position: relative;
-        margin-bottom: rem-calc(40);
+        margin-bottom: rem-calc(30);
         @include breakpoint(large) {
             margin-bottom: 0;
         }
         td {
-            padding: rem-calc(15 0);
+            padding: rem-calc(0 0 15 0);
             @include breakpoint(large) {
                 padding: rem-calc(30 30 30 0);
             }
             &.cart-item-image-wrapper {
+                padding: rem-calc(15 0);
                 @include breakpoint(large) {
+                    padding: rem-calc(30 30 30 0);
                     width: 15%;
                 }
             }
@@ -53,6 +55,7 @@
                 position: absolute;
                 right: 0;
                 bottom: 0;
+                line-height: 1;
                 @include breakpoint(large) {
                     position: static;
                     right: auto;
@@ -68,7 +71,10 @@
             display: block;
             position: relative;
             border: 1px solid #ddd;
-            max-width: rem-calc(320);
+            max-width: rem-calc(180);
+            @include breakpoint(medium) {
+                max-width: rem-calc(320);
+            }
         }
 
         .cart-item-name {
@@ -94,6 +100,7 @@
             color: $white;
             cursor: pointer;
             outline: none;
+            vertical-align: top;
             &:before {
                 content: 'X';
                 font-size: rem-calc(14);
