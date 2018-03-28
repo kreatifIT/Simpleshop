@@ -414,12 +414,11 @@ class CheckoutController extends Controller
     {
         // finally save order - DONE / COMPLETE
         $this->Order->completeOrder();
-        //        $this->sendMail($this->params['debug']);
-        $this->sendMail(true);
+        $this->sendMail($this->params['debug']);
 
         // CLEAR THE SESSION
-        //        Session::clearCheckout();
-        //        Session::clearCart();
+        Session::clearCheckout();
+        Session::clearCart();
 
         $this->fragment_path[] = 'simpleshop/checkout/complete.php';
     }
