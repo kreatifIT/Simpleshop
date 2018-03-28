@@ -19,7 +19,7 @@ $tax            = $this->getVar('tax', null);
 ?>
 <table class="<?= $styles['css'] ?>" style="<?= $styles['table'] ?>">
 
-    <?php if ($initial_total != $total): ?>
+    <?php if ($initial_total > 0 && $initial_total != $total): ?>
         <tr <?= $styles['tr'] ? 'style="' . $styles['tr'] . '"' : '' ?>>
             <td <?= $styles['td'] ? 'style="' . $styles['td'] . '"' : '' ?>>###label.subtotal###</td>
             <td class="text-right" <?= $styles['td'] ? 'style="text-align:right;' . $styles['td'] . '"' : '' ?>>

@@ -36,6 +36,24 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                     header('Location: ' . html_entity_decode(rex_url::currentBackendPage($_GET)));
                     exit;
 
+                case 'generate_creditnote':
+                    $CreditNote = \FriendsOfREDAXO\Simpleshop\Order::create();
+
+                    $CreditNote->setValue('customer_id', $Order->getValue('customer_id'));
+                    $CreditNote->setValue('status', 'CN');
+                    $CreditNote->setValue('initial', $Order->getValue('total'));
+                    $CreditNote->setValue('address_1', $Order->getValue('address_1'));
+                    $CreditNote->setValue('ip_address', rex_server('REMOTE_ADDR', 'string', 'notset'));
+                    $CreditNote->setValue('total', $Order->getValue('total') * -1);
+                    $CreditNote->setValue('ref_order_id', $Order->getId());
+                    $CreditNote->setFinalize(true);
+                    $CreditNote->save();
+
+                    unset($_GET['ss-action']);
+                    $_GET['ss-msg'] = $action;
+                    header('Location: ' . html_entity_decode(rex_url::currentBackendPage($_GET)));
+                    exit;
+
                 case 'recalculate_sums':
                     $products       = [];
                     $order_products = \FriendsOfREDAXO\Simpleshop\OrderProduct::getAll(true, ['filter' => [['order_id', $Order->getId()]], 'orderBy' => 'm.id']);
@@ -71,12 +89,44 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                             </a>
                         ';
                     }
-                    $output[]                                    = '
+                    $output[] = '
                         <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'recalculate_sums'])) . '" class="btn btn-default">
                             <i class="fa fa-calculator"></i>&nbsp;
                             ' . rex_i18n::msg('label.recalculate_sums') . '
                         </a>
                     ';
+
+                    if ($Order->getValue('status') == 'CA') {
+                        $CreditNote = \FriendsOfREDAXO\Simpleshop\Order::getOne(false, [
+                            'filter'  => [['ref_order_id', $Order->getId()]],
+                            'orderBy' => 'id',
+                        ]);
+
+                        if ($CreditNote) {
+                            $output[] = '
+                                <a href="' . rex_url::currentBackendPage(['table_name' => 'rex_shop_order', 'data_id' => $CreditNote->getId(), 'func' => 'edit']) . '" class="btn btn-primary">
+                                    <i class="fa fa-money"></i>&nbsp;
+                                    ' . rex_i18n::msg('action.goto_creditnote') . '
+                                </a>
+                            ';
+                        }
+                        else {
+                            $output[] = '
+                                <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'generate_creditnote'])) . '" class="btn btn-default">
+                                    <i class="fa fa-money"></i>&nbsp;
+                                    ' . rex_i18n::msg('label.generate_creditnote') . '
+                                </a>
+                            ';
+                        }
+                    }
+                    else if ($Order->valueIsset('ref_order_id')) {
+                        $output[] = '
+                                <a href="' . rex_url::currentBackendPage(['table_name' => 'rex_shop_order', 'data_id' => $Order->getValue('ref_order_id'), 'func' => 'edit']) . '" class="btn btn-primary">
+                                    <i class="fa fa-file-text-o"></i>&nbsp;
+                                    ' . rex_i18n::msg('action.goto_order') . '
+                                </a>
+                            ';
+                    }
                     $this->params['form_output'][$this->getId()] = '
                         <div class="row nested-panel">
                             <div class="form-group col-xs-12" id="' . $this->getHTMLId() . '">

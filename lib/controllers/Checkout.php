@@ -15,6 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 
 use Sprog\Wildcard;
+use Whoops\Exception\ErrorException;
 
 class CheckoutController extends Controller
 {
@@ -103,9 +104,18 @@ class CheckoutController extends Controller
         $Mail     = new \FriendsOfREDAXO\Simpleshop\Mail();
         $Settings = \rex::getConfig('simpleshop.Settings');
         $Customer = $this->Order->getInvoiceAddress();
-
-        $Mail->Subject = '###shop.email.order_complete###';
-        $Mail->setFragmentPath('order/complete');
+        
+        if ($this->Order->valueIsset('ref_order_id')) {
+            if ($this->Order->getValue('status') != 'CN') {
+                throw new OrderException('Credit Note status is not correct');
+            }
+            $Mail->Subject = '###shop.email.credit_note###';
+            $Mail->setFragmentPath('order/credit_note');
+        }
+        else {
+            $Mail->Subject = '###shop.email.order_complete###';
+            $Mail->setFragmentPath('order/complete');
+        }
 
         // add vars
         $Mail->setVar('Order', $this->Order);

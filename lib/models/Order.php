@@ -98,6 +98,11 @@ class Order extends Model
         ]));
     }
 
+    public function setFinalize($value)
+    {
+        self::$_finalizeOrder = $value;
+    }
+
     public function save($simple_save = true)
     {
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['finalize_order' => self::$_finalizeOrder, 'simple_save' => $simple_save]));
