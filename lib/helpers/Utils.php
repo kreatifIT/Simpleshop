@@ -59,20 +59,4 @@ class Utils
             $Mail->send();
         }
     }
-
-    public static function ext_register_tables($params = null)
-    {
-        $Addon          = \rex_addon::get('simpleshop');
-        $sql            = \rex_sql::factory();
-        $_table_classes = $Addon->getProperty('table_classes');
-        $db_tables      = $sql->getArray("SHOW TABLES", [], \PDO::FETCH_COLUMN);
-        $table_classes  = [];
-
-        foreach ($_table_classes as $table => $class) {
-            if (in_array($table, $db_tables)) {
-                $table_classes[$table] = $class;
-            }
-        }
-        $Addon->setConfig('table_classes', $table_classes);
-    }
 }

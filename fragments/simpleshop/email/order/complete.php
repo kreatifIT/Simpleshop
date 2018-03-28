@@ -15,7 +15,6 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 $Order         = $this->getVar('Order');
 $add_info      = $this->getVar('additional_info');
-$primary_color = $this->getVar('primary_color');
 $Payment       = $Order->getValue('payment');
 $Shipping      = $Order->getValue('shipping');
 $products      = $Order->getProducts(false);
@@ -27,7 +26,6 @@ FragmentConfig::$data['cart']['button']['has_quantity_control'] = false;
 FragmentConfig::$data['cart']['table-wrapper']['has_go_ahead'] = false;
 
 $styles = FragmentConfig::getValue('email_styles');
-$config = FragmentConfig::getValue('checkout.email');
 
 ?>
 <div class="order-complete-email">
@@ -115,11 +113,8 @@ $config = FragmentConfig::getValue('checkout.email');
     //        'total' => 'font-size:18px;font-weight:700;',
     //    ]);
 
-    $this->setVar('tax', $Order->getTaxTotal());
-    $this->setVar('taxes', $Order->getValue('taxes'));
-    $this->setVar('total', $Order->getValue('total'));
-    $this->setVar('initial_total', $Order->getValue('initial_total'));
-    $this->subfragment('simpleshop/cart/summary.php');
+    $this->setVar('Order', $Order);
+    $this->subfragment('simpleshop/email/order/conclusion.php');
 
     ?>
 </div>

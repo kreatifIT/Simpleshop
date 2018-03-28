@@ -36,8 +36,7 @@ class DefaultShipping extends ShippingAbstract
             $Country = $Address ? Country::get($Address->getValue('country')) : null;
 
             if ($Country && $Country->valueIsset('shipping_costs')) {
-                $this->price = $Country->getValue('shipping_costs') / (100 + $this->tax_percentage) * 100;
-                $this->tax   = $Country->getValue('shipping_costs') / (100 + $this->tax_percentage) * $this->tax_percentage;
+                $this->price = $Country->getValue('shipping_costs');
             }
         }
     }
@@ -52,11 +51,5 @@ class DefaultShipping extends ShippingAbstract
     {
         $this->calculatePrice($Order);
         return parent::getNetPrice($order, $products);
-    }
-
-    public function getTax()
-    {
-        $this->calculatePrice($Order);
-        return parent::getTax();
     }
 }

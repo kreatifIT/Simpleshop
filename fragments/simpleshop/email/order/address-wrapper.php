@@ -1,5 +1,6 @@
 <?php
 
+$Order    = $this->getVar('Order');
 $config   = $this->getVar('config', []);
 $shipping = $this->getVar('shipping_address', null);
 $invoice  = $this->getVar('invoice_address', null);
@@ -19,6 +20,7 @@ $styles   = \FriendsOfREDAXO\Simpleshop\FragmentConfig::getValue('styles');
                                 <th <?= $styles['th'] ?>>
                                     <?php
                                     $this->setVar('address', $invoice);
+                                    $this->setVar('customer', $Order->getValue('customer_data'));
                                     $this->setVar('title', '###label.invoice_address###');
                                     $this->subfragment('simpleshop/checkout/summary/address_item.php');
                                     ?>
@@ -34,7 +36,7 @@ $styles   = \FriendsOfREDAXO\Simpleshop\FragmentConfig::getValue('styles');
                                     <th <?= $styles['th'] ?>>
                                         <?php
                                         $this->setVar('address', $shipping);
-                                        $this->setVar('type', 'shipping');
+                                        $this->setVar('customer', null);
                                         $this->setVar('title', '###label.shipping_address###');
                                         $this->subfragment('simpleshop/checkout/summary/address_item.php');
                                         ?>

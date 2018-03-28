@@ -78,21 +78,6 @@ class Order extends Model
         ]));
     }
 
-    public function getTaxTotal()
-    {
-        return array_sum($this->getValue('taxes', false, [])) ?: array_sum($this->getValue('tax'));
-    }
-
-    public function getNetPrice()
-    {
-        return $this->getValue('initial_total', false, 0);
-    }
-
-    public function getGrossPrice()
-    {
-        return $this->getValue('total', false, 0);
-    }
-
     public function completeOrder()
     {
         self::$_finalizeOrder = true;
@@ -106,6 +91,8 @@ class Order extends Model
 
     public function save($simple_save = true)
     {
+        Utils::setCalcLocale();
+
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['finalize_order' => self::$_finalizeOrder, 'simple_save' => $simple_save]));
 
         $sql      = \rex_sql::factory();
@@ -205,6 +192,7 @@ class Order extends Model
                 $OrderProduct->save(true);
             }
         }
+        Utils::resetLocale();
         return $result;
     }
 
@@ -302,8 +290,6 @@ class Order extends Model
 
     private function calculatePrices($promotions, $net_prices)
     {
-        Utils::setCalcLocale();
-
         $taxes       = [];
         $errors      = [];
         $_promotions = [];
@@ -357,17 +343,19 @@ class Order extends Model
 
         $this->setValue('brut_prices', $brut_prices);
 
+
         if ($this->getValue('shipping_costs') > 0 && !$this->isTaxFree()) {
             $tax = $this->getValue('shipping')->getTaxPercentage();
-            $this->setValue('shipping_costs', (float) $this->getValue('shipping_costs') / (100 + $tax) * 100);
-            $taxes[$tax] += $this->getValue('shipping_costs') * $tax / 100;
+
+            if ($tax > 0) {
+                $this->setValue('shipping_costs', (float) $this->getValue('shipping_costs') / (100 + $tax) * 100);
+                $taxes[$tax] += $this->getValue('shipping')->getTax();
+            }
         }
         ksort($taxes);
 
         $this->setValue('taxes', $taxes);
         $this->setValue('total', $this->getValue('shipping_costs') + array_sum($brut_prices) + array_sum($taxes));
-
-        Utils::resetLocale();
 
         return [$errors, $_promotions];
     }

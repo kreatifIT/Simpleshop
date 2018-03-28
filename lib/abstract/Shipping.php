@@ -25,7 +25,6 @@ abstract class ShippingAbstract extends PluginAbstract
     protected $name           = '';
     protected $hasCosts       = true;
     protected $price          = 0;
-    protected $tax            = 0;
     protected $tax_percentage = 0;
     protected $parcels        = [];
 
@@ -54,17 +53,17 @@ abstract class ShippingAbstract extends PluginAbstract
 
     public function getPrice($order, $products = null)
     {
-        return $this->price;
+        return $this->price - $this->getTax();
     }
 
     public function getNetPrice($order, $products = null)
     {
-        return $this->price + $this->tax;
+        return $this->price;
     }
 
     public function getTax()
     {
-        return $this->tax;
+        return $this->price / (100 + $this->tax_percentage) * $this->tax_percentage;
     }
 
     public function getTaxPercentage()

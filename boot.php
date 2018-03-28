@@ -17,33 +17,23 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$this->setProperty('table_classes', [
-    Category::TABLE        => Category::class,
-    Coupon::TABLE          => Coupon::class,
-    Country::TABLE         => Country::class,
-    Customer::TABLE        => Customer::class,
-    CustomerAddress::TABLE => CustomerAddress::class,
-    DiscountGroup::TABLE   => DiscountGroup::class,
-    Feature::TABLE         => Feature::class,
-    FeatureValue::TABLE    => FeatureValue::class,
-    Order::TABLE           => Order::class,
-    OrderProduct::TABLE    => OrderProduct::class,
-    Package::TABLE         => Package::class,
-    PackageCategory::TABLE => PackageCategory::class,
-    Product::TABLE         => Product::class,
-    Session::TABLE         => Session::class,
-    Tax::TABLE             => Tax::class,
-    Variant::TABLE         => Variant::class,
-]);
-$table_classes = $this->getConfig('table_classes');
+\rex_yform_manager_dataset::setModelClass(Category::TABLE, Category::class);
+\rex_yform_manager_dataset::setModelClass(Coupon::TABLE, Coupon::class);
+\rex_yform_manager_dataset::setModelClass(Country::TABLE, Country::class);
+\rex_yform_manager_dataset::setModelClass(Customer::TABLE, Customer::class);
+\rex_yform_manager_dataset::setModelClass(CustomerAddress::TABLE, CustomerAddress::class);
+\rex_yform_manager_dataset::setModelClass(DiscountGroup::TABLE, DiscountGroup::class);
+\rex_yform_manager_dataset::setModelClass(Feature::TABLE, Feature::class);
+\rex_yform_manager_dataset::setModelClass(FeatureValue::TABLE, FeatureValue::class);
+\rex_yform_manager_dataset::setModelClass(Order::TABLE, Order::class);
+\rex_yform_manager_dataset::setModelClass(OrderProduct::TABLE, OrderProduct::class);
+\rex_yform_manager_dataset::setModelClass(Package::TABLE, Package::class);
+\rex_yform_manager_dataset::setModelClass(PackageCategory::TABLE, PackageCategory::class);
+\rex_yform_manager_dataset::setModelClass(Product::TABLE, Product::class);
+\rex_yform_manager_dataset::setModelClass(Session::TABLE, Session::class);
+\rex_yform_manager_dataset::setModelClass(Tax::TABLE, Tax::class);
+\rex_yform_manager_dataset::setModelClass(Variant::TABLE, Variant::class);
 
-if (!$table_classes) {
-    Utils::ext_register_tables();
-    $table_classes = $this->getConfig('table_classes');
-}
-foreach ($table_classes as $table => $class) {
-    \rex_yform_manager_dataset::setModelClass($table, $class);
-}
 
 $include_files = glob($this->getPath('functions/*.inc.php'));
 $include_files = array_merge($include_files, glob($this->getPath('inc/*.inc.php')));
