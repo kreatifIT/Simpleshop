@@ -24,10 +24,15 @@ if (count($Controller->getProducts())) {
     $ctrlTpl = 'simpleshop/cart/offcanvas/items.php';
 }
 
+
+
 ?>
 <div class="offcanvas-cart">
     <div class="offcanvas-cart-inner">
-        <button class="offcanvas-cart-continue-shopping" type="button">###label.continue_shopping###</button>
+        <button class="offcanvas-cart-continue-shopping" type="button">
+            <?= file_get_contents(\rex_path::addonAssets('simpleshop', 'img/back.svg')); ?>
+            ###label.continue_shopping###
+        </button>
         <div class="offcanvas-cart-success">
             <span class="check">✔</span>
             <span class="description">###simpleshop.add_to_cart_success###</span>
