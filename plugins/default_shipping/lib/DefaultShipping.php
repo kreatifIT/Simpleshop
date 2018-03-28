@@ -19,12 +19,44 @@ class DefaultShipping extends ShippingAbstract
 {
     const NAME = 'simpleshop.shipping_default';
 
+    protected $tax_percentage = 22;
+
     public function getName()
     {
-        if ($this->name == '')
-        {
+        if ($this->name == '') {
             $this->name = Wildcard::get(self::NAME);
         }
         return parent::getName();
+    }
+
+    protected function calculatePrice($Order)
+    {
+        if ($this->price == 0) {
+            $Address = $Order->getShippingAddress();
+            $Country = $Address ? Country::get($Address->getValue('country')) : null;
+
+            if ($Country && $Country->valueIsset('shipping_costs')) {
+                $this->price = $Country->getValue('shipping_costs') / (100 + $this->tax_percentage) * 100;
+                $this->tax   = $Country->getValue('shipping_costs') / (100 + $this->tax_percentage) * $this->tax_percentage;
+            }
+        }
+    }
+
+    public function getPrice($Order, $products = null)
+    {
+        $this->calculatePrice($Order);
+        return parent::getPrice($Order, $products);
+    }
+
+    public function getNetPrice($Order, $products = null)
+    {
+        $this->calculatePrice($Order);
+        return parent::getNetPrice($order, $products);
+    }
+
+    public function getTax()
+    {
+        $this->calculatePrice($Order);
+        return parent::getTax();
     }
 }

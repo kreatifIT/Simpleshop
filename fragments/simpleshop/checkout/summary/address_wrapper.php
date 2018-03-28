@@ -22,13 +22,13 @@ $shipping_addr = $Order->getShippingAddress();
     <div class="row medium-up-2 ">
         <?php
         if ($shipping_addr) {
-            $this->setVar('address', $shipping_addr);
+            $this->setVar('address', $invoice_addr);
             $this->setVar('customer', $Order->getValue('customer_data'));
             $this->setVar('title', '###label.invoice_address###');
             $this->subfragment('simpleshop/checkout/summary/address_item.php');
         }
         if ($invoice_addr) {
-            $this->setVar('address', $invoice_addr);
+            $this->setVar('address', $shipping_addr);
             $this->setVar('customer', null);
             $this->setVar('title', '###label.shipping_address###');
             $this->subfragment('simpleshop/checkout/summary/address_item.php');

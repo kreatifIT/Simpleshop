@@ -226,13 +226,12 @@ class Session extends Model
 
     public static function getTotal()
     {
-        $products  = self::_getCartItems($raw, $throwErrors);
-        $Customer  = Customer::getCurrentUser();
-        $isCompany = $Customer ? $Customer->isCompany() : false;
-        $total     = 0;
+        $total    = 0;
+        $products = self::_getCartItems();
+
         foreach ($products as $product) {
             $cart_quantity = $product->getValue('cart_quantity');
-            $price         = $product->getPrice(!$isCompany);
+            $price         = $product->getPrice();
             $total         += ($cart_quantity * $price);
         }
         return $total;

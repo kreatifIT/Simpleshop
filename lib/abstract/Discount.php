@@ -22,7 +22,6 @@ abstract class Discount extends Model
         }
         if ($this->getValue('free_shipping')) {
             $Order->setValue('shipping_costs', 0);
-            $Order->setValue('initial_shipping_costs', 0);
         }
         else if ($this->getValue('discount_value') > 0 || $this->getValue('discount_percent') > 0) {
             $net_prices = $Order->getValue('net_prices');

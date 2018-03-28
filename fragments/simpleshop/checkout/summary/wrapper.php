@@ -100,6 +100,7 @@ $shipping   = $Order->getValue('shipping');
         <div class="checkout-summary-items row column margin-bottom">
             <?php
             $Controller = CartController::execute([
+                'use_tax_prices'            => !$Order->isTaxFree(),
                 'cart_config'               => array_merge(FragmentConfig::getValue('cart'), [
                     'has_remove_button' => false,
                 ]),

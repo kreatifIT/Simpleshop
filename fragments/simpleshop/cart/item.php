@@ -14,14 +14,12 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Kreatif\Resource;
 
-$product = $this->getVar('product');
-
-$Customer  = Customer::getCurrentUser();
-$isCompany = $Customer ? $Customer->isCompany() : false;
+$product      = $this->getVar('product');
+$useTaxPrices = $this->getVar('use_tax_prices', true);
 
 $images      = $product->getArrayValue('images');
 $picture     = array_shift($images);
-$price       = $product->getPrice(!$isCompany);
+$price       = $product->getPrice($useTaxPrices);
 $features    = $product->getValue('features');
 $quantity    = $product->getValue('cart_quantity');
 $key         = $product->getValue('key');

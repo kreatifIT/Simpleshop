@@ -31,12 +31,20 @@ class Order extends Model
 
     public function getShippingAddress()
     {
-        return $this->valueIsset('shipping_address') ? $this->getValue('shipping_address') : $this->getValue('invoice_address');
+        return $this->getValue('shipping_address') == '' ? $this->getValue('invoice_address') : $this->getValue('shipping_address');
     }
 
     public function getInvoiceAddress()
     {
         return $this->getValue('invoice_address');
+    }
+
+    public function isTaxFree()
+    {
+        $Address = $this->getInvoiceAddress();
+        $Country = Country::get($Address->getValue('country'));
+
+        return $Country && !$Country->getValue('b2b_has_tax');
     }
 
     public function getProducts($raw = true)
@@ -204,13 +212,12 @@ class Order extends Model
     {
         Utils::setCalcLocale();
 
-        $Customer             = $this->getValue('customer_data');
-        $net_prices           = [];
-        $this->quantity       = 0;
-        $this->discount       = 0;
-        $this->shipping_costs = 0;
-        $this->initial_total  = 0;
-        $manual_discount      = $this->getValue('manual_discount', false, 0);
+        $Customer            = $this->getValue('customer_data');
+        $net_prices          = [];
+        $this->quantity      = 0;
+        $this->discount      = 0;
+        $this->initial_total = 0;
+        $manual_discount     = $this->getValue('manual_discount', false, 0);
 
         // calculate total
         foreach ($products as $product) {
@@ -218,18 +225,20 @@ class Order extends Model
             $tax_perc = Tax::get($product->getValue('tax'))->getValue('tax');
 
             $net_prices[$tax_perc] += (float) $product->getPrice() * $quantity;
-            $this->initial_total   += (float) $product->getPrice(!$Customer->isCompany()) * $quantity;
+            $this->initial_total   += (float) $product->getPrice(!$this->isTaxFree()) * $quantity;
             $this->quantity        += $quantity;
         }
         // get shipping costs
-        try {
-            if ($this->shipping) {
-                $this->setValue('shipping_costs', (float) $this->shipping->getNetPrice($this, $products));
-                $this->setValue('initial_shipping_costs', (float) $this->shipping->getPrice($this, $products));
+        if ($this->getValue('shipping')) {
+            try {
+                $this->setValue('shipping_costs', (float) $this->getValue('shipping')->getNetPrice($this, $products));
+            }
+            catch (\Exception $ex) {
+                throw new OrderException($ex->getLabelByCode());
             }
         }
-        catch (\Exception $ex) {
-            throw new OrderException($ex->getLabelByCode());
+        else {
+            $this->setValue('shipping_costs', 0);
         }
         ksort($net_prices);
 
@@ -298,6 +307,7 @@ class Order extends Model
         $taxes       = [];
         $errors      = [];
         $_promotions = [];
+        $brut_prices = [];
         $Settings    = \rex::getConfig('simpleshop.Settings');
 
         foreach ($promotions as $name => $_promotion) {
@@ -340,23 +350,22 @@ class Order extends Model
         $this->setValue('subtotal', array_sum($net_prices));
 
         // set tax values
-        foreach ($this->net_prices as $tax => $net_price) {
-            $taxes[$tax] += (float) $net_price / (100 + $tax) * $tax;
+        foreach ($net_prices as $tax => $net_price) {
+            $brut_prices[$tax] += (float) $net_price / (100 + $tax) * 100;
+            $taxes[$tax]       += (float) $net_price / (100 + $tax) * $tax;
         }
-        if ($this->shipping_costs) {
-            $tax         = $this->shipping->getTaxPercentage();
-            $taxes[$tax] += (float) $this->shipping_costs / (100 + $tax) * $tax;
+
+        $this->setValue('brut_prices', $brut_prices);
+
+        if ($this->getValue('shipping_costs') > 0 && !$this->isTaxFree()) {
+            $tax = $this->getValue('shipping')->getTaxPercentage();
+            $this->setValue('shipping_costs', (float) $this->getValue('shipping_costs') / (100 + $tax) * 100);
+            $taxes[$tax] += $this->getValue('shipping_costs') * $tax / 100;
         }
         ksort($taxes);
 
         $this->setValue('taxes', $taxes);
-
-        if ($Settings['brutto_prices']) {
-            $this->setValue('total', $this->shipping_costs + array_sum($this->net_prices));
-        }
-        else {
-            $this->setValue('total', $this->shipping_costs + array_sum($this->net_prices) + array_sum($taxes));
-        }
+        $this->setValue('total', $this->getValue('shipping_costs') + array_sum($brut_prices) + array_sum($taxes));
 
         Utils::resetLocale();
 

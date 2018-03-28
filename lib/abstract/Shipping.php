@@ -59,7 +59,7 @@ abstract class ShippingAbstract extends PluginAbstract
 
     public function getNetPrice($order, $products = null)
     {
-        return $this->getPrice($order, $products);
+        return $this->price + $this->tax;
     }
 
     public function getTax()

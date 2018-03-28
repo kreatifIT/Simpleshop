@@ -23,12 +23,9 @@ $products = $this->getVar('products', []);
 
     <?php
 
-    $Customer  = Customer::getCurrentUser();
-    $isCompany = $Customer ? $Customer->isCompany() : false;
-
     $images      = $product->getArrayValue('images');
     $picture     = array_shift($images);
-    $price       = $product->getPrice(!$isCompany);
+    $price       = $product->getPrice();
     $quantity    = $product->getValue('cart_quantity');
     $product_url = $product->getUrl();
     $key         = $product->getValue('key');
@@ -44,7 +41,7 @@ $products = $this->getVar('products', []);
                 <span class="quantity"><?= $quantity ?> x </span>
             <?php endif; ?>
             <span class="name"><?= $product->getName() ?></span>
-            <span class="price">&euro;&nbsp;<?= $price ?></span>
+            <span class="price">&euro;&nbsp;<?= format_price($price) ?></span>
         </div>
         <div class="remove" onclick="Simpleshop.removeCartItem(this, <?= $key ?>, 'offcanvas_cart')"></div>
     </div>

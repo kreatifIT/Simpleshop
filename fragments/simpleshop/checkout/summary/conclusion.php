@@ -14,10 +14,10 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $Order      = $this->getVar('Order');
-$shipping   = $Order->getValue('initial_shipping_costs');
+$shipping   = $Order->getValue('shipping_costs');
+$subtotal   = $Order->getValue('brut_prices');
 $total      = $Order->getValue('total');
 $taxes      = $Order->getValue('taxes');
-$taxTotal   = $Order->getTaxTotal();
 $promotions = (array) $Order->getValue('promotions');
 
 ?>
@@ -26,12 +26,12 @@ $promotions = (array) $Order->getValue('promotions');
         <div class="checkout-summary-total">
             <div class="subtotal">
                 <span class="label">###simpleshop.brutto_total###</span>
-                <span class="price">&euro;&nbsp;<?= format_price($total - $taxTotal) ?></span>
+                <span class="price">&euro;&nbsp;<?= format_price(array_sum($subtotal)) ?></span>
             </div>
 
-            <?php if ($shipping > 0): ?>
+            <?php if ($Order->getValue('shipping')): ?>
                 <div class="shipping">
-                    <span class="label">###label.shipment_cost###</span>
+                    <span class="label">###simpleshop.shipping_costs###</span>
                     <span class="price">&euro;&nbsp;<?= format_price($shipping) ?></span>
                 </div>
             <?php endif; ?>
@@ -50,12 +50,15 @@ $promotions = (array) $Order->getValue('promotions');
                 <?php endif; ?>
             <?php endforeach; ?>
 
-            <?php foreach ($taxes as $percent => $tax): ?>
-                <div class="taxes">
-                    <span class="label"><?= $percent ?>% ###label.tax###</span>
-                    <span class="price">&euro;&nbsp;<?= format_price($tax) ?></span>
-                </div>
-            <?php endforeach; ?>
+            <?php if (!$Order->isTaxFree()): ?>
+                <?php foreach ($taxes as $percent => $tax): ?>
+                    <div class="taxes">
+                        <span class="label"><?= $percent ?>% ###label.tax###</span>
+                        <span class="price">&euro;&nbsp;<?= format_price($tax) ?></span>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+
             <div class="total">
                 <span class="label">###label.total_sum###</span>
                 <span class="price">&euro;&nbsp;<?= format_price($total) ?></span>
