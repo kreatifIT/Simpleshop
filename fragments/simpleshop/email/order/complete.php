@@ -81,7 +81,12 @@ $products = $Order->getProducts(false);
     <br/>
 <?php endif; ?>
 
-    <h2>###label.order### #<?= $order_id ?></h2>
+    <h2>
+        <?= strtr(\Wildcard::get('label.order_text'), [
+            '{NUM}'  => $order_id,
+            '{DATE}' => date('d-m-Y', strtotime($Order->getValue('createdate'))),
+        ]) ?>
+    </h2>
 <?php if ($config['use_invoicing']): ?>
     <h2>###label.invoice_num### <?= $Order->getInvoiceNum() ?></h2>
 <?php endif; ?>
