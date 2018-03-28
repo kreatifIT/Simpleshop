@@ -374,7 +374,7 @@ class CheckoutController extends Controller
         $do_send  = true;
         $Mail     = new \FriendsOfREDAXO\Simpleshop\Mail();
         $Settings = \rex::getConfig('simpleshop.Settings');
-        $Customer = Customer::get($this->Order->getValue('customer_id'));
+        $Customer = $this->Order->getValue('customer_data');
 
         $Mail->Subject = '###simpleshop.email.order_complete###';
         $Mail->setFragmentPath('order/complete');
