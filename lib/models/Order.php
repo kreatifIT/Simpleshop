@@ -41,8 +41,13 @@ class Order extends Model
 
     public function isTaxFree()
     {
-        $Address = $this->getInvoiceAddress();
-        $Country = Country::get($Address->getValue('country'));
+        $Customer = $this->getValue('customer_data');
+        $Country  = null;
+
+        if ($Customer->isCompany()) {
+            $Address = $this->getInvoiceAddress();
+            $Country = Country::get($Address->getValue('country'));
+        }
 
         return $Country && !$Country->getValue('b2b_has_tax');
     }
