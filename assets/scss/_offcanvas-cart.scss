@@ -46,15 +46,25 @@
     background-color: $primary-color;
     color: $white;
     line-height: rem-calc(20);
-    padding: rem-calc(20);
+    padding: rem-calc(20 20 20 60);
     width: 100%;
     border-radius: 0;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-weight: $global-weight-bold;
     text-shadow: $text-shadow-black;
+    position: relative;
+    text-align: left;
     &:hover {
         background-color: scale_color($primary-color, $lightness: -15%);
+    }
+    svg {
+        fill: $white;
+        display: block;
+        width: rem-calc(20);
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: rem-calc(10);
     }
 }
 

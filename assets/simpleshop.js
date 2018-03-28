@@ -18,10 +18,20 @@ var Simpleshop = (function ($) {
         return $loading;
     }
 
-    $continueShoppingButton.on('click', function () {
+    function closeOffcanvasCart() {
         $offcanvasCart.removeClass('expanded');
         $body.removeClass('offcanvas-cart-open');
         $offcanvasCartSuccess.fadeOut();
+    }
+
+    function showOffcanvasCart() {
+        $offcanvasCart.addClass('expanded');
+        $body.addClass('offcanvas-cart-open');
+        $offcanvasCartSuccess.fadeIn();
+    }
+
+    $continueShoppingButton.on('click', function () {
+        closeOffcanvasCart();
     });
 
     function updateCart(response, $itemsContainer, $totalContainer, $loading) {
@@ -50,8 +60,10 @@ var Simpleshop = (function ($) {
         });
     });
 
-    $('.offcanvas-cart-continue-shopping').on('click', function () {
-        $(this).parent().removeClass('expanded');
+    $body.click(function (event) {
+        if (!$(event.target).closest('.offcanvas-cart').length) {
+            closeOffcanvasCart();
+        }
     });
 
     $(window).on('load', function (e) {
@@ -121,9 +133,7 @@ var Simpleshop = (function ($) {
                 }
             }).done(function (resp) {
                 updateCart(resp, $itemsContainer, $totalContainer, $loading);
-                $offcanvasCart.addClass('expanded');
-                $body.addClass('offcanvas-cart-open');
-                $offcanvasCartSuccess.fadeIn();
+                showOffcanvasCart();
             });
         },
         removeCartItem: function (_this, vkey, layout) {
