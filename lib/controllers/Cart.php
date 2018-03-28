@@ -69,7 +69,7 @@ class CartController extends Controller
         $subject  = $ep->getSubject();
         $fragment = new \rex_fragment();
 
-        $subject .= $fragment->parse('simpleshop/cart/offcanvas.php');
+        $subject .= $fragment->parse('simpleshop/cart/offcanvas/wrapper.php');
         return $subject;
     }
 }
