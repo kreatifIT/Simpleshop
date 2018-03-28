@@ -31,7 +31,7 @@ class DiscountGroup extends Discount
                 $price  = $discount->getValue('price');
                 $amount = $discount->getValue('amount');
 
-                if (($price && array_sum($Order->getValue('net_prices')) >= $price) || ($amount && $Order->getValue('quantity') >= $amount)) {
+                if (($price && array_sum((array) $Order->getValue('net_prices')) >= $price) || ($amount && $Order->getValue('quantity') >= $amount)) {
                     $promotions['discount_' . $discount->getValue('id')] = $discount;
 
                     if (!$apply_all) {

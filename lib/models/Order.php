@@ -200,7 +200,6 @@ class Order extends Model
     {
         Utils::setCalcLocale();
 
-        $Customer            = $this->getValue('customer_data');
         $net_prices          = [];
         $this->quantity      = 0;
         $this->discount      = 0;
@@ -263,7 +262,7 @@ class Order extends Model
                 }
             }
 
-            list($__errors, $__promotions) = $this->calculatePrices(['manual_discount' => $netto_discount], $this->net_prices);
+            list($__errors, $__promotions) = $this->calculatePrices(['manual_discount' => $netto_discount], $net_prices);
 
             $errors      = array_merge($errors, $__errors);
             $_promotions = array_merge($_promotions, $__promotions);
@@ -371,6 +370,22 @@ class Order extends Model
                 $products = Session::getCartItems();
             }
         }
+
+        $this->initial_total = 0;
+        $this->quantity      = 0;
+        $net_prices          = [];
+
+        // calculate total
+        foreach ($products as $product) {
+            $quantity = $product->getValue('cart_quantity');
+            $tax_perc = Tax::get($product->getValue('tax'))->getValue('tax');
+
+            $net_prices[$tax_perc] += (float) $product->getPrice() * $quantity;
+            $this->initial_total   += (float) $product->getPrice(!$this->isTaxFree()) * $quantity;
+            $this->quantity        += $quantity;
+        }
+
+        $this->setValue('net_prices', $net_prices);
 
         try {
             $promotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.applyDiscounts', [$this->getValue('discount')], ['Order' => $this]));
