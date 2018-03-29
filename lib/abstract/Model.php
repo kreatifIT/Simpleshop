@@ -137,49 +137,6 @@ abstract class Model extends \Kreatif\Model
         return $data;
     }
 
-    public static function customValidateField($label, $value, $params, $field)
-    {
-        $params = json_decode($params, true);
-
-        switch ($params['method']) {
-            case 'empty-if':
-                if ($field->getValueObject($params['field'])->getValue() == $params['value'] && trim($value) == '') {
-                    return true;
-                }
-                break;
-
-            case 'fiscal_code':
-                if (empty($params['field']) || $field->getValueObject($params['field'])->getValue() == $params['value']) {
-                    try {
-                        FiscalcodeCheck::validateField($value);
-                    }
-                    catch (\ErrorException $ex) {
-                        return true;
-                    }
-                }
-                break;
-
-            case 'vat_num':
-                if (empty($params['field']) || $field->getValueObject($params['field'])->getValue() == $params['value']) {
-                    $value  = trim($value);
-                    $prefix = substr($value, 0, 2);
-                    $num    = substr($value, 2);
-
-                    try {
-                        VatCheck::validateField($prefix, $num);
-                    }
-                    catch (\SoapFault $ex) {
-                        return true;
-                    }
-                    catch (\ErrorException $ex) {
-                        return true;
-                    }
-                }
-                break;
-        }
-        return false;
-    }
-
     public static function ext_setValueField(\rex_extension_point $Ep)
     {
         if (!\rex::isBackend()) {
