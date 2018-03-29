@@ -21,7 +21,7 @@ $text  = $this->getVar('text');
 ?>
 <div class="dashboard">
     <div class="row column">
-        <h2 class="margin-bottom"><?= $title ?></h2>
+        <h2 class="<?= strlen($text) ? 'margin-bottom' : '' ?>"><?= $title ?></h2>
 
         <?= strlen($text) ? $text : '' ?>
     </div>
@@ -29,6 +29,15 @@ $text  = $this->getVar('text');
 
     <div class="row column margin-top">
         <a href="<?= rex_getUrl(null, null, ['action' => 'logout']) ?>" class="button">###action.logout###</a>
+    </div>
+
+    <div class="row column margin-large-top padding-top">
+        <h2>###label.account_data###</h2>
+
+        <?php
+        $fragment = new \rex_fragment();
+        echo $fragment->parse('simpleshop/customer/customer_area/account_form.php');
+        ?>
     </div>
 </div>
 
