@@ -151,6 +151,11 @@ class Session extends Model
         do {
             try {
                 $products = self::_getCartItems($raw, $throwErrors, $verifyAmount);
+                $products = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Session.getCartItems', $products, [
+                    'raw'          => $raw,
+                    'throwErrors'  => $throwErrors,
+                    'verifyAmount' => $verifyAmount,
+                ]));
                 $retry    = false;
             }
             catch (ProductException $ex) {
@@ -167,7 +172,7 @@ class Session extends Model
                     case 3:
                         // variant-combination does not exist
                         Session::removeProduct($key);
-                        self::$errors['cart_product_not_exists']['label'] = checkstr(Wildcard::get('simpleshop.error.cart_product_not_exists'), '###simpleshop.error.cart_product_not_exists###');
+                        self::$errors['cart_product_not_exists']['label']   = checkstr(Wildcard::get('simpleshop.error.cart_product_not_exists'), '###simpleshop.error.cart_product_not_exists###');
                         self::$errors['cart_product_not_exists']['replace'] += 1;
                         break;
 
@@ -190,6 +195,10 @@ class Session extends Model
                             '{{count}}'   => $product->getValue('amount'),
                         ]);
                         self::$errors[] = ['label' => $label];
+                        break;
+
+                    case 0:
+                        self::$errors[] = ['label' => $msg];
                         break;
 
                     default:
