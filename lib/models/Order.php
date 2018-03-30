@@ -120,8 +120,12 @@ class Order extends Model
             $value = $sql->getValue('num');
             $num   = (int) substr($value, 2) + 1;
             $num   = date('y') . str_pad($num, 5, '0', STR_PAD_LEFT);
+            $num   = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoice_num', $num, ['Order' => $this, 'value' => $value]));
 
-            $this->setValue('invoice_num', \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoice_num', $num, ['Order' => $this, 'value' => $value])));
+            if ($num == 0) {
+                $num = null;
+            }
+            $this->setValue('invoice_num', $num);
         }
 
         $result = parent::save(true);
