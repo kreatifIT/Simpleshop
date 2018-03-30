@@ -67,7 +67,12 @@ $styles = array_merge([
 ]));
 
 ?>
-    <h2>###shop.email.credit_note### <?= $Order->getInvoiceNum() ?></h2>
+    <h2>
+        <?= strtr(\Wildcard::get('shop.email.credit_note_subject'), [
+            '{NUM}'  => $Order->getInvoiceNum(),
+            '{DATE}' => date('d-m-Y', strtotime($Order->getValue('createdate'))),
+        ]) ?>
+    </h2>
     <!-- order conclusion/sum -->
 
     <table class="<?= $styles['css'] ?>" style="<?= $styles['table'] ?>">
