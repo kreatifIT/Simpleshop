@@ -105,6 +105,7 @@ class Order extends Model
 
     public function save($simple_save = true)
     {
+        Utils::setCalcLocale();
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['finalize_order' => self::$_finalizeOrder, 'simple_save' => $simple_save]));
 
         $sql      = \rex_sql::factory();
@@ -208,6 +209,8 @@ class Order extends Model
                 $OrderProduct->save(true);
             }
         }
+
+        Utils::resetLocale();
         return $result;
     }
 
