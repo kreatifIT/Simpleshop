@@ -87,7 +87,7 @@ $products = $Order->getProducts(false);
             '{DATE}' => date('d-m-Y', strtotime($Order->getValue('createdate'))),
         ]) ?>
     </h2>
-<?php if ($config['use_invoicing'] && $Order->getInvoiceNum() > 0): ?>
+<?php if ($config['use_invoicing'] && strlen($Order->getInvoiceNum())): ?>
     <h2>###label.invoice_num### <?= $Order->getInvoiceNum() ?></h2>
 <?php endif; ?>
 
