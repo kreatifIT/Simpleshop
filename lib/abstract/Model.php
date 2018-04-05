@@ -139,8 +139,9 @@ abstract class Model extends \Kreatif\Model
 
     public static function ext_setValueField(\rex_extension_point $Ep)
     {
+        $subject = $Ep->getSubject();
+
         if (!\rex::isBackend()) {
-            $subject     = $Ep->getSubject();
             $Object      = $Ep->getParam('object');
             $type        = $Ep->getParam('type_name');
             $table       = $Object->getTable()->getTableName();
@@ -163,10 +164,11 @@ abstract class Model extends \Kreatif\Model
 
     public static function ext_setValidateField(\rex_extension_point $Ep)
     {
+        $subject = $Ep->getSubject();
+
         if (!\rex::isBackend()) {
-            $subject = $Ep->getSubject();
-            $Object  = $Ep->getParam('object');
-            $table   = $Object->getTable()->getTableName();
+            $Object = $Ep->getParam('object');
+            $table  = $Object->getTable()->getTableName();
 
             $_excludeds = (array) $Ep->getParam('excluded_fields');
             $excluded   = array_merge(FragmentConfig::getValue("yform_fields.{$table}._excludedFields", []), $_excludeds);
