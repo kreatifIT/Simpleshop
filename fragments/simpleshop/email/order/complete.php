@@ -50,6 +50,7 @@ $this->setVar('order', $Order);
 $order_id = $Order->getValue('id');
 
 $this->setVar('tax', $Order->getTaxTotal());
+$this->setVar('old_tax', $Order->getValue('tax'));
 $this->setVar('taxes', $Order->getValue('taxes'));
 $this->setVar('total', $Order->getValue('total'));
 $this->setVar('initial_total', $Order->getValue('initial_total'));
@@ -82,13 +83,15 @@ $products = $Order->getProducts(false);
 <?php endif; ?>
 
     <h2>
-        <?= strtr(\Wildcard::get('label.order_text'), [
-            '{NUM}'  => $order_id,
-            '{DATE}' => date('d-m-Y', strtotime($Order->getValue('createdate'))),
-        ]) ?>
+        ###label.order### #<?= $order_id ?>
     </h2>
 <?php if ($config['use_invoicing'] && strlen($Order->getInvoiceNum())): ?>
-    <h2>###label.invoice_num### <?= $Order->getInvoiceNum() ?></h2>
+    <h2>
+        <?= strtr(\Wildcard::get('label.invoice_num_text'), [
+            '{NUM}'  => $Order->getInvoiceNum(),
+            '{DATE}' => date('d/m/Y', strtotime($Order->getValue('createdate'))),
+        ]) ?>
+    </h2>
 <?php endif; ?>
 
     <?php

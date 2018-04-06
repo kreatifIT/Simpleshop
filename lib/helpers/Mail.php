@@ -55,7 +55,7 @@ class Mail extends \rex_mailer
 
         if ($debug)
         {
-            pr($this->Subject);
+            ob_clean();
             echo $this->Body;
             exit;
         }
