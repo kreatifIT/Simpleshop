@@ -70,7 +70,7 @@ $products = $Order->getProducts(false);
     <p><?= $add_info ?></p>
 <?php endif; ?>
 
-<?php if ($config['use_invoicing']): ?>
+<?php if ($config['use_invoicing'] && strlen($Order->getInvoiceNum()) && $Order->getInvoiceNum() != '0'): ?>
     <div>
         <br/>
         <strong>###company.name###</strong><br/>
@@ -85,7 +85,7 @@ $products = $Order->getProducts(false);
     <h2>
         ###label.order### #<?= $order_id ?>
     </h2>
-<?php if ($config['use_invoicing'] && strlen($Order->getInvoiceNum())): ?>
+<?php if ($config['use_invoicing'] && strlen($Order->getInvoiceNum()) && $Order->getInvoiceNum() != '0'): ?>
     <h2>
         <?= strtr(\Wildcard::get('label.invoice_num_text'), [
             '{NUM}'  => $Order->getInvoiceNum(),
