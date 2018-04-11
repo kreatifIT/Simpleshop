@@ -36,7 +36,7 @@ class Coupon extends Discount
 
     public static function createGiftcard($Order, $Product)
     {
-        $order_id = $Order->getValue('id');
+        $order_id = $Order->getID();
 
         $_this = self::create();
         $_this->setValue('code', \rex_yform_value_coupon_code::getRandomCode());
@@ -64,7 +64,7 @@ class Coupon extends Discount
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Coupon.createGiftcard.CREATED', $_this, ['Order' => $Order, 'Product' => $Product]));
     }
 
-    public function applyToOrder($Order)
+    public function applyToOrder($Order, &$brut_prices, $name = '')
     {
         $start   = strtotime($this->getValue('start_time'));
         $end     = $this->getValue('end_time') != '' ? strtotime($this->getValue('end_time')) : null;
@@ -91,12 +91,13 @@ class Coupon extends Discount
         else if ($end && $end <= time()) {
             throw new CouponException('Coupon not valid anymore', 4);
         }
-        $result = parent::applyToOrder($Order);
+
+        $discount = parent::applyToOrder($Order, $brut_prices, 'coupon');
 
         if (isset ($_value)) {
             $this->setValue('discount_value', $_value);
         }
-        return $result;
+        return $discount;
     }
 
     public function linkToOrder($Order)

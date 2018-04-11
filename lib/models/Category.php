@@ -69,7 +69,7 @@ class Category extends Model
         if ($result !== false && $params->getParam('table')->getTableName() == self::TABLE) {
             $Addon    = \rex_addon::get('simpleshop');
             $links    = [];
-            $name     = sprogfield('name');
+            $name     = 'name_'. \rex_clang::getCurrentId();
             $cat_id   = $params->getParam('data_id');
             $products = Product::query()->resetSelect()->select('id')->select($name)->where('category_id', $cat_id)->find();
 

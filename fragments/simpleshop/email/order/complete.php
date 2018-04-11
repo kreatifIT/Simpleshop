@@ -101,6 +101,7 @@ $styles = FragmentConfig::getValue('email_styles');
     //        'th'   => $styles['th'] . 'background:' . $primary_color . ';border:1px solid #fff;color:#fff;padding:10px;',
     //    ]);
     $this->setVar('products', $products);
+    $this->setVar('use_tax_prices', false);
     $this->subfragment('simpleshop/cart/table-wrapper.php');
     ?>
 

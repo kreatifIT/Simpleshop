@@ -40,10 +40,10 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                     $products       = [];
                     $order_products = \FriendsOfREDAXO\Simpleshop\OrderProduct::getAll(true, ['filter' => [['order_id', $Order->getId()]], 'orderBy' => 'm.id']);
                     $promotions     = $Order->getValue('promotions', false, []);
-
+                    
                     foreach ($order_products as $order_product) {
                         $product = $order_product->getValue('data');
-                        $product->setValue('cart_quantity', $order_product->getValue('quantity'));
+                        $product->setValue('cart_quantity', $order_product->getValue('cart_quantity'));
                         $products[] = $product;
                     }
 

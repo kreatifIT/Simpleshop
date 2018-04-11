@@ -18,6 +18,7 @@ label.load_more
 label.load_more
 label.vat_short
 label.tax
+label.discount
 
 error.insert_company_name
 error.insert_firstname
@@ -34,7 +35,6 @@ error.field.vat_not_valid
 
 simpleshop.product_not_available
 simpleshop.no_products_in_cart
-simpleshop.error.cart_product_not_enough_amount
 simpleshop.summary_order
 simpleshop.redeem_coupon
 simpleshop.shipping_default
@@ -54,11 +54,16 @@ simpleshop.order_complete_pickup_text
 simpleshop.shipping_address_is_idem
 simpleshop.invoice_num
 simpleshop.shipping_costs
+simpleshop.subtotal
 simpleshop.brutto_total
 simpleshop.total_sum
 simpleshop.amount
 simpleshop.tax_included_value
 
+shop.error_summary_no_product_available
+simpleshop.error.cart_product_not_exists
+simpleshop.error.cart_product_not_enough_amount
+simpleshop.error.cart_product_not_available
 simpleshop.error.tos_rma_not_accepted
 simpleshop.error.coupon_not_exists
 simpleshop.error.coupon_consumed

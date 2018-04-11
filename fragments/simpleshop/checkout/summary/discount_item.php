@@ -15,5 +15,9 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 $promotion = $this->getVar('promotion');
 
+if (!is_object($promotion)) {
+    return;
+}
+
 ?>
-<div class="callout promotion-item secondary"><?= $promotion->getValue(sprogfield('name')) ?></div>
+<div class="callout promotion-item secondary"><?= $promotion->getValue('name', true) ?></div>

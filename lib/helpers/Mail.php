@@ -14,54 +14,17 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-use Sprog\Wildcard;
-
-class Mail extends \rex_mailer
+class Mail extends \Kreatif\Mail
 {
     protected $variables = [];
-    protected $fragment  = NULL;
+    protected $fragment  = null;
 
     public function __construct()
     {
         parent::__construct();
-        $this->fragment = new \rex_fragment();
-        $this->fragment->setVar('base_url', \rex_yrewrite::getFullPath());
-        $this->fragment->setVar('logo_path', 'resources/img/email/logo.png');
-        $this->IsHTML(TRUE);
 
         FragmentConfig::$data['email_styles']['use_mail_styles'] = true;
         return $this;
-    }
-
-    public function setFragmentPath($fragment_path)
-    {
-        $this->fragment->setVar('fragment_path', $fragment_path);
-    }
-
-    public function setVar($key, $value, $escape = true)
-    {
-        $this->fragment->setVar($key, $value, $escape);
-    }
-
-    public function getVar($key, $default = null)
-    {
-        $this->fragment->getVar($key, $default);
-    }
-
-    public function send($debug = FALSE)
-    {
-        $this->Body = $this->fragment->parse('simpleshop/email/master.php');
-
-        $this->Subject = Wildcard::parse(Wildcard::parse($this->Subject));
-        $this->Body    = Wildcard::parse(Wildcard::parse($this->Body));
-
-        if ($debug)
-        {
-            pr($this->Subject);
-            echo $this->Body;
-            exit;
-        }
-        return parent::send();
     }
 }
 

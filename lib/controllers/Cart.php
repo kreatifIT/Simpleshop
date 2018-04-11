@@ -22,12 +22,18 @@ class CartController extends Controller
     {
         $this->params = array_merge([
             'check_cart' => true,
+            'products'   => null,
         ], $this->params);
 
         $errors = [];
 
         try {
-            $this->products = Session::getCartItems(false, $this->params['check_cart']);
+            if ($this->params['products'] === null) {
+                $this->products = Session::getCartItems(false, $this->params['check_cart']);
+            }
+            else {
+                $this->products = $this->params['products'];
+            }
         }
         catch (CartException $ex) {
             if ($ex->getCode() == 1) {

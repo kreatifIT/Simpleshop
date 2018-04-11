@@ -28,7 +28,7 @@ class Tax extends Model
             $products = Product::query()->resetSelect()->select('id')->select('tax')->where('tax', $obj_id)->find();
 
             foreach ($products as $product) {
-                $links[] = $product->getValue(sprogfield('name')) . ' -
+                $links[] = $product->getValue('tax') . ' -
                     <a href="' . \rex_url::backendPage('yform/manager/data_edit', ['data_id' => $product->getValue('id'), 'table_name' => Product::TABLE, 'func' => 'edit',]) . '" target="_blank">' . $Addon->i18n('action.edit_product') . '</a> |
                     <a href="' . $product->getUrl() . '" target="_blank">' . $Addon->i18n('action.show_in_frontend') . '</a>
                 ';

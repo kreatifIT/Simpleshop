@@ -21,8 +21,8 @@ $styles = FragmentConfig::getValue('styles');
         <th <?= $styles['prod-th'] ?>>###label.preview###</th>
     <?php endif; ?>
     <th <?= $styles['prod-th'] ?>>###label.product###</th>
-    <th <?= $styles['prod-th'] ?>>###label.single_price###</th>
     <th <?= $styles['prod-th'] ?>>###label.amount###</th>
+    <th <?= $styles['prod-th'] ?>>###label.single_price###</th>
     <th <?= $styles['prod-th'] ?>>###label.total###</th>
     <?php if ($config['has_remove_button']): ?>
         <th <?= $styles['prod-th'] ?>>&nbsp;</th>

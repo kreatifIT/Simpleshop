@@ -26,6 +26,7 @@ $key         = $product->getValue('key');
 $product_url = $product->getUrl();
 $is_giftcard = $product->getValue('type') == 'giftcard';
 $extras      = $product->getValue('extras');
+$discount    = $product->getValue('discount');
 
 $Category = $product->valueIsset('category_id') ? Category::get($product->getValue('category_id')) : null;
 
@@ -66,12 +67,6 @@ if ($is_giftcard) {
             <?php endforeach; ?>
         <?php endif; ?>
     </td>
-    <td class="cart-item-price-wrapper" <?= $styles['prod-td'] ?>>
-        <?php if (!$useEmailStyles): ?>
-            <span class="hide-for-large">###label.price###: </span>
-        <?php endif; ?>
-        <strong>&euro;&nbsp;<?= format_price($price) ?></strong>
-    </td>
     <td class="cart-item-amount-wrapper" <?= $styles['prod-td'] ?>>
         <?php
         $fragment = new \rex_fragment();
@@ -81,6 +76,15 @@ if ($is_giftcard) {
         $fragment->setVar('max_amount', $product->getValue('amount'));
         echo $fragment->parse('simpleshop/cart/button.php');
         ?>
+    </td>
+    <td class="cart-item-price-wrapper" <?= $styles['prod-td'] ?>>
+        <?php if (!$useEmailStyles): ?>
+            <span class="hide-for-large">###label.price###: </span>
+        <?php endif; ?>
+        <strong>&euro;&nbsp;<?= format_price($price) ?></strong>
+        <?php if ($discount): ?>
+            <div class="product-discount"><?= $discount->getName() ?></div>
+        <?php endif; ?>
     </td>
     <td class="cart-item-total-wrapper" <?= $styles['prod-td'] ?>>
         <?php if (!$useEmailStyles): ?>

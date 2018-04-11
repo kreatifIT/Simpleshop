@@ -377,7 +377,7 @@ class CheckoutController extends Controller
         $Customer = $this->Order->getValue('customer_data');
 
         $Mail->Subject = '###simpleshop.email.order_complete###';
-        $Mail->setFragmentPath('order/complete');
+        $Mail->setFragmentPath('simpleshop/email/order/complete.php');
 
         // add vars
         $Mail->setVar('Order', $this->Order);

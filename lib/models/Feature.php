@@ -10,6 +10,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace FriendsOfREDAXO\Simpleshop;
 
 
@@ -38,7 +39,7 @@ class Feature extends Model
         if ($result !== false && $params->getParam('table')->getTableName() == self::TABLE) {
             $Addon  = \rex_addon::get('simpleshop');
             $links  = [];
-            $name   = sprogfield('name');
+            $name   = 'name_'. \rex_clang::getCurrentId();
             $obj_id = $params->getParam('data_id');
             $values = FeatureValue::query()->resetSelect()->select('id')->select($name)->where('feature_id', $obj_id)->find();
 

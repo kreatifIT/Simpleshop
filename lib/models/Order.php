@@ -59,18 +59,24 @@ class Order extends Model
             'orderBy' => 'id',
         ])->toArray();
 
-        if (!$raw) {
-            foreach ($products as $index => &$orderProduct) {
-                $Product     = clone $orderProduct->getValue('data');
-                $orderPData  = $orderProduct->getData();
-                $productData = $Product->getData();
 
-                foreach ($orderPData as $key => $value) {
-                    if (!array_key_exists($key, $productData)) {
-                        $Product->setValue($key, $value);
+        if (!$raw) {
+            if (empty($products)) {
+                $products = $this->getValue('products');
+            }
+            else {
+                foreach ($products as $index => &$orderProduct) {
+                    $Product     = clone $orderProduct->getValue('data');
+                    $orderPData  = $orderProduct->getData();
+                    $productData = $Product->getData();
+
+                    foreach ($orderPData as $key => $value) {
+                        if (!array_key_exists($key, $productData)) {
+                            $Product->setValue($key, $value);
+                        }
                     }
+                    $orderProduct = $Product;
                 }
-                $orderProduct = $Product;
             }
         }
         return $products;
@@ -108,7 +114,6 @@ class Order extends Model
         }
 
         if (self::$_finalizeOrder && ($this->getValue('invoice_num') === null || $this->getValue('invoice_num') === 0)) {
-
             $sql->setQuery('SELECT MAX(invoice_num) as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"');
             $value = $sql->getValue('num');
             $num   = (int) substr($value, 2) + 1;
@@ -120,8 +125,7 @@ class Order extends Model
         $result = parent::save(true);
 
         if ($result && !$simple_save) {
-
-            $order_id   = $this->getValue('id');
+            $order_id   = $this->getId();
             $promotions = $this->getValue('promotions');
 
             if (self::$_finalizeOrder && isset ($promotions['coupon'])) {
@@ -130,12 +134,15 @@ class Order extends Model
             }
 
             // reset quanities
-            $order_products = OrderProduct::getAll(false, ['filter' => [['order_id', $order_id]], 'orderBy' => 'id']);
+            $order_products = OrderProduct::getAll(false, [
+                'filter'  => [['order_id', $order_id]],
+                'orderBy' => 'id',
+            ]);
 
             foreach ($order_products as $order_product) {
-                if ($order_product->getValue('quantity')) {
+                if ($order_product->getValue('cart_quantity')) {
                     $_product = $order_product->getValue('data');
-                    $quantity = $order_product->getValue('quantity');
+                    $quantity = $order_product->getValue('cart_quantity');
 
                     if ($_product->getValue('inventory') == 'F') {
                         // update inventory
@@ -152,10 +159,11 @@ class Order extends Model
                     }
                 }
             }
-            // clear all products first
-            \rex_sql::factory()->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$order_id}");
 
             $products = Session::getCartItems(false, false);
+
+            // clear all products first
+            \rex_sql::factory()->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$order_id}");
 
             // set order products
             foreach ($products as $product) {
@@ -182,12 +190,13 @@ class Order extends Model
                         Coupon::createGiftcard($this, $product);
                     }
                 }
+
                 $OrderProduct = OrderProduct::create();
-                $OrderProduct->setValue('order_id', $order_id);
+                $OrderProduct->setValue('data', $product);
                 $OrderProduct->setValue('product_id', $product->getValue('id'));
                 $OrderProduct->setValue('code', $product->getValue('code'));
-                $OrderProduct->setValue('quantity', $quantity);
-                $OrderProduct->setValue('data', $product);
+                $OrderProduct->setValue('cart_quantity', $quantity);
+                $OrderProduct->setValue('order_id', $order_id);
                 $OrderProduct->setValue('createdate', $date_now);
 
                 $OrderProduct = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.saveOrderProduct', $OrderProduct, [
@@ -201,7 +210,7 @@ class Order extends Model
         return $result;
     }
 
-    public function recalculateDocument($products = [], $promotions = [])
+    public function recalculateDocument($products = [], $promotions = [], $errors = [])
     {
         Utils::setCalcLocale();
 
@@ -214,9 +223,9 @@ class Order extends Model
         // calculate total
         foreach ($products as $product) {
             $quantity = $product->getValue('cart_quantity');
-            $tax_perc = Tax::get($product->getValue('tax'))->getValue('tax');
+            $tax_perc = $this->isTaxFree() ? 0 : Tax::get($product->getValue('tax'))->getValue('tax');
 
-            $net_prices[$tax_perc] += (float) $product->getPrice() * $quantity;
+            $net_prices[$tax_perc] += (float) $product->getPrice(!$this->isTaxFree()) * $quantity;
             $this->initial_total   += (float) $product->getPrice(!$this->isTaxFree()) * $quantity;
             $this->quantity        += $quantity;
         }
@@ -236,44 +245,25 @@ class Order extends Model
 
         $this->setValue('updatedate', date('Y-m-d H:i:s'));
         $this->setValue('net_prices', $net_prices);
-        $this->setValue('subtotal', array_sum($net_prices));
         $this->setValue('total', array_sum($net_prices));
 
-        // reset manual discount
-        unset($promotions['manual_discount']);
-
-        // set promotions for order history
-        list($errors, $_promotions) = $this->calculatePrices($promotions, $net_prices);
-
-        // calculate manual discount
+        // calculate manual discount8
         if ($manual_discount > 0) {
-            $netto_discount = 0;
+            $mDiscount = DiscountGroup::create();
+            $mDiscount->setValue('discount_value', $manual_discount);
+            $mDiscount->setValue('ctype', 'all');
+            $mDiscount->setValue('name_' . \rex_clang::getCurrentId(), '###label.discount###');
 
-            foreach ($this->net_prices as $tax_perc => $net_price) {
-                if ($manual_discount <= 0) {
-                    break;
-                }
-
-                $_ndiscount = $manual_discount / (100 + $tax_perc) * 100;
-
-                if ($_ndiscount <= $net_price) {
-                    $netto_discount  += $_ndiscount;
-                    $manual_discount = 0;
-                }
-                else {
-                    $_bdiscount      = $_ndiscount * (1 + $tax_perc / 100);
-                    $manual_discount -= $_bdiscount;
-                    $netto_discount  += $net_price;
-                }
-            }
-
-            list($__errors, $__promotions) = $this->calculatePrices(['manual_discount' => $netto_discount], $net_prices);
-
-            $errors      = array_merge($errors, $__errors);
-            $_promotions = array_merge($_promotions, $__promotions);
+            $promotions['manual_discount'] = $mDiscount;
         }
 
-        $this->setValue('promotions', $_promotions);
+        // set promotions for order history
+        list($_errors, $promotions) = $this->calculatePrices($promotions, $net_prices);
+
+        $errors = array_merge((array) $errors, (array) $_errors);
+
+        $this->setValue('promotions', $promotions);
+        $this->setValue('products', $products);
 
         try {
             \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.calculateDocument', $this));
@@ -298,56 +288,38 @@ class Order extends Model
         $errors      = [];
         $_promotions = [];
         $brut_prices = [];
-        $Settings    = \rex::getConfig('simpleshop.Settings');
+        $discount    = 0;
 
-        foreach ($promotions as $name => $_promotion) {
-            $promotion = null;
+        $this->setValue('net_prices', $net_prices);
+
+        // set gross prices
+        foreach ($net_prices as $tax => $net_price) {
+            $brut_prices[$tax] += (float) $net_price / (100 + $tax) * 100;
+        }
+
+        $this->setValue('brut_prices', $brut_prices);
+
+        foreach ($promotions as $name => $promotion) {
             try {
-                if (is_object($_promotion)) {
-                    $promotion = $_promotion->applyToOrder($this);
-                }
-                else if (is_numeric($_promotion) && $_promotion > 0) {
-                    $__promotion = $_promotion;
-
-                    foreach ($net_prices as &$net_price) {
-                        if ($__promotion <= 0) {
-                            break;
-                        }
-                        if ($__promotion < $net_price) {
-                            $net_price      -= $__promotion;
-                            $this->discount -= $__promotion;
-                            $__promotion    = 0;
-                            $promotion      = $_promotion;
-                        }
-                        else {
-                            $__promotion    -= $net_price;
-                            $this->discount -= $net_price;
-                            $promotion      += $net_price;
-                            $net_price      = 0;
-                        }
-                    }
+                if (is_object($promotion)) {
+                    $discount += $promotion->applyToOrder($this, $brut_prices, $name);
                 }
             }
             catch (\Exception $ex) {
-                $errors[] = ['label' => $ex->getLabelByCode()];
+                $errors[]  = ['label' => $ex->getLabelByCode()];
+                $promotion = null;
             }
             if ($promotion) {
                 $_promotions[$name] = $promotion;
             }
         }
 
-        $this->setValue('net_prices', $net_prices);
-        $this->setValue('subtotal', array_sum($net_prices));
-
-        // set tax values
-        foreach ($net_prices as $tax => $net_price) {
-            $brut_prices[$tax] += (float) $net_price / (100 + $tax) * 100;
-            $taxes[$tax]       += (float) $net_price / (100 + $tax) * $tax;
+        // set tax costs
+        foreach ($brut_prices as $tax => $brut_price) {
+            $taxes[$tax] += (float) $brut_price * ($tax / 100);
         }
 
-        $this->setValue('brut_prices', $brut_prices);
-
-
+        // set shipping costs
         if ($this->getValue('shipping_costs') > 0 && !$this->isTaxFree()) {
             $tax = $this->getValue('shipping')->getTaxPercentage();
 
@@ -359,7 +331,8 @@ class Order extends Model
         ksort($taxes);
 
         $this->setValue('taxes', $taxes);
-        $this->setValue('total', $this->getValue('shipping_costs') + array_sum($brut_prices) + array_sum($taxes));
+        $this->setValue('discount', $discount);
+        $this->setValue('total', $this->getValue('shipping_costs') + array_sum($brut_prices) + array_sum($taxes)) - $discount;
 
         return [$errors, $_promotions];
     }
@@ -376,33 +349,22 @@ class Order extends Model
             }
         }
 
-        $this->initial_total = 0;
-        $this->quantity      = 0;
-        $net_prices          = [];
-
-        // calculate total
-        foreach ($products as $product) {
-            $quantity = $product->getValue('cart_quantity');
-            $tax_perc = Tax::get($product->getValue('tax'))->getValue('tax');
-
-            $net_prices[$tax_perc] += (float) $product->getPrice() * $quantity;
-            $this->initial_total   += (float) $product->getPrice(!$this->isTaxFree()) * $quantity;
-            $this->quantity        += $quantity;
-        }
-
-        $this->setValue('net_prices', $net_prices);
-
         try {
-            $promotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.applyDiscounts', [$this->getValue('discount')], ['Order' => $this]));
+            $promotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.applyDiscounts', [], [
+                'Order'    => $this,
+                'products' => $products,
+            ]));
         }
         catch (\Exception $ex) {
             $promotions = [];
             $errors[]   = ['label' => $ex->getLabelByCode()];
         }
 
+        $this->setValue('initial_total', 0);
+        $this->setValue('quantity', 0);
         $this->setValue('ip_address', rex_server('REMOTE_ADDR', 'string', 'notset'));
 
-        return $this->recalculateDocument($products, $promotions);
+        return $this->recalculateDocument($products, $promotions, $errors);
     }
 
     public static function ext_yform_data_delete($params)

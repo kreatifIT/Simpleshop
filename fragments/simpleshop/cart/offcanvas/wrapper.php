@@ -18,12 +18,13 @@ $ctrlTpl  = '';
 $picture  = null;
 $Settings = \rex::getConfig('simpleshop.Settings');
 
-$Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute();
+$Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute([
+    'check_cart' => rex_server('HTTP_X_PJAX', 'string', false),
+]);
 
 if (count($Controller->getProducts())) {
     $ctrlTpl = 'simpleshop/cart/offcanvas/items.php';
 }
-
 
 
 ?>

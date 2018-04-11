@@ -23,7 +23,6 @@ $promotions = $Order->getValue('promotions');
 $payment    = $Order->getValue('payment');
 $shipping   = $Order->getValue('shipping');
 
-
 ?>
 <div class="summary-wrapper">
 
@@ -100,7 +99,8 @@ $shipping   = $Order->getValue('shipping');
         <div class="checkout-summary-items row column margin-bottom">
             <?php
             $Controller = CartController::execute([
-                'use_tax_prices'            => !$Order->isTaxFree(),
+                'products'                  => $Order->getProducts(false),
+                'use_tax_prices'            => false,
                 'cart_config'               => array_merge(FragmentConfig::getValue('cart'), [
                     'has_remove_button' => false,
                 ]),

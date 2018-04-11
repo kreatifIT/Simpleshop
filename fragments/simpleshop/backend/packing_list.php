@@ -87,9 +87,9 @@ echo $fragment->parse('core/top.php');
                 <td class="xxs-small text-center"><?= $index + 1 ?></td>
                 <td class="small"><?= $product->getValue('code') ?></td>
                 <td>
-                    <div class="description"><?= $product->getValue(sprogfield('name')) ?></div>
+                    <div class="description"><?= $product->getValue('name', true) ?></div>
                     <?php if ($product->getValue('category_id')): ?>
-                        <div class="description"><em><?= $Addon->i18n('label.category') ?>: <?= Category::get($product->getValue('category_id'))->getValue(sprogfield('name')) ?></em></div>
+                        <div class="description"><em><?= $Addon->i18n('label.category') ?>: <?= Category::get($product->getValue('category_id'))->getValue('name', true) ?></em></div>
                     <?php endif; ?>
                     <?php if ($product->getValue('width') || $product->getValue('length') || $product->getValue('height')): ?>
                         <div class="description"><?= (int) ($product->getValue('width') ?: 0.1) / 10 ?>cm x <?= (int) ($product->getValue('length') ?: 0.1) / 10 ?>cm x <?= (int) ($product->getValue('height') ?: 0.1) / 10 ?>cm</div>

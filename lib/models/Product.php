@@ -45,6 +45,7 @@ class Product extends Model
     {
         $type     = $this->getValue('type');
         $price    = $this->getValue('price');
+        $discount = $this->getValue('discount');
         $Settings = \rex::getConfig('simpleshop.Settings');
 
         if ($type == 'giftcard') {
@@ -56,6 +57,22 @@ class Product extends Model
             $reduced = $this->getValue('reduced_price');
             $price   = $reduced > 0 ? $reduced : $price;
         }
+
+        $price = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Product.getPrice', $price, [
+            'product'     => $this,
+            'includeTax'  => $includeTax,
+            'use_reduced' => $use_reduced,
+        ]));
+
+        if (is_object($discount)) {
+            if ($discount->getValue('discount_value') > 0) {
+                $price -= $discount->getValue('discount_value');
+            }
+            elseif ($discount->getValue('discount_percent') > 0) {
+                $price = $price / 100 * (100 - $discount->getValue('discount_percent'));
+            }
+        }
+
         if ($includeTax) {
             $tax = Tax::get($this->getValue('tax'))->getValue('tax');
 
