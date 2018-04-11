@@ -14,16 +14,24 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
 
     public function enterObject()
     {
-        if ($this->getParam('send') == 0 && $this->getParam('main_id') > 0 && rex::isBackend()) {
-            $action   = rex_get('ss-action', 'string');
-            $Order    = \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id'));
-            $Customer = $Order->getValue('customer_id') ? \FriendsOfREDAXO\Simpleshop\Customer::get($Order->getValue('customer_id')) : $Order->getInvoiceAddress();;
+        $Order    = \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id'));
+        $Customer = $Order->getValue('customer_id') ? \FriendsOfREDAXO\Simpleshop\Customer::get($Order->getValue('customer_id')) : $Order->getInvoiceAddress();;
+        $table  = $this->getParam('main_table');
+        $params = [
+            'data_id'    => $this->getParam('main_id'),
+            'table_name' => $table,
+            'func'       => 'edit',
+        ];
+
+        if (strlen($table) && $this->getParam('send') == 0 && $this->getParam('main_id') > 0 && rex::isBackend()) {
+            $action = rex_get('ss-action', 'string');
 
             // set user lang id
             if ($Customer) {
                 \rex_clang::setCurrentId($Customer->getValue('lang_id', false, \rex_clang::getCurrentId()));
                 setlocale(LC_ALL, \rex_clang::getCurrent()->getValue('clang_setlocale'));
             }
+
 
             switch ($action) {
                 case 'resend_email':
@@ -40,7 +48,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                     $products       = [];
                     $order_products = \FriendsOfREDAXO\Simpleshop\OrderProduct::getAll(true, ['filter' => [['order_id', $Order->getId()]], 'orderBy' => 'm.id']);
                     $promotions     = $Order->getValue('promotions', false, []);
-                    
+
                     foreach ($order_products as $order_product) {
                         $product = $order_product->getValue('data');
                         $product->setValue('cart_quantity', $order_product->getValue('cart_quantity'));
@@ -54,39 +62,38 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                     $_GET['ss-msg'] = $action;
                     header('Location: ' . html_entity_decode(rex_url::currentBackendPage($_GET)));
                     exit;
-
-                default:
-                    $output = [];
-                    $msg    = rex_get('ss-msg', 'string');
-
-                    if ($msg) {
-                        echo rex_view::info(rex_i18n::msg("label.msg_{$msg}"));
-                    }
-
-                    if ($Customer) {
-                        $output[] = '
-                            <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'resend_email'])) . '" class="btn btn-default">
-                                <i class="fa fa-send"></i>&nbsp;
-                                ' . rex_i18n::msg('label.resend_email') . '
-                            </a>
-                        ';
-                    }
-                    $output[]                                    = '
-                        <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'recalculate_sums'])) . '" class="btn btn-default">
-                            <i class="fa fa-calculator"></i>&nbsp;
-                            ' . rex_i18n::msg('label.recalculate_sums') . '
-                        </a>
-                    ';
-                    $this->params['form_output'][$this->getId()] = '
-                        <div class="row nested-panel">
-                            <div class="form-group col-xs-12" id="' . $this->getHTMLId() . '">
-                                <div>' . implode('', $output) . '</div>
-                            </div>
-                        </div>
-                    ';
-                    break;
             }
         }
+
+        $output = [];
+        $msg    = rex_get('ss-msg', 'string');
+
+        if ($msg) {
+            echo rex_view::info(rex_i18n::msg("label.msg_{$msg}"));
+        }
+
+        if ($Customer) {
+            $output[] = '
+                <a href="' . rex_url::currentBackendPage(array_merge($_GET, $params, ['ss-action' => 'resend_email'])) . '" class="btn btn-default">
+                    <i class="fa fa-send"></i>&nbsp;
+                    ' . rex_i18n::msg('label.resend_email') . '
+                </a>
+            ';
+        }
+        $output[] = '
+                <a href="' . rex_url::currentBackendPage(array_merge($_GET, $params, ['ss-action' => 'recalculate_sums',])) . '" class="btn btn-default">
+                    <i class="fa fa-calculator"></i>&nbsp;
+                    ' . rex_i18n::msg('label.recalculate_sums') . '
+                </a>
+            ';
+
+        $this->params['form_output'][$this->getId()] = '
+                <div class="row nested-panel">
+                    <div class="form-group col-xs-12" id="' . $this->getHTMLId() . '">
+                        <div>' . implode('', $output) . '</div>
+                    </div>
+                </div>
+            ';
     }
 
     public function getDefinitions()
