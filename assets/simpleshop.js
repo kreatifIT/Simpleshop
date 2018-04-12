@@ -128,7 +128,7 @@ var Simpleshop = (function ($) {
                 $loading.remove();
             });
         },
-        addToCart: function (_this, amount, layout) {
+        addToCart: function (_this, vkey, amount, layout) {
 
             if (parseInt(amount) <= 0) {
                 var selector = '.quantity-ctrl-button|.amount-input',

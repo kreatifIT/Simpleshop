@@ -352,8 +352,17 @@ class Product extends Model
         $vkey   = trim(rex_get('vkey', 'string'));
 
         if ($vkey != '' && $Ep->getParam('table') == self::TABLE) {
-            $Object = $Object->getVariant($vkey);
-            pr($Object->getValue('images'));
+            try {
+                $Object = $Object->getVariant($vkey);
+
+                \rex_extension::register('YREWRITE_ROBOTS_TAG', function(\rex_extension_point $Ep) {
+                    return false;
+                });
+            }
+            catch (ProductException $ex) {
+                \rex_response::setStatus(404);
+                $Object = false;
+            }
         }
         return $Object;
     }
