@@ -110,10 +110,13 @@ class Product extends Model
             $feature_values = [];
             // get feature values
             foreach ($feature_val_ids as $feature_id) {
-                $_value                 = FeatureValue::get($feature_id);
-                $_id                    = $_value->getValue('feature_id');
-                $feature_ids[]          = $_id;
-                $feature_values[$_id][] = $_value;
+                $_value = FeatureValue::get($feature_id);
+
+                if ($_value) {
+                    $_id                    = $_value->getValue('feature_id');
+                    $feature_ids[]          = $_id;
+                    $feature_values[$_id][] = $_value;
+                }
             }
             // get features
             $_features = Feature::query()->where('id', $feature_ids)->find();
@@ -144,42 +147,41 @@ class Product extends Model
     public function getFeatureVariants()
     {
         if ($this->__feature_data === null) {
-            $_variants = Variant::query()->resetSelect()->select('id')->select('variant_key')->where('product_id', $this->getValue('id'))->where('type', 'NE', '!=')->find();
+            $sql  = \rex_sql::factory();
+            $stmt = Variant::query();
+            $stmt->resetSelect();
+            $stmt->select('id');
+            $stmt->select('variant_key');
+            $stmt->where('product_id', $this->getValue('id'));
+            $stmt->where('type', 'NE', '!=');
+            $_variants = $stmt->find();
 
             $this->__feature_data = [
-                'mapping'  => [],
-                'features' => [],
                 'variants' => [],
             ];
 
             foreach ($_variants as $variant) {
                 $key  = $variant->getValue('variant_key');
                 $_ids = explode(',', $key);
-                // apply default values from product
-                $clone   = clone $this;
-                $variant = $clone->getVariant($key);
-                // set the min amount number to know if available or not
-                $amount = $clone->getValue('amount');
-                // set variants
-                $this->__feature_data['variants'][$key] = $variant;
 
-                // create the mapping
-                foreach ($_ids as $id) {
-                    if (!isset($this->__feature_data['mapping'][$id]['min_amount'])) {
-                        $this->__feature_data['mapping'][$id]['min_amount'] = $amount > 0 ? $amount : 0;
-                    }
-                    foreach ($_ids as $__id) {
-                        if ($id != $__id) {
-                            if ($amount > 0 && ($amount < $this->__feature_data['mapping'][$id]['min_amount'] || $this->__feature_data['mapping'][$id]['min_amount'] == 0)) {
-                                $this->__feature_data['mapping'][$id]['min_amount'] = $amount;
-                            }
-                            $this->__feature_data['mapping'][$id]['variants'][$__id] = $key;
-                        }
-                    }
+                // order ids by feature priority
+                $query = '
+                    SELECT m.id 
+                    FROM ' . FeatureValue::TABLE . ' AS m
+                    LEFT JOIN ' . Feature::TABLE . ' AS jt1 ON jt1.id = m.feature_id
+                    WHERE m.id IN(' . implode(',', $_ids) . ')
+                    ORDER BY jt1.prio ASC
+                ';
+                $_ids  = $sql->getArray($query, [], \PDO::FETCH_COLUMN);
+
+                if (count($_ids)) {
+                    // apply default values from product
+                    $clone   = clone $this;
+                    $variant = $clone->getVariant($key);
+                    // set variants
+                    $this->__feature_data['variants'][implode(',', $_ids)] = $variant;
                 }
             }
-            // get all linked features
-            $this->__feature_data['features'] = $this->_getFeatures(array_keys($this->__feature_data['mapping']));
         }
         return $this->__feature_data;
     }
@@ -330,18 +332,30 @@ class Product extends Model
         return implode('/', $_paths);
     }
 
-    public static function ext_yform_data_delete($params)
+    public static function ext_yform_data_delete(\rex_extension_point $Ep)
     {
-        $result = $params->getSubject();
+        $result = $Ep->getSubject();
 
-        if ($result !== false && $params->getParam('table')->getTableName() == self::TABLE) {
+        if ($result !== false && $Ep->getParam('table')->getTableName() == self::TABLE) {
             // remove all related variants
-            $obj_id = $params->getParam('data_id');
+            $obj_id = $Ep->getParam('data_id');
             $query  = "DELETE FROM " . Variant::TABLE . " WHERE product_id = {$obj_id}";
             $sql    = \rex_sql::factory();
             $sql->setQuery($query);
         }
         return $result;
+    }
+
+    public static function ext_setUrlObject(\rex_extension_point $Ep)
+    {
+        $Object = $Ep->getSubject();
+        $vkey   = trim(rex_get('vkey', 'string'));
+
+        if ($vkey != '' && $Ep->getParam('table') == self::TABLE) {
+            $Object = $Object->getVariant($vkey);
+            pr($Object->getValue('images'));
+        }
+        return $Object;
     }
 }
 

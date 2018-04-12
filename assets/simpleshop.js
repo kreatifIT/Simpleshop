@@ -107,7 +107,28 @@ var Simpleshop = (function ($) {
                 $container.find('.company-field').removeClass('hide');
             }
         },
-        addToCart: function (_this, vkey, amount, layout) {
+        toggleVariant: function (_this, selector, event) {
+            var $this = $(_this),
+                $container = $this.parents(selector),
+                $loading = addLoading($container);
+
+            if (!$container.length) {
+                alert('Variant container class not found ['+ selector +']');
+            }
+            else if (typeof KreatifPjax == 'undefined') {
+                alert('KreatifPjax is not defined - Gruntfile?');
+                return false;
+            }
+
+            KreatifPjax.submit(event, {
+                url: $this.val(),
+                fragment: selector,
+                container: selector
+            }, function (event, xhr, options) {
+                $loading.remove();
+            });
+        },
+        addToCart: function (_this, amount, layout) {
 
             if (parseInt(amount) <= 0) {
                 var selector = '.quantity-ctrl-button|.amount-input',
