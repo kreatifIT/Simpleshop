@@ -17,6 +17,8 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+\rex_yform::addTemplatePath(\rex_path::addon('simpleshop', 'ytemplates'));
+
 \rex_yform_manager_dataset::setModelClass(Category::TABLE, Category::class);
 \rex_yform_manager_dataset::setModelClass(Coupon::TABLE, Coupon::class);
 \rex_yform_manager_dataset::setModelClass(Country::TABLE, Country::class);

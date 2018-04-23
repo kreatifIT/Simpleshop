@@ -1,7 +1,7 @@
 var Simpleshop = (function ($) {
 
     $(document).ready(function () {
-        // initProductSelect();
+        initProductSelect();
         initVariantSelect();
     });
 
@@ -22,7 +22,7 @@ var Simpleshop = (function ($) {
     }
 
     function initProductSelect() {
-        $('select.package-select2').wrap('<div class="yform-select2-container"/>').select2({
+        $('select.product-select2').select2({
             debug: true,
             ajax: {
                 url: rex.simpleshop.ajax_url,

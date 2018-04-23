@@ -131,6 +131,18 @@ class Product extends Model
         return $result;
     }
 
+    public static function getProductVariant($variant_key)
+    {
+        list ($product_id, $variant_key) = explode('|', $variant_key);
+
+        $Object = self::get($product_id);
+
+        if ($Object && strlen($variant_key)) {
+            $Object = $Object->getVariant($variant_key);
+        }
+        return $Object;
+    }
+
     public function getVariant($variant_key)
     {
         $product_id = $this->getValue('id');
@@ -189,43 +201,6 @@ class Product extends Model
             }
         }
         return $this->__feature_data;
-    }
-
-    public function getAllVariants($filter = [])
-    {
-        if ($this->__variants === null) {
-            $stmt = Variant::query()->resetSelect()->select('id')->select('variant_key')->where('product_id', $this->getValue('id'))->where('type', 'NE', '!=');
-
-            foreach ($filter as $data) {
-                $stmt->where($data[0], $data[1], $data[2] ?: '=');
-            }
-            $_variants = $stmt->find();
-
-            $this->__feature_data = [
-                'features' => [],
-                'variants' => [],
-            ];
-
-            foreach ($_variants as $variant) {
-                $key  = $variant->getValue('variant_key');
-                $_ids = explode(',', $key);
-                // apply default values from product
-                $clone   = clone $this;
-                $variant = $clone->getVariant($key);
-                // set variants
-                $this->__variants['variants'][$key] = $variant;
-
-                if (parent::isRegistered(FeatureValue::TABLE)) {
-                    // create the mapping
-                    foreach ($_ids as $id) {
-                        if (!isset ($this->__variants['features'][$id])) {
-                            $this->__variants['features'][$id] = FeatureValue::get($id);
-                        }
-                    }
-                }
-            }
-        }
-        return $this->__variants;
     }
 
     public static function getProductByKey($key, $cart_quantity = null, $extras = [], $throwErrors = true)

@@ -23,42 +23,58 @@ class DiscountGroup extends Discount
         $promotions = $Ep->getSubject();
 
         if (parent::isRegistered(self::TABLE)) {
-            $Order    = $Ep->getParam('Order');
-            $products = $Ep->getParam('products');
+            $Order      = $Ep->getParam('Order');
+            $promotions = self::getValidPromotions($Ep->getParam('products'), $Order->getValue('customer_data'));
+        }
+        return $promotions;
+    }
 
-            $Settings  = \rex::getConfig('simpleshop.Settings');
-            $apply_all = from_array($Settings, 'discounts_are_accumulable', 0);
-            $discounts = self::query()->where('status', 1)->orderBy('prio')->find();
-            $Customer  = $Order->getValue('customer_data');
-            $Cctype    = $Customer->getValue('ctype');
+    public static function getValidPromotions($products, $Customer = null)
+    {
+        $promotions = [];
+        $Settings   = \rex::getConfig('simpleshop.Settings');
+        $apply_all  = from_array($Settings, 'discounts_are_accumulable', 0);
+        $discounts  = self::query()->where('status', 1)->orderBy('prio')->find();
+        $Cctype     = $Customer ? $Customer->getValue('ctype') : 'person';
 
-            foreach ($discounts as $discount) {
-                $price  = $discount->getValue('price');
-                $amount = $discount->getValue('amount');
-                $Dctype = $discount->getValue('ctype', false, 'all');
+        foreach ($discounts as $discount) {
+            $dfound = false;
+            $price  = $discount->getValue('price');
+            $amount = $discount->getValue('amount');
+            $Dctype = $discount->getValue('ctype', false, 'all');
 
-                if ($Cctype == '' || $Dctype == 'all' || $Cctype == $Dctype) {
-                    if ($amount) {
-                        foreach ($products as $product) {
-                            if ($product->getValue('discount') == '') {
-                                if ($product->getValue('cart_quantity') >= $amount) {
-                                    if ($discount->getValue('free_shipping')) {
-                                        $promotions['discount_' . $discount->getValue('id')] = $discount;
-                                    }
-                                    else {
-                                        $product->setValue('discount', $discount);
-                                    }
-                                }
+            if ($Cctype == '' || $Dctype == 'all' || $Cctype == $Dctype) {
+                if ($amount) {
+                    foreach ($products as $product) {
+                        if ($product->getValue('discount') == '' && $product->getValue('cart_quantity') >= $amount) {
+                            $dfound = true;
+
+                            if ($discount->getValue('free_shipping')) {
+                                $promotions['discount_' . $discount->getValue('id')] = $discount;
+                            }
+                            else {
+                                $product->setValue('discount', $discount);
                             }
                         }
                     }
-                    elseif ($price) {
+                    if ($dfound && !$apply_all) {
+                        break; // discount found - stop here
+                    }
+                }
+                elseif ($price) {
+                    $cartTotal = 0;
+
+                    foreach ($products as $product) {
+                        $cartTotal += $product->getPrice() * $product->getValue('cart_quantity');
+                    }
+                    if ($cartTotal >= $price) {
                         $promotions['discount_' . $discount->getValue('id')] = $discount;
 
                         if (!$apply_all) {
                             break; // discount found - stop here
                         }
                     }
+
                 }
             }
         }

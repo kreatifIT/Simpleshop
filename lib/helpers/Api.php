@@ -68,12 +68,30 @@ class rex_api_simpleshop_api extends rex_api_function
         ]));
 
         foreach ($collection as $item) {
-            $result['results'][] = [
-                'id'   => $item->getId(),
-                'code' => $item->getValue('code'),
-                'name' => $item->getName(),
-                'text' => "({$item->getValue('code')})  {$item->getName()} [ID: {$item->getId()}]",
-            ];
+            $variants = $item->getFeatureVariants();
+
+            if (count($variants['variants'])) {
+                foreach ($variants['variants'] as $vitem) {
+                    $_flabel    = [];
+                    $featureIds = explode(',', $vitem->getValue('variant_key'));
+
+                    foreach ($featureIds as $featureId) {
+                        $_flabel[] = \FriendsOfREDAXO\Simpleshop\FeatureValue::get($featureId)->getName();
+                    }
+                    $result['results'][] = [
+                        'id'   => $vitem->getId() . '|' . $vitem->getValue('variant_key'),
+                        'name' => $vitem->getName(),
+                        'text' => "[{$vitem->getValue('code')}]  {$vitem->getName()}  |  ". implode(' + ', $_flabel),
+                    ];
+                }
+            }
+            else {
+                $result['results'][] = [
+                    'id'   => $item->getId(),
+                    'name' => $item->getName(),
+                    'text' => "[{$item->getValue('code')}]  {$item->getName()}",
+                ];
+            }
         }
         $totalDiff = $totalCnt - ($offset + $limit);
 
