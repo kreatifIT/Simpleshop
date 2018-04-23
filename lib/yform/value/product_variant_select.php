@@ -17,59 +17,40 @@ class rex_yform_value_product_variant_select extends rex_yform_value_select
         $multiple = $this->getElement('multiple') == 1;
         $lvalues  = [];
 
-        if ($multiple) {
-            $values = $this->getValue();
-            if (!is_array($values)) {
-                $values = explode('+', $values);
-            }
+        $values = $this->getValue();
+        if (!is_array($values)) {
+            $values = explode('+', $values);
+        }
+        $values = array_filter($values);
 
-            $real_values = [];
-            foreach ($values as $value) {
-                $Product = \FriendsOfREDAXO\Simpleshop\Product::getProductVariant($value);
+        $real_values = [];
+        foreach ($values as $value) {
+            $Product = \FriendsOfREDAXO\Simpleshop\Product::getProductVariant($value);
 
-                if ($Product) {
-                    $real_values[] = $value;
+            if ($Product) {
+                $real_values[] = $value;
 
-                    if ($Product->valueIsset('variant_key')) {
-                        $_flabel    = [];
-                        $featureIds = explode(',', $Product->getValue('variant_key'));
+                if ($Product->valueIsset('variant_key')) {
+                    $_flabel    = [];
+                    $featureIds = explode(',', $Product->getValue('variant_key'));
 
-                        foreach ($featureIds as $featureId) {
-                            $_flabel[] = \FriendsOfREDAXO\Simpleshop\FeatureValue::get($featureId)->getName();
-                        }
-
-                        $lvalues[$value] = "[{$Product->getValue('code')}]  {$Product->getName()}  |  " . implode(' + ', $_flabel);
+                    foreach ($featureIds as $featureId) {
+                        $_flabel[] = \FriendsOfREDAXO\Simpleshop\FeatureValue::get($featureId)->getName();
                     }
-                    else {
-                        $lvalues[$value] = "[{$Product->getValue('code')}] {$Product->getName()}";
-                    }
+
+                    $lvalues[$value] = "[{$Product->getValue('code')}]  {$Product->getName()}  |  " . implode(' + ', $_flabel);
+                }
+                else {
+                    $lvalues[$value] = "[{$Product->getValue('code')}] {$Product->getName()}";
+                }
+
+                if (!$multiple) {
+                    break;
                 }
             }
+        }
 
-            $this->setValue($real_values);
-        }
-        else {
-            $default = null;
-            //            $Product = \FriendsOfREDAXO\Simpleshop\Product::getProductVariant($value);
-            //
-            //            if (isset($options[$this->getElement('default')])) {
-            //                $default = $this->getElement('default');
-            //            }
-            //            $value = (string) $this->getValue();
-            //
-            //            if (!isset($options[$value])) {
-            //                if ($default !== null) {
-            //                    $this->setValue([$default]);
-            //                }
-            //                else {
-            //                    reset($options);
-            //                    $this->setValue([key($options)]);
-            //                }
-            //            }
-            //            else {
-            //                $this->setValue([$value]);
-            //            }
-        }
+        $this->setValue($real_values);
 
         // ---------- rex_yform_set
         if (isset($this->params['rex_yform_set'][$this->getName()]) && !is_array($this->params['rex_yform_set'][$this->getName()])) {
@@ -86,7 +67,7 @@ class rex_yform_value_product_variant_select extends rex_yform_value_select
             $this->params['form_output'][$this->getId()] = $this->parse('value.product_variant_select.tpl.php', compact('lvalues', 'multiple', 'size'));
         }
 
-        $this->setValue(implode('+', $this->getValue()));
+        $this->setValue(implode('+', (array) $this->getValue()));
 
         $this->params['value_pool']['email'][$this->getName()]           = $this->getValue();
         $this->params['value_pool']['email'][$this->getName() . '_NAME'] = count($lvalues) ? implode(', ', $lvalues) : (isset($lvalues[$this->getValue()]) ? $lvalues[$this->getValue()] : null);
@@ -110,78 +91,4 @@ class rex_yform_value_product_variant_select extends rex_yform_value_select
             'famous'      => false,
         ];
     }
-
-    //    public static function getListValue($params)
-    //    {
-    //        $return = [];
-    //
-    //        $new_select = new self();
-    //        $values = $new_select->getArrayFromString($params['params']['field']['options']);
-    //
-    //        foreach (explode(',', $params['value']) as $k) {
-    //            if (isset($values[$k])) {
-    //                $return[] = rex_i18n::translate($values[$k]);
-    //            }
-    //        }
-    //
-    //        return implode('<br />', $return);
-    //    }
-    //
-    //    public static function getSearchField($params)
-    //    {
-    //        $options = [];
-    //        $options['(empty)'] = '(empty)';
-    //        $options['!(empty)'] = '!(empty)';
-    //
-    //        $new_select = new self();
-    //        $options += $new_select->getArrayFromString($params['field']['options']);
-    //
-    //        if (isset($options[''])) {
-    //            unset($options['']);
-    //        }
-    //
-    //        $params['searchForm']->setValueField('select', [
-    //                'name' => $params['field']->getName(),
-    //                'label' => $params['field']->getLabel(),
-    //                'options' => $options,
-    //                'multiple' => 1,
-    //                'size' => 5,
-    //                'notice' => rex_i18n::msg('yform_search_defaults_select_notice'),
-    //            ]
-    //        );
-    //    }
-    //
-    //    public static function getSearchFilter($params)
-    //    {
-    //        $sql = rex_sql::factory();
-    //
-    //        $field = $params['field']->getName();
-    //        $values = (array) $params['value'];
-    //
-    //        $multiple = $params['field']->getElement('multiple') == 1;
-    //
-    //        $where = [];
-    //        foreach ($values as $value) {
-    //            switch ($value) {
-    //                case '(empty)':
-    //                    $where[] = ' ' . $sql->escapeIdentifier($field) . ' = ""';
-    //                    break;
-    //                case '!(empty)':
-    //                    $where[] = ' ' . $sql->escapeIdentifier($field) . ' != ""';
-    //                    break;
-    //                default:
-    //                    if ($multiple) {
-    //                        $where[] = ' ( FIND_IN_SET( ' . $sql->escape($value) . ', ' . $sql->escapeIdentifier($field) . ') )';
-    //                    } else {
-    //                        $where[] = ' ( ' . $sql->escape($value) . ' = ' . $sql->escapeIdentifier($field) . ' )';
-    //                    }
-    //
-    //                    break;
-    //            }
-    //        }
-    //
-    //        if (count($where) > 0) {
-    //            return ' ( ' . implode(' or ', $where) . ' )';
-    //        }
-    //    }
 }
