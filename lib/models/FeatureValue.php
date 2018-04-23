@@ -17,13 +17,29 @@ class FeatureValue extends Model
 {
     const TABLE = 'rex_shop_feature_values';
 
+    public static function getByVariantKey($vkey, $onlyNames = false)
+    {
+        $result     = [];
+        $featureIds = explode(',', $vkey);
+
+        foreach ($featureIds as $featureId) {
+            if ($onlyNames) {
+                $result[$featureId] = self::get($featureId)->getName();
+            }
+            else {
+                $result[$featureId] = self::get($featureId);
+            }
+        }
+        return $result;
+    }
+
     public static function ext_yform_data_delete($params)
     {
         $result = $params->getSubject();
 
         if ($result !== false && $params->getParam('table')->getTableName() == self::TABLE) {
             $links    = [];
-            $name     = sprogfield('name');
+            $name     = 'name_'. \rex_clang::getCurrentId();
             $Addon    = \rex_addon::get('simpleshop');
             $obj_id   = $params->getParam('data_id');
             $products = Product::query()->resetSelect()->select('id')->select($name)->whereRaw("

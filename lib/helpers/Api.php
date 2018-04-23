@@ -39,6 +39,48 @@ class rex_api_simpleshop_api extends rex_api_function
         return new rex_api_result($this->success, $this->response);
     }
 
+    private function api__package_selectproducts()
+    {
+        $limit   = 6;
+        $lang_id = rex_clang::getCurrentId();
+        $result  = ['results' => [], 'pagination' => ['more' => false]];
+        $page    = rex_get('page', 'int', 0);
+        $term    = rex_get('term', 'string');
+        $orderBy = rex_get('orderby', 'string', 'name_' . $lang_id);
+        $offset  = $page * $limit;
+
+        $queryParams = [
+            'orderBy' => $orderBy,
+            'order'   => 'asc',
+            'filter'  => [
+                [
+                    ["name_{$lang_id} LIKE :term", "code LIKE :term"],
+                    ['term' => "%{$term}%"],
+                    'OR',
+                ],
+            ],
+        ];
+
+        $totalCnt   = \FriendsOfREDAXO\Simpleshop\Product::getCount(false, $queryParams);
+        $collection = \FriendsOfREDAXO\Simpleshop\Product::getAll(false, array_merge($queryParams, [
+            'limit'  => $limit,
+            'offset' => $offset,
+        ]));
+
+        foreach ($collection as $item) {
+            $result['results'][] = [
+                'id'   => $item->getId(),
+                'code' => $item->getValue('code'),
+                'name' => $item->getName(),
+                'text' => "({$item->getValue('code')})  {$item->getName()} [ID: {$item->getId()}]",
+            ];
+        }
+        $totalDiff = $totalCnt - ($offset + $limit);
+
+        $result['pagination']['more'] = $totalDiff > 0;
+        $this->response['result']     = $result;
+    }
+
     private function api__cart_getcartcontent($layout)
     {
         $ctrlTpl  = '';

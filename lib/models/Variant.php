@@ -39,4 +39,46 @@ class Variant extends Model
     {
         return true;
     }
+
+    public static function be_getYFields()
+    {
+        $labels  = [];
+        $fields  = [];
+        $columns = \rex_yform_manager_table::get(self::TABLE)->getFields();
+        $params  = ['this' => \rex_yform::factory()];
+
+        foreach ($columns as $column) {
+            $type = $column->getTypeName();
+            $name = $column->getName();
+
+            if ($name == 'variant_key' || in_array($type, ['be_manager_relation', 'datestamp'])) {
+                continue;
+            }
+            $notice      = '';
+            $values      = [$type];
+            $class       = 'rex_yform_value_' . trim($type);
+            $field       = new $class();
+            $definitions = $field->getDefinitions();
+
+            foreach ($definitions['values'] as $key => $_) {
+                $values[] = $column->getElement($key);
+            }
+
+            if (count($values) > 4) {
+                $i          = count($values) - 1;
+                $notice     = $values[$i];
+                $values[$i] = '';
+            }
+            $field->loadParams($params, $values);
+            $fields[] = $field;
+
+            if ($type != 'hidden_input') {
+                $labels[] = [
+                    'label'  => $field->getLabel(),
+                    'notice' => $notice,
+                ];
+            }
+        }
+        return [$labels, $fields];
+    }
 }

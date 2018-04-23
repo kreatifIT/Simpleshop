@@ -13,19 +13,47 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$name   = $this->getVar('name');
-$fields = $this->getVar('fields');
-$type   = $this->getVar('type');
+$status  = '';
+$hiddens = [];
+$columns = [];
+$vkey    = $this->getVar('vkey');
+$name    = $this->getVar('name');
+$fields  = $this->getVar('fields');
+$Variant = $this->getVar('Variant');
+
+
+foreach ($fields as $field) {
+    $field->params['this']->setObjectparams('form_name', $vkey);
+    $field->setId($field->name);
+    $field->init();
+    $field->setLabel('');
+    $field->setValue($Variant ? $Variant->getValue($field->name) : null);
+    $field->enterObject();
+
+    if ($field->name == 'type') {
+        $status = $field->getValue();
+    }
+
+    if ($field->type == 'hidden_input' || $field->name == 'prio') {
+        $hiddens[] = $field->params['form_output'][$field->getId()];
+    }
+    else {
+        $columns[] = "<td>{$field->params['form_output'][$field->getId()]}</td>";
+    }
+}
 
 ?>
-<tr class="type-<?= $type ?>">
-    <td>
-    <span
-        style="white-space:nowrap;">- <?= implode('<br/></span><span style="white-space:nowrap;">- ', $name) ?></span>
+<tr class="type-<?= $status ?> item">
+    <td class="rex-table-icon sort-handle ui-sortable-handle">
+        <i class="rex-icon fa fa-bars sort-icon"></i>
     </td>
-    <?php foreach ($fields as $field): ?>
-        <td><?= $field ?></td>
-    <?php endforeach; ?>
+    <td>
+    <span class="variant-name">
+        <?= implode('<br/></span><span style="white-space:nowrap;">+ ', $name) ?>
+    </span>
+    </td>
+    <td><?= implode('', $columns) ?></td>
+    <td><?= implode('', $hiddens) ?></td>
 </tr>
 
 

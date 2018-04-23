@@ -81,8 +81,28 @@ table.table {
     // variants
     &.variants {
         tr {
+            &.type-NE {
+                background: #e8cdb8;
+                opacity: 0.8;
+            }
+            &.type-FREE {
+                background: #d1e3f7;
+            }
             &:first-child {
                 background: #fff;
+            }
+            &.ui-sortable-helper {
+                background: #FDFFAB;
+                td {
+                    height: 150px;
+                    overflow: hidden;
+                }
+            }
+            &.ui-sortable-placeholder {
+                background: #FAFFDD;
+                height: 150px;
+                width: 100%;
+                visibility: visible !important;
             }
             td {
                 label {
@@ -94,6 +114,10 @@ table.table {
                 small,
                 .form-group {
                     margin-bottom: 0;
+                }
+                .sort-icon:hover {
+                    color: #3bb594;
+                    cursor: move;
                 }
             }
         }

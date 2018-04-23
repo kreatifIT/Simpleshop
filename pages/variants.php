@@ -23,7 +23,7 @@ if ($_FUNC == 'rm-variants') {
     $sql = \rex_sql::factory();
     $sql->setQuery("DELETE FROM " . Variant::TABLE . " WHERE product_id = :product_id", ['product_id' => $product_id]);
 }
-if ($_FUNC == 'apply-features') {
+elseif ($_FUNC == 'apply-features') {
     $features_ids = explode(',', rex_get('feature_ids', 'string'));
     $current_fids = explode(',', $product->getValue('features'));
     $product->setValue('features', implode(',', array_unique(array_filter(array_merge($features_ids, $current_fids)))));
@@ -52,7 +52,7 @@ else if (!$features && Variant::query()->where('product_id', $product_id)->count
 
         foreach ($_features as $feature_id) {
             if (!isset($features[$feature_id])) {
-                $features[$feature_id] = FeatureValue::get($feature_id)->getValue(sprogfield('name'));
+                $features[$feature_id] = FeatureValue::get($feature_id)->getValue('name', true);
             }
         }
     }
@@ -82,119 +82,108 @@ else if (!$features) {
     ]));
     return;
 }
+
 if ($_FUNC == 'save') {
-    $saved_keys = [];
-    $data       = rex_post('FORM', 'array');
+    $vIds = [];
+    $data = rex_post('FORM', 'array');
 
     foreach ($data as $key => $values) {
-        $variant = Variant::query()->where('variant_key', $key)->where('product_id', $product_id)->findOne();
+        $Variant = Variant::getOne(false, [
+            'filter' => [
+                ['product_id', $product_id],
+                ['variant_key', $key],
+            ],
+        ]);
 
-        if (!$variant) {
-            $variant = Variant::create();
-            $variant->setValue('variant_key', $key);
-            $variant->setValue('product_id', $product_id);
+        if ($Variant) {
+            $Variant->setValue('updatedate', date('Y-m-d H:i:s'));
         }
         else {
-            $variant->setValue('updatedate', date('Y-m-d H:i:s'));
+            $Variant = Variant::create();
+            $Variant->setValue('variant_key', $key);
+            $Variant->setValue('product_id', $product_id);
         }
         foreach ($values as $name => $value) {
-            $variant->setValue($name, $value);
+            $Variant->setValue($name, $value);
         }
-        $variant->save();
-        $saved_keys[] = $key;
+        $Variant->save();
+        $vIds[] = $Variant->getId();
     }
     // remove previously saved variants
-    \rex_sql::factory()->setQuery("DELETE FROM " . Variant::TABLE . " WHERE product_id = ? AND variant_key NOT IN(" . implode(',', $saved_keys) . ")", [$product_id]);
+    \rex_sql::factory()->setQuery("DELETE FROM " . Variant::TABLE . " WHERE product_id = ? AND id NOT IN(" . implode(',', $vIds) . ")", [$product_id]);
 }
 
 // load all columns from yform
-$columns     = \rex_yform_manager_table::get(Variant::TABLE)->getFields();
-$params      = ['this' => \rex_yform::factory()];
-$fields      = [];
-$labels      = [];
-$variants    = [];
-$feature_ids = [];
-$rows        = [];
+$rows         = [];
+$featureNames = [];
+$featureKeys  = [];
+$variants     = Variant::getAll(false, ['filter' => [['product_id', $product_id]]]);
 
 // load all yform fields to place them into columns
-foreach ($columns as $column) {
-    $type = $column->getTypeName();
-    $name = $column->getName();
+list ($labels, $fields) = Variant::be_getYFields();
 
-    if ($name == 'variant_key' || in_array($type, ['be_manager_relation', 'datestamp'])) {
-        continue;
-    }
-    $values      = [$type];
-    $class       = 'rex_yform_value_' . trim($type);
-    $field       = new $class();
-    $definitions = $field->getDefinitions();
-
-    foreach ($definitions['values'] as $key => $_) {
-        $values[] = $column->getElement($key);
-    }
-    $notice = '';
-
-    if (count($values) > 4) {
-        $notice                     = $values[count($values) - 1];
-        $values[count($values) - 1] = '';
-    }
-    $field->loadParams($params, $values);
-    $fields[] = $field;
-
-    if ($type != 'hidden_input') {
-        $labels[] = [
-            'label'  => $field->getLabel(),
-            'notice' => $notice,
-        ];
-    }
-}
 
 // calculate the possible variants
 foreach ($features as $feature) {
-    $values    = $feature->values;
-    $_variants = $variants;
-    $variants  = [];
+    $_fk         = $featureKeys;
+    $featureKeys = [];
 
-    if (count($_variants) == 0) {
-        $_variants[] = '';
+    if (count($_fk) == 0) {
+        $_fk[] = '';
     }
-    foreach ($values as $value) {
-        $feature_ids[$value->getValue('id')] = $value->getValue('name_1');
+    foreach ($feature->getValue('values') as $value) {
+        $featureNames[$value->getValue('id')] = $value->getName();
 
-        foreach ($_variants as $variant) {
-            $variants[] = ltrim($variant . ',' . $value->getValue('id'), ',');
+        foreach ($_fk as $fk) {
+            $vkey   = explode(',', ltrim($fk, ','));
+            $vkey[] = $value->getValue('id');
+            sort($vkey);
+
+            $featureKeys[] = implode(',', $vkey);
         }
     }
 }
 
 // apply fields/columns to variants
-foreach ($variants as $variant_key) {
-    $_ids    = explode(',', $variant_key);
-    $type    = '';
-    $_name   = [];
-    $_fields = [];
-    $variant = Variant::query()->where('product_id', $product_id)->where('variant_key', $variant_key)->findOne();
+$fragment = new \rex_fragment();
+$fragment->setVar('fields', $fields);
 
-    foreach ($_ids as $id) {
-        $_name[] = $feature_ids[$id];
-    }
-    foreach ($fields as $field) {
-        $field->params['this']->setObjectparams('form_name', $variant_key);
-        $field->setId($field->name);
-        $field->init();
-        $field->setLabel('');
-        $field->setValue($variant ? $variant->getValue($field->name) : null);
-        $field->enterObject();
-        $_fields[] = $field->params['form_output'][$field->getId()];
+foreach ($variants as $Variant) {
+    $name   = [];
+    $vkey   = $Variant->getValue('variant_key');
+    $findex = array_search($vkey, $featureKeys);
 
-        if ($field->name == 'type') {
-            $type = $field->getValue();
-        }
+    if ($findex !== false) {
+        // remove vkey from featurekeys
+        unset($featureKeys[$findex]);
     }
-    $fragment = new \rex_fragment();
-    $fragment->setVar('fields', $_fields, false);
-    $fragment->setVar('name', $_name);
-    $fragment->setVar('type', $type);
+    else {
+        // by pass invalid feature-keys
+        continue;
+    }
+
+    foreach (explode(',', $vkey) as $fid) {
+        $name[] = $featureNames[$fid];
+    }
+    $fragment->setVar('vkey', $vkey);
+    $fragment->setVar('name', $name);
+    $fragment->setVar('Variant', $Variant);
+
+    $rows[] = $fragment->parse('simpleshop/backend/variants/row_item.php');
+}
+// reset variant
+$fragment->setVar('Variant', null);
+
+// add the empty variants
+foreach ($featureKeys as $vkey) {
+    $name = [];
+
+    foreach (explode(',', $vkey) as $fid) {
+        $name[] = $featureNames[$fid];
+    }
+    $fragment->setVar('vkey', $vkey);
+    $fragment->setVar('name', $name);
+
     $rows[] = $fragment->parse('simpleshop/backend/variants/row_item.php');
 }
 
@@ -212,10 +201,10 @@ $fragment     = new \rex_fragment();
 $fragment->setVar('elements', $formElements, false);
 $buttons = $fragment->parse('core/form/submit.php');
 
-echo '<form action="" method="post">';
+echo '<form action="" method="post" onsubmit="Simpleshop.saveVariants(this)">';
 $fragment = new \rex_fragment();
 $fragment->setVar('class', 'edit', false);
-$fragment->setVar('title', $product->getValue('name_1') . ' [' . $product_id . ']');
+$fragment->setVar('title', $product->getName() . ' [' . $product_id . ']');
 $fragment->setVar('content', $content, false);
 $fragment->setVar('buttons', $buttons, false);
 echo $fragment->parse('core/page/section.php');

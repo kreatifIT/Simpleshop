@@ -134,7 +134,11 @@ class Product extends Model
     public function getVariant($variant_key)
     {
         $product_id = $this->getValue('id');
-        $variant    = Variant::query()->where('product_id', $product_id)->where('variant_key', $variant_key)->where('type', 'NE', '!=')->findOne();
+        $stmt       = Variant::query();
+        $stmt->where('product_id', $product_id);
+        $stmt->where('variant_key', $variant_key);
+        $stmt->where('type', 'NE', '!=');
+        $variant = $stmt->findOne();
 
         if (!$variant) {
             throw new ProductException("The variant doesn't exist --key:{$product_id}|{$variant_key}", 3);
@@ -154,6 +158,7 @@ class Product extends Model
             $stmt->select('variant_key');
             $stmt->where('product_id', $this->getValue('id'));
             $stmt->where('type', 'NE', '!=');
+            $stmt->orderBy('prio', 'asc');
             $_variants = $stmt->find();
 
             $this->__feature_data = [
@@ -351,20 +356,59 @@ class Product extends Model
         $Object = $Ep->getSubject();
         $vkey   = trim(rex_get('vkey', 'string'));
 
-        if ($vkey != '' && $Ep->getParam('table') == self::TABLE) {
-            try {
-                $Object = $Object->getVariant($vkey);
-
-                \rex_extension::register('YREWRITE_ROBOTS_TAG', function(\rex_extension_point $Ep) {
-                    return false;
-                });
+        if ($Ep->getParam('table') == self::TABLE) {
+            if ($vkey == '') {
+                $sql = \rex_sql::factory();
+                $sql->setQuery("
+                    SELECT variant_key 
+                    FROM " . Variant::TABLE . " 
+                    WHERE product_id = :pid 
+                    AND type != 'NE'
+                    ORDER BY prio ASC LIMIT 1", ['pid' => $Object->getId()]);
+                $vkey = @$sql->getValue('variant_key');
             }
-            catch (ProductException $ex) {
-                \rex_response::setStatus(404);
-                $Object = false;
+            if ($vkey != '') {
+                try {
+                    $Object = $Object->getVariant($vkey);
+
+                    \rex_extension::register('YREWRITE_ROBOTS_TAG', function (\rex_extension_point $Ep) {
+                        return false;
+                    });
+                }
+                catch (ProductException $ex) {
+                    \rex_response::setStatus(404);
+                    $Object = false;
+                }
             }
         }
         return $Object;
+    }
+
+    public static function ext_queryCollection(\rex_extension_point $Ep)
+    {
+        $collection = $Ep->getSubject();
+
+        if ($Ep->getParam('table') == self::TABLE) {
+            $result = [];
+            $sql    = \rex_sql::factory();
+
+            foreach ($collection as $Object) {
+                $sql->setQuery("
+                    SELECT variant_key 
+                    FROM " . Variant::TABLE . " 
+                    WHERE product_id = :pid 
+                    AND type != 'NE'
+                    ORDER BY prio ASC LIMIT 1", ['pid' => $Object->getId()]);
+                $vkey = @$sql->getValue('variant_key');
+
+                if ($vkey != '') {
+                    $Object = $Object->getVariant($vkey);
+                }
+                $result[] = $Object;
+            }
+            $collection = $result;
+        }
+        return $collection;
     }
 }
 

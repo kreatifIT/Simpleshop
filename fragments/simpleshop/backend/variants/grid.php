@@ -18,8 +18,9 @@ $labels = $this->getVar('labels');
 $rows   = $this->getVar('rows');
 
 ?>
-<table class="table variants">
+<table class="table table-condensed variants" valign="top">
     <tr>
+        <th>&nbsp;</th>
         <th><?= $this->i18n('label.name') ?></th>
         <?php foreach ($labels as $label): ?>
             <th>
@@ -33,8 +34,7 @@ $rows   = $this->getVar('rows');
     </tr>
 
     <?php
-    foreach ($rows as $row)
-    {
+    foreach ($rows as $row) {
         echo $row;
     }
     ?>
