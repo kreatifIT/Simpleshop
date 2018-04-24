@@ -52,7 +52,7 @@ foreach ($fields as $field) {
         <?= implode('<br/></span><span style="white-space:nowrap;">+ ', $name) ?>
     </span>
     </td>
-    <td><?= implode('', $columns) ?></td>
+    <?= implode('', $columns) ?>
     <td><?= implode('', $hiddens) ?></td>
 </tr>
 
