@@ -179,7 +179,7 @@ class Product extends Model
 
             foreach ($_variants as $variant) {
                 $key  = $variant->getValue('variant_key');
-                $_ids = explode(',', $key);
+                $_ids = array_filter(explode(',', $key));
 
                 // order ids by feature priority
                 $query = '
