@@ -39,13 +39,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                 case 'generate_creditnote':
                     $CreditNote = \FriendsOfREDAXO\Simpleshop\Order::create();
 
-                    $CreditNote->setValue('customer_id', $Order->getValue('customer_id'));
-                    $CreditNote->setValue('status', 'CN');
-                    $CreditNote->setValue('initial', $Order->getValue('total'));
-                    $CreditNote->setValue('address_1', $Order->getValue('address_1'));
-                    $CreditNote->setValue('ip_address', rex_server('REMOTE_ADDR', 'string', 'notset'));
-                    $CreditNote->setValue('total', $Order->getValue('total') * -1);
-                    $CreditNote->setValue('ref_order_id', $Order->getId());
+                    $CreditNote->calculateCreditNote($Order);
                     $CreditNote->setFinalize(true);
                     $CreditNote->save();
 

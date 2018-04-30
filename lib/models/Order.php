@@ -225,25 +225,37 @@ class Order extends Model
         $this->initial_total  = 0;
         $manual_discount      = $this->getValue('manual_discount', false, 0);
 
-        // calculate total
-        foreach ($products as $product) {
-            $quantity = $product->getValue('cart_quantity');
-            $tax_perc = Tax::get($product->getValue('tax'))->getValue('tax');
+        if ($this->getValue('status') == 'CN') {
+            // calculate credit note total
+            $ROrder = Order::get($this->getValue('ref_order_id'));
 
-            $net_prices[$tax_perc] += (float) $product->getPrice() * $quantity;
-            $this->initial_total   += (float) $product->getPrice(true) * $quantity;
-            $this->quantity        += $quantity;
-        }
-        // get shipping costs
-        try {
-            if ($this->shipping) {
-                $this->setValue('shipping_costs', (float) $this->shipping->getNetPrice($this, $products));
-                $this->setValue('initial_shipping_costs', (float) $this->shipping->getPrice($this, $products));
+            if ($ROrder) {
+                $net_prices = $this->calculateCreditNote($ROrder);
             }
         }
-        catch (\Exception $ex) {
-            throw new OrderException($ex->getLabelByCode());
+        else {
+            // calculate products total
+            foreach ($products as $product) {
+                $quantity = $product->getValue('cart_quantity');
+                $tax_perc = Tax::get($product->getValue('tax'))->getValue('tax');
+
+                $net_prices[$tax_perc] += (float) $product->getPrice() * $quantity;
+                $this->initial_total   += (float) $product->getPrice(true) * $quantity;
+                $this->quantity        += $quantity;
+            }
+
+            // get shipping costs
+            try {
+                if ($this->shipping) {
+                    $this->setValue('shipping_costs', (float) $this->shipping->getNetPrice($this, $products));
+                    $this->setValue('initial_shipping_costs', (float) $this->shipping->getPrice($this, $products));
+                }
+            }
+            catch (\Exception $ex) {
+                throw new OrderException($ex->getLabelByCode());
+            }
         }
+
         ksort($net_prices);
 
         $this->setValue('updatedate', date('Y-m-d H:i:s'));
@@ -302,6 +314,27 @@ class Order extends Model
         Utils::resetLocale();
 
         return $errors;
+    }
+
+    public function calculateCreditNote(Order $ReferenceOrder)
+    {
+        $total      = $ReferenceOrder->getValue('total') * -1;
+        $net_prices = $ReferenceOrder->getValue('net_prices');
+
+        foreach ($net_prices as &$net_price) {
+            $net_price = $net_price * -1;
+        }
+
+        $this->setValue('customer_id', $ReferenceOrder->getValue('customer_id'));
+        $this->setValue('status', 'CN');
+        $this->setValue('initial', $total);
+        $this->setValue('net_prices', $net_prices);
+        $this->setValue('address_1', $ReferenceOrder->getValue('address_1'));
+        $this->setValue('ip_address', rex_server('REMOTE_ADDR', 'string', 'notset'));
+        $this->setValue('total', $total);
+        $this->setValue('ref_order_id', $ReferenceOrder->getId());
+
+        return $net_prices;
     }
 
     private function calculatePrices($promotions, $net_prices)
