@@ -72,7 +72,7 @@ class Variant extends Model
             $field->loadParams($params, $values);
             $fields[] = $field;
 
-            if ($type != 'hidden_input') {
+            if ($type != 'hidden_input' && $name != 'prio') {
                 $labels[] = [
                     'label'  => $field->getLabel(),
                     'notice' => $notice,
