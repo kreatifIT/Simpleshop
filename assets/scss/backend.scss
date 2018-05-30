@@ -6,6 +6,22 @@
     border-bottom: 1px solid #c1c9d4;
 }
 
+.coupon-functions {
+    .coupon-clone-count {
+        width: 60px;
+        margin-right: 5px;
+        float: left;
+        text-align: right;
+        background-color: #ffffff;
+    }
+    .inline-text {
+        float: left;
+        height: 30px;
+        line-height: 30px;
+        margin: 4px 5px 0 0;
+    }
+}
+
 //Packing list styles
 .packing-list-page {
     font-size: 12px;

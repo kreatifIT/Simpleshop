@@ -28,6 +28,8 @@ label.recalculate_sums = Werte neu berechnen
 label.msg_resend_email = Email wurde versendet
 label.msg_recalculate_sums = Werte wurden aktualisiert
 label.invoice_num = Rechn.-Nr
+label.clone_coupon = diesen Coupon klonen
+label.msg_clone = Es wurden {NUM} Coupons generiert
 
 
 action.manage_variants = Varianten verwalten
@@ -59,5 +61,5 @@ settings.shop_settings = Shop-Einstellungen
 settings.brutto_prices = Bruttopreise
 settings.brutto_prices_info = Bruttopreise bei der Eingabe im Backend verwenden (inkl. MwSt)
 
-yform_values.order_functions_label = Funktionen
+yform_values.coupon_functions_description = Funktionen für Coupon-Codes
 yform_values.order_functions_description = Funktionen für Bestelldokumente

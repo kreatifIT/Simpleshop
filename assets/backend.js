@@ -56,6 +56,12 @@ var Simpleshop = (function ($) {
         saveVariants: function(_this) {
             updateVariantPrio($(_this).find('table.variants'));
         },
+        cloneCoupon: function(_this) {
+            var $this = $(_this),
+                $input = $this.parent().find('input.coupon-clone-count');
+
+            $this.prop('href', $this.prop('href') + $input.val());
+        },
         addShippingPackage: function (el) {
             var $this = $(el),
                 $tr = $this.parents('tr'),
