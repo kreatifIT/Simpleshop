@@ -56,7 +56,9 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                 case 'recalculate_sums':
                     $products       = [];
                     $order_products = \FriendsOfREDAXO\Simpleshop\OrderProduct::getAll(true, ['filter' => [['order_id', $Order->getId()]], 'orderBy' => 'm.id']);
-                    $promotions     = (array) $Order->getValue('promotions', false, []);
+                    $promotions     = $Order->getValue('promotions', false, []);
+                    $abos           = $Order->getValue('abos');
+                    $discount       = 0;
 
                     foreach ($order_products as $order_product) {
                         $product = $order_product->getValue('data');
@@ -64,6 +66,10 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                         $products[] = $product;
                     }
 
+                    foreach ($abos as $abo) {
+                        $discount += $abo['value'];
+                    }
+                    $Order->setValue('manual_discount', $discount);
                     $Order->recalculateDocument($products, $promotions);
                     $Order->save();
 
