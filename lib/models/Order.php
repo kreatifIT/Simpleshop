@@ -14,7 +14,8 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-use PHPMailer\PHPMailer\Exception;
+use Kreatif\Mpdf\Mpdf;
+
 
 class Order extends Model
 {
@@ -62,12 +63,19 @@ class Order extends Model
                 $orderProduct = $Product;
             }
         }
+
         return $products;
     }
 
     public function getInvoiceNum()
     {
-        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.getInvoiceNum', $this->getValue('invoice_num'), [
+        $invoice_num = trim($this->getValue('invoice_num'));
+
+        if ($invoice_num == '0' || $invoice_num == '' || $invoice_num == 0) {
+            $invoice_num = null;
+        }
+
+        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.getInvoiceNum', $invoice_num, [
             'Order' => $this,
         ]));
     }
@@ -96,11 +104,6 @@ class Order extends Model
         return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.completeOrder', $result, [
             'Order' => $this,
         ]));
-    }
-
-    public function setFinalize($value)
-    {
-        self::$_finalizeOrder = $value;
     }
 
     public function save($simple_save = true)
@@ -211,6 +214,7 @@ class Order extends Model
         }
 
         Utils::resetLocale();
+
         return $result;
     }
 
@@ -327,12 +331,14 @@ class Order extends Model
 
         $this->setValue('customer_id', $ReferenceOrder->getValue('customer_id'));
         $this->setValue('status', 'CN');
-        $this->setValue('initial', $total);
+        $this->setValue('initial_total', $total);
         $this->setValue('net_prices', $net_prices);
         $this->setValue('address_1', $ReferenceOrder->getValue('address_1'));
         $this->setValue('ip_address', rex_server('REMOTE_ADDR', 'string', 'notset'));
         $this->setValue('total', $total);
         $this->setValue('ref_order_id', $ReferenceOrder->getId());
+
+        self::$_finalizeOrder = true;
 
         return $net_prices;
     }
@@ -438,7 +444,63 @@ class Order extends Model
             $sql    = \rex_sql::factory();
             $sql->setQuery($query);
         }
+
         return $result;
+    }
+
+    public function getInvoicePDF($type = 'invoice', $debug = false, Mpdf $_Mpdf = null)
+    {
+        $content    = '';
+        $fragment   = new \rex_fragment();
+        $Mpdf       = $_Mpdf ?: new Mpdf([]);
+        $invoiceNum = $this->getInvoiceNum();
+
+        if ($invoiceNum == null) {
+            $type = 'order';
+        }
+
+        $docTitle  = $type == 'invoice' ? 'simpleshop.invoice_title' : 'simpleshop.orderdocument_title';
+        $discounts = (array) $this->getValue('abos');
+        $mdiscount = $this->getValue('manual_discount');
+
+        $Mpdf->SetProtection(['print']);
+        $Mpdf->SetDisplayMode('fullpage');
+
+        $fragment->setVar('Customer', $this->getInvoiceAddress());
+        $fragment->setVar('Order', $this);
+        $fragment->setVar('type', $type);
+        $content .= $fragment->parse('simpleshop/pdf/invoice/header.php');
+
+        $content .= $fragment->parse('simpleshop/pdf/invoice/invoice_data.php');
+
+        $content .= $fragment->parse('simpleshop/pdf/invoice/items.php');
+
+
+        if (count($discounts) == 0 && $this->getValue('discount') > 0) {
+            $discounts[] = ['name' => '###label.discount###', 'value' => $this->getValue('discount')];
+        }
+        if ($mdiscount) {
+            $discounts[] = ['name' => '###label.discount###', 'value' => $mdiscount];
+        }
+        $fragment->setVar('discounts', $discounts);
+        $fragment->setVar('tax', $this->getTaxTotal());
+        $fragment->setVar('old_tax', $this->getValue('tax'));
+        $fragment->setVar('taxes', $this->getValue('taxes'));
+        $fragment->setVar('total', $this->getValue('total'));
+        $fragment->setVar('initial_total', $this->getValue('initial_total'));
+        $content .= $fragment->parse('simpleshop/pdf/invoice/summary.php');
+
+        $fragment->setVar('title', strtr(\Wildcard::get($docTitle), ['{NUM}' => $invoiceNum]));
+        $fragment->setVar('content', $content, false);
+        $html = $fragment->parse('simpleshop/pdf/invoice/wrapper.php');
+
+        if ($debug) {
+            echo "<div style='background:#666;height:100vh;padding:20px;'><div style='max-width:800px;margin:0px auto;background:#fff;'>{$html}</div></div>";
+            exit;
+        }
+        $Mpdf->WriteHTML($html);
+
+        return $Mpdf;
     }
 }
 

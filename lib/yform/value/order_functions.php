@@ -26,6 +26,12 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
             }
 
             switch ($action) {
+                case 'generate_pdf':
+                    rex_response::cleanOutputBuffers();
+                    $PDF = $Order->getInvoicePDF('invoice', false);
+                    $PDF->Output();
+                    exit;
+
                 case 'resend_email':
                     $Controller = new \FriendsOfREDAXO\Simpleshop\CheckoutController();
                     $Controller->setOrder($Order);
@@ -40,7 +46,6 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                     $CreditNote = \FriendsOfREDAXO\Simpleshop\Order::create();
 
                     $CreditNote->calculateCreditNote($Order);
-                    $CreditNote->setFinalize(true);
                     $CreditNote->save();
 
                     unset($_GET['ss-action']);
@@ -51,7 +56,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                 case 'recalculate_sums':
                     $products       = [];
                     $order_products = \FriendsOfREDAXO\Simpleshop\OrderProduct::getAll(true, ['filter' => [['order_id', $Order->getId()]], 'orderBy' => 'm.id']);
-                    $promotions     = $Order->getValue('promotions', false, []);
+                    $promotions     = (array) $Order->getValue('promotions', false, []);
 
                     foreach ($order_products as $order_product) {
                         $product = $order_product->getValue('data');
@@ -87,6 +92,12 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                         <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'recalculate_sums'])) . '" class="btn btn-default">
                             <i class="fa fa-calculator"></i>&nbsp;
                             ' . rex_i18n::msg('label.recalculate_sums') . '
+                        </a>
+                    ';
+                    $output[] = '
+                        <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'generate_pdf'])) . '" class="btn btn-default">
+                            <i class="fa fa-file"></i>&nbsp;
+                            PDF drucken
                         </a>
                     ';
 

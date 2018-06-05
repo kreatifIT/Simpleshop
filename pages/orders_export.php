@@ -40,7 +40,7 @@ $_FUNC = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.orde
     'output'    => $output,
 ]));
 
-if ($_FUNC == 'export' && count($order_ids)) {
+if ($_FUNC == 'export-csv' && count($order_ids)) {
     ob_clean();
 
     if ($output == 'file') {
@@ -54,7 +54,30 @@ if ($_FUNC == 'export' && count($order_ids)) {
     $fragment->setVar('order_ids', $order_ids);
     $fragment->setVar('output', $output);
     $fragment->setVar('statuses', $statuses);
-    echo $fragment->parse('simpleshop/backend/export/orders_export.php');
+    echo $fragment->parse('simpleshop/backend/export/orders_export_csv.php');
+    exit;
+}
+else if ($_FUNC == 'export-pdf' && count($order_ids)) {
+    ob_clean();
+
+    if ($output == 'file') {
+        header('Content-Type: application/pdf; charset=utf-8');
+        header("Content-Disposition: attachment;filename=orders-{$year}-{$month}.pdf");
+        header('Content-Description: File Transfer');
+        header('Content-Transfer-Encoding: binary');
+        header('Cache-Control: public, must-revalidate, max-age=0');
+        header('Pragma: public');
+        $tpl = 'orders_export_pdf.php';
+    }
+    else {
+        header('Content-Type: text/html; charset=utf-8');
+        $tpl = 'orders_export_csv.php';
+    }
+    $fragment = new \rex_fragment();
+    $fragment->setVar('order_ids', $order_ids);
+    $fragment->setVar('output', $output);
+    $fragment->setVar('statuses', $statuses);
+    echo $fragment->parse('simpleshop/backend/export/' . $tpl);
     exit;
 }
 
