@@ -32,7 +32,6 @@ $Category = $product->valueIsset('category_id') ? Category::get($product->getVal
 
 $config         = $this->getVar('cart_config', FragmentConfig::getValue('cart'));
 $styles         = FragmentConfig::getValue('styles');
-$useEmailStyles = FragmentConfig::getValue('email_styles.use_mail_styles');
 
 if ($is_giftcard) {
     $config['has_quantity_control'] = false;
@@ -78,18 +77,12 @@ if ($is_giftcard) {
         ?>
     </td>
     <td class="cart-item-price-wrapper" <?= $styles['prod-td'] ?>>
-        <?php if (!$useEmailStyles): ?>
-            <span class="hide-for-large">###label.price###: </span>
-        <?php endif; ?>
         <strong>&euro;&nbsp;<?= format_price($price) ?></strong>
         <?php if ($discount): ?>
             <div class="product-discount"><?= $discount->getName() ?></div>
         <?php endif; ?>
     </td>
     <td class="cart-item-total-wrapper" <?= $styles['prod-td'] ?>>
-        <?php if (!$useEmailStyles): ?>
-            <span class="hide-for-large">###label.total###: </span>
-        <?php endif; ?>
         <strong>&euro;&nbsp;<?= format_price($price * $quantity) ?></strong>
     </td>
     <?php if ($config['has_remove_button']): ?>

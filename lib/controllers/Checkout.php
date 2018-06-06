@@ -18,6 +18,7 @@ use Kreatif\Project\Settings;
 use Sprog\Wildcard;
 use Symfony\Component\Yaml\Exception\RuntimeException;
 
+
 class CheckoutController extends Controller
 {
     protected $products = [];
@@ -52,8 +53,7 @@ class CheckoutController extends Controller
 
                     if (strlen($backStep)) {
                         $back_url = rex_getUrl(null, null, ['step' => $backStep]);
-                    }
-                    else {
+                    } else {
                         $Settings = \rex::getConfig('simpleshop.Settings');
                         $back_url = rex_getUrl($Settings['linklist']['cart']);
                     }
@@ -90,8 +90,7 @@ class CheckoutController extends Controller
                 case 'init-payment':
                     return $this->initPayment();
             }
-        }
-        else {
+        } else {
             // no products - redirect to shopping cart
             rex_redirect($this->settings['linklist']['cart']);
         }
@@ -165,7 +164,8 @@ class CheckoutController extends Controller
                 'limit'   => 1,
                 'orderBy' => 'id',
                 'order'   => 'desc',
-            ])->toArray();
+            ])
+                ->toArray();
             $Address   = array_shift($addresses);
         }
 
@@ -197,7 +197,8 @@ class CheckoutController extends Controller
     public static function shippingAddressCallback(\rex_extension_point $Ep)
     {
         $yform = $Ep->getSubject();
-        $table = $Ep->getParam('table')->getTableName();
+        $table = $Ep->getParam('table')
+            ->getTableName();
 
         if (!\rex::isBackend() && $table == CustomerAddress::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
             $Object   = $Ep->getParam('data');
@@ -228,7 +229,8 @@ class CheckoutController extends Controller
                 'limit'   => 1,
                 'orderBy' => 'id',
                 'order'   => 'asc',
-            ])->toArray();
+            ])
+                ->toArray();
             $Address   = array_shift($addresses);
         }
 
@@ -242,7 +244,8 @@ class CheckoutController extends Controller
     public static function invoiceAddressCallback(\rex_extension_point $Ep)
     {
         $yform = $Ep->getSubject();
-        $table = $Ep->getParam('table')->getTableName();
+        $table = $Ep->getParam('table')
+            ->getTableName();
 
         if (!\rex::isBackend() && $table == Customer::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
             CheckoutController::$callbackCheck['invoice'] = true;
@@ -260,8 +263,7 @@ class CheckoutController extends Controller
                 CheckoutController::setDoneStep($nextStep);
                 rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
             }
-        }
-        else if (!\rex::isBackend() && $table == CustomerAddress::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
+        } else if (!\rex::isBackend() && $table == CustomerAddress::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
             CheckoutController::$callbackCheck['shipping'] = true;
 
             $Object   = $Ep->getParam('data');
@@ -290,18 +292,15 @@ class CheckoutController extends Controller
             $nextStep = CheckoutController::getNextStep();
             CheckoutController::setDoneStep($nextStep);
             rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
-        }
-        else if (rex_post('action', 'string') == 'set-shipping-payment') {
+        } else if (rex_post('action', 'string') == 'set-shipping-payment') {
             try {
                 $this->Order->setValue('shipping', Shipping::get(rex_post('shipment', 'string')));
-            }
-            catch (RuntimeException $ex) {
+            } catch (RuntimeException $ex) {
             }
 
             try {
                 $this->Order->setValue('payment', Payment::get(rex_post('payment', 'string')));
-            }
-            catch (RuntimeException $ex) {
+            } catch (RuntimeException $ex) {
             }
 
             Session::setCheckoutData('Order', $this->Order);
@@ -330,8 +329,7 @@ class CheckoutController extends Controller
                     $this->setVar('code', $code);
                     // save coupon to apply it also on page refresh
                     Session::setCheckoutData('coupon_code', $code);
-                }
-                catch (CouponException $ex) {
+                } catch (CouponException $ex) {
                     $warnings[] = ['label' => $ex->getLabelByCode()];
                 }
                 break;
@@ -342,8 +340,7 @@ class CheckoutController extends Controller
 
                 if ($tos_accepted && $rma_accepted) {
                     rex_redirect(null, null, ['action' => 'init-payment']);
-                }
-                else {
+                } else {
                     $warnings[] = ['label' => '###simpleshop.error.tos_rma_not_accepted###'];
                 }
                 break;
@@ -351,8 +348,7 @@ class CheckoutController extends Controller
 
         try {
             $warnings = array_merge($warnings, $this->Order->calculateDocument($this));
-        }
-        catch (OrderException $ex) {
+        } catch (OrderException $ex) {
             $errors[] = $ex->getMessage();
         }
 
@@ -362,6 +358,8 @@ class CheckoutController extends Controller
         if ($product_cnt < 1) {
             $errors[] = Wildcard::get('shop.error_summary_no_product_available');
         }
+
+        Session::setCheckoutData('Order', $this->Order);
 
         $this->fragment_path[] = 'simpleshop/checkout/summary/wrapper.php';
         $this->setVar('errors', $errors);
@@ -398,6 +396,10 @@ class CheckoutController extends Controller
                 $Mail->addCC($_add);
             }
         }
+
+        $type = \FriendsOfREDAXO\Simpleshop\Utils::getSetting('use_invoicing', false) && $this->Order->getInvoiceNum() ? 'invoice' : 'order';
+        $PDF  = $this->Order->getInvoicePDF($type, false);
+        $Mail->addStringAttachment($PDF->Output('', 'S'), \rex::getServerName() . ' - ' . Wildcard::get('label.' . $type) . '.pdf', 'base64', 'application/pdf');
 
         $do_send = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.orderComplete', $do_send, [
             'Mail'  => $Mail,

@@ -17,9 +17,6 @@ $Order         = $this->getVar('Order');
 $add_info      = $this->getVar('additional_info');
 $Payment       = $Order->getValue('payment');
 $Shipping      = $Order->getValue('shipping');
-$products      = $Order->getProducts(false);
-$Settings      = \rex::getConfig('simpleshop.Settings');
-
 
 FragmentConfig::$data['cart']['has_remove_button'] = false;
 FragmentConfig::$data['cart']['button']['has_quantity_control'] = false;
@@ -48,22 +45,6 @@ $styles = FragmentConfig::getValue('email_styles');
         <p><?= $add_info ?></p>
     <?php endif; ?>
 
-    <h2>###label.order### #<?= $Order->getValue('id') ?></h2>
-
-    <?php if ($Settings['use_invoicing']): ?>
-        <h2>###label.invoice_num### <?= $Order->getInvoiceNum() ?></h2>
-    <?php endif; ?>
-
-    <?php
-    $this->setVar('invoice_address', $Order->getInvoiceAddress());
-    $this->setVar('shipping_address', $Shipping ? $Order->getShippingAddress() : null);
-    $this->subfragment('simpleshop/email/order/address-wrapper.php');
-    ?>
-
-    <br/>
-    <br/>
-
-
     <?php if ($Payment): ?>
         <!-- payment -->
         <table <?= $styles['table'] ?>>
@@ -91,31 +72,5 @@ $styles = FragmentConfig::getValue('email_styles');
         </table>
     <?php endif; ?>
 
-    <br/>
-    <br/>
 
-    <!-- cart content -->
-    <?php
-    //    $styles = array_merge($styles, [
-    //        'body' => $styles['body'] . 'margin-top:20px;',
-    //        'th'   => $styles['th'] . 'background:' . $primary_color . ';border:1px solid #fff;color:#fff;padding:10px;',
-    //    ]);
-    $this->setVar('products', $products);
-    $this->setVar('use_tax_prices', false);
-    $this->subfragment('simpleshop/cart/table-wrapper.php');
-    ?>
-
-    <!-- order conclusion/sum -->
-    <?php
-    //    $styles = array_merge($styles, [
-    //        'table' => 'border-collapse:collapse;border-spacing:0;margin-top:20px;padding:0;text-align:left;vertical-align:top;width:100%;',
-    //        'tr'    => 'border-bottom:1px solid #cacaca;padding:0;text-align:left;vertical-align:top;',
-    //        'td'    => '-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;hyphens:auto;line-height:1.6;margin:0;padding:10px;vertical-align:top;word-wrap:break-word;',
-    //        'total' => 'font-size:18px;font-weight:700;',
-    //    ]);
-
-    $this->setVar('Order', $Order);
-    $this->subfragment('simpleshop/email/order/conclusion.php');
-
-    ?>
 </div>

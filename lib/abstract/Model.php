@@ -41,8 +41,7 @@ abstract class Model extends \Kreatif\Model
                 $_values[$name] = $this->unprepare($val);
             }
             $value = $_values;
-        }
-        else {
+        } else {
             $value = $this->unprepare($value);
         }
         return $value;
@@ -50,7 +49,8 @@ abstract class Model extends \Kreatif\Model
 
     public static function isRegistered($table)
     {
-        $table_classes = \rex_addon::get('simpleshop')->getConfig('table_classes');
+        $table_classes = \rex_addon::get('simpleshop')
+            ->getConfig('table_classes');
         return isset($table_classes[$table]);
     }
 
@@ -82,17 +82,21 @@ abstract class Model extends \Kreatif\Model
                 $value = $decoded_json;
 
                 if (isset ($value['class'])) {
-                    $data = (array) $value['data'];
+                    $data = (array)$value['data'];
 
                     if (class_exists($value['class'])) {
                         if (isset ($data['id'])) {
-                            $Object = clone call_user_func_array([$value['class'], 'get'], [$data['id']]);
+                            $_Object = call_user_func_array([$value['class'], 'get'], [$data['id']]);
+                            if (is_object($_Object)) {
+                                $Object = clone $_Object;
+                            } else {
+                                $Object = $value['class']::create();
+                            }
                         }
                         if (!isset($Object)) {
                             $Object = call_user_func([$value['class'], 'create']);
                         }
-                    }
-                    else {
+                    } else {
                         $Object = Std::create();
                     }
 
@@ -100,8 +104,7 @@ abstract class Model extends \Kreatif\Model
                         $Object->setValue($name, $value);
                     }
                     $value = $Object;
-                }
-                else if (is_array($value)) {
+                } else if (is_array($value)) {
                     foreach ($value as $name => &$val) {
                         $val = self::unprepare($val);
                     }
@@ -122,14 +125,12 @@ abstract class Model extends \Kreatif\Model
                     if (is_object($val)) {
                         $class_name     = get_class($val);
                         $_values[$name] = json_encode(['class' => $class_name, 'data' => self::prepare($val)]);
-                    }
-                    else {
+                    } else {
                         $_values[$name] = $val;
                     }
                 }
                 $value = json_encode($_values);
-            }
-            else if (is_object($value)) {
+            } else if (is_object($value)) {
                 $class_name = get_class($value);
                 $value      = json_encode(['class' => $class_name, 'data' => $value->getData()]);
             }
@@ -144,15 +145,15 @@ abstract class Model extends \Kreatif\Model
         if (!\rex::isBackend()) {
             $Object      = $Ep->getParam('object');
             $type        = $Ep->getParam('type_name');
-            $table       = $Object->getTable()->getTableName();
-            $_excludeds  = (array) $Ep->getParam('excluded_fields');
+            $table       = $Object->getTable()
+                ->getTableName();
+            $_excludeds  = (array)$Ep->getParam('excluded_fields');
             $fieldConfig = array_merge(FragmentConfig::getValue("yform_fields.{$table}._fieldDefaults", []), FragmentConfig::getValue("yform_fields.{$table}.{$subject[0]}", []));
             $excluded    = array_merge(FragmentConfig::getValue("yform_fields.{$table}._excludedFields", []), $_excludeds);
 
             if (in_array($subject[0], $excluded)) {
                 $subject = false;
-            }
-            else if ($subject) {
+            } else if ($subject) {
                 if ($type == 'be_manager_relation') {
                     $subject[3] = strtr($subject[3], ['_1' => '_' . \rex_clang::getCurrentId()]);
                 }
@@ -168,9 +169,10 @@ abstract class Model extends \Kreatif\Model
 
         if (!\rex::isBackend()) {
             $Object = $Ep->getParam('object');
-            $table  = $Object->getTable()->getTableName();
+            $table  = $Object->getTable()
+                ->getTableName();
 
-            $_excludeds = (array) $Ep->getParam('excluded_fields');
+            $_excludeds = (array)$Ep->getParam('excluded_fields');
             $excluded   = array_merge(FragmentConfig::getValue("yform_fields.{$table}._excludedFields", []), $_excludeds);
 
             if (in_array($subject[0], $excluded)) {

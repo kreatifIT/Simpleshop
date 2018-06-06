@@ -17,6 +17,16 @@ class Utils
 {
     protected static $origLocale = '';
 
+    public static function getSetting($key = false, $default = null)
+    {
+        $settings = \rex::getConfig('simpleshop.Settings');
+
+        if ($key) {
+            $settings = array_key_exists($key, $settings) && $settings[$key] !== null ? $settings[$key] : $default;
+        }
+        return $settings;
+    }
+
     public static function setCalcLocale()
     {
         self::$origLocale = setlocale(LC_NUMERIC, 0);
@@ -37,7 +47,8 @@ class Utils
 
     public static function log($code, $msg, $type, $send_mail = false)
     {
-        $email    = \rex_addon::get('simpleshop')->getProperty('debug_email');
+        $email    = \rex_addon::get('simpleshop')
+            ->getProperty('debug_email');
         $log_path = \rex_path::addonData('simpleshop', 'log/');
         $log_file = $log_path . date('d') . '.log';
         $msg      = "{$code}: {$msg}\n";
@@ -47,7 +58,7 @@ class Utils
             \rex_dir::create($log_path, true);
         }
         // save to log file
-        $append = (int) date('d') == (int) date('d', @filemtime($log_file)) ? FILE_APPEND : null;
+        $append = (int)date('d') == (int)date('d', @filemtime($log_file)) ? FILE_APPEND : null;
         file_put_contents($log_file, "[" . date('Y-m-d H:i:s') . "] {$type} - " . $msg, $append);
 
         if ($email && $send_mail) {

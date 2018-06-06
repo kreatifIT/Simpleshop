@@ -1,0 +1,61 @@
+body {
+    font-family: FreeSans;
+    font-size: 10pt;
+
+    table {
+        border-collapse: collapse;
+    }
+}
+
+#invoice-header-infos {
+    margin: 12mm 0 12mm 0;
+}
+
+#invoice-data {
+    margin: 0 0 6mm 0;
+}
+#invoice-data-title {
+    font-size: 16pt;
+    font-weight: normal;
+}
+
+#invoice-items {
+    border: 0.1mm solid #666;
+
+    thead td {
+
+        background-color: #3c3c3b;
+        color: #fff;
+        text-align: center;
+        border: 0.1mm solid #666;
+    }
+    td {
+        border-bottom: 0.1mm solid #999;
+        border-left: 0.1mm solid #999;
+        border-right: 0.1mm solid #999;
+        vertical-align: top;
+
+        &.invoice-participant-cell {
+            background: #eee;
+            td {
+                border: none;
+            }
+        }
+        &.product-name {
+            height: 15mm;
+        }
+    }
+}
+
+#invoice-summary {
+    margin-top: 4mm;
+    td {
+        border-bottom: 0.1mm solid #999;
+        padding: 2mm 3mm 2mm 0;
+    }
+}
+#invoice-summary-total-label,
+#invoice-summary-total-value {
+    font-weight: bold;
+    font-size: 12pt;
+}

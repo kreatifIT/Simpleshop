@@ -89,7 +89,7 @@ class rex_yform_value_coupon_functions extends rex_yform_value_abstract
         }
     }
 
-    public function getDefinitions()
+    public function getDefinitions($values = [])
     {
         return [
             'is_hiddeninlist' => true,

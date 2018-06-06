@@ -39,7 +39,7 @@ class rex_yform_value_coupon_code extends rex_yform_value_text
         return 'coupon_code|name|[no_db]';
     }
 
-    function getDefinitions()
+    function getDefinitions($values = [])
     {
         return [
             'type'       => 'value',

@@ -15,14 +15,16 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
     public function enterObject()
     {
         if (rex::isBackend() && $this->getParam('main_id')) {
-            $Order    = \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id'));
-            $Customer = $Order->getValue('customer_id') ? \FriendsOfREDAXO\Simpleshop\Customer::get($Order->getValue('customer_id')) : $Order->getInvoiceAddress();;
-            $table  = $this->getParam('main_table');
-            $params = [
+            $Order         = \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id'));
+            $table         = $this->getParam('main_table');
+            $use_invoicing = \FriendsOfREDAXO\Simpleshop\Utils::getSetting('use_invoicing', false);
+            $params        = [
                 'data_id'    => $this->getParam('main_id'),
                 'table_name' => $table,
                 'func'       => 'edit',
             ];
+
+            $Customer = $Order->getValue('customer_id') ? \FriendsOfREDAXO\Simpleshop\Customer::get($Order->getValue('customer_id')) : $Order->getInvoiceAddress();;
 
             if (strlen($table) && $this->getParam('send') == 0 && $this->getParam('main_id') > 0) {
                 $action = rex_get('ss-action', 'string');
@@ -30,11 +32,18 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                 // set user lang id
                 if ($Customer) {
                     \rex_clang::setCurrentId($Customer->getValue('lang_id', false, \rex_clang::getCurrentId()));
-                    setlocale(LC_ALL, \rex_clang::getCurrent()->getValue('clang_setlocale'));
+                    setlocale(LC_ALL, \rex_clang::getCurrent()
+                        ->getValue('clang_setlocale'));
                 }
 
 
                 switch ($action) {
+                    case 'generate_pdf':
+                        rex_response::cleanOutputBuffers();
+                        $PDF = $Order->getInvoicePDF('invoice', false);
+                        $PDF->Output();
+                        exit;
+
                     case 'resend_email':
                         $Controller = new \FriendsOfREDAXO\Simpleshop\CheckoutController();
                         $Controller->setOrder($Order);
@@ -49,7 +58,6 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                         $CreditNote = \FriendsOfREDAXO\Simpleshop\Order::create();
 
                         $CreditNote->calculateCreditNote($Order);
-                        $CreditNote->setFinalize(true);
                         $CreditNote->save();
 
                         unset($_GET['ss-action']);
@@ -99,6 +107,15 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                     ' . rex_i18n::msg('label.recalculate_sums') . '
                 </a>
             ';
+            if ($use_invoicing) {
+                $output[] = '
+                    <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'generate_pdf'])) . '" class="btn btn-default">
+                        <i class="fa fa-file"></i>&nbsp;
+                        PDF drucken
+                    </a>
+                ';
+            }
+
             if ($Order->getValue('status') == 'CA') {
                 $CreditNote = \FriendsOfREDAXO\Simpleshop\Order::getOne(false, [
                     'filter'  => [['ref_order_id', $Order->getId()]],
@@ -112,8 +129,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                             ' . rex_i18n::msg('action.goto_creditnote') . '
                         </a>
                     ';
-                }
-                else {
+                } else {
                     $output[] = '
                         <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'generate_creditnote'])) . '" class="btn btn-default">
                             <i class="fa fa-money"></i>&nbsp;
@@ -121,8 +137,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                         </a>
                     ';
                 }
-            }
-            else if ($Order->valueIsset('ref_order_id')) {
+            } else if ($Order->valueIsset('ref_order_id')) {
                 $output[] = '
                     <a href="' . rex_url::currentBackendPage(['table_name' => 'rex_shop_order', 'data_id' => $Order->getValue('ref_order_id'), 'func' => 'edit']) . '" class="btn btn-primary">
                         <i class="fa fa-file-text-o"></i>&nbsp;
@@ -141,7 +156,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
         }
     }
 
-    public function getDefinitions()
+    public function getDefinitions($values = [])
     {
         return [
             'is_hiddeninlist' => true,

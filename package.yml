@@ -28,6 +28,7 @@ page:
 requires:
     redaxo: '>=5.3'
     packages:
+        kreatif-mpdf: '^1.0'
         yform: '^2.3'
         yform/manager: '^2.3'
         sprog: '^1.0'

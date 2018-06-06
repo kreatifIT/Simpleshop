@@ -74,7 +74,7 @@ class rex_yform_value_product_variant_select extends rex_yform_value_select
         $this->params['value_pool']['sql'][$this->getName()]             = $this->getValue();
     }
 
-    public function getDefinitions()
+    public function getDefinitions($values = [])
     {
         return [
             'type'        => 'value',

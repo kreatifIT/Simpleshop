@@ -28,10 +28,14 @@ label.recalculate_sums = Werte neu berechnen
 label.msg_resend_email = Email wurde versendet
 label.msg_recalculate_sums = Werte wurden aktualisiert
 label.invoice_num = Rechn.-Nr
+label.generate_creditnote = Gutschrift erstellen
+label.msg_generate_creditnote = Gutschrift wurder erstellt
 label.clone_coupon = diesen Coupon klonen
 label.msg_clone = Es wurden {NUM} Coupons generiert
 
 
+action.goto_creditnote = gehe zur Gutschrift
+action.goto_order = Bestellung ansehen
 action.manage_variants = Varianten verwalten
 action.edit_product = Produkt bearbeiten
 action.edit_value = Wert bearbeiten

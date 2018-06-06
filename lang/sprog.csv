@@ -19,6 +19,9 @@ label.load_more
 label.vat_short
 label.tax
 label.discount
+label.order
+label.invoice
+label.code
 
 error.insert_company_name
 error.insert_firstname
@@ -59,6 +62,13 @@ simpleshop.brutto_total
 simpleshop.total_sum
 simpleshop.amount
 simpleshop.tax_included_value
+simpleshop.invoice_title
+simpleshop.orderdocument_title
+simpleshop.position_short
+simpleshop.single_price
+simpleshop.credit_note_reference_info
+simpleshop.credit_note
+simpleshop.order_num
 
 shop.error_summary_no_product_available
 simpleshop.error.cart_product_not_exists
@@ -80,3 +90,4 @@ simpleshop.email.order_complete
 simpleshop.email.password_reset_text
 simpleshop.email.order_complete_text
 simpleshop.email.registration_text
+simpleshop.email.creditnote_text

@@ -13,6 +13,8 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Kreatif\Mpdf\Mpdf;
+
 
 class Order extends Model
 {
@@ -57,14 +59,14 @@ class Order extends Model
         $products = OrderProduct::getAll(false, [
             'filter'  => [['order_id', $this->getId()]],
             'orderBy' => 'id',
-        ])->toArray();
+        ])
+            ->toArray();
 
 
         if (!$raw) {
             if (empty($products)) {
                 $products = $this->getValue('products');
-            }
-            else {
+            } else {
                 foreach ($products as $index => &$orderProduct) {
                     $Product     = clone $orderProduct->getValue('data');
                     $orderPData  = $orderProduct->getData();
@@ -84,7 +86,13 @@ class Order extends Model
 
     public function getInvoiceNum()
     {
-        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.getInvoiceNum', $this->getValue('invoice_num'), [
+        $invoice_num = trim($this->getValue('invoice_num'));
+
+        if ($invoice_num == '0' || $invoice_num == '' || $invoice_num == 0) {
+            $invoice_num = null;
+        }
+
+        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.getInvoiceNum', $invoice_num, [
             'Order' => $this,
         ]));
     }
@@ -108,6 +116,7 @@ class Order extends Model
 
         $sql      = \rex_sql::factory();
         $date_now = date('Y-m-d H:i:s');
+        $products = $this->getValue('products');
 
         if (!$this->valueIsset('createdate')) {
             $this->setValue('createdate', $date_now);
@@ -116,7 +125,7 @@ class Order extends Model
         if (self::$_finalizeOrder && ($this->getValue('invoice_num') === null || $this->getValue('invoice_num') === 0)) {
             $sql->setQuery('SELECT MAX(invoice_num) as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"');
             $value = $sql->getValue('num');
-            $num   = (int) substr($value, 2) + 1;
+            $num   = (int)substr($value, 2) + 1;
             $num   = date('y') . str_pad($num, 5, '0', STR_PAD_LEFT);
 
             $this->setValue('invoice_num', \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoice_num', $num, ['Order' => $this, 'value' => $value])));
@@ -124,9 +133,13 @@ class Order extends Model
 
         $result = parent::save(true);
 
+
         if ($result && !$simple_save) {
             $order_id   = $this->getId();
             $promotions = $this->getValue('promotions');
+
+            // IMPORTANT! after saving readd the products
+            $this->setValue('products', $products);
 
             if (self::$_finalizeOrder && isset ($promotions['coupon'])) {
                 // relate coupon
@@ -150,8 +163,7 @@ class Order extends Model
                             $Variant = Variant::getByVariantKey($_product->getValue('key'));
                             $Variant->setValue('amount', $Variant->getValue('amount') + $quantity);
                             $Variant->save();
-                        }
-                        else {
+                        } else {
                             $product = Product::get($_product->getId());
                             $product->setValue('amount', $product->getValue('amount') + $quantity);
                             $product->save();
@@ -160,10 +172,9 @@ class Order extends Model
                 }
             }
 
-            $products = Session::getCartItems(false, false);
-
             // clear all products first
-            \rex_sql::factory()->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$order_id}");
+            \rex_sql::factory()
+                ->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$order_id}");
 
             // set order products
             foreach ($products as $product) {
@@ -180,8 +191,7 @@ class Order extends Model
                             $Variant = Variant::getByVariantKey($product->getValue('key'));
                             $Variant->setValue('amount', $Variant->getValue('amount') - $quantity);
                             $Variant->save();
-                        }
-                        else {
+                        } else {
                             $product->setValue('amount', $product->getValue('amount') - $quantity);
                             $product->save();
                         }
@@ -227,28 +237,27 @@ class Order extends Model
             if ($ROrder) {
                 $net_prices = $this->calculateCreditNote($ROrder);
             }
-        }
-        else {
+        } else {
             // calculate products total
             foreach ($products as $product) {
                 $quantity = $product->getValue('cart_quantity');
-                $tax_perc = $this->isTaxFree() ? 0 : Tax::get($product->getValue('tax'))->getValue('tax');
+                $tax_perc = $this->isTaxFree() ? 0 : Tax::get($product->getValue('tax'))
+                    ->getValue('tax');
 
-                $net_prices[$tax_perc] += (float) $product->getPrice(!$this->isTaxFree()) * $quantity;
-                $this->initial_total   += (float) $product->getPrice(!$this->isTaxFree()) * $quantity;
+                $net_prices[$tax_perc] += (float)$product->getPrice(!$this->isTaxFree()) * $quantity;
+                $this->initial_total   += (float)$product->getPrice(!$this->isTaxFree()) * $quantity;
                 $this->quantity        += $quantity;
             }
         }
         // get shipping costs
         if ($this->getValue('shipping')) {
             try {
-                $this->setValue('shipping_costs', (float) $this->getValue('shipping')->getNetPrice($this, $products));
-            }
-            catch (\Exception $ex) {
+                $this->setValue('shipping_costs', (float)$this->getValue('shipping')
+                    ->getNetPrice($this, $products));
+            } catch (\Exception $ex) {
                 throw new OrderException($ex->getLabelByCode());
             }
-        }
-        else {
+        } else {
             $this->setValue('shipping_costs', 0);
         }
         ksort($net_prices);
@@ -270,15 +279,14 @@ class Order extends Model
         // set promotions for order history
         list($_errors, $promotions) = $this->calculatePrices($promotions, $net_prices);
 
-        $errors = array_merge((array) $errors, (array) $_errors);
+        $errors = array_merge((array)$errors, (array)$_errors);
 
         $this->setValue('promotions', $promotions);
         $this->setValue('products', $products);
 
         try {
             \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.calculateDocument', $this));
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             $errors[] = ['label' => $ex->getLabelByCode()];
         }
 
@@ -303,12 +311,14 @@ class Order extends Model
 
         $this->setValue('customer_id', $ReferenceOrder->getValue('customer_id'));
         $this->setValue('status', 'CN');
-        $this->setValue('initial', $total);
+        $this->setValue('initial_total', $total);
         $this->setValue('net_prices', $net_prices);
         $this->setValue('address_1', $ReferenceOrder->getValue('address_1'));
         $this->setValue('ip_address', rex_server('REMOTE_ADDR', 'string', 'notset'));
         $this->setValue('total', $total);
         $this->setValue('ref_order_id', $ReferenceOrder->getId());
+
+        self::$_finalizeOrder = true;
 
         return $net_prices;
     }
@@ -325,7 +335,7 @@ class Order extends Model
 
         // set gross prices
         foreach ($net_prices as $tax => $net_price) {
-            $brut_prices[$tax] += (float) $net_price / (100 + $tax) * 100;
+            $brut_prices[$tax] += (float)$net_price / (100 + $tax) * 100;
         }
 
         $this->setValue('brut_prices', $brut_prices);
@@ -335,8 +345,7 @@ class Order extends Model
                 if (is_object($promotion)) {
                     $discount += $promotion->applyToOrder($this, $brut_prices, $name);
                 }
-            }
-            catch (\Exception $ex) {
+            } catch (\Exception $ex) {
                 $errors[]  = ['label' => $ex->getLabelByCode()];
                 $promotion = null;
             }
@@ -347,16 +356,18 @@ class Order extends Model
 
         // set tax costs
         foreach ($brut_prices as $tax => $brut_price) {
-            $taxes[$tax] += (float) $brut_price * ($tax / 100);
+            $taxes[$tax] += (float)$brut_price * ($tax / 100);
         }
 
         // set shipping costs
         if ($this->getValue('shipping_costs') > 0 && !$this->isTaxFree()) {
-            $tax = $this->getValue('shipping')->getTaxPercentage();
+            $tax = $this->getValue('shipping')
+                ->getTaxPercentage();
 
             if ($tax > 0) {
-                $this->setValue('shipping_costs', (float) $this->getValue('shipping_costs') / (100 + $tax) * 100);
-                $taxes[$tax] += $this->getValue('shipping')->getTax();
+                $this->setValue('shipping_costs', (float)$this->getValue('shipping_costs') / (100 + $tax) * 100);
+                $taxes[$tax] += $this->getValue('shipping')
+                    ->getTax();
             }
         }
         ksort($taxes);
@@ -372,8 +383,7 @@ class Order extends Model
     {
         try {
             $products = Session::getCartItems();
-        }
-        catch (CartException $ex) {
+        } catch (CartException $ex) {
             if ($ex->getCode() == 1) {
                 $errors   = Session::$errors;
                 $products = Session::getCartItems();
@@ -385,8 +395,7 @@ class Order extends Model
                 'Order'    => $this,
                 'products' => $products,
             ]));
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             $promotions = [];
             $errors[]   = ['label' => $ex->getLabelByCode()];
         }
@@ -402,7 +411,9 @@ class Order extends Model
     {
         $result = $params->getSubject();
 
-        if ($result !== false && $params->getParam('table')->getTableName() == self::TABLE) {
+        if ($result !== false && $params->getParam('table')
+                ->getTableName() == self::TABLE
+        ) {
             // remove all related order products
             $obj_id = $params->getParam('data_id');
             $query  = "DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$obj_id}";
@@ -410,6 +421,55 @@ class Order extends Model
             $sql->setQuery($query);
         }
         return $result;
+    }
+
+    public function getInvoicePDF($type = 'invoice', $debug = false, Mpdf $_Mpdf = null)
+    {
+        $content    = '';
+        $fragment   = new \rex_fragment();
+        $Mpdf       = $_Mpdf ?: new Mpdf([
+            'margin_left'   => 20,
+            'margin_right'  => 15,
+            'margin_top'    => 10,
+            'margin_bottom' => 34,
+            'margin_header' => 0,
+            'margin_footer' => 0,
+        ]);
+        $invoiceNum = $this->getInvoiceNum();
+
+        if ($invoiceNum == null) {
+            $type = 'order';
+        }
+
+        $Mpdf->SetProtection(['print']);
+        $Mpdf->SetDisplayMode('fullpage');
+
+        $fragment->setVar('type', $type);
+        $fragment->setVar('debug', $debug);
+        $fragment->setVar('Customer', $this->getInvoiceAddress());
+        $fragment->setVar('Order', $this);
+
+        // HEADER
+        $content .= $fragment->parse('simpleshop/pdf/invoice/header.php');
+        // INVOICE DATA
+        $content .= $fragment->parse('simpleshop/pdf/invoice/invoice_data.php');
+        // ITEMS
+        $content .= $fragment->parse('simpleshop/pdf/invoice/items.php');
+        // SUMMARY
+        $content .= $fragment->parse('simpleshop/pdf/invoice/summary.php');
+
+        $docTitle = $type == 'invoice' ? 'simpleshop.invoice_title' : 'simpleshop.orderdocument_title';
+        $fragment->setVar('title', strtr(\Wildcard::get($docTitle), ['{NUM}' => $invoiceNum]));
+        $fragment->setVar('content', $content, false);
+        $html = $fragment->parse('simpleshop/pdf/invoice/wrapper.php');
+
+        if ($debug) {
+            echo "<div style='background:#666;height:100vh;padding:20px;'><div style='max-width:800px;margin:0px auto;background:#fff;'>{$html}</div></div>";
+            exit;
+        }
+        $Mpdf->WriteHTML($html);
+
+        return $Mpdf;
     }
 }
 

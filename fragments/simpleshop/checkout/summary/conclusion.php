@@ -56,7 +56,7 @@ $promotions  = (array) $Order->getValue('promotions');
 
                 <?php foreach ($taxes as $percent => $tax): ?>
                     <div class="taxes">
-                        <span class="label"><?= $percent ?>% ###label.tax###</span>
+                        <span class="label">+ <?= $percent ?>% ###label.tax###</span>
                         <span class="price">&euro;&nbsp;<?= format_price($tax) ?></span>
                     </div>
                 <?php endforeach; ?>
