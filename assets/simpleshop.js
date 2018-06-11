@@ -129,7 +129,7 @@ var Simpleshop = (function ($) {
 
             var $this = $(_this),
                 $loading = addLoading($this),
-                $container = $offcanvasCart.find(selector || '[data-cart-container]');
+                $container = $offcanvasCart.find('[data-cart-container]');
 
             $.ajax({
                 url: rex.simpleshop.ajax_url,
@@ -177,7 +177,7 @@ var Simpleshop = (function ($) {
                 $input = $this.parents('[data-amount-increment]').find('input'),
                 sign = $this.data('amount-increment-sign');
 
-            if (sign == 'minus') { 
+            if (sign == 'minus') {
                 $input.val(parseInt($input.val()) - 1);
             }
             else if (sign == 'plus') {
