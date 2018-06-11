@@ -16,16 +16,15 @@ namespace FriendsOfREDAXO\Simpleshop;
 \rex::setProperty('simpleshop.product_variants', 'variants');
 
 \rex_extension::register('PACKAGES_INCLUDED', function () {
-    if ($this->getProperty('compile') || \rex_addon::get('project')->getProperty('compile') || !file_exists($this->getAssetsPath('css/backend.css'))) {
+    if ($this->getProperty('compile') || \rex_addon::get('project')
+            ->getProperty('compile') || !file_exists($this->getAssetsPath('css/backend.css'))
+    ) {
         $compiler = new \rex_scss_compiler();
-        $compiler->setScssFile([$this->getPath('assets/styles.scss')]);
-        $compiler->setCssFile($this->getAssetsPath('css/styles.css'));
+        $compiler->setScssFile([$this->getPath('assets/scss/backend.scss')]);
+        $compiler->setCssFile($this->getAssetsPath('css/backend.css'));
         $compiler->compile();
-
-        \rex_file::copy($this->getPath('assets/simpleshop.js'), $this->getAssetsPath('js/simpleshop.js'));
     }
 
-    // include assets
-    \rex_view::addCssFile($this->getAssetsUrl('css/styles.css?mtime=' . filemtime($this->getAssetsPath('css/styles.css'))));
-    \rex_view::addJsFile($this->getAssetsUrl('js/simpleshop.js?mtime=' . filemtime($this->getAssetsPath('js/simpleshop.js'))));
+    \rex_view::addCssFile($this->getAssetsUrl('css/backend.css?mtime=' . filemtime($this->getAssetsPath('css/backend.css'))));
+    \rex_view::addJsFile($this->getAssetsUrl('js/backend.js?mtime=' . filemtime($this->getAssetsPath('js/backend.js'))));
 });
