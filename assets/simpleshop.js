@@ -1,11 +1,46 @@
 var Simpleshop = (function ($) {
     'use strict';
 
-    var lang_id = $('html:first').data('lang-id');
-    var $offcanvasCart = $('.offcanvas-cart'),
-        $body = $('body'),
-        $continueShoppingButton = $('.offcanvas-cart-continue-shopping'),
+    var lang_id,
+        $body,
+        $offcanvasCart,
+        $offcanvasCartSuccess;
+
+    $(window).on('load', function (ev) {
+        var $ctype = $('select[name=ctype]');
+
+        if ($ctype.length) {
+            $ctype.trigger('change');
+        }
+    });
+
+    $(document).ready(init);
+
+    function init() {
+        lang_id = $('html:first').data('lang-id');
+        $body = $('body');
+        $offcanvasCart = $('.offcanvas-cart');
         $offcanvasCartSuccess = $('.offcanvas-cart-success');
+
+        $body.click(function (event) {
+            if (!$(event.target).closest('.offcanvas-cart').length) {
+                result.closeOffcanvasCart();
+            }
+        });
+
+        $('.checkout-radio-panel').on('click', function () {
+            var $radio = $(this).find('input');
+            if ($radio.is(':checked') === false) {
+                $radio.prop('checked', true);
+                $(this).addClass('selected');
+            }
+            $('.checkout-radio-panel').each(function () {
+                if ($(this).find('input').is(':checked') === false) {
+                    $(this).removeClass('selected');
+                }
+            });
+        });
+    }
 
     function addLoading($container) {
         var css = $container.offset(),
@@ -18,66 +53,22 @@ var Simpleshop = (function ($) {
         return $loading;
     }
 
-    function closeOffcanvasCart() {
-        $offcanvasCart.removeClass('expanded');
-        $body.removeClass('offcanvas-cart-open');
-        $offcanvasCartSuccess.fadeOut();
-    }
-
-    function showOffcanvasCart() {
-        $offcanvasCart.addClass('expanded');
-        $body.addClass('offcanvas-cart-open');
-        $offcanvasCartSuccess.fadeIn();
-    }
-
-    $continueShoppingButton.on('click', function () {
-        closeOffcanvasCart();
-    });
-
-    function updateCart(response, $itemsContainer, $totalContainer, $loading) {
-        if ($itemsContainer.length !== 0) {
-            $itemsContainer.html(response.message.cart_html);
-        }
-        if ($totalContainer.length !== 0) {
-            $totalContainer.html(response.message.total_formatted);
-        }
-        if ($loading.length !== 0) {
-            $loading.remove();
-        }
-        $(document).trigger('simpleshop.updateCart', response);
-    }
-
-    $('.checkout-radio-panel').on('click', function () {
-        var $radio = $(this).find('input');
-        if ($radio.is(':checked') === false) {
-            $radio.prop('checked', true);
-            $(this).addClass('selected');
-        }
-        $('.checkout-radio-panel').each(function () {
-            if ($(this).find('input').is(':checked') === false) {
-                $(this).removeClass('selected');
-            }
-        });
-    });
-
-    $body.click(function (event) {
-        if (!$(event.target).closest('.offcanvas-cart').length) {
-            closeOffcanvasCart();
-        }
-    });
-
-    $(window).on('load', function (e) {
-        var $ctype = $('select[name=ctype]');
-
-        if ($ctype.length) {
-            $ctype.trigger('change');
-        }
-    });
-
     var result = {
+        showOffcanvasCart: function () {
+            $offcanvasCart.addClass('expanded');
+            $body.addClass('offcanvas-cart-open');
+            $offcanvasCartSuccess.fadeIn();
+        },
+
+        closeOffcanvasCart: function () {
+            $offcanvasCart.removeClass('expanded');
+            $body.removeClass('offcanvas-cart-open');
+            $offcanvasCartSuccess.fadeOut();
+        },
+
         toggleAuth: function (_this, selector) {
             var $this = $(_this),
-                $wrapper = $this.parents('.auth-wrapper');
+                $wrapper = $this.parents('[data-auth-wrapper]');
 
             $wrapper.children('div').addClass('hide');
             $wrapper.children(selector).removeClass('hide');
@@ -113,7 +104,7 @@ var Simpleshop = (function ($) {
                 $loading = addLoading($container);
 
             if (!$container.length) {
-                alert('Variant container class not found ['+ selector +']');
+                alert('Variant container class not found [' + selector + ']');
             }
             else if (typeof KreatifPjax == 'undefined') {
                 alert('KreatifPjax is not defined - Gruntfile?');
@@ -128,18 +119,17 @@ var Simpleshop = (function ($) {
                 $loading.remove();
             });
         },
-        addToCart: function (_this, vkey, amount, layout) {
+        addToCart: function (_this, vkey, amount, layout, selector) {
 
             if (parseInt(amount) <= 0) {
-                var selector = '.quantity-ctrl-button|.amount-input',
+                var selector = '[data-quantity-ctrl-button]|[data-amount-input]',
                     chunks = selector.split('|');
                 amount = $(_this).parents(chunks[0]).find(chunks[1]).val();
             }
 
             var $this = $(_this),
                 $loading = addLoading($this),
-                $itemsContainer = $offcanvasCart.find('[data-cart-item-container]'),
-                $totalContainer = $offcanvasCart.find('[data-cart-item-total]');
+                $container = $offcanvasCart.find(selector || '[data-cart-container]');
 
             $.ajax({
                 url: rex.simpleshop.ajax_url,
@@ -153,19 +143,15 @@ var Simpleshop = (function ($) {
                     'layout': layout
                 }
             }).done(function (resp) {
-                updateCart(resp, $itemsContainer, $totalContainer, $loading);
-                showOffcanvasCart();
+                $container.html(resp.message.cart_html);
+                $loading.remove();
+                result.showOffcanvasCart();
             });
         },
-        removeCartItem: function (_this, vkey, layout) {
-            var $this = $(_this);
-            var $item = $this.parents('[data-cart-item]'),
-                $itemsContainer = $item.parents('[data-cart-item-container]'),
-                $totalContainer = $offcanvasCart.find('[data-cart-item-total]');
-
-            if ($itemsContainer.length !== 0) {
-                var $loading = addLoading($itemsContainer);
-            }
+        removeCartItem: function (_this, vkey, layout, selector) {
+            var $this = $(_this),
+                $container = $this.parents(selector || '[data-cart-container]'),
+                $loading = addLoading($container);
 
             $.ajax({
                 url: rex.simpleshop.ajax_url,
@@ -173,26 +159,28 @@ var Simpleshop = (function ($) {
                 data: {
                     'controller': 'Cart.removeProduct',
                     'rex-api-call': 'simpleshop_api',
+                    'lang': lang_id,
                     'product_key': vkey,
-                    'layout': layout
+                    'layout': layout,
                 }
             }).done(function (resp) {
-                updateCart(resp, $itemsContainer, $totalContainer, $loading);
-                $offcanvasCartSuccess.fadeOut();
+                $container.html(resp.message.cart_html);
+                $loading.remove();
             });
         },
-        changeCartAmount: function (_this, vkey, _max, rowSelector) {
+        changeCartAmount: function (_this, vkey, _max, selector) {
             var $this = $(_this),
                 max = _max || 999,
-                chunks = rowSelector ? rowSelector.split('|') : ['.cart-container', '.cart-item'],
+                chunks = selector ? selector.split('|') : ['[data-cart-container]', '[data-cart-item]'],
                 $container = $this.parents(chunks[0]),
                 $row = $this.parents(chunks[1]),
-                $input = $this.parents('.amount-increment').find('input');
+                $input = $this.parents('[data-amount-increment]').find('input'),
+                sign = $this.data('amount-increment-sign');
 
-            if ($this.hasClass('amount-increment-minus')) {
+            if (sign == 'minus') { 
                 $input.val(parseInt($input.val()) - 1);
             }
-            else if ($this.hasClass('amount-increment-plus')) {
+            else if (sign == 'plus') {
                 $input.val(parseInt($input.val()) + 1);
             }
 
@@ -208,10 +196,10 @@ var Simpleshop = (function ($) {
 
             if (vkey) {
                 if (!$row.length) {
-                    alert('Cart row class not found [default = .cart-item]');
+                    alert('Cart row not found [default = data-cart-item]');
                 }
                 else if (!$container.length) {
-                    alert('Cart container class not found [default = .cart-container]');
+                    alert('Cart container not found [default = data-cart-container');
                 }
 
                 var $loading = addLoading($container);

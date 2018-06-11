@@ -43,6 +43,6 @@ $products = $this->getVar('products', []);
             <span class="name"><?= $product->getName() ?></span>
             <span class="price">&euro;&nbsp;<?= format_price($price) ?></span>
         </div>
-        <div class="remove" onclick="Simpleshop.removeCartItem(this, <?= $key ?>, 'offcanvas_cart')"></div>
+        <div class="remove" onclick="Simpleshop.removeCartItem(this, '<?= $key ?>', 'offcanvas_cart')"></div>
     </div>
 <?php endforeach; ?>

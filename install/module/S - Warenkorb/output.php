@@ -13,12 +13,13 @@
 
 use FriendsOfREDAXO\Simpleshop;
 
+
 ?>
 <div class="row column margin-large-top margin-large-bottom">
     <h2 class="heading large separator">###label.cart###</h2>
 
     <div class="row">
-        <div class="column cart-container">
+        <div class="column" data-cart-container>
             <?php
             $Controller = Simpleshop\CartController::execute();
             echo $Controller->parse();

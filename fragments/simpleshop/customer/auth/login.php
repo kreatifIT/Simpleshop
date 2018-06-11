@@ -62,7 +62,7 @@ else if (strlen($referer)) {
 unset($_GET['action'])
 
 ?>
-<div id="<?= $sid ?>" class="auth-wrapper <?= $Config['css_class']['wrapper'] ?>">
+<div id="<?= $sid ?>" class="auth-wrapper <?= $Config['css_class']['wrapper'] ?>" data-auth-wrapper>
     <div class="login-form <?= $action == 'recover' || $action == 'register' ? 'hide' : '' ?>">
         <div class="row medium-6 large-4 medium-centered">
             <div class="column">

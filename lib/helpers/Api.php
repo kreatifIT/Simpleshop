@@ -20,7 +20,8 @@ class rex_api_simpleshop_api extends rex_api_function
     {
         $lang_id = rex_request('lang', 'int');
         if ($lang_id) {
-            setlocale(LC_ALL, rex_clang::get($lang_id)->getValue('clang_setlocale'));
+            setlocale(LC_ALL, rex_clang::get($lang_id)
+                ->getValue('clang_setlocale'));
         }
 
         $controller  = rex_request('controller', 'string', null);
@@ -31,8 +32,7 @@ class rex_api_simpleshop_api extends rex_api_function
         }
         try {
             $this->$_controller();
-        }
-        catch (ErrorException $ex) {
+        } catch (ErrorException $ex) {
             throw new ApiException($ex->getMessage());
         }
         $this->response['controller'] = strtolower($controller);
@@ -76,16 +76,16 @@ class rex_api_simpleshop_api extends rex_api_function
                     $featureIds = explode(',', $vitem->getValue('variant_key'));
 
                     foreach ($featureIds as $featureId) {
-                        $_flabel[] = \FriendsOfREDAXO\Simpleshop\FeatureValue::get($featureId)->getName();
+                        $_flabel[] = \FriendsOfREDAXO\Simpleshop\FeatureValue::get($featureId)
+                            ->getName();
                     }
                     $result['results'][] = [
                         'id'   => $vitem->getId() . '|' . $vitem->getValue('variant_key'),
                         'name' => $vitem->getName(),
-                        'text' => "[{$vitem->getValue('code')}]  {$vitem->getName()}  |  ". implode(' + ', $_flabel),
+                        'text' => "[{$vitem->getValue('code')}]  {$vitem->getName()}  |  " . implode(' + ', $_flabel),
                     ];
                 }
-            }
-            else {
+            } else {
                 $result['results'][] = [
                     'id'   => $item->getId(),
                     'name' => $item->getName(),
@@ -101,12 +101,14 @@ class rex_api_simpleshop_api extends rex_api_function
 
     private function api__cart_getcartcontent($layout)
     {
-        $ctrlTpl  = '';
-        $emptyTpl = 'simpleshop/cart/empty.php';
         if ($layout == 'offcanvas_cart') {
-            $ctrlTpl  = 'simpleshop/cart/offcanvas/items.php';
+            $ctrlTpl  = 'simpleshop/cart/offcanvas/container.php';
             $emptyTpl = 'simpleshop/cart/offcanvas/empty.php';
+        } else {
+            $ctrlTpl  = '';
+            $emptyTpl = 'simpleshop/cart/empty.php';
         }
+
         $Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute();
         $products   = $Controller->getProducts();
         $result     = [
@@ -138,8 +140,7 @@ class rex_api_simpleshop_api extends rex_api_function
             rex_extension::registerPoint(new rex_extension_point('Api.Cart.addGiftcard.PRE_ADD', $product_key, ['extras' => $extras]));
 
             \FriendsOfREDAXO\Simpleshop\Session::setProductData($product_key, 1, $extras);
-        }
-        catch (ApiException $ex) {
+        } catch (ApiException $ex) {
             $this->success = false;
         }
         $this->api__cart_getcartcontent();
@@ -158,8 +159,7 @@ class rex_api_simpleshop_api extends rex_api_function
         }
         if ($exact_qty) {
             \FriendsOfREDAXO\Simpleshop\Session::setProductData($product_key, $exact_qty, $extras);
-        }
-        else {
+        } else {
             \FriendsOfREDAXO\Simpleshop\Session::addProduct($product_key, $quantity, $extras);
         }
         $this->response['cart_items']       = \FriendsOfREDAXO\Simpleshop\Session::getCartItems(true);
