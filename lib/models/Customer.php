@@ -35,13 +35,13 @@ class Customer extends Model
         return $result;
     }
 
-    public static function getCurrentUser()
+    public static function getCurrentUser($redirect_on_error = true)
     {
         $result = null;
-        if (!empty($_SESSION['customer']['user']) && (int) $_SESSION['customer']['user']['id'] > 0) {
+        if (self::isLoggedIn()) {
             $result = parent::get($_SESSION['customer']['user']['id']);
 
-            if (!$result) {
+            if (!$result && $redirect_on_error) {
                 self::logout();
                 rex_redirect(\rex_article::getCurrentId());
             }
