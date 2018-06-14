@@ -35,7 +35,9 @@ $months         = $this->getVar('months');
     <div class="col-sm-7">
         <button class="btn btn-default float-left" type="submit" name="func" value="filter"><?= $this->i18n("update") ?></button>
         &nbsp;&nbsp;&nbsp;
-        <button class="btn btn-apply float-left" type="submit" name="func" value="export">CSV <?= $this->i18n("action.export") ?></button>
+        <button class="btn btn-apply float-left" type="submit" name="func" value="export-pdf">PDF <?= $this->i18n("action.export") ?></button>
+        &nbsp;&nbsp;&nbsp;
+        <button class="btn btn-apply float-left" type="submit" name="func" value="export-csv">CSV <?= $this->i18n("action.export") ?></button>
         &nbsp;&nbsp;&nbsp;
 
         <?php

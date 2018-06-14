@@ -26,6 +26,7 @@ abstract class Model extends \rex_yform_manager_dataset
         if (count(self::$settings) == 0) {
             self::$settings = \rex::getConfig('simpleshop.Settings');
         }
+
         return self::$settings[$key] ?: $default;
     }
 
@@ -152,6 +153,7 @@ abstract class Model extends \rex_yform_manager_dataset
                 $coll = new \rex_yform_manager_collection(static::TABLE, $data);
             }
         }
+
         return $coll;
     }
 
@@ -169,6 +171,7 @@ abstract class Model extends \rex_yform_manager_dataset
             }
             $results = $_results;
         }
+
         return $results;
     }
 
@@ -181,6 +184,7 @@ abstract class Model extends \rex_yform_manager_dataset
     {
         $params['limit']  = 0;
         $params['offset'] = 0;
+
         return count(self::prepareQuery($ignoreOffline, $params, $debug));
     }
 
@@ -189,6 +193,7 @@ abstract class Model extends \rex_yform_manager_dataset
         $params['limit'] = 1;
 
         $rows = self::prepareQuery($ignoreOffline, $params, $debug);
+
         return isset($rows[0]) ? $rows[0] : null;
     }
 
@@ -220,12 +225,14 @@ abstract class Model extends \rex_yform_manager_dataset
         else {
             $value = $this->unprepare($value);
         }
+
         return $value;
     }
 
     public function valueIsset($key, $dependsOnLang = false)
     {
         $value = $this->getValue($key, $dependsOnLang);
+
         return is_object($value) || strlen($value) > 0;
     }
 
@@ -245,12 +252,14 @@ abstract class Model extends \rex_yform_manager_dataset
                 $result = explode(',', $value);
             }
         }
+
         return $result;
     }
 
     public function isOnline($lang_id = null)
     {
         $is_online = $this->getValue('status') === null || $this->getValue('status') == 1;
+
         return $is_online && ($lang_id == null || !$this->nameIsEmpty($lang_id));
     }
 
@@ -275,12 +284,14 @@ abstract class Model extends \rex_yform_manager_dataset
             $key     = defined('static::URL_PARAMKEY') ? static::URL_PARAMKEY : $this->url_data->urlParamKey;
             $_params = [$key => $this->getId()];
         }
+
         return rex_getUrl(null, null, array_merge($_params, $params));
     }
 
     public static function isRegistered($table)
     {
         $table_classes = \rex_addon::get('simpleshop')->getConfig('table_classes');
+
         return isset($table_classes[$table]);
     }
 
@@ -318,6 +329,7 @@ abstract class Model extends \rex_yform_manager_dataset
                 }
             }
         }
+
         return $fields;
     }
 
@@ -356,6 +368,7 @@ abstract class Model extends \rex_yform_manager_dataset
                 $fields[] = $_nfield;
             }
         }
+
         return $fields;
     }
 
@@ -390,6 +403,7 @@ abstract class Model extends \rex_yform_manager_dataset
         if ($prepare) {
             $this->prepareData($this);
         }
+
         return parent::save();
     }
 
@@ -400,6 +414,7 @@ abstract class Model extends \rex_yform_manager_dataset
         foreach ($data as $name => $value) {
             $Object->setValue($name, $value);
         }
+
         return $Object;
     }
 
@@ -416,7 +431,13 @@ abstract class Model extends \rex_yform_manager_dataset
 
                     if (class_exists($value['class'])) {
                         if (isset ($data['id'])) {
-                            $Object = clone call_user_func_array([$value['class'], 'get'], [$data['id']]);
+                            $_Object = call_user_func_array([$value['class'], 'get'], [$data['id']]);
+                            if (is_object($_Object)) {
+                                $Object = clone $_Object;
+                            }
+                            else {
+                                $Object = $value['class']::create();
+                            }
                         }
                         if (!isset($Object)) {
                             $Object = call_user_func([$value['class'], 'create']);
@@ -438,6 +459,7 @@ abstract class Model extends \rex_yform_manager_dataset
                 }
             }
         }
+
         return $value;
     }
 
@@ -464,18 +486,21 @@ abstract class Model extends \rex_yform_manager_dataset
                 $value      = json_encode(['class' => $class_name, 'data' => $value->getData()]);
             }
         }
+
         return $data;
     }
 
     public static function getAllYformFields($filter = [])
     {
         $table = self::create();
+
         return $table->getFields($filter);
     }
 
     public static function getYformFieldByName($name)
     {
         $fields = self::getAllYformFields(['name' => $name]);
+
         return array_shift($fields);
     }
 }

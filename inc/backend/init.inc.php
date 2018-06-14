@@ -17,13 +17,10 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 \rex_extension::register('PACKAGES_INCLUDED', function () {
     if ($this->getProperty('compile') || \rex_addon::get('project')->getProperty('compile') || !file_exists($this->getAssetsPath('css/backend.css'))) {
-        $compiler   = new \rex_scss_compiler();
-        $scss_files = \rex_extension::registerPoint(new \rex_extension_point('BE_STYLE_SCSS_FILES', [$this->getPath('assets/styles.scss')]));
-        $compiler->setScssFile($scss_files);
-        $compiler->setCssFile($this->getPath('assets/styles.css'));
+        $compiler = new \rex_scss_compiler();
+        $compiler->setScssFile([$this->getPath('assets/styles.scss')]);
+        $compiler->setCssFile($this->getAssetsPath('css/styles.css'));
         $compiler->compile();
-        \rex_file::copy($this->getPath('assets/styles.css'), $this->getAssetsPath('css/styles.css'));
-        \rex_file::delete($this->getPath('assets/css/styles.css'));
 
         \rex_file::copy($this->getPath('assets/simpleshop.js'), $this->getAssetsPath('js/simpleshop.js'));
     }

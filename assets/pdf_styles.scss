@@ -1,0 +1,69 @@
+body {
+    font-family: FreeSans;
+    font-size: 11pt;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+#invoice-header-infos {
+    margin: 12mm 0 20mm 0;
+}
+
+#invoice-data {
+    margin: 12mm 0 6mm 0;
+}
+
+#invoice-items {
+    border: 0.1mm solid #666;
+
+    thead td {
+        background-color: #3c3c3b;
+        color: #fff;
+        text-align: center;
+        border: 0.1mm solid #666;
+        font-variant: small-caps;
+    }
+    td {
+        border-bottom: 0.1mm solid #666;
+        border-left: 0.1mm solid #666;
+        border-right: 0.1mm solid #666;
+
+        .blanktotal {
+            background-color: #EEEEEE;
+            border: 0.1mm solid #000000;
+            background-color: #FFFFFF;
+            border: 0mm none #000000;
+            border-top: 0.1mm solid #000000;
+            border-right: 0.1mm solid #000000;
+        }
+        .totals {
+            text-align: right;
+            border: 0.1mm solid #000000;
+        }
+        .cost {
+            text-align: "." center;
+        }
+
+        &.invoice-participant-cell {
+            background: #eee;
+            td {
+                border: none;
+            }
+        }
+    }
+}
+
+#invoice-summary {
+    margin-top: 4mm;
+    td {
+        border-bottom: 0.1mm solid #999;
+        padding: 3mm 3mm 3mm 0;
+    }
+}
+#invoice-summary-total-label,
+#invoice-summary-total-value {
+    font-weight: bold;
+    font-size: 12pt;
+}

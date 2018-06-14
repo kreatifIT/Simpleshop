@@ -23,13 +23,17 @@ label.return_address = Absenderadresse
 label.product_list = Produktliste
 label.accounting = Buchhaltung
 label.what_u_want_todo = Was wollen Sie tun?
-label.resend_email = Bestellungs-Email an Kunde senden
+label.resend_email = Dokument an Kunde senden
 label.recalculate_sums = Werte neu berechnen
+label.generate_creditnote = Gutschrift erstellen
+label.msg_generate_creditnote = Gutschrift wurder erstellt
 label.msg_resend_email = Email wurde versendet
 label.msg_recalculate_sums = Werte wurden aktualisiert
 label.invoice_num = Rechn.-Nr
 
 
+action.goto_creditnote = gehe zur Gutschrift
+action.goto_order = Bestellung ansehen
 action.manage_variants = Varianten verwalten
 action.edit_product = Produkt bearbeiten
 action.edit_value = Wert bearbeiten

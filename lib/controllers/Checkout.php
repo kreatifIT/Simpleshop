@@ -16,6 +16,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Sprog\Wildcard;
 
+
 class CheckoutController extends Controller
 {
     protected $products = [];
@@ -104,8 +105,17 @@ class CheckoutController extends Controller
         $Settings = \rex::getConfig('simpleshop.Settings');
         $Customer = $this->Order->getInvoiceAddress();
 
-        $Mail->Subject = '###shop.email.order_complete###';
-        $Mail->setFragmentPath('order/complete');
+        if ($this->Order->valueIsset('ref_order_id')) {
+            if ($this->Order->getValue('status') != 'CN') {
+                throw new OrderException('Credit Note status is not correct');
+            }
+            $Mail->Subject = '###shop.email.credit_note###';
+            $Mail->setFragmentPath('order/credit_note');
+        }
+        else {
+            $Mail->Subject = '###shop.email.order_complete###';
+            $Mail->setFragmentPath('order/complete');
+        }
 
         // add vars
         $Mail->setVar('Order', $this->Order);
@@ -130,6 +140,10 @@ class CheckoutController extends Controller
                 $Mail->addCC($_add);
             }
         }
+
+        $type = $this->Order->getInvoiceNum() ? 'invoice' : 'order';
+        $PDF  = $this->Order->getInvoicePDF($type, false);
+        $Mail->addStringAttachment($PDF->Output('', 'S'), \rex::getServerName() . ' - ' . Wildcard::get('label.'. $type) . '.pdf', 'base64', 'application/pdf');
 
         $do_send = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.orderComplete', $do_send, [
             'Mail'  => $Mail,

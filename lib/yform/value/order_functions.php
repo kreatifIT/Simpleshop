@@ -26,6 +26,12 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
             }
 
             switch ($action) {
+                case 'generate_pdf':
+                    rex_response::cleanOutputBuffers();
+                    $PDF = $Order->getInvoicePDF('invoice', false);
+                    $PDF->Output();
+                    exit;
+
                 case 'resend_email':
                     $Controller = new \FriendsOfREDAXO\Simpleshop\CheckoutController();
                     $Controller->setOrder($Order);
@@ -36,10 +42,23 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                     header('Location: ' . html_entity_decode(rex_url::currentBackendPage($_GET)));
                     exit;
 
+                case 'generate_creditnote':
+                    $CreditNote = \FriendsOfREDAXO\Simpleshop\Order::create();
+
+                    $CreditNote->calculateCreditNote($Order);
+                    $CreditNote->save();
+
+                    unset($_GET['ss-action']);
+                    $_GET['ss-msg'] = $action;
+                    header('Location: ' . html_entity_decode(rex_url::currentBackendPage($_GET)));
+                    exit;
+
                 case 'recalculate_sums':
                     $products       = [];
                     $order_products = \FriendsOfREDAXO\Simpleshop\OrderProduct::getAll(true, ['filter' => [['order_id', $Order->getId()]], 'orderBy' => 'm.id']);
                     $promotions     = $Order->getValue('promotions', false, []);
+                    $abos           = $Order->getValue('abos');
+                    $discount       = 0;
 
                     foreach ($order_products as $order_product) {
                         $product = $order_product->getValue('data');
@@ -47,6 +66,10 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                         $products[] = $product;
                     }
 
+                    foreach ($abos as $abo) {
+                        $discount += $abo['value'];
+                    }
+                    $Order->setValue('manual_discount', $discount);
                     $Order->recalculateDocument($products, $promotions);
                     $Order->save();
 
@@ -71,12 +94,50 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                             </a>
                         ';
                     }
-                    $output[]                                    = '
+                    $output[] = '
                         <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'recalculate_sums'])) . '" class="btn btn-default">
                             <i class="fa fa-calculator"></i>&nbsp;
                             ' . rex_i18n::msg('label.recalculate_sums') . '
                         </a>
                     ';
+                    $output[] = '
+                        <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'generate_pdf'])) . '" class="btn btn-default">
+                            <i class="fa fa-file"></i>&nbsp;
+                            PDF drucken
+                        </a>
+                    ';
+
+                    if ($Order->getValue('status') == 'CA') {
+                        $CreditNote = \FriendsOfREDAXO\Simpleshop\Order::getOne(false, [
+                            'filter'  => [['ref_order_id', $Order->getId()]],
+                            'orderBy' => 'id',
+                        ]);
+
+                        if ($CreditNote) {
+                            $output[] = '
+                                <a href="' . rex_url::currentBackendPage(['table_name' => 'rex_shop_order', 'data_id' => $CreditNote->getId(), 'func' => 'edit']) . '" class="btn btn-primary">
+                                    <i class="fa fa-money"></i>&nbsp;
+                                    ' . rex_i18n::msg('action.goto_creditnote') . '
+                                </a>
+                            ';
+                        }
+                        else {
+                            $output[] = '
+                                <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'generate_creditnote'])) . '" class="btn btn-default">
+                                    <i class="fa fa-money"></i>&nbsp;
+                                    ' . rex_i18n::msg('label.generate_creditnote') . '
+                                </a>
+                            ';
+                        }
+                    }
+                    else if ($Order->valueIsset('ref_order_id')) {
+                        $output[] = '
+                                <a href="' . rex_url::currentBackendPage(['table_name' => 'rex_shop_order', 'data_id' => $Order->getValue('ref_order_id'), 'func' => 'edit']) . '" class="btn btn-primary">
+                                    <i class="fa fa-file-text-o"></i>&nbsp;
+                                    ' . rex_i18n::msg('action.goto_order') . '
+                                </a>
+                            ';
+                    }
                     $this->params['form_output'][$this->getId()] = '
                         <div class="row nested-panel">
                             <div class="form-group col-xs-12" id="' . $this->getHTMLId() . '">
