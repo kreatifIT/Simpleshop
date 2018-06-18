@@ -42,6 +42,9 @@ class CartController extends Controller
         else if ($_func == 'remove') {
             \rex_response::cleanOutputBuffers();
             Session::removeProduct(rex_get('key'));
+
+            \rex_extension::registerPoint(new \rex_extension_point('Cart.removed', rex_get('key')));
+
             header('Location: ' . rex_getUrl());
             exit();
         }

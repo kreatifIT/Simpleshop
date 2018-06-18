@@ -143,7 +143,10 @@ class CheckoutController extends Controller
 
         $type = $this->Order->getInvoiceNum() ? 'invoice' : 'order';
         $PDF  = $this->Order->getInvoicePDF($type, false);
-        $Mail->addStringAttachment($PDF->Output('', 'S'), \rex::getServerName() . ' - ' . Wildcard::get('label.'. $type) . '.pdf', 'base64', 'application/pdf');
+
+        if ($PDF) {
+            $Mail->addStringAttachment($PDF->Output('', 'S'), \rex::getServerName() . ' - ' . Wildcard::get('label.'. $type) . '.pdf', 'base64', 'application/pdf');
+        }
 
         $do_send = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.orderComplete', $do_send, [
             'Mail'  => $Mail,

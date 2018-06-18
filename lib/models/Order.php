@@ -450,6 +450,10 @@ class Order extends Model
 
     public function getInvoicePDF($type = 'invoice', $debug = false, Mpdf $_Mpdf = null)
     {
+        if (!class_exists(Mpdf)) {
+            return false;
+        }
+
         $content    = '';
         $fragment   = new \rex_fragment();
         $Mpdf       = $_Mpdf ?: new Mpdf([]);
