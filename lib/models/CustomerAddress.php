@@ -47,6 +47,7 @@ class CustomerAddress extends Model
             if (in_array('lastname', $excludedFields)) {
                 $form->setValueField('hidden', ['lastname', rex_post('lastname', 'string')]);
             }
+            $form->setValueField('hidden', ['status', 1]);
         }
         return $form;
     }

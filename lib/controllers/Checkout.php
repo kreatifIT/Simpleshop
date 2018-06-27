@@ -224,14 +224,11 @@ class CheckoutController extends Controller
         CheckoutController::$callbackCheck = ['invoice' => false, 'shipping' => false];
 
         if (!$Address) {
-            $addresses = CustomerAddress::getAll(true, [
-                'filter'  => [['customer_id', $Customer->getId()]],
-                'limit'   => 1,
-                'orderBy' => 'id',
-                'order'   => 'asc',
-            ])
-                ->toArray();
-            $Address   = array_shift($addresses);
+            $Address = CustomerAddress::query()
+                ->where('status', 1)
+                ->where('customer_id', $Customer->getId())
+                ->orderBy('id', 'desc')
+                ->findOne();
         }
 
         $this->setVar('Address', $Address ?: CustomerAddress::create());
