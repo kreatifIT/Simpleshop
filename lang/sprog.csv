@@ -66,6 +66,7 @@ simpleshop.invoice_title
 simpleshop.orderdocument_title
 simpleshop.position_short
 simpleshop.single_price
+simpleshop.single_price_no_vat
 simpleshop.credit_note_reference_info
 simpleshop.credit_note
 simpleshop.order_num

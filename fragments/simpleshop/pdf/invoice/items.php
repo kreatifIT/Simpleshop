@@ -27,7 +27,7 @@ if (count($products) == 0) {
         <td width="14%">###label.code###</td>
         <td width="38%">###label.description###</td>
         <td width="10%">###simpleshop.amount###</td>
-        <td width="15%">###simpleshop.single_price###</td>
+        <td width="15%">###simpleshop.single_price_no_vat###</td>
         <td width="15%">###simpleshop.total_sum###</td>
     </tr>
     </thead>

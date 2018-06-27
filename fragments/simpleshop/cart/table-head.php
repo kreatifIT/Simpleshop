@@ -12,19 +12,19 @@
  */
 namespace FriendsOfREDAXO\Simpleshop;
 
-$config = $this->getVar('cart_config', FragmentConfig::getValue('cart'));
-$styles = FragmentConfig::getValue('styles');
+$config         = $this->getVar('cart_config', FragmentConfig::getValue('cart'));
+$use_tax_prices = $this->getVar('use_tax_prices', true);
 
 ?>
-<tr class="cart-header" <?= $styles['tr'] ?>>
+<tr class="cart-header">
     <?php if ($config['has_image']): ?>
-        <th <?= $styles['prod-th'] ?>>###label.preview###</th>
+        <th>###label.preview###</th>
     <?php endif; ?>
-    <th <?= $styles['prod-th'] ?>>###label.product###</th>
-    <th <?= $styles['prod-th'] ?>>###label.amount###</th>
-    <th <?= $styles['prod-th'] ?>>###label.single_price###</th>
-    <th <?= $styles['prod-th'] ?>>###label.total###</th>
+    <th>###label.product###</th>
+    <th>###label.amount###</th>
+    <th><?= $use_tax_prices ? '###simpleshop.single_price###' : '###simpleshop.single_price_no_vat###' ?></th>
+    <th>###label.total###</th>
     <?php if ($config['has_remove_button']): ?>
-        <th <?= $styles['prod-th'] ?>>&nbsp;</th>
+        <th>&nbsp;</th>
     <?php endif; ?>
 </tr>

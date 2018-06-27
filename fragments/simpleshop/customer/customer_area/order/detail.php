@@ -85,7 +85,7 @@ foreach ($_products as $product)
     <thead>
     <tr>
         <th>###shop.produt_code###</th>
-        <th>###shop.single_price###</th>
+        <th>###simpleshop.single_price_no_vat###</th>
         <th>###shop.amount###</th>
         <th>###label.total###</th>
     </tr>
