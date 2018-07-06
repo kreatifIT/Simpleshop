@@ -20,6 +20,7 @@ class rex_api_simpleshop_api extends rex_api_function
     {
         $lang_id = rex_request('lang', 'int');
         if ($lang_id) {
+            rex_clang::setCurrentId($lang_id);
             setlocale(LC_ALL, rex_clang::get($lang_id)->getValue('clang_setlocale'));
         }
 
