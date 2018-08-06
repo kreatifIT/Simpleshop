@@ -106,7 +106,7 @@ unset($_GET['action'])
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // PASSWORD RECOVERY
         ?>
-        <div class="recovery-form <?= $action == 'recover' ? '' : 'hide' ?>">
+        <div class="recovery-form medium-6 large-4 medium-centered <?= $action == 'recover' ? '' : 'hide' ?>">
             <div class="row column">
                 <h2 class="margin-small-bottom heading"><?= ucfirst(\Sprog\Wildcard::get('label.password_forgotten')) ?></h2>
 
@@ -225,7 +225,7 @@ unset($_GET['action'])
         }
 
         ?>
-        <div class="register-form <?= $action == 'register' ? '' : 'hide' ?>">
+        <div class="register-form large-6 medium-centered <?= $action == 'register' ? '' : 'hide' ?>">
             <div class="row column">
                 <h2 class="margin-small-bottom heading"><?= ucfirst(\Sprog\Wildcard::get('action.register')) ?></h2>
             </div>

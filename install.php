@@ -49,13 +49,13 @@ if (!$this->hasConfig()) {
 
     // import tables
     $tablesets = glob($this->getPath('install') . '/tablesets/*.json');
-    $sqls      = glob($this->getPath('install') . '/sql/*.sql');
+    $sql_files = glob($this->getPath('install') . '/sql/*.sql');
 
     foreach ($tablesets as $tableset) {
         \rex_yform_manager_table_api::importTablesets(file_get_contents($tableset));
     }
 
-    foreach ($sqls as $sql) {
-        $sql->setQuery(file_get_contents($sql));
+    foreach ($sql_files as $sql_file) {
+        $sql->setQuery(file_get_contents($sql_file));
     }
 }

@@ -19,7 +19,7 @@ class Utils
 
     public static function getSetting($key = false, $default = null)
     {
-        $settings = \rex::getConfig('simpleshop.Settings');
+        $settings = (array) \rex::getConfig('simpleshop.Settings');
 
         if ($key) {
             $settings = array_key_exists($key, $settings) && $settings[$key] !== null ? $settings[$key] : $default;

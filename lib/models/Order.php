@@ -13,9 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-use Kreatif\Mpdf\Mpdf;
-
-
 class Order extends Model
 {
     const TABLE = 'rex_shop_order';
@@ -427,7 +424,7 @@ class Order extends Model
     {
         $content    = '';
         $fragment   = new \rex_fragment();
-        $Mpdf       = $_Mpdf ?: new Mpdf([
+        $Mpdf       = $_Mpdf ?: new Kreatif\Mpdf\Mpdf([
             'margin_left'   => 20,
             'margin_right'  => 15,
             'margin_top'    => 10,

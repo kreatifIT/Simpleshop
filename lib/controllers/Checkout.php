@@ -395,8 +395,13 @@ class CheckoutController extends Controller
         }
 
         $type = \FriendsOfREDAXO\Simpleshop\Utils::getSetting('use_invoicing', false) && $this->Order->getInvoiceNum() ? 'invoice' : 'order';
-        $PDF  = $this->Order->getInvoicePDF($type, false);
-        $Mail->addStringAttachment($PDF->Output('', 'S'), \rex::getServerName() . ' - ' . Wildcard::get('label.' . $type) . '.pdf', 'base64', 'application/pdf');
+
+        if (\rex_addon::get('kreatif-mpdf')
+            ->isAvailable()
+        ) {
+            $PDF = $this->Order->getInvoicePDF($type, false);
+            $Mail->addStringAttachment($PDF->Output('', 'S'), \rex::getServerName() . ' - ' . Wildcard::get('label.' . $type) . '.pdf', 'base64', 'application/pdf');
+        }
 
         $do_send = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.orderComplete', $do_send, [
             'Mail'  => $Mail,

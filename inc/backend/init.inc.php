@@ -25,6 +25,9 @@ namespace FriendsOfREDAXO\Simpleshop;
         $compiler->compile();
     }
 
-    \rex_view::addCssFile($this->getAssetsUrl('css/backend.css?mtime=' . filemtime($this->getAssetsPath('css/backend.css'))));
-    \rex_view::addJsFile($this->getAssetsUrl('js/backend.js?mtime=' . filemtime($this->getAssetsPath('js/backend.js'))));
+    $cssTime = @filemtime($this->getAssetsPath('css/backend.css'));
+    $jsTime  = @filemtime($this->getAssetsPath('js/backend.js'));
+
+    \rex_view::addCssFile($this->getAssetsUrl('css/backend.css?mtime=' . $cssTime));
+    \rex_view::addJsFile($this->getAssetsUrl('js/backend.js?mtime=' . $jsTime));
 });
