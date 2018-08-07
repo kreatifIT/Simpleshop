@@ -16,6 +16,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Sprog\Wildcard;
 
+
 class Customer extends Model
 {
     const TABLE       = 'rex_shop_customer';
@@ -24,7 +25,9 @@ class Customer extends Model
 
     public static function getUserByEmail($email)
     {
-        return self::query()->where('email', $email)->findOne();
+        return self::query()
+            ->where('email', $email)
+            ->findOne();
     }
 
     public function save($prepare = false)
@@ -38,7 +41,7 @@ class Customer extends Model
     public static function getCurrentUser()
     {
         $result = null;
-        if (!empty($_SESSION['customer']['user']) && (int) $_SESSION['customer']['user']['id'] > 0) {
+        if (!empty($_SESSION['customer']['user']) && (int)$_SESSION['customer']['user']['id'] > 0) {
             $result = parent::get($_SESSION['customer']['user']['id']);
 
             if (!$result) {
@@ -53,8 +56,7 @@ class Customer extends Model
     {
         if ($this->getValue('ctype') == 'company') {
             $name = $this->getValue('company_name');
-        }
-        else {
+        } else {
             $name = $this->getValue('firstname') . ' ' . $this->getValue('lastname');
         }
         return $name;
@@ -75,13 +77,14 @@ class Customer extends Model
             $_this->setValue($attr, $value);
         }
 
-        $exclFields = array_diff(FragmentConfig::getValue('yform_fields.rex_shop_customer._excludedFields'), ['created', 'updatedate', 'status']);
+        $statusField = self::getYformFieldByName('status');
+        $exclFields  = array_diff(FragmentConfig::getValue('yform_fields.rex_shop_customer._excludedFields'), ['created', 'updatedate', 'status']);
 
         FragmentConfig::$data['yform_fields']['rex_shop_customer']['_excludedFields'] = $exclFields;
 
         $_this->setValue('email', $email);
         $_this->setValue('password', $password);
-        $_this->setValue('status', 1);
+        $_this->setValue('status', $statusField->getElement('default'));
         $_this->setValue('created', date('Y-m-d H:i:s'));
         $success  = $_this->save();
         $messages = $_this->getMessages();
@@ -152,9 +155,10 @@ class Customer extends Model
         $password = null;
         $User     = self::getUserByEmail($email);
 
-        if ($User) {
+        if ($User && $User->getValue('status') == 1) {
             $password = random_string(self::MIN_PWD_LEN);
-            $User->setValue('password', $password)->save();
+            $User->setValue('password', $password)
+                ->save();
 
             $Mail          = new Mail();
             $do_send       = true;
@@ -194,7 +198,7 @@ class Customer extends Model
 
     public static function isLoggedIn()
     {
-        return (!empty($_SESSION['customer']['user']) && (int) $_SESSION['customer']['user']['id'] > 0);
+        return (!empty($_SESSION['customer']['user']) && (int)$_SESSION['customer']['user']['id'] > 0);
     }
 
     public function isCompany()

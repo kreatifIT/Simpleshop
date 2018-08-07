@@ -15,6 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Kreatif\Form;
 
+
 $referer  = $this->getVar('referer');
 $Config   = FragmentConfig::getValue('auth');
 $errors   = [];
@@ -37,29 +38,31 @@ if (rex_post('action', 'string') == 'login') {
             default:
                 if ($referer == '') {
                     rex_redirect(\rex_article::getCurrentId(), null, $_GET);
-                }
-                else if (strlen($referer)) {
+                } else if (strlen($referer)) {
                     header('Location: ' . $referer);
                     exit;
                 }
                 break;
         }
-    }
-    else {
+    } else {
         $errors[] = '###error.login_failed###';
     }
 }
 if (rex_get('referer', 'string') == 'return') {
     rex_set_session('login_referer', rex_server('HTTP_REFERER'));
-}
-else if (rex_get('referer', 'string') == 'account') {
+} else if (rex_get('referer', 'string') == 'account') {
     rex_set_session('login_referer', 'account');
-}
-else if (strlen($referer)) {
+} else if (strlen($referer)) {
     rex_set_session('login_referer', $referer);
 }
 
-unset($_GET['action'])
+unset($_GET['action']);
+
+$texts = [
+    'registration_info_text' => \Wildcard::get('simpleshop.registration_info_text'),
+    'login_info_text'        => \Wildcard::get('simpleshop.login_info_text'),
+    'pwd_recovery_info_text' => \Wildcard::get('simpleshop.pwd_recovery_info_text'),
+];
 
 ?>
 <div id="<?= $sid ?>" class="auth-wrapper <?= $Config['css_class']['wrapper'] ?>" data-auth-wrapper>
@@ -69,6 +72,10 @@ unset($_GET['action'])
 
                 <form action="<?= rex_getUrl(null, null, $_GET) ?>#-<?= $sid ?>" method="post" class="padding-small-top padding-small-bottom">
                     <h2 class="margin-small-bottom heading"><?= ucfirst(\Sprog\Wildcard::get('action.login')) ?></h2>
+
+                    <?php if (strlen($texts['login_info_text'])): ?>
+                        <p><?= $texts['login_info_text'] ?></p>
+                    <?php endif; ?>
 
                     <?php if (count($errors)): ?>
                         <div class="callout alert">
@@ -109,6 +116,10 @@ unset($_GET['action'])
         <div class="recovery-form medium-6 large-4 medium-centered <?= $action == 'recover' ? '' : 'hide' ?>">
             <div class="row column">
                 <h2 class="margin-small-bottom heading"><?= ucfirst(\Sprog\Wildcard::get('label.password_forgotten')) ?></h2>
+
+                <?php if (strlen($texts['pwd_recovery_info_text'])): ?>
+                    <p><?= $texts['pwd_recovery_info_text'] ?></p>
+                <?php endif; ?>
 
                 <?php
                 $recoverySuccess = false;
@@ -170,7 +181,7 @@ unset($_GET['action'])
             }
 
             if ($field->getElement('type_id') == 'value') {
-                $params = array_merge($field->toArray(), (array) $Config[$field->getElement('name')], [
+                $params = array_merge($field->toArray(), (array)$Config[$field->getElement('name')], [
                     'notice' => null,
                 ]);
 
@@ -180,8 +191,7 @@ unset($_GET['action'])
                     $params['field'] = strtr($params['field'], ['_1' => '_' . \rex_clang::getCurrentId()]);
                 }
                 $form->setValueField($field->getElement('type_name'), $params);
-            }
-            else if ($field->getElement('type_id') == 'validate') {
+            } else if ($field->getElement('type_id') == 'validate') {
                 $form->setValidateField($field->getElement('type_name'), $field->toArray());
             }
         }
@@ -217,8 +227,7 @@ unset($_GET['action'])
             try {
                 Customer::register($values['email'], $values['password'], $values);
                 Customer::login($values['email'], $values['password']);
-            }
-            catch (CustomerException $ex) {
+            } catch (CustomerException $ex) {
                 $customerError = true;
                 $formOutput    = '<div class="callout alert">' . $ex->getMessage() . '</div>' . $formOutput;
             }
@@ -228,6 +237,10 @@ unset($_GET['action'])
         <div class="register-form large-6 medium-centered <?= $action == 'register' ? '' : 'hide' ?>">
             <div class="row column">
                 <h2 class="margin-small-bottom heading"><?= ucfirst(\Sprog\Wildcard::get('action.register')) ?></h2>
+
+                <?php if (strlen($texts['registration_info_text'])): ?>
+                    <p><?= $texts['registration_info_text'] ?></p>
+                <?php endif; ?>
             </div>
 
             <div class="row">
