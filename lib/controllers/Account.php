@@ -20,7 +20,13 @@ class AccountController extends Controller
 
     public function _execute()
     {
-        $errors       = [];
+        $errors   = [];
+        $Settings = \rex::getConfig('simpleshop.Settings');
+
+        if (!in_array($this->params['content'], $Settings['membera_area_contents'])) {
+            $this->params['content'] = array_shift($Settings['membera_area_contents']);
+        }
+
         $this->params = array_merge([
             'content' => true,
         ], $this->params);
@@ -35,13 +41,7 @@ class AccountController extends Controller
         }
 
         $this->setVar('User', Customer::getCurrentUser());
-
-        switch ($this->params['content']) {
-            case 'dashboard':
-                $this->setVar('template', 'dashboard.php');
-                break;
-        }
-
+        $this->setVar('template', "{$this->params['content']}.php");
 
         if (count($errors)) {
             ob_start();

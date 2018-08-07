@@ -64,6 +64,11 @@ settings.discounts_are_accumulable = Rabatte können (wenn möglich) alle akkumu
 settings.shop_settings = Shop-Einstellungen
 settings.brutto_prices = Bruttopreise
 settings.brutto_prices_info = Bruttopreise bei der Eingabe im Backend verwenden (inkl. MwSt)
+settings.member_area_contents = Kundenbereich-Inhalte
+settings.member_area_contents_label = Folgende Inhalte sollen im Kundenbereich zur Verfügung stehen
+settings.content_dashboard = Dashboard
+settings.content_history = Bestellhistorie
+settings.content_addresses = Adressen
 
 yform_values.coupon_functions_description = Funktionen für Coupon-Codes
 yform_values.order_functions_description = Funktionen für Bestelldokumente

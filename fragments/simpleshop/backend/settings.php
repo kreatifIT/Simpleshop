@@ -17,6 +17,12 @@ namespace FriendsOfREDAXO\Simpleshop;
 $Addon    = $this->getVar('Addon');
 $Settings = $this->getVar('Settings');
 
+$ma_contents = (array) \rex_extension::registerPoint(new \rex_extension_point('simpleshop.memberarea.input_contents', [
+    'dashboard' => $Addon->i18n('settings.content_dashboard'),
+    'history'   => $Addon->i18n('settings.content_history'),
+    'addresses' => $Addon->i18n('settings.content_addresses'),
+]));
+
 ?>
 <fieldset>
 
@@ -25,7 +31,9 @@ $Settings = $this->getVar('Settings');
         <dt><?= $Addon->i18n('settings.brutto_prices'); ?></dt>
         <dd>
             <label class="form-label">
-                <input type="checkbox" name="brutto_prices" value="1" <?php if (from_array($Settings, 'brutto_prices') == 1) echo 'checked="checked"'; ?>/><span></span><?= $Addon->i18n('settings.brutto_prices_info'); ?>
+                <input type="checkbox" name="brutto_prices" value="1" <?php if (from_array($Settings, 'brutto_prices') == 1) {
+                    echo 'checked="checked"';
+                } ?>/><span></span><?= $Addon->i18n('settings.brutto_prices_info'); ?>
             </label>
         </dd>
     </dl>
@@ -33,7 +41,9 @@ $Settings = $this->getVar('Settings');
         <dt><?= $Addon->i18n('label.packing_list_title'); ?></dt>
         <dd>
             <label class="form-label">
-                <input type="checkbox" name="packing_list_printing" value="1" <?php if (from_array($Settings, 'packing_list_printing') == 1) echo 'checked="checked"'; ?>/><span></span><?= $Addon->i18n('action.print_packing_list'); ?>
+                <input type="checkbox" name="packing_list_printing" value="1" <?php if (from_array($Settings, 'packing_list_printing') == 1) {
+                    echo 'checked="checked"';
+                } ?>/><span></span><?= $Addon->i18n('action.print_packing_list'); ?>
             </label>
         </dd>
     </dl>
@@ -41,7 +51,9 @@ $Settings = $this->getVar('Settings');
         <dt><?= $Addon->i18n('label.accounting'); ?></dt>
         <dd>
             <label class="form-label">
-                <input type="checkbox" name="use_invoicing" value="1" <?php if (from_array($Settings, 'use_invoicing') == 1) echo 'checked="checked"'; ?>/><span></span><?= $Addon->i18n('action.use_invoicing'); ?>
+                <input type="checkbox" name="use_invoicing" value="1" <?php if (from_array($Settings, 'use_invoicing') == 1) {
+                    echo 'checked="checked"';
+                } ?>/><span></span><?= $Addon->i18n('action.use_invoicing'); ?>
             </label>
         </dd>
     </dl>
@@ -53,11 +65,13 @@ $Settings = $this->getVar('Settings');
     </dl>
 
     <?php if (DiscountGroup::isRegistered(DiscountGroup::TABLE)): ?>
-    <legend><?= $Addon->i18n('settings.discount_settings'); ?></legend>
-    <dl class="rex-form-group form-group">
-        <dt><?= $Addon->i18n('settings.discount_application'); ?></dt>
-        <dd><label class="form-label"><input type="checkbox" name="discounts_are_accumulable" value="1" <?php if (from_array($Settings, 'discounts_are_accumulable') == 1) echo 'checked="checked"'; ?>/><span></span><?= $Addon->i18n('settings.discounts_are_accumulable'); ?></label></dd>
-    </dl>
+        <legend><?= $Addon->i18n('settings.discount_settings'); ?></legend>
+        <dl class="rex-form-group form-group">
+            <dt><?= $Addon->i18n('settings.discount_application'); ?></dt>
+            <dd><label class="form-label"><input type="checkbox" name="discounts_are_accumulable" value="1" <?php if (from_array($Settings, 'discounts_are_accumulable') == 1) {
+                        echo 'checked="checked"';
+                    } ?>/><span></span><?= $Addon->i18n('settings.discounts_are_accumulable'); ?></label></dd>
+        </dl>
     <?php endif; ?>
 
     <legend><?= $Addon->i18n('settings.page_mapping'); ?></legend>
@@ -77,6 +91,18 @@ $Settings = $this->getVar('Settings');
         <dt>Checkout</dt>
         <dd>
             <?= \rex_var_link::getWidget('linklist_checkout', 'linklist[checkout]', $Settings['linklist']['checkout']) ?>
+        </dd>
+    </dl>
+
+    <legend><?= $Addon->i18n('settings.member_area_contents'); ?></legend>
+    <dl class="rex-form-group form-group">
+        <dt><?= $Addon->i18n('settings.member_area_contents_label'); ?></dt>
+        <dd>
+            <select name="membera_area_contents[]" class="form-control" size="6" multiple>
+                <?php foreach ($ma_contents as $key => $value): ?>
+                    <option value="<?= $key ?>" <?= in_array($key, (array) $Settings['membera_area_contents']) ? 'selected="selected"' : '' ?>><?= $value ?></option>
+                <?php endforeach; ?>
+            </select>
         </dd>
     </dl>
 

@@ -16,6 +16,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 $fields           = $this->getVar('excluded_fields', []);
 $form             = $this->getVar('Form', null);
+$redirect_url     = $this->getVar('redirect_url', '');
 $back_url         = $this->getVar('back_url', '');
 $show_save_btn    = $this->getVar('show_save_btn', true);
 $real_field_names = $this->getVar('real_field_names', false);
@@ -46,6 +47,10 @@ $form->setObjectparams('form_name', $sid);
 $form->setObjectparams('form_class', 'row medium-up-2');
 $form->setObjectparams('form_action', '');
 $form->setObjectparams('only_fields', $only_fields);
+
+if ($redirect_url) {
+    $form->setActionField('redirect', [$redirect_url]);
+}
 
 if ($show_save_btn) {
     // Submit
