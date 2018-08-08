@@ -69,6 +69,7 @@ settings.member_area_contents_label = Folgende Inhalte sollen im Kundenbereich z
 settings.content_dashboard = Dashboard
 settings.content_history = Bestellhistorie
 settings.content_addresses = Adressen
+settings.content_account = Profildaten
 
 yform_values.coupon_functions_description = Funktionen für Coupon-Codes
 yform_values.order_functions_description = Funktionen für Bestelldokumente

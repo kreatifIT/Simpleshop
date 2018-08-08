@@ -62,6 +62,14 @@ class Customer extends Model
         return $name;
     }
 
+    public function hasPermission($permission)
+    {
+        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.hasPermission', true, [
+            'User'       => $this,
+            'permission' => $permission,
+        ]));
+    }
+
     public static function register($email, $password, $attributes = [])
     {
         $result = null;

@@ -15,6 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 $template = $this->getVar('template');
 
+$User     = Customer::getCurrentUser();
 $curId    = \rex_article::getCurrentId();
 $Category = \rex_category::getCurrent();
 $articles = $Category->getArticles(true);
@@ -25,11 +26,18 @@ $articles = $Category->getArticles(true);
         <?php if (count($articles) > 1): ?>
             <div class="column large-3 sidebar margin-bottom">
                 <ul class="no-bullet">
-                    <?php foreach ($articles as $article): ?>
+                    <?php foreach ($articles as $article):
+                        if (!$User->hasPermission("fragment.customer-area--sidebar-article--{$article->getId()}")) {
+                            continue;
+                        }
+                        ?>
                         <li <?= $curId == $article->getId() ? 'class="active"' : '' ?>>
                             <a href="<?= $article->getUrl() ?>"><?= $article->getName() ?></a>
                         </li>
                     <?php endforeach; ?>
+                    <li>
+                        <a href="<?= rex_getUrl(null, null, ['action' => 'logout']) ?>">###action.logout###</a>
+                    </li>
                 </ul>
             </div>
         <?php endif; ?>

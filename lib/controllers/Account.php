@@ -23,10 +23,6 @@ class AccountController extends Controller
         $errors   = [];
         $Settings = \rex::getConfig('simpleshop.Settings');
 
-        if (!in_array($this->params['content'], $Settings['membera_area_contents'])) {
-            $this->params['content'] = array_shift($Settings['membera_area_contents']);
-        }
-
         $this->params = array_merge([
             'content' => true,
         ], $this->params);
@@ -35,12 +31,27 @@ class AccountController extends Controller
             $this->setVar($key, $value, false);
         }
 
+        // CHECK CUSTOMER IS LOGGED
         if (!Customer::isLoggedIn()) {
             $this->fragment_path[] = 'simpleshop/customer/auth/login.php';
             return $this;
         }
 
-        $this->setVar('User', Customer::getCurrentUser());
+        // CHECK CONTENT IS ENABLED BY SETTINGS
+        if (!in_array($this->params['content'], $Settings['membera_area_contents'])) {
+            $this->fragment_path[] = 'simpleshop/customer/auth/no_permission.php';
+            return $this;
+        }
+
+        $User = Customer::getCurrentUser();
+
+        // CHECK USER HAS PERMISSION
+        if (!$User->hasPermission("AccountController.content--{$this->params['content']}")) {
+            $this->fragment_path[] = 'simpleshop/customer/auth/no_permission.php';
+            return $this;
+        }
+
+        $this->setVar('User', $User);
         $this->setVar('template', "{$this->params['content']}.php");
 
         if (count($errors)) {

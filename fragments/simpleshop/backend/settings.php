@@ -20,6 +20,7 @@ $Settings = $this->getVar('Settings');
 $ma_contents = (array) \rex_extension::registerPoint(new \rex_extension_point('simpleshop.memberarea.input_contents', [
     'dashboard' => $Addon->i18n('settings.content_dashboard'),
     'history'   => $Addon->i18n('settings.content_history'),
+    'account'   => $Addon->i18n('settings.content_account'),
     'addresses' => $Addon->i18n('settings.content_addresses'),
 ]));
 
