@@ -19,6 +19,7 @@ if (!$this->hasConfig()) {
     $sql     = rex_sql::factory();
     $modules = glob(__DIR__ . '/install/module/*/');
 
+
     foreach ($modules as $module) {
         $name   = trim(substr($module, strrpos($module, '/', -2)), '/');
         $input  = glob($module . 'input.php');
@@ -58,4 +59,7 @@ if (!$this->hasConfig()) {
     foreach ($sql_files as $sql_file) {
         $sql->setQuery(file_get_contents($sql_file));
     }
+
+    // install media manager types
+    include_once __DIR__ . '/install/inc/mediatypes.inc.php';
 }
