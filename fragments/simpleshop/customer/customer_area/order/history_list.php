@@ -15,9 +15,10 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Sprog\Wildcard;
 
+
 $orders = $this->getVar('orders');
 
- if (count($orders)): ?>
+if (count($orders)): ?>
     <table class="table stack">
         <thead>
         <tr>
@@ -37,8 +38,9 @@ $orders = $this->getVar('orders');
                 <td>&euro; <?= $order->getValue('total') ?></td>
                 <td><?= Wildcard::get('shop.order_status_' . $order->getValue('status')) ?></td>
                 <td>
-                    <a href="<?= rex_getUrl(NULL, NULL, ['ctrl'     => 'order.detail',
-                                                         'order_id' => $order->getValue('id'),
+                    <a href="<?= rex_getUrl(null, null, [
+                        'ctrl'     => 'order.detail',
+                        'order_id' => $order->getValue('id'),
                     ]) ?>">###label.details###</a>
                 </td>
             </tr>
@@ -47,6 +49,8 @@ $orders = $this->getVar('orders');
         </tbody>
     </table>
 <?php else: ?>
-    ###label.no_orders###
+    <p class="margin-small-top margin-bottom">
+        <i>###simpleshop.no_orders###</i>
+    </p>
 <?php endif; ?>
 
