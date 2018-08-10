@@ -27,6 +27,20 @@ class Product extends Model
     protected $__variants     = null;
     protected $__features     = null;
 
+    public static function filterQuery(\rex_yform_manager_query $stmt = null)
+    {
+        $lang_id = \rex_clang::getCurrentId();
+
+        if (!$stmt) {
+            $stmt = self::query();
+        }
+        $stmt->whereRaw('(price > 0 OR reduced_price > 0)')
+            ->where('amount', 0, '>')
+            ->where("name_{$lang_id}", '', '!=')
+            ->where('status', 1);
+        return $stmt;
+    }
+
 
     public function getFeatures()
     {
