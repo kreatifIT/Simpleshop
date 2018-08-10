@@ -20,7 +20,7 @@ use Sprog\Wildcard;
 class Customer extends Model
 {
     const TABLE       = 'rex_shop_customer';
-    const MIN_PWD_LEN = 6;
+    const MIN_PWD_LEN = 8;
 
 
     public static function getUserByEmail($email)

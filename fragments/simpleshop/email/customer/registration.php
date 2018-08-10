@@ -17,16 +17,28 @@ $email         = $this->getVar('email');
 $addText       = $this->getVar('additional_text', '');
 $password      = $this->getVar('password');
 $url           = $this->getVar('url');
+$url_label     = $this->getVar('url_label', $url);
 $primary_color = $this->getVar('primary_color');
 
 ?>
 <p>###simpleshop.email.registration_text###</p>
 
-<p>
-    <?php if (strlen($url)): ?>###label.website###: <a href="<?= $url ?>" style="color:<?= $primary_color ?>"><?= $url ?></a><?php endif; ?><br/>
-    ###label.email###: <?= $email ?><br/>
-    ###label.password###: <?= $password ?>
-</p>
+<table style="width:100%;">
+    <?php if (strlen($url)): ?>
+    <tr>
+        <td>###label.website###</td>
+        <td><a href="<?= $url ?>"><?= $url_label ?></a></td>
+    </tr>
+    <?php endif; ?>
+    <tr>
+        <td>###label.email###</td>
+        <td><?= $email ?></td>
+    </tr>
+    <tr>
+        <td>###label.password###</td>
+        <td><?= $password ?></td>
+    </tr>
+</table>
 
 <?php if (strlen($addText)): ?>
     <p><?= $addText ?></p>
