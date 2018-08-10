@@ -103,14 +103,7 @@ class rex_api_simpleshop_api extends rex_api_function
 
     private function api__cart_getcartcontent($layout)
     {
-        if ($layout == 'offcanvas_cart') {
-            $ctrlTpl  = 'simpleshop/cart/offcanvas/container.php';
-            $emptyTpl = 'simpleshop/cart/offcanvas/empty.php';
-        } else {
-            $ctrlTpl  = '';
-            $emptyTpl = 'simpleshop/cart/empty.php';
-        }
-
+        $ctrlTpl    = $layout == 'offcanvas_cart' ? 'simpleshop/cart/offcanvas/container.php' : null;
         $Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute();
         $products   = $Controller->getProducts();
         $result     = [
@@ -118,10 +111,6 @@ class rex_api_simpleshop_api extends rex_api_function
             'html'  => $Controller->parse($ctrlTpl),
             'count' => count($products),
         ];
-        if (count($products) == 0) {
-            $fragment       = new rex_fragment();
-            $result['html'] = $fragment->parse($emptyTpl);
-        }
         $result = rex_extension::registerPoint(new rex_extension_point('Api.Cart.getCartContent', $result, ['products' => $products]));
 
         $this->response['cart_html']       = \Sprog\Wildcard::parse($result['html']);

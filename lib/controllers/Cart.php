@@ -43,13 +43,7 @@ class CartController extends Controller
         }
 
         if (count($errors)) {
-            ob_start();
-            foreach ($errors as $error): ?>
-                <div class="callout alert">
-                    <p><?= isset($error['replace']) ? strtr($error['label'], ['{{replace}}' => $error['replace']]) : $error['label'] ?></p>
-                </div>
-            <?php endforeach;
-            $this->output .= ob_get_clean();
+            $this->errors = array_merge($this->errors, $errors);
         }
 
         foreach ($this->params as $key => $value) {

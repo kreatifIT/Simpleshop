@@ -16,7 +16,7 @@ $Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute([
     'check_cart' => rex_server('HTTP_X_PJAX', 'string', false),
 ]);
 
-$tpl = count($Controller->getProducts()) ? 'simpleshop/cart/offcanvas/container.php' : '';
+$tpl = count($Controller->getProducts()) ? 'simpleshop/cart/offcanvas/container.php' : null;
 
 ?>
 <div class="offcanvas-cart">

@@ -55,13 +55,7 @@ class AccountController extends Controller
         $this->setVar('template', "{$this->params['content']}.php");
 
         if (count($errors)) {
-            ob_start();
-            foreach ($errors as $error): ?>
-                <div class="callout alert">
-                    <p><?= isset($error['replace']) ? strtr($error['label'], ['{{replace}}' => $error['replace']]) : $error['label'] ?></p>
-                </div>
-            <?php endforeach;
-            $this->output .= ob_get_clean();
+            $this->errors = array_merge($this->errors, $errors);
         }
         $this->fragment_path[] = 'simpleshop/customer/customer_area/wrapper.php';
     }

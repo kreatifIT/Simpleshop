@@ -12,11 +12,10 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-use Whoops\Exception\ErrorException;
-
 abstract class Controller
 {
     protected $output        = '';
+    protected $errors        = [];
     protected $params        = [];
     protected $fragment_path = [];
     protected $fragment      = null;
@@ -51,7 +50,7 @@ abstract class Controller
         // verifiy params
         foreach ($required_params as $param) {
             if (!$this->params[$param]) {
-                throw new ErrorException("The param '{$param}' is missing!");
+                throw new \ErrorException("The param '{$param}' is missing!");
             }
         }
     }
@@ -71,6 +70,16 @@ abstract class Controller
 
     public function parse($fragment_path = null, $delete_whitespaces = true)
     {
+        if (count($this->errors)) {
+            ob_start();
+            foreach ($this->errors as $error): ?>
+                <div class="callout alert">
+                    <p><?= isset($error['replace']) ? strtr($error['label'], ['{{replace}}' => $error['replace']]) : $error['label'] ?></p>
+                </div>
+            <?php endforeach;
+            $this->output = ob_get_clean() . $this->output;
+        }
+
         if ($fragment_path) {
             array_pop($this->fragment_path);
             $this->fragment_path[] = $fragment_path;
