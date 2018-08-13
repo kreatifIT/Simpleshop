@@ -26,13 +26,8 @@ $Address          = $this->getVar('Address', CustomerAddress::create());
 $Customer         = Customer::getCurrentUser();
 
 
-$id  = 'form-data-' . \rex_article::getCurrentId();
-$sid = "form-{$id}";
-
-if ($Customer->getValue('ctype') != 'company') {
-    $fields = array_merge($fields, ['company_name']);
-}
-
+$id   = 'form-data-' . \rex_article::getCurrentId();
+$sid  = "form-{$id}";
 $form = $Address->getForm($form, $fields, $Customer->getId());
 
 $form->setObjectparams('debug', false);

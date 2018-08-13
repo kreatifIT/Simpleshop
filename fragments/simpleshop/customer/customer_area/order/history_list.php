@@ -49,7 +49,7 @@ if (count($orders)): ?>
         </tbody>
     </table>
 <?php else: ?>
-    <p class="margin-small-top margin-bottom">
+    <p class="margin-bottom">
         <i>###simpleshop.no_orders###</i>
     </p>
 <?php endif; ?>

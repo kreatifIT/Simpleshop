@@ -13,16 +13,14 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-$User  = $this->getVar('User');
-$title = $this->getVar('title', '###label.account_data###');
-$text  = $this->getVar('text');
-
-$action = rex_get('action', 'string');
+$User       = $this->getVar('User');
+$action     = rex_get('action', 'string');
+$canAddItem = $User->hasPermission('fragment.customer-area--addresses--add-new');
 
 ?>
 <div class="member-area--address">
 
-    <?php if ($action == 'edit'): ?>
+    <?php if ($canAddItem && $action == 'edit'): ?>
         <?php
         $address_id = rex_get('data-id', 'int');
         $back_url   = rex_getUrl();
@@ -31,24 +29,32 @@ $action = rex_get('action', 'string');
         $this->setVar('Address', $Address);
         $this->setVar('back_url', $back_url);
         $this->setVar('redirect_url', $back_url);
+        $this->setVar('excluded_fields', ['office_id']);
         ?>
         <h2><?= $address_id ? '###simpleshop.edit_address###' : '###simpleshop.new_address###' ?></h2>
         <?php $this->subfragment('simpleshop/customer/customer_area/address_form.php'); ?>
     <?php else: ?>
-        <div class="row column">
-            <h2 class="<?= strlen($text) ? 'margin-bottom' : '' ?>"><?= $title ?></h2>
-            <?= strlen($text) ? $text : '' ?>
-        </div>
-
         <?php
-        $addresses = CustomerAddress::query()
-            ->where('customer_id', $User->getId())
-            ->find();
+        $where = ["customer_id = {$User->getId()}"];
+
+        if ($User->valueIsset('addresses')) {
+            $where[] = "id IN({$User->getValue('addresses')})";
+        }
+
+        $stmt = CustomerAddress::query()
+            ->whereRaw('(' . implode(' OR ', $where) . ')')
+            ->where('status', 0, '!=');
+
+        $addresses = $stmt->find();
+        $statuses  = \Kreatif\Utils::getArrayFromString(CustomerAddress::getYformFieldByName('status')
+            ->getElement('options'));
+
+        $this->subfragment('simpleshop/customer/customer_area/title.php');
 
         if (count($addresses)): ?>
-            <ul class="no-bullet">
+            <ul class="no-bullet">U
                 <?php foreach ($addresses as $address): ?>
-                    <li class="row margin-small-top">
+                    <li class="row margin-small-bottom">
                         <div class="column medium-6">
                             <?= $address->getName() ?><br/>
                             <?= $address->getValue('street') ?>
@@ -56,20 +62,26 @@ $action = rex_get('action', 'string');
                             <?= $address->getValue('postal') ?> <?= $address->getValue('location') ?><br/>
                         </div>
                         <div class="column medium-6">
-                            <a href="<?= rex_getUrl(null, null, [
-                                'action'  => 'edit',
-                                'data-id' => $address->getId(),
-                            ]) ?>">###action.edit###</a>
+                            <?php if ($canAddItem): ?>
+                                <a href="<?= rex_getUrl(null, null, [
+                                    'action'  => 'edit',
+                                    'data-id' => $address->getId(),
+                                ]) ?>">###action.edit###</a>
+                            <br/>
+                            <?php endif; ?>
+                            <span class="badge"><?= $statuses[$address->getValue('status')] ?></span>
                         </div>
                     </li>
                 <?php endforeach; ?>
             </ul>
         <?php else: ?>
-            <p class="margin-small-top margin-bottom">
+            <p class="margin-bottom">
                 <i>###simpleshop.no_address_available###</i>
             </p>
         <?php endif; ?>
 
-        <a href="<?= rex_getUrl(null, null, ['action' => 'edit']) ?>" class="button margin-small-top">+&nbsp; ###simpleshop.add_address###</a>
+        <?php if ($canAddItem): ?>
+            <a href="<?= rex_getUrl(null, null, ['action' => 'edit']) ?>" class="button margin-small-top">+&nbsp; ###simpleshop.add_address###</a>
+        <?php endif; ?>
     <?php endif; ?>
 </div>

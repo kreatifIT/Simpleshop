@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the Kreatif\Project package.
+ * This file is part of the Simpleshop package.
  *
  * @author Kreatif GmbH
  * @author a.platter@kreatif.it
@@ -13,18 +13,11 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-$User  = $this->getVar('User');
-$title = $this->getVar('title', '###label.account_data###');
-$text  = $this->getVar('text');
-
+$User   = $this->getVar('User');
 $action = rex_get('action', 'string');
 
 ?>
 <div class="member-area--history">
-    <div class="row column">
-        <h2 class="<?= strlen($text) ? 'margin-bottom' : '' ?>"><?= $title ?></h2>
-        <?= strlen($text) ? $text : '' ?>
-    </div>
-
+    <?php $this->subfragment('simpleshop/customer/customer_area/title.php') ?>
     <?php $this->subfragment('simpleshop/customer/customer_area/order/history_list.php') ?>
 </div>
