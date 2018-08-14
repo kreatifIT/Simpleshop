@@ -27,11 +27,6 @@ $tpl = count($Controller->getProducts()) ? 'simpleshop/cart/offcanvas/container.
             ###label.continue_shopping###
         </button>
 
-        <div class="offcanvas-cart-success">
-            <span class="check">✔</span>
-            <span class="description">###simpleshop.add_to_cart_success###</span>
-        </div>
-
         <div data-cart-container>
             <?= $Controller->parse($tpl); ?>
         </div>

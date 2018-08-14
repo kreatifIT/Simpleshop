@@ -14,13 +14,22 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $products = $this->getVar('products', []);
+$product_added = $this->getVar('product_added', false);
 $Settings = \rex::getConfig('simpleshop.Settings');
+
 
 if (count($products) == 0):
     $fragment = new \rex_fragment();
     echo $fragment->parse('simpleshop/cart/empty.php');
     return;
 else: ?>
+    <?php if ($product_added): ?>
+        <div class="offcanvas-cart-success">
+            <span class="check">✔</span>
+            <span class="description">###simpleshop.add_to_cart_success###</span>
+        </div>
+    <?php endif; ?>
+
     <div class="offcanvas-cart-content">
         <div class="offcanvas-cart-items" data-cart-item-container>
             <?= $this->subfragment('simpleshop/cart/offcanvas/items.php') ?>

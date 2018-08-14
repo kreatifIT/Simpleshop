@@ -105,6 +105,9 @@ class rex_api_simpleshop_api extends rex_api_function
     {
         $ctrlTpl    = $layout == 'offcanvas_cart' ? 'simpleshop/cart/offcanvas/container.php' : null;
         $Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute();
+
+        $Controller->setVar('product_added', true);
+
         $products   = $Controller->getProducts();
         $result     = [
             'total' => 0,

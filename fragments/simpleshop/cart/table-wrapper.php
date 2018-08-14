@@ -18,7 +18,7 @@ $styles   = FragmentConfig::getValue('styles');
 $settings = \rex::getConfig('simpleshop.Settings');
 
 ?>
-<table class="cart <?= $config['class'] ?>" data-cart-item-container="" <?= $styles['table'] ?>>
+<table class="cart <?= $config['class'] ?>" data-cart-item-container <?= $styles['table'] ?>>
     <thead>
     <?= $this->subfragment('simpleshop/cart/table-head.php'); ?>
     </thead>

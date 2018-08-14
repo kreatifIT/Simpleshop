@@ -84,7 +84,7 @@ $texts = [
                     <?php endif; ?>
 
                     <div class="input-group">
-                        <input type="text" class="input-group-field" name="uname" value="<?= rex_post('uname', 'string') ?>" placeholder="###label.email###" tabindex="103"/>
+                        <input type="email" class="input-group-field" name="uname" value="<?= rex_post('uname', 'string') ?>" placeholder="###label.email###" tabindex="103"/>
                     </div>
                     <div class="input-group">
                         <input type="password" class="input-group-field" name="pwd" value="" placeholder="###label.password###" tabindex="104"/>
@@ -135,7 +135,7 @@ $texts = [
                     <div class="callout success">###notif.password_reset_msg###</div>
                 <?php else: ?>
                     <form action="#-<?= $sid ?>" method="post">
-                        <input type="text" name="uname" placeholder="###label.email###" value="<?= rex_post('uname', 'string'); ?>">
+                        <input type="email" name="uname" placeholder="###label.email###" value="<?= rex_post('uname', 'string'); ?>">
                         <button type="submit" class="button <?= $Config['css_class']['buttons'] ?>" name="action" value="recover">
                             ###action.reset###
                         </button>

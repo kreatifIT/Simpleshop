@@ -3,8 +3,7 @@ var Simpleshop = (function ($) {
 
     var lang_id,
         $body,
-        $offcanvasCart,
-        $offcanvasCartSuccess;
+        $offcanvasCart;
 
     $(window).on('load', function (ev) {
         var $ctype = $('select[name=ctype]');
@@ -20,7 +19,6 @@ var Simpleshop = (function ($) {
         lang_id = $('html:first').data('lang-id');
         $body = $('body');
         $offcanvasCart = $('.offcanvas-cart');
-        $offcanvasCartSuccess = $('.offcanvas-cart-success');
 
         $body.click(function (event) {
             if (!$(event.target).closest('.offcanvas-cart').length) {
@@ -57,13 +55,21 @@ var Simpleshop = (function ($) {
         showOffcanvasCart: function () {
             $offcanvasCart.addClass('expanded');
             $body.addClass('offcanvas-cart-open');
-            $offcanvasCartSuccess.fadeIn();
+
+            var $success = $offcanvasCart.find('.offcanvas-cart-success');
+
+            if ($success.length) {
+                window.setTimeout(function() {
+                    $success.fadeOut();
+                }, 3000);
+            }
+            window.event.stopPropagation();
         },
 
         closeOffcanvasCart: function () {
             $offcanvasCart.removeClass('expanded');
             $body.removeClass('offcanvas-cart-open');
-            $offcanvasCartSuccess.fadeOut();
+            window.event.stopPropagation();
         },
 
         toggleAuth: function (_this, selector) {
