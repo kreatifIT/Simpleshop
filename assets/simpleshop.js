@@ -52,6 +52,7 @@ var Simpleshop = (function ($) {
     }
 
     var result = {
+        addLoading: addLoading,
         showOffcanvasCart: function () {
             $offcanvasCart.addClass('expanded');
             $body.addClass('offcanvas-cart-open');

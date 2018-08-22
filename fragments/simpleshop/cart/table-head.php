@@ -18,13 +18,13 @@ $use_tax_prices = $this->getVar('use_tax_prices', true);
 ?>
 <tr class="cart-header">
     <?php if ($config['has_image']): ?>
-        <th>###label.preview###</th>
+        <th class="img">###label.preview###</th>
     <?php endif; ?>
-    <th>###label.product###</th>
-    <th>###label.amount###</th>
-    <th><?= $use_tax_prices ? '###simpleshop.single_price###' : '###simpleshop.single_price_no_vat###' ?></th>
-    <th>###label.total###</th>
+    <th class="name">###label.product###</th>
+    <th class="amount">###label.amount###</th>
+    <th class="price"><?= $use_tax_prices ? '###simpleshop.single_price###' : '###simpleshop.single_price_no_vat###' ?></th>
+    <th class="total">###label.total###</th>
     <?php if ($config['has_remove_button']): ?>
-        <th>&nbsp;</th>
+        <th class="action">&nbsp;</th>
     <?php endif; ?>
 </tr>

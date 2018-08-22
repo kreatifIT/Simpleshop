@@ -46,33 +46,18 @@ $canAddItem = $User->hasPermission('fragment.customer-area--addresses--add-new')
             ->where('status', 0, '!=');
 
         $addresses = $stmt->find();
-        $statuses  = \Kreatif\Utils::getArrayFromString(CustomerAddress::getYformFieldByName('status')
-            ->getElement('options'));
 
         $this->subfragment('simpleshop/customer/customer_area/title.php');
 
         if (count($addresses)): ?>
-            <ul class="no-bullet">U
-                <?php foreach ($addresses as $address): ?>
-                    <li class="row margin-small-bottom">
-                        <div class="column medium-6">
-                            <?= $address->getName() ?><br/>
-                            <?= $address->getValue('street') ?>
-                            <?= $address->valueIsset('street_additional') ? " - {$address->getValue('street_additional')}" : '' ?><br/>
-                            <?= $address->getValue('postal') ?> <?= $address->getValue('location') ?><br/>
-                        </div>
-                        <div class="column medium-6">
-                            <?php if ($canAddItem): ?>
-                                <a href="<?= rex_getUrl(null, null, [
-                                    'action'  => 'edit',
-                                    'data-id' => $address->getId(),
-                                ]) ?>">###action.edit###</a>
-                            <br/>
-                            <?php endif; ?>
-                            <span class="badge"><?= $statuses[$address->getValue('status')] ?></span>
-                        </div>
-                    </li>
-                <?php endforeach; ?>
+            <ul class="no-bullet">
+                <?php foreach ($addresses as $address) {
+                    $fragment = new \rex_fragment();
+                    $fragment->setVar('Address', $address);
+                    $fragment->setVar('canAddItem', $canAddItem);
+                    echo $fragment->parse('simpleshop/customer/customer_area/address_item.php');
+                }
+                ?>
             </ul>
         <?php else: ?>
             <p class="margin-bottom">

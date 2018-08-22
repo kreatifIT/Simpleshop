@@ -47,8 +47,10 @@ class CustomerAddress extends Model
             if (in_array('lastname', $excludedFields)) {
                 $form->setValueField('hidden', ['lastname', rex_post('lastname', 'string')]);
             }
-            $defaulStatus = self::getYformFieldByName('status')->getElement('default');
-            $form->setValueField('hidden', ['status', $defaulStatus]);
+            if (!$form->getObjectparams('main_id')) {
+                $defaultStatus = self::getYformFieldByName('status')->getElement('default');
+                $form->setValueField('hidden', ['status', $defaultStatus]);
+            }
         }
         return $form;
     }
