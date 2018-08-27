@@ -24,7 +24,7 @@ $additional_info = \rex_extension::registerPoint(new \rex_extension_point('simpl
         <h2 class="text-center margin-bottom">###simpleshop.order_placed###</h2>
     </div>
     <?php
-    if ($Order->getValue('total') > 0) {
+    if ($Order->getValue('total') > 0 && $Order->getValue('payment')) {
         $this->subfragment('simpleshop/payment/' . $Payment->plugin_name . '/order_complete.php');
     }
     if ($Shipping) {

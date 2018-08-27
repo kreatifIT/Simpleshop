@@ -27,11 +27,10 @@ class rex_yform_value_model_data extends rex_yform_value_textarea
             if ($content_cnt <= 2) {
                 if ($content_cnt <= 1) {
                     $content = ['<table class="table table-condensed">'];
-                }
-                else if ($content_cnt == 2) {
+                } else if ($content_cnt == 2) {
                     array_pop($content);
                 }
-                $content[] = '<tr><td><i class="text-muted">'. rex_i18n::msg('list_no_rows') .'</i></td></tr>';
+                $content[] = '<tr><td><i class="text-muted">' . rex_i18n::msg('list_no_rows') . '</i></td></tr>';
                 $content[] = '</table>';
             }
             $this->params['form_output'][$this->getId()] = '
@@ -53,14 +52,13 @@ class rex_yform_value_model_data extends rex_yform_value_textarea
             foreach ($Object as $key => $val) {
                 if (!is_numeric($key) && in_array($key, ['submit'])) {
                     continue;
-                }
-                else {
+                } else {
                     $content[] = '<tr><td>' . (is_numeric($key) ? 'index: ' . $key : $key) . '</td><td>' . implode('', $this->unprepare($val)) . '</td></tr>';
                 }
             }
-        }
-        else if (is_object($Object) && defined(get_class($Object) . "::TABLE")) {
-            $columns = \rex_yform_manager_table::get($Object::TABLE)->getFields();
+        } else if (is_object($Object) && defined(get_class($Object) . "::TABLE")) {
+            $columns = \rex_yform_manager_table::get($Object::TABLE)
+                ->getFields();
 
             foreach ($columns as $column) {
                 if (in_array($column->getType(), ['validate']) || in_array($column->getTypeName(), ['php', 'html', 'hidden_input'])) {
@@ -73,15 +71,13 @@ class rex_yform_value_model_data extends rex_yform_value_textarea
                 }
                 $content[] = '<tr><td>' . $column->getLabel() . '</td><td>' . $value . '</td></tr>';
             }
-        }
-        else if (is_object($Object)) {
+        } else if (is_object($Object)) {
             $data = $Object->getData();
 
             foreach ($data as $name => $value) {
                 $content[] = '<tr><td>' . $name . '</td><td>' . implode('', $this->unprepare($value)) . '</td></tr>';
             }
-        }
-        else {
+        } else {
             $content     = [$Object];
             $close_table = false;
         }
@@ -92,15 +88,28 @@ class rex_yform_value_model_data extends rex_yform_value_textarea
         return $content;
     }
 
-    function getDescription()
+    public function getDescription()
     {
         return 'model_data|name|label|defaultwert|[no_db]|';
     }
 
-    function getDefinitions($values = [])
+    public static function getListValue($data)
     {
-        $parent         = parent::getDefinitions();
-        $parent['name'] = 'model_data';
+        $result = [];
+        $values = explode(',', $data['params']['field']['value']);
+        $Object = \FriendsOfREDAXO\Simpleshop\Model::unprepare($data['subject']);
+
+        foreach ($values as $_value) {
+            $result[] = $Object->getValue($_value);
+        }
+        return implode(' | ', $result);
+    }
+
+    public function getDefinitions($values = [])
+    {
+        $parent                    = parent::getDefinitions();
+        $parent['name']            = 'model_data';
+        $parent['values']['value'] = ['type' => 'text', 'label' => 'Object-Values (durch , getrennt)'];
         return $parent;
     }
 }
