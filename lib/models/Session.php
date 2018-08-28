@@ -16,6 +16,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Sprog\Wildcard;
 
+
 class Session extends Model
 {
     const TABLE = 'rex_shop_session';
@@ -34,8 +35,7 @@ class Session extends Model
     {
         if ($key) {
             return array_key_exists($key, $_SESSION['checkout']) && $_SESSION['checkout'][$key] !== null ? $_SESSION['checkout'][$key] : $default;
-        }
-        else {
+        } else {
 
             return $_SESSION['checkout'];
         }
@@ -50,8 +50,7 @@ class Session extends Model
     {
         if (!isset ($_SESSION['checkout']['Order'])) {
             $_SESSION['checkout']['Order'] = Order::create();
-        }
-        else if (!$_SESSION['checkout']['Order']->exists() && $_SESSION['checkout']['Order']->getValue('id')) {
+        } else if (!$_SESSION['checkout']['Order']->exists() && $_SESSION['checkout']['Order']->getValue('id')) {
             // to prevent duplicate key errors on resaving orders
             $_SESSION['checkout']['Order'] = Order::get($_SESSION['checkout']['Order']->getValue('id'));
         }
@@ -65,21 +64,30 @@ class Session extends Model
 
             $session_id    = session_id();
             $User          = Customer::getCurrentUser();
-            $session       = parent::query()->where('session_id', $session_id)->findOne();
+            $session       = parent::query()
+                ->where('session_id', $session_id)
+                ->findOne();
             self::$session = $session ?: parent::create();
 
             if ($User) {
-                $user_session = parent::query()->where('customer_id', $User->getId())->where('session_id', $session_id, '!=')->orderBy('lastupdate', 'DESC')->findOne();
+                $user_session = parent::query()
+                    ->where('customer_id', $User->getId())
+                    ->where('session_id', $session_id, '!=')
+                    ->orderBy('lastupdate', 'DESC')
+                    ->findOne();
 
                 if ($user_session) {
                     // merge sessions because we found to sessions for the same user
-                    $cart_items = (array) $user_session->getValue('cart_items') + (array) self::$session->getValue('cart_items');
+                    $cart_items = (array)$user_session->getValue('cart_items') + (array)self::$session->getValue('cart_items');
                     unset($cart_items[0]);
 
                     self::$session = $user_session;
                     self::$session->setValue('session_id', $session_id);
 
-                    \rex_sql::factory()->setTable(self::TABLE)->setWhere('customer_id = :cid OR session_id = :sid', ['cid' => $User->getId(), 'sid' => $session_id])->delete();
+                    \rex_sql::factory()
+                        ->setTable(self::TABLE)
+                        ->setWhere('customer_id = :cid OR session_id = :sid', ['cid' => $User->getId(), 'sid' => $session_id])
+                        ->delete();
 
                     self::$session->writeSession(['cart_items' => $cart_items]);
                 }
@@ -102,7 +110,8 @@ class Session extends Model
             }
             $this->setValue($key, $value);
         }
-        $this->setValue('lastupdate', date('Y-m-d H:i:s'))->setValue('session_id', session_id());
+        $this->setValue('lastupdate', date('Y-m-d H:i:s'))
+            ->setValue('session_id', session_id());
 
         if ($User) {
             $this->setValue('customer_id', $User->getValue('id'));
@@ -113,7 +122,7 @@ class Session extends Model
     private static function _getCartItems($raw = false, $throwErrors = false)
     {
         $session    = self::getSession();
-        $cart_items = (array) $session->getValue('cart_items');
+        $cart_items = (array)$session->getValue('cart_items');
 
 
         if (!$raw) {
@@ -125,8 +134,7 @@ class Session extends Model
                     try {
                         $product            = Product::getProductByKey($key, $item['quantity'], $item['extras']);
                         self::$has_shipping = self::$has_shipping || $product->getValue('type') == 'product';
-                    }
-                    catch (ProductException $ex) {
+                    } catch (ProductException $ex) {
                         if ($throwErrors) {
                             throw new ProductException($ex->getMessage(), $ex->getCode());
                         }
@@ -149,8 +157,7 @@ class Session extends Model
             try {
                 $products = self::_getCartItems($raw, $throwErrors);
                 $retry    = false;
-            }
-            catch (ProductException $ex) {
+            } catch (ProductException $ex) {
                 $retry = true;
                 $msg   = $ex->getMessage();
                 $key   = substr($msg, strrpos($msg, '--key:') + 6);
@@ -194,8 +201,7 @@ class Session extends Model
                         break;
                 }
             }
-        }
-        while ($retry);
+        } while ($retry);
 
         if (count(self::$errors)) {
             throw new CartException('Product errors', 1);
@@ -250,7 +256,7 @@ class Session extends Model
         // update the quantity
         $cart_items[$product_key]['quantity'] = $quantity;
         // update extras
-        $cart_items[$product_key]['extras'] = array_merge((array) $cart_items[$product_key]['extras'], $extras);
+        $cart_items[$product_key]['extras'] = array_merge((array)$cart_items[$product_key]['extras'], $extras);
         $session->writeSession(['cart_items' => $cart_items]);
     }
 

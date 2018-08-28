@@ -1,5 +1,10 @@
-<div class="modul-content">
-    <div class="form-horizontal">
-        <h1 style="margin:40px 0;text-align:center;">Modul ohne Eingabe</h1>
-    </div>
-</div>
+<?php
+
+$id    = 1;
+$mform = new MForm();
+
+$mform->addFieldset('Inhalt');
+$mform->addTextAreaField("{$id}.title", ['label' => 'Titel (optional)']);
+$mform->addTextAreaField("{$id}.text", ['label' => 'Beschreibung (optional)', 'class' => 'tinyMCEEditor']);
+
+echo $mform->show();

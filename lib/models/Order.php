@@ -113,7 +113,7 @@ class Order extends Model
 
         $sql      = \rex_sql::factory();
         $date_now = date('Y-m-d H:i:s');
-        $products = $this->getValue('products');
+        $products = $this->getProducts(false);
 
         if (!$this->valueIsset('createdate')) {
             $this->setValue('createdate', $date_now);
