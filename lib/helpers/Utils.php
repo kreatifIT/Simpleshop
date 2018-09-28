@@ -70,4 +70,18 @@ class Utils
             $Mail->send();
         }
     }
+
+    public static function getConfig($key = null) {
+        $settings = \rex::getConfig('simpleshop.Settings');
+
+        if ($key != null) {
+            $keys = explode('.', $key);
+
+            foreach ($keys as $item) {
+                $settings = $settings[$item];
+            }
+        }
+
+        return $settings;
+    }
 }
