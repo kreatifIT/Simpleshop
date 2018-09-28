@@ -41,6 +41,18 @@ class Product extends Model
         return $stmt;
     }
 
+    public function getUrl($params = [], $lang_id = null)
+    {
+        $vkey = $this->getValue('variant_key');
+
+        if ($vkey) {
+            $params = array_merge($params, [
+                'vkey' => $vkey,
+            ]);
+        }
+        return parent::getUrl($params, $lang_id);
+    }
+
 
     public function getFeatures()
     {
@@ -179,13 +191,14 @@ class Product extends Model
     {
         if ($this->__feature_data === null) {
             $sql  = \rex_sql::factory();
-            $stmt = Variant::query();
-            $stmt->resetSelect();
-            $stmt->select('id');
-            $stmt->select('variant_key');
-            $stmt->where('product_id', $this->getValue('id'));
-            $stmt->where('type', 'NE', '!=');
-            $stmt->orderBy('prio', 'asc');
+            $stmt = Variant::query()
+                ->resetSelect()
+                ->select('id')
+                ->select('variant_key')
+                ->where('product_id', $this->getValue('id'))
+                ->where('type', 'NE', '!=')
+                ->orderBy('prio', 'asc');
+
             $_variants = $stmt->find();
 
             $this->__feature_data = [
@@ -352,16 +365,28 @@ class Product extends Model
         $Object = $Ep->getSubject();
         $vkey   = trim(rex_get('vkey', 'string'));
 
-        if ($vkey != '' && $Ep->getParam('table') == self::TABLE) {
-            try {
-                $Object = $Object->getVariant($vkey);
+        if ($Ep->getParam('table') == self::TABLE) {
+            if ($vkey != '') {
+                try {
+                    $Object = $Object->getVariant($vkey);
 
-                \rex_extension::register('YREWRITE_ROBOTS_TAG', function (\rex_extension_point $Ep) {
-                    return false;
-                });
-            } catch (ProductException $ex) {
-                \rex_response::setStatus(404);
-                $Object = false;
+                    \rex_extension::register('YREWRITE_ROBOTS_TAG', function (\rex_extension_point $Ep) {
+                        return false;
+                    });
+                } catch (ProductException $ex) {
+                    \rex_response::setStatus(404);
+                    $Object = false;
+                }
+            } else if (!$Object->valueIsset('code')) {
+                $collection = $Object->getFeatureVariants();
+                $Variant    = array_shift($collection['variants']);
+
+                if ($Variant) {
+                    $Object = $Variant;
+                } else {
+                    \rex_response::setStatus(404);
+                    $Object = false;
+                }
             }
         }
         return $Object;
@@ -397,4 +422,12 @@ class Product extends Model
 
 class ProductException extends \Exception
 {
+    /*
+     * Error Codes:
+     * 1 = No product with ID
+     * 2 = No feature with ID
+     * 3 = The variant doesn't exist
+     * 4 = Product not available any more
+     * 5 = Amount of product is lower than cart quantity
+     */
 }
