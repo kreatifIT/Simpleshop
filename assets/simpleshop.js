@@ -129,7 +129,7 @@ var Simpleshop = (function ($) {
         addToCart: function (_this, vkey, amount, layout, selector) {
 
             if (parseInt(amount) <= 0) {
-                var selector = '[data-quantity-ctrl-button]|[data-amount-input]',
+                var selector = selector || '[data-quantity-ctrl-button]|[data-amount-input]',
                     chunks = selector.split('|');
                 amount = $(_this).parents(chunks[0]).find(chunks[1]).val();
             }
