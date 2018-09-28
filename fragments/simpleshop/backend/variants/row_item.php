@@ -49,7 +49,7 @@ foreach ($fields as $field) {
     </td>
     <td>
     <span class="variant-name">
-        <?= implode('<br/></span><span style="white-space:nowrap;">+ ', $name) ?>
+        <?= implode('<br/></span><span style="white-space:nowrap;">+ ', array_filter($name)) ?>
     </span>
     </td>
     <?= implode('', $columns) ?>

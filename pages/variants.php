@@ -139,7 +139,7 @@ foreach ($features as $feature) {
             $vkey[] = $value->getValue('id');
             sort($vkey);
 
-            $featureKeys[] = implode(',', $vkey);
+            $featureKeys[] = implode(',', array_filter($vkey));
         }
     }
 }
