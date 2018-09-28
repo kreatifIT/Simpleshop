@@ -195,7 +195,7 @@ class Product extends Model
                 ->resetSelect()
                 ->select('id')
                 ->select('variant_key')
-                ->where('product_id', $this->getValue('id'))
+                ->where('product_id', $this->getId())
                 ->where('type', 'NE', '!=')
                 ->orderBy('prio', 'asc');
 
@@ -383,6 +383,7 @@ class Product extends Model
 
                 if ($Variant) {
                     $Object = $Variant;
+                    $Object->__feature_data = null;
                 } else {
                     \rex_response::setStatus(404);
                     $Object = false;
