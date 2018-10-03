@@ -82,15 +82,12 @@
     text-align: center;
 }
 
-.login-form-passwort-reset {
-    margin-bottom: 1em;
-    .link {
+.auth-wrapper {
+    .text-link {
         font-weight: $global-weight-bold;
     }
 }
 
-.login-form-register {
-    .link {
-        font-weight: $global-weight-bold;
-    }
+.login-form-passwort-reset {
+    margin-bottom: 1em;
 }

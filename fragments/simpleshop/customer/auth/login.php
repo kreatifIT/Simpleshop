@@ -94,13 +94,13 @@ $texts = [
 
                     <?php if ($Config['has_password_recovery']): ?>
                         <div class="login-form-passwort-reset">
-                            <a class="link" href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.recovery-form')">###action.reset_password###.</a>
+                            <a class="text-link" href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.recovery-form')">###action.reset_password###.</a>
                         </div>
                     <?php endif; ?>
                     <?php if ($Config['has_registration']): ?>
                         <div class="login-form-register">
                             <span class="label">###label.no_login_data###:</span class="login-form-register-label">
-                            <a class="link" href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.register-form')">###label.register_now###</a>
+                            <a class="text-link" href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.register-form')">###label.register_now###</a>
                         </div>
                     <?php endif; ?>
                 </form>
@@ -141,9 +141,9 @@ $texts = [
                         </button>
                     </form>
                 <?php endif ?>
-                <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.login-form')">###action.back_to_login###</a>.
+                <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.login-form')" class="text-link">###action.back_to_login###</a>.
                 <?php if ($Config['has_registration']): ?>
-                    ###label.no_login_data###: <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.register-form')">###label.register_now###</a>
+                    ###label.no_login_data###: <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.register-form')" class="text-link">###label.register_now###</a>
                 <?php endif; ?>
             </div>
         </div>
@@ -257,7 +257,7 @@ $texts = [
                 <?php else: ?>
                     <?= $formOutput ?>
                     <div class="column margin-small-top">
-                        <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.login-form')">###action.back_to_login###</a>.
+                        <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.login-form')" class="text-link">###action.back_to_login###</a>.
                     </div>
                 <?php endif; ?>
 

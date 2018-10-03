@@ -84,6 +84,7 @@ simpleshop.error.discountgroup_not_applyable_anymore
 simpleshop.error.order_has_no_product
 simpleshop.error.shipping_zipcode_not_valid
 simpleshop.error.shipping_no_price
+simpleshop.error.wsconnector_exception
 
 simpleshop.email.user_registration_subject
 simpleshop.email.user_password_reset

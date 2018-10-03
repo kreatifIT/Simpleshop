@@ -252,7 +252,12 @@ class Order extends Model
                 $this->setValue('shipping_costs', (float)$this->getValue('shipping')
                     ->getNetPrice($this, $products));
             } catch (\Exception $ex) {
-                throw new OrderException($ex->getLabelByCode());
+                $msg = trim($ex->getLabelByCode());
+
+                if ($msg == '') {
+                    $msg = $ex->getMessage();
+                }
+                throw new OrderException($msg);
             }
         } else {
             $this->setValue('shipping_costs', 0);
