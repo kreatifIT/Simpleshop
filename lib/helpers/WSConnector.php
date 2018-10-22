@@ -19,17 +19,17 @@ class WSConnector
     const CURL_TIMEOUT         = 600;
     const CURL_CONNECT_TIMEOUT = 5;
 
-    private $debug          = FALSE;
+    private $debug          = false;
     private $_base_url      = '';
-    private $_port          = NULL;
-    private $_auth_name     = NULL;
-    private $_auth_pass     = NULL;
+    private $_port          = null;
+    private $_auth_name     = null;
+    private $_auth_pass     = null;
     private $_auth_type     = CURLAUTH_ANY;
     private $_req_format    = 'application/json';
     private $_resp_format   = 'application/json';
     private $_lang          = 'en-US';
-    private $_uses_gzip     = FALSE;
-    private $_return_header = FALSE;
+    private $_uses_gzip     = false;
+    private $_return_header = false;
 
     private $url      = '';
     private $data     = [];
@@ -95,15 +95,14 @@ class WSConnector
         return $this;
     }
 
-    protected function log($code, $msg, $type, $send_email = TRUE)
+    protected function log($code, $msg, $type, $send_email = true)
     {
         $decoded_json = json_decode($this->response['response']);
 
-        if (json_last_error() == JSON_ERROR_NONE)
-        {
+        if (json_last_error() == JSON_ERROR_NONE) {
             $this->response['response'] = $decoded_json;
         }
-        $msg = "{$msg}\n\nURL: {$this->url}\nData: " . print_r($this->data, TRUE) . "\nResponse: " . print_r($this->response, TRUE) . "\n\n";
+        $msg = "{$msg}\n\nURL: {$this->url}\nData: " . print_r($this->data, true) . "\nResponse: " . print_r($this->response, true) . "\n\n";
         Utils::log($code, $msg, $type, $send_email);
     }
 
@@ -112,32 +111,25 @@ class WSConnector
         $s    = curl_init();
         $args = '';
 
-        if ($this->_auth_name != NULL)
-        {
+        if ($this->_auth_name != null) {
             curl_setopt($s, CURLOPT_HTTPAUTH, $this->_auth_type);
             curl_setopt($s, CURLOPT_USERPWD, $this->_auth_name . ':' . $this->_auth_pass);
         }
-        if ($method == 'post')
-        {
+        if ($method == 'post') {
             $this->data = $_data;
-            curl_setopt($s, CURLOPT_POST, TRUE);
+            curl_setopt($s, CURLOPT_POST, true);
             curl_setopt($s, CURLOPT_POSTFIELDS, $this->data);
-        }
-        else if ($method == 'put')
-        {
+        } else if ($method == 'put') {
             $this->data = $_data;
             curl_setopt($s, CURLOPT_CUSTOMREQUEST, 'PUT');
             curl_setopt($s, CURLOPT_POSTFIELDS, $this->data);
-        }
-        else if ($method == 'get' && !empty ($_data))
-        {
-            if (is_array ($_data))
-            {
+        } else if ($method == 'get' && !empty ($_data)) {
+            if (is_array($_data)) {
                 $_data = http_build_query($_data);
             }
             $args = '?' . $_data;
         }
-        curl_setopt($s, CURLOPT_FRESH_CONNECT, TRUE);
+        curl_setopt($s, CURLOPT_FRESH_CONNECT, true);
 
         $this->url = $this->_base_url . $path . $args;
 
@@ -146,12 +138,10 @@ class WSConnector
             'Accept-Language: ' . $this->_lang,
         ];
 
-        if ($this->_req_format)
-        {
+        if ($this->_req_format) {
             $headers = ['Content-Type: ' . $this->_req_format];
         }
-        if ($this->_uses_gzip)
-        {
+        if ($this->_uses_gzip) {
             $headers = ['Accept-Encoding: gzip'];
         }
         curl_setopt($s, CURLOPT_URL, $this->url);
@@ -159,66 +149,53 @@ class WSConnector
         curl_setopt($s, CURLOPT_CONNECTTIMEOUT, self::CURL_CONNECT_TIMEOUT);
         curl_setopt($s, CURLOPT_TIMEOUT, self::CURL_TIMEOUT);
         curl_setopt($s, CURLOPT_ENCODING, '');
-        curl_setopt($s, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($s, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($s, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($s, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($s, CURLOPT_HEADER, $this->_return_header);
-        if ($this->_port)
-        {
+        if ($this->_port) {
             curl_setopt($s, CURLOPT_PORT, $this->_port);
         }
 
         $___response                = curl_exec($s);
         $this->response             = curl_getinfo($s);
-        $__resp_status              = (int) $this->response['http_code'];
+        $__resp_status              = (int)$this->response['http_code'];
         $this->response['response'] = $___response;
 
         curl_close($s);
 
-        if ($this->debug)
-        {
+        if ($this->debug) {
             pr($this->url);
             pr($_data);
             pr($this->response);
         }
 
-        $this->log($name . ' - Curl-Request', $this->response, 'INFO', FALSE);
+        $this->log($name . ' - Curl-Request', $this->response, 'INFO', false);
 
-        if ($__resp_status == 0)
-        {
-            if (TRUE || $this->response['total_time'] >= self::CURL_TIMEOUT)
-            {
+        if ($__resp_status == 0) {
+            if (true || $this->response['total_time'] >= self::CURL_TIMEOUT) {
                 $message = "Service did not respond within " . self::CURL_TIMEOUT . " milliseconds";
                 $this->log('Request.timeout', $message, 'ERROR');
                 throw new WSConnectorException($message, 1);
-            }
-            else
-            {
+            } else {
                 $message = "The Server is not reachable";
                 $this->log('Server.not-reachable', $message, 'ERROR');
                 throw new WSConnectorException($message, 2);
             }
-        }
-        else if ($__resp_status < 200 || $__resp_status > 299)
-        {
+        } else if ($__resp_status < 200 || $__resp_status > 299) {
             $message = "Response is a {$__resp_status} message";
             $this->log('Response.invalid-status', $message, 'ERROR');
             throw new WSConnectorException($message, 3);
         }
 
         // everything fine - parse response
-        if ($this->_resp_format == 'application/json' && !is_array($this->response['response']))
-        {
-            if (is_object($this->response['response']))
-            {
-                $this->response['response'] = (array) $this->response['response'];
-            }
-            else if (is_string($this->response['response']))
-            {
-                $this->response['response'] = json_decode($this->response['response'], TRUE);
+        if ($this->_resp_format == 'application/json' && !is_array($this->response['response'])) {
+            if (is_object($this->response['response'])) {
+                $this->response['response'] = (array)$this->response['response'];
+            } else if (is_string($this->response['response'])) {
+                $this->response['response'] = json_decode($this->response['response'], true);
             }
         }
-        if ($this->debug)
-        {
+        if ($this->debug) {
             pr($this->response['response']);
         }
         return $this->response;
@@ -226,4 +203,10 @@ class WSConnector
 }
 
 
-class WSConnectorException extends \Exception {}
+class WSConnectorException extends \Exception
+{
+    public function getLabelByCode()
+    {
+        return \Wildcard::get('simpleshop.error.wsconnector_exception');
+    }
+}
