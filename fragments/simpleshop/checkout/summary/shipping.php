@@ -16,10 +16,5 @@ $shipping = $this->getVar('shipping');
 ?>
 <div class="medium-6 column margin-bottom">
     <h3 class="heading small">###label.shipping_method###</h3>
-
-    <?php
-    $this->setVar('name', $shipping->getName());
-    $this->setVar('plugin_name', $shipping->getPluginName());
-    $this->subfragment('simpleshop/checkout/shipping_and_payment/shipping_item.php');
-    ?>
+    <?= $shipping->getName() ?>
 </div>

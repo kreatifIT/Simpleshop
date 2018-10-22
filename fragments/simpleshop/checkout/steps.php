@@ -14,7 +14,8 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $current_step = $this->getVar('current_step');
-$step_number  = 0;
+$step_number  = array_search($current_step, FragmentConfig::$data['checkout']['steps']);
+
 switch ($current_step) {
     case 'invoice_address' :
         $step_number = 1;
@@ -22,6 +23,8 @@ switch ($current_step) {
     case 'shipping_address' :
         $step_number = 2;
         break;
+    case 'shipping' :
+    case 'payment' :
     case 'shipping||payment' :
         $step_number = 3;
         break;
@@ -44,8 +47,7 @@ switch ($current_step) {
                 echo 'href="' . rex_getUrl(null, null, ['step' => 'shipping_address']) . '"';
             } ?> class="checkout-step <?php if ($step_number == 2) {
                 echo 'active';
-            }
-            elseif ($step_number < 2) {
+            } else if ($step_number < 2) {
                 echo 'disabled';
             } ?>">
                 <span class="checkout-step-number">2</span>
@@ -55,11 +57,10 @@ switch ($current_step) {
         <div class="checkout-step-wrapper">
 
             <a <?php if ($step_number >= 3) {
-                echo 'href="' . rex_getUrl(null, null, ['step' => 'shipping||payment']) . '"';
+                echo 'href="' . rex_getUrl(null, null, ['step' => FragmentConfig::$data['checkout']['steps'][2]]) . '"';
             } ?> class="checkout-step <?php if ($step_number == 3) {
                 echo 'active';
-            }
-            elseif ($step_number < 3) {
+            } else if ($step_number < 3) {
                 echo 'disabled';
             } ?>">
                 <span class="checkout-step-number">3</span>
@@ -71,8 +72,7 @@ switch ($current_step) {
                 echo 'href="' . rex_getUrl(null, null, ['step' => 'show-summary']) . '"';
             } ?> class="checkout-step <?php if ($step_number == 4) {
                 echo 'active';
-            }
-            elseif ($step_number < 4) {
+            } else if ($step_number < 4) {
                 echo 'disabled';
             } ?>">
                 <span class="checkout-step-number">4</span>

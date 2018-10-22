@@ -30,10 +30,10 @@ $styles = FragmentConfig::getValue('email_styles');
 
     <?php
     if ($Payment) {
-        $this->subfragment('simpleshop/payment/' . $Payment->plugin_name . '/order_complete.php');
+        $this->subfragment('simpleshop/checkout/payment/' . $Payment->plugin_name . '/order_complete.php');
     }
     if ($Shipping) {
-        $this->subfragment('simpleshop/shipping/' . $Shipping->plugin_name . '/order_complete.php');
+        $this->subfragment('simpleshop/checkout/shipping/' . $Shipping->plugin_name . '/order_complete.php');
 
         if ($Shipping->hasCosts()) {
             $this->setVar('shipping_costs', $Order->getValue('shipping_costs'));

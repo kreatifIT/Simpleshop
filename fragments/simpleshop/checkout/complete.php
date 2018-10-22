@@ -25,10 +25,10 @@ $additional_info = \rex_extension::registerPoint(new \rex_extension_point('simpl
     </div>
     <?php
     if ($Order->getValue('total') > 0 && $Order->getValue('payment')) {
-        $this->subfragment('simpleshop/payment/' . $Payment->plugin_name . '/order_complete.php');
+        $this->subfragment('simpleshop/checkout/payment/' . $Payment->plugin_name . '/order_complete.php');
     }
     if ($Shipping) {
-        $this->subfragment('simpleshop/shipping/' . $Shipping->plugin_name . '/order_complete.php');
+        $this->subfragment('simpleshop/checkout/shipping/' . $Shipping->plugin_name . '/order_complete.php');
     }
     ?>
 

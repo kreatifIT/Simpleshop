@@ -14,17 +14,31 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-$Addon    = $this->getVar('Addon');
-$Settings = $this->getVar('Settings');
+$Addon        = $this->getVar('Addon');
+$Settings     = $this->getVar('Settings');
+$serviceTypes = (array)from_array($Settings, 'service_types', []);
 
 ?>
 <fieldset>
+
+    <legend>Konfiguration</legend>
+    <dl class="rex-form-group form-group">
+        <dt>Versandarten</dt>
+        <dd>
+            <select class="form-control" name="service_types[]" multiple>
+                <option value="EC" <?= in_array('EC', $serviceTypes) ? 'selected="selected"' : '' ?>>Economy</option>
+                <option value="EX" <?= in_array('EX', $serviceTypes) ? 'selected="selected"' : '' ?>>Express</option>
+            </select>
+        </dd>
+    </dl>
+    <br/>
+    <br/>
 
     <legend><?= $Addon->i18n('omest_shipping.basic_settings'); ?></legend>
     <dl class="rex-form-group form-group">
         <dt><?= $Addon->i18n('omest_shipping.warehouse_key'); ?></dt>
         <dd>
-            <input type="text" class="form-control" name="warehouse_key" value="<?= from_array($Settings, 'warehouse_key') ?>" placeholder="WH1"/>
+            <input type="text" class="form-control" name="warehouse_key" value="<?= from_array($Settings, 'warehouse_key', 'OMEST S.A.S') ?>" placeholder='"WH1" oder "OMEST S.A.S" für bei Omest lagernde Ware'/>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
@@ -66,17 +80,36 @@ $Settings = $this->getVar('Settings');
             <input type="text" class="form-control" name="pickup_country_code" value="<?= from_array($Settings, 'pickup_country_code') ?>"/>
         </dd>
     </dl>
+    <br/>
+    <br/>
 
 
     <legend><?= $Addon->i18n('omest_shipping.api_settings'); ?></legend>
     <dl class="rex-form-group form-group">
         <dt>Test-Modus:</dt>
         <dd>
-            <label class="form-label">
-                <input type="checkbox" class="form-control" name="sandbox" value="1" <?= from_array($Settings, 'sandbox') ? 'checked="checked"' : '' ?>/>
-                <span></span>
-                <?= $Addon->i18n('label.activated'); ?>
-            </label>
+            <select class="form-control" name="sandbox">
+                <option value="0"><?= $Addon->i18n('no'); ?></option>
+                <option value="1" <?= from_array($Settings, 'sandbox') ? 'selected="selected"' : '' ?>><?= $Addon->i18n('yes'); ?></option>
+            </select>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
+        <dt>Calculate shipping costs:</dt>
+        <dd>
+            <select class="form-control" name="calc_costs">
+                <option value="0"><?= $Addon->i18n('no'); ?></option>
+                <option value="1" <?= from_array($Settings, 'calc_costs') ? 'selected="selected"' : '' ?>><?= $Addon->i18n('yes'); ?></option>
+            </select>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
+        <dt>Generate Shipping Barcodes:</dt>
+        <dd>
+            <select class="form-control" name="generate_barcode">
+                <option value="0"><?= $Addon->i18n('no'); ?></option>
+                <option value="1" <?= from_array($Settings, 'generate_barcode') ? 'selected="selected"' : '' ?>><?= $Addon->i18n('yes'); ?></option>
+            </select>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
@@ -89,18 +122,6 @@ $Settings = $this->getVar('Settings');
         <dt>Customer-Key:</dt>
         <dd>
             <input type="text" class="form-control" name="customer_key" value="<?= from_array($Settings, 'customer_key') ?>"/>
-        </dd>
-    </dl>
-    <dl class="rex-form-group form-group">
-        <dt>TEST Api-Key:</dt>
-        <dd>
-            <input type="text" class="form-control" name="test_api_key" value="<?= from_array($Settings, 'test_api_key') ?>"/>
-        </dd>
-    </dl>
-    <dl class="rex-form-group form-group">
-        <dt>TEST Customer-Key:</dt>
-        <dd>
-            <input type="text" class="form-control" name="test_customer_key" value="<?= from_array($Settings, 'test_customer_key') ?>"/>
         </dd>
     </dl>
 
