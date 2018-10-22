@@ -141,12 +141,12 @@ class Omest extends ShippingAbstract
             $Order    = Order::get($order_id);
             $response = self::api_createShipment($Order, $Settings);
 
-            if ($response['status'] != 1) {
+            if ($response['response']['status'] != 1) {
                 throw new OmestShippingException($response['response']['message']);
             } else {
                 // save shipping key
                 $Shipping = $Order->getValue('shipping');
-                $Shipping->setValue('shipping_key', $response['shipment']->key);
+                $Shipping->setValue('shipping_key', $response['response']['shipment']->key);
                 $Order->setValue('shipping', $Shipping);
                 $Order->save();
 
@@ -254,11 +254,11 @@ class Omest extends ShippingAbstract
 
             $response = self::api_createShipment($Order, $Settings);
 
-            if ($response['status'] != 1) {
-                Utils::log('Omest.ext__completeOrder.create-shipment-failed', $response['message'], 'Error', true);
+            if ($response['response']['status'] != 1) {
+                Utils::log('Omest.ext__completeOrder.create-shipment-failed', $response['response']['message'], 'Error', true);
                 throw new OrderException("Could not create Omest-Shipping for Order {$Order->getId()}", 70);
             } else {
-                $Shipping->setValue('shipping_key', $response['shipment']->key);
+                $Shipping->setValue('shipping_key', $response['response']['shipment']->key);
                 $Order->setValue('shipping', $Shipping);
                 $Order->save();
             }
