@@ -58,18 +58,20 @@ class CheckoutController extends Controller
                         $back_url = rex_getUrl($Settings['linklist']['cart']);
                     }
 
+                    $this->setVar('current_step', $currentStep);
+                    $this->setVar('back_url', $back_url);
+
                     if ($this->params['show_steps_fragment']) {
-                        $this->setVar('current_step', $currentStep);
                         $this->fragment_path[] = 'simpleshop/checkout/steps.php';
                     }
-
-                    $this->setVar('back_url', $back_url);
 
                     switch ($currentStep) {
                         case 'invoice_address':
                             return $this->getInvoiceAddressView();
                         case 'shipping_address':
                             return $this->getShippingAddressView();
+                        case 'shipping':
+                        case 'payment':
                         case 'shipping||payment':
                             return $this->getShippingPaymentView();
                         case 'show-summary':
@@ -307,6 +309,7 @@ class CheckoutController extends Controller
             rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
         }
 
+        $this->setVar('currentStep', $currentStep);
         $this->setVar('shippings', $shippings);
         $this->setVar('payments', $payments);
         $this->fragment_path[] = 'simpleshop/checkout/shipping_and_payment/wrapper.php';
@@ -418,6 +421,7 @@ class CheckoutController extends Controller
     {
         // finally save order - DONE / COMPLETE
         $this->Order->completeOrder();
+
         $this->sendMail($this->params['debug']);
 
         // CLEAR THE SESSION
@@ -430,12 +434,12 @@ class CheckoutController extends Controller
     protected function initPayment()
     {
         $payment               = $this->Order->getValue('payment');
-        $this->fragment_path[] = 'simpleshop/payment/' . $payment->getValue('plugin_name') . '/payment_init.php';
+        $this->fragment_path[] = 'simpleshop/checkout/payment/' . $payment->getValue('plugin_name') . '/payment_init.php';
     }
 
     protected function doPay()
     {
         $payment               = $this->Order->getValue('payment');
-        $this->fragment_path[] = 'simpleshop/payment/' . $payment->getValue('plugin_name') . '/payment_process.php';
+        $this->fragment_path[] = 'simpleshop/checkout/payment/' . $payment->getValue('plugin_name') . '/payment_process.php';
     }
 }
