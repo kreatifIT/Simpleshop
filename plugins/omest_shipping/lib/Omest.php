@@ -15,11 +15,12 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Sprog\Wildcard;
 
+
 class Omest extends ShippingAbstract
 {
     const NAME         = 'simpleshop.omest_shipping';
     const OLC_URL      = 'https://olc.omest.com/services';
-    const OLC_TEST_URL = 'http://debug.olc.omest.com/services';
+    const OLC_TEST_URL = 'https://staging.olc.omest.com/services';
 
     protected $tax_percentage = 22;
 
@@ -48,27 +49,38 @@ class Omest extends ShippingAbstract
     public function getName()
     {
         if ($this->name == '') {
-            $this->name = Wildcard::get(self::NAME);
+            $this->name = "###simpleshop.omest_shipping_". mb_strtolower($this->getValue('extension')) ."###";
         }
         return parent::getName();
     }
 
+    /**
+     * @param $Order
+     * @param $products
+     *
+     * @return float
+     * @throws OmestShippingException
+     */
     protected function calculatePriceFromOLC($Order, $products)
     {
-        $Settings = \rex::getConfig('simpleshop.OmestShipping.Settings');
-        $test     = $Settings['sandbox'];
-        $extras   = $Order->getValue('extras');
-        $IAddress = $Order->getValue('address_1');
-        $DAddress = $extras['address_extras']['use_shipping_address'] ? $Order->getValue('address_2') : $IAddress;
+        $Settings  = \rex::getConfig('simpleshop.OmestShipping.Settings');
+        $test      = $Settings['sandbox'];
+        $DAddress  = $Order->getShippingAddress();
+        $countryId = $DAddress->getValue('country');
+        $Country   = $countryId ? Country::get($countryId) : null;
 
         // SKIP if no products
         if (count($products) < 1) {
             throw new OmestShippingException("Order has no products", 1);
         }
 
+        if (!$Settings['calc_costs']) {
+            return false;
+        }
+
         $data = [
             'shipmentTypeKey'    => 'PARCEL',
-            'shippingServiceKey' => $extras['shipping']['service_key'],
+            'shippingServiceKey' => $this->getValue('extension'),
             'amountCOD'          => 0,
             'amountInsured'      => 0,
             'parcels'            => [],
@@ -78,8 +90,8 @@ class Omest extends ShippingAbstract
                 'countryCode' => $Settings['pickup_country_code'],
             ],
             'deliveryAddress'    => [
-                'zipcode'     => $DAddress->getValue('zip'),
-                'countryCode' => $extras['shipping']['country_code'],
+                'zipcode'     => $DAddress->getValue('postal'),
+                'countryCode' => $Country->getValue('iso2'),
             ],
         ];
 
@@ -98,8 +110,8 @@ class Omest extends ShippingAbstract
         }
 
         $sdata = html_entity_decode(http_build_query([
-            'api_key'      => $test ? $Settings['test_api_key'] : $Settings['api_key'],
-            'customer_key' => $test ? $Settings['test_customer_key'] : $Settings['customer_key'],
+            'api_key'      => $Settings['api_key'],
+            'customer_key' => $Settings['customer_key'],
             'data'         => json_encode($data),
         ]));
 
@@ -111,14 +123,12 @@ class Omest extends ShippingAbstract
         if ($response['response']['status'] <= 0) {
             Utils::log('Omest.calculatePriceFromOLC', $response['response']['message'] . "\n" . print_r($data, true) . "\n" . print_r($DAddress, true), 'Error', true);
             throw new OmestShippingException($response['response']['message'], 2);
-        }
-        else if ($response['response']['shipment']->price == '' || $response['response']['shipment']->price == '-') {
+        } else if ($response['response']['shipment']->price == '' || $response['response']['shipment']->price == '-') {
             Utils::log('Omest.calculatePriceFromOLC', "No price found!\n" . print_r($data, true) . "\n" . print_r($DAddress, true), 'Error', true);
             throw new OmestShippingException('', 3);
-        }
-        else {
+        } else {
             // return shipping costs
-            return (float) $response['response']['shipment']->price;
+            return (float)$response['response']['shipment']->price;
         }
     }
 
@@ -126,83 +136,13 @@ class Omest extends ShippingAbstract
     {
         $procces_cnt = 0;
         $Settings    = \rex::getConfig('simpleshop.OmestShipping.Settings');
-        $test        = $Settings['sandbox'];
 
         foreach ($order_ids as $order_id) {
             $Order    = Order::get($order_id);
-            $IAddress = $Order->getValue('address_1');
-            $DAddress = $Order->getValue('address_2');
-            $Customer = $Order->getValue('customer_id') ? Customer::get($Order->getValue('customer_id')) : null;
-            $extras   = $Order->getValue('extras');
-            $Shipping = $Order->getValue('shipping');
-            $parcels  = $Shipping->getValue('parcels');
-            $products = OrderProduct::query()->where('order_id', $order_id)->find();
-
-            // SKIP if no products
-            if (count($products) < 1) {
-                throw new OmestShippingException("Order [{$order_id}] has no products", 1);
-            }
-            if (count($parcels) < 1) {
-                throw new OmestShippingException("Order [{$order_id}] has no parcels", 2);
-            }
-
-            $data = [
-                'key'                => $Order->getValue('shipping_key'),
-                'reference1'         => $order_id,
-                'shippingServiceKey' => $extras['shipping']['service_key'],
-                'shipmentTypeKey'    => 'PARCEL',
-                'parcels'            => [],
-                'pickupAddress'      => [
-                    'pickupOMEST'  => $Settings['omest_pickup'],
-                    'companyName'  => $Settings['pickup_company_name'],
-                    'street'       => $Settings['pickup_street'],
-                    'city'         => $Settings['pickup_city'],
-                    'zipcode'      => $Settings['pickup_zip'],
-                    'countryCode'  => $Settings['pickup_country_code'],
-                    'warehouseKey' => $Settings['warehouse_key'],
-                ],
-                'deliveryAddress'    => [
-                    'personName'  => $DAddress->getName(),
-                    'companyName' => $DAddress->getValue('company'),
-                    'street'      => $DAddress->getValue('street'),
-                    'zipcode'     => $DAddress->getValue('zip'),
-                    'city'        => $DAddress->getValue('location'),
-                    'countryCode' => "IT",
-                    //                    'countryCode'  => $DAddress->getValue('country'),
-                    'phone'       => $DAddress->getValue('phone'),
-                    'email'       => $Customer ? $Customer->getValue('email') : $IAddress->getValue('email'),
-                ],
-            ];
-
-            foreach ($parcels as $parcel) {
-                $_parcel = [
-                    'key'    => null,
-                    'weight' => $parcel->getValue('weight') / 1000,
-                    'width'  => $parcel->getValue('width'),
-                    'length' => $parcel->getValue('length'),
-                    'height' => $parcel->getValue('height'),
-                ];
-                if ($parcel->getValue('pallett')) {
-                    $data['shipmentTypeKey']  = 'PALLET';
-                    $_parcel['palletTypeKey'] = $parcel->getValue('pallett');
-                }
-                $data['parcels'][] = $_parcel;
-            }
-
-            $sdata = html_entity_decode(http_build_query([
-                'api_key'      => $test ? $Settings['test_api_key'] : $Settings['api_key'],
-                'customer_key' => $test ? $Settings['test_customer_key'] : $Settings['customer_key'],
-                'data'         => json_encode($data),
-            ]));
-
-            $Connector = new WSConnector($test ? self::OLC_TEST_URL : self::OLC_URL);
-            $Connector->setRespFormat('application/json');
-            $response = $Connector->request('/create-update-shipment', $sdata, 'get', 'Omest.sendOrdersToOLC');
 
             if ($response['response']['status'] <= 0) {
                 throw new OmestShippingException($response['response']['message']);
-            }
-            else {
+            } else {
                 // save shipping key
                 $Order->setValue('shipping_key', $response['response']['shipment']->key);
                 $Order->save(false, true);
@@ -210,6 +150,10 @@ class Omest extends ShippingAbstract
             }
         }
         return $procces_cnt;
+    }
+
+    protected static function api_createShipment($Order, $Settings)
+    {
     }
 }
 
@@ -226,8 +170,7 @@ class OmestShippingException extends \Exception
 
                 if (preg_match('/zipcode (.*) invalid/', $msg)) {
                     $errors = '###simpleshop.error.shipping_zipcode_not_valid###';
-                }
-                else {
+                } else {
                     $errors = $this->getMessage();
                 }
                 break;
