@@ -15,6 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Symfony\Component\Yaml\Exception\RuntimeException;
 
+
 abstract class Plugin
 {
     protected static $classes = [];
@@ -22,34 +23,29 @@ abstract class Plugin
 
     public static function register($class, $plugin_name)
     {
-        self::$classes[static::$type][$class]       = ['plugin_name' => $plugin_name, 'this' => NULL];
+        self::$classes[static::$type][$class]       = ['plugin_name' => $plugin_name, 'this' => null];
         self::$plugins[static::$type][$plugin_name] = $class;
     }
 
     public static function get($plugin_name)
     {
-        return self::getByClass(self::$plugins[static::$type][$plugin_name]);
+        list ($name, $extension) = explode('.', $plugin_name);
+        return self::getByClass(self::$plugins[static::$type][$name], $extension);
     }
 
-    public static function getByClass($class)
+    public static function getByClass($class, $extension = '')
     {
-        if (!array_key_exists($class, self::$classes[static::$type]))
-        {
-            throw new RuntimeException("'{$class}' is not as registered ". static::$type ." class");
+        if (!array_key_exists($class, self::$classes[static::$type])) {
+            throw new RuntimeException("'{$class}' is not as registered " . static::$type . " class");
         }
-        if (self::$classes[static::$type][$class]['this'] === NULL)
-        {
-            $_this = new $class();
-            // check if is extended from abstract
-            if ($_this instanceof PluginAbstract)
-            {
-                $_this->plugin_name = self::$classes[static::$type][$class]['plugin_name'];
-                self::$classes[static::$type][$class]['this'] = $_this;
-            }
-            else
-            {
-                throw new RuntimeException("'{$class}' must be instance of PluginAbstract");
-            }
+        $_this = new $class();
+        // check if is extended from abstract
+        if ($_this instanceof PluginAbstract) {
+            $_this->plugin_name                           = self::$classes[static::$type][$class]['plugin_name'];
+            $_this->extension                             = $extension;
+            self::$classes[static::$type][$class]['this'] = $_this;
+        } else {
+            throw new RuntimeException("'{$class}' must be instance of PluginAbstract");
         }
         return self::$classes[static::$type][$class]['this'];
     }
@@ -57,8 +53,7 @@ abstract class Plugin
     public static function getAll()
     {
         $result = [];
-        foreach ((array) self::$classes[static::$type] as $class => $data)
-        {
+        foreach ((array)self::$classes[static::$type] as $class => $data) {
             $result[] = self::getByClass($class);
         }
         return $result;
@@ -72,7 +67,8 @@ abstract class PluginAbstract
 
     public abstract function getName();
 
-    public static function get() {}
+    public static function get() { }
+
     public static function create()
     {
         return static::get();
@@ -80,10 +76,9 @@ abstract class PluginAbstract
 
     public function getValue($key)
     {
-        $value = NULL;
+        $value = null;
 
-        if (property_exists($this, $key))
-        {
+        if (property_exists($this, $key)) {
             $value = Model::unprepare($this->$key);
         }
         return $value;

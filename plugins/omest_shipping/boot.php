@@ -14,3 +14,6 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 Shipping::register(Omest::class, 'omest_shipping');
+
+
+\rex_extension::register('simpleshop.Order.completeOrder', ['\FriendsOfREDAXO\Simpleshop\Omest', 'ext__completeOrder']);

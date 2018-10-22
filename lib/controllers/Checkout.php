@@ -420,7 +420,12 @@ class CheckoutController extends Controller
     protected function getCompleteView()
     {
         // finally save order - DONE / COMPLETE
-        $this->Order->completeOrder();
+        try {
+            $this->Order->completeOrder();
+        } catch (OrderException $ex) {
+            echo '<div class="row column"><div class="margin callout alert">' . $ex->getMessage() . '</div></div>';
+            return;
+        }
 
         $this->sendMail($this->params['debug']);
 

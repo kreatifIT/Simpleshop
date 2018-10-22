@@ -14,21 +14,20 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-$order      = $this->getVar('order');
-$order_id   = $order->getValue('id');
-$address_1  = $order->getValue('address_1');
-$address_2  = $order->getValue('address_2');
-$shipping   = $order->getValue('shipping');
-$payment    = $order->getValue('payment');
-$promotions = $order->getValue('promotions');
-$extras     = $order->getValue('extras');
+$order    = $this->getVar('order');
+$order_id = $order->getValue('id');
+$SAdress  = $order->getShippingAddress();
+$IAdress  = $order->getInvoiceAddress();
+$shipping = $order->getValue('shipping');
+$payment  = $order->getValue('payment');
 
 $products  = [];
-$_products = OrderProduct::query()->where('order_id', $order_id)->find();
+$_products = OrderProduct::query()
+    ->where('order_id', $order_id)
+    ->find();
 
 
-foreach ($_products as $product)
-{
+foreach ($_products as $product) {
     $_product = $product->getValue('data');
     $_product->setValue('cart_quantity');
     $_product->setValue('code', $product->getValue('code'));
@@ -46,33 +45,26 @@ foreach ($_products as $product)
 <div class="row">
 
     <?php
-    $this->setVar('address', $address_1);
+    $this->setVar('address', $IAdress);
     $this->setVar('title', '###label.invoice_address###');
-    $this->setVar('has_edit_link', FALSE);
+    $this->setVar('has_edit_link', false);
     $this->subfragment('simpleshop/checkout/summary/address_item.php');
     ?>
 
     <?php
-    if ($extras['address_extras']['use_shipping_address'])
-    {
-        $this->setVar('address', $address_2);
-    }
-    else
-    {
-        $this->setVar('address', $address_1);
-    }
+    $this->setVar('address', $SAdress);
     $this->setVar('title', '###label.shipping_address###');
-    $this->setVar('has_edit_link', FALSE);
+    $this->setVar('has_edit_link', false);
     $this->subfragment('simpleshop/checkout/summary/address_item.php');
     ?>
 </div>
 
 <div class="row">
     <?php if ($shipping): ?>
-    <div class="medium-6 columns margin-bottom">
-        <h3>###label.shipment###</h3>
-        <p><?= $shipping->getName() ?></p>
-    </div>
+        <div class="medium-6 columns margin-bottom">
+            <h3>###label.shipment###</h3>
+            <p><?= $shipping->getName() ?></p>
+        </div>
     <?php endif; ?>
 
     <div class="medium-6 columns margin-bottom">
@@ -93,12 +85,11 @@ foreach ($_products as $product)
     <tbody>
 
     <?php
-    foreach ($products as $product)
-    {
+    foreach ($products as $product) {
         $this->setVar('product', $product);
-        $this->setVar('has_quantity_control', FALSE);
-        $this->setVar('has_remove_button', FALSE);
-        $this->setVar('has_image', FALSE);
+        $this->setVar('has_quantity_control', false);
+        $this->setVar('has_remove_button', false);
+        $this->setVar('has_image', false);
         echo $this->subfragment('simpleshop/cart/item.php');
     }
     ?>
