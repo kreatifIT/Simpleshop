@@ -98,7 +98,7 @@ class PayPalExpress extends PaymentAbstract
             Utils::log('Paypal.initPayment.response', $logMsg, 'INFO');
             $this->responses['initPayment'] = $__response;
             $Order                          = Session::getCurrentOrder();
-            $Order->setValue('payment', $this);
+            $Order->setValue('payment', Order::prepareData($this));
         }
         // redirect to paypal
         return ($prefix == 'sandbox_' ? self::SANDBOX_REDIRECT_URL : self::LIVE_REDIRECT_URL) . $__response['TOKEN'];
@@ -167,7 +167,7 @@ class PayPalExpress extends PaymentAbstract
             $this->responses['processPayment'] = $__response;
 
             $Order = Session::getCurrentOrder();
-            $Order->setValue('payment', $this);
+            $Order->setValue('payment', Order::prepareData($this));
             // update status
             $Order->setValue('status', 'IP');
         }

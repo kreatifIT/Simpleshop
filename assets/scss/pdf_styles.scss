@@ -7,6 +7,11 @@ body {
     }
 }
 
+#logo-row {
+    text-align: right;
+    margin: 0;
+}
+
 #invoice-header-infos {
     margin: 12mm 0 12mm 0;
 }
@@ -14,6 +19,7 @@ body {
 #invoice-data {
     margin: 0 0 6mm 0;
 }
+
 #invoice-data-title {
     font-size: 16pt;
     font-weight: normal;
@@ -54,8 +60,54 @@ body {
         padding: 2mm 3mm 2mm 0;
     }
 }
+
 #invoice-summary-total-label,
 #invoice-summary-total-value {
     font-weight: bold;
     font-size: 12pt;
+}
+
+#packing-list-header-infos {
+    margin-bottom: 8mm;
+
+    .logo {
+        width: 55mm;
+        padding-right: 10mm;
+    }
+    .company-data {
+        td {
+            padding-right: 10mm;
+        }
+    }
+}
+
+#packing-list-info {
+
+    td {
+        border: 0.1mm solid #666;
+        padding: 2mm 3mm;
+    }
+}
+#ship-label,
+#address-label,
+#page-label {
+    font-size: 8pt;
+    padding-bottom: 5mm;
+}
+
+#packing-items {
+    border: 0.1mm solid #666;
+
+    thead td {
+        background-color: #3c3c3b;
+        color: #fff;
+        text-align: center;
+        border: 0.1mm solid #666;
+    }
+    td {
+        border-bottom: 0.1mm solid #999;
+        border-left: 0.1mm solid #999;
+        border-right: 0.1mm solid #999;
+        vertical-align: top;
+    }
 }

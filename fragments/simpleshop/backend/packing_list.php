@@ -15,17 +15,31 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Sprog\Wildcard;
 
-$Order     = $this->getVar('order');
-$SAddress  = $this->getVar('saddress');
-$products  = $this->getVar('products');
+
+$Order    = $this->getVar('order');
+$Shipping = $Order->getValue('shipping');
+$barCode  = $Order->getShippingKey();
+$products = $Order->getProducts(false);
+$SAddress = $Order->getShippingAddress();
+
+
+if (strlen($barCode)) {
+    $Code = new \Barcode($barCode, 4);
+
+    ob_start();
+    imagepng($Code->image());
+    $image = ob_get_clean();
+    echo '<img src="data:image/png;base64,' . base64_encode($image) . '">';
+}
+exit;
+
 $Addon     = \rex_addon::get('simpleshop');
-$addr_data = $SAddress->getData();
 $css_files = \rex_view::getCssFiles();
 
-foreach ($css_files['all'] as $index => $file)
-{
-    if (preg_match('!\/be_style\/plugins\/!', $file))
-    {
+$addr_data = $SAddress->getData();
+
+foreach ($css_files['all'] as $index => $file) {
+    if (preg_match('!\/be_style\/plugins\/!', $file)) {
         unset($css_files['all'][$index]);
     }
 }
@@ -34,10 +48,10 @@ $fragment = new \rex_fragment();
 $fragment->setVar('pageTitle', \rex_be_controller::getPageTitle());
 $fragment->setVar('cssFiles', $css_files);
 $fragment->setVar('jsFiles', \rex_view::getJsFiles());
-$fragment->setVar('jsProperties', json_encode(\rex_view::getJsProperties()), FALSE);
+$fragment->setVar('jsProperties', json_encode(\rex_view::getJsProperties()), false);
 $fragment->setVar('favicon', \rex_view::getFavicon());
-$fragment->setVar('pageHeader', \rex_extension::registerPoint(new \rex_extension_point('PAGE_HEADER', '')), FALSE);
-$fragment->setVar('bodyAttr', ' class="packing-list-page" style="background-color:#666;"', FALSE);
+$fragment->setVar('pageHeader', \rex_extension::registerPoint(new \rex_extension_point('PAGE_HEADER', '')), false);
+$fragment->setVar('bodyAttr', ' class="packing-list-page" style="background-color:#666;"', false);
 echo $fragment->parse('core/top.php');
 
 ?>
@@ -89,10 +103,11 @@ echo $fragment->parse('core/top.php');
                 <td>
                     <div class="description"><?= $product->getValue('name', true) ?></div>
                     <?php if ($product->getValue('category_id')): ?>
-                        <div class="description"><em><?= $Addon->i18n('label.category') ?>: <?= Category::get($product->getValue('category_id'))->getValue('name', true) ?></em></div>
+                        <div class="description"><em><?= $Addon->i18n('label.category') ?>: <?= Category::get($product->getValue('category_id'))
+                                    ->getValue('name', true) ?></em></div>
                     <?php endif; ?>
                     <?php if ($product->getValue('width') || $product->getValue('length') || $product->getValue('height')): ?>
-                        <div class="description"><?= (int) ($product->getValue('width') ?: 0.1) / 10 ?>cm x <?= (int) ($product->getValue('length') ?: 0.1) / 10 ?>cm x <?= (int) ($product->getValue('height') ?: 0.1) / 10 ?>cm</div>
+                        <div class="description"><?= (int)($product->getValue('width') ?: 0.1) / 10 ?>cm x <?= (int)($product->getValue('length') ?: 0.1) / 10 ?>cm x <?= (int)($product->getValue('height') ?: 0.1) / 10 ?>cm</div>
                     <?php endif; ?>
                 </td>
                 <td class="xs-small text-center"><?= $product->getValue('weight') ? $product->getValue('weight') . 'g' : '-' ?></td>

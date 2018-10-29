@@ -94,6 +94,39 @@ class Order extends Model
         ]));
     }
 
+    public function getReferenceId()
+    {
+        $_refId = date('Ym', strtotime($this->getValue('createdate'))) . str_pad($this->getId(), 6, '0', STR_PAD_LEFT);
+
+        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.getReferenceId', $_refId, [
+            'Order' => $this,
+        ]));
+    }
+
+    public function getShippingKey($forBarcode = false)
+    {
+        $refId = $this->getReferenceId();
+        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.getShippingKey', $refId, [
+            'Order'      => $this,
+            'forBarcode' => $forBarcode,
+        ]));
+    }
+
+    public function getBarCodeImg()
+    {
+        $img = null;
+        $key = $this->getShippingKey(true);
+
+        if (strlen($key) == 12 || strlen($key) == 13) {
+            $Code = new \Barcode($key, 4);
+
+            ob_start();
+            imagepng($Code->image());
+            $img = 'data:image/png;base64,' . base64_encode(ob_get_clean());
+        }
+        return $img;
+    }
+
     public function completeOrder()
     {
         self::$_finalizeOrder = true;
@@ -462,6 +495,53 @@ class Order extends Model
 
         $docTitle = $type == 'invoice' ? 'simpleshop.invoice_title' : 'simpleshop.orderdocument_title';
         $fragment->setVar('title', strtr(\Wildcard::get($docTitle), ['{NUM}' => $invoiceNum]));
+        $fragment->setVar('content', $content, false);
+        $html = $fragment->parse('simpleshop/pdf/invoice/wrapper.php');
+
+        if ($debug) {
+            echo "<div style='background:#666;height:100vh;padding:20px;'><div style='max-width:800px;margin:0px auto;background:#fff;'>{$html}</div></div>";
+            exit;
+        }
+        $Mpdf->WriteHTML($html);
+
+        return $Mpdf;
+    }
+
+    public function getPackingListPDF($debug = false)
+    {
+        $Customer = $this->getValue('customer_data');
+
+        if ($Customer->valueIsset('lang_id')) {
+            \Kreatif\Utils::setCLang($Customer->getValue('lang_id'));
+        }
+
+        $content  = '';
+        $refId    = $this->getReferenceId();
+        $fragment = new \rex_fragment();
+        $Mpdf     = new Mpdf([
+            'orientation'      => 'L',
+            'margin_left'      => 20,
+            'margin_right'     => 15,
+            'margin_top'       => 5,
+            'margin_bottom'    => 5,
+            'margin_header'    => 10,
+            'margin_footer'    => 0,
+            'setAutoTopMargin' => 'pad',
+        ]);
+
+        $Mpdf->SetProtection(['print']);
+        $Mpdf->SetDisplayMode('fullpage');
+
+        $fragment->setVar('debug', $debug);
+        $fragment->setVar('Order', $this);
+
+        // HEADER
+        $Mpdf->DefHTMLHeaderByName('PackingListHeader', \Wildcard::parse($fragment->parse('simpleshop/pdf/packing_list/header.php')));
+        $Mpdf->SetHTMLHeaderByName('PackingListHeader');
+        // ITEMS
+        $content .= $fragment->parse('simpleshop/pdf/packing_list/items.php');
+
+        $fragment->setVar('title', strtr(\Wildcard::parse(\Wildcard::get('simpleshop.packing_list_title')), ['{NUM}' => $refId]));
         $fragment->setVar('content', $content, false);
         $html = $fragment->parse('simpleshop/pdf/invoice/wrapper.php');
 

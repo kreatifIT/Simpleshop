@@ -160,6 +160,7 @@ class Omest extends ShippingAbstract
     {
         $IAddress = $Order->getInvoiceAddress();
         $DAddress = $Order->getShippingAddress();
+        $Country  = Country::get($DAddress->getValue('country'));
         $Customer = $Order->getValue('customer_data');
         $Shipping = $Order->getValue('shipping');
         $parcels  = $Shipping->getValue('parcels');
@@ -176,8 +177,8 @@ class Omest extends ShippingAbstract
         }
 
         $data = [
-            'key'                => $Order->getValue('shipping_key'),
-            'reference1'         => $Order->getId(),
+            'key'                => $Shipping->getValue('shipping_key'),
+            'reference1'         => $Order->getReferenceId(),
             'shippingServiceKey' => $Shipping->getValue('extension'),
             'shipmentTypeKey'    => 'PARCEL',
             'parcels'            => [],
@@ -195,8 +196,7 @@ class Omest extends ShippingAbstract
                 'street'      => $DAddress->getValue('street'),
                 'zipcode'     => $DAddress->getValue('postal'),
                 'city'        => $DAddress->getValue('location'),
-                'countryCode' => "IT",
-                //                    'countryCode'  => $DAddress->getValue('country'),
+                'countryCode' => $Country->getValue('iso2'),
                 'phone'       => $DAddress->getValue('phone'),
                 'email'       => $Customer ? $Customer->getValue('email') : $IAddress->getValue('email'),
             ],
@@ -227,44 +227,73 @@ class Omest extends ShippingAbstract
         $Connector->setRespFormat('application/json');
         $response = $Connector->request('/create-update-shipment', $sdata, 'get', 'Omest.sendOrdersToOLC');
 
+        if ($response['response']['status'] != 1) {
+            Utils::log('Omest.ext__completeOrder.create-shipment-failed', $response['response']['message'], 'Error', true);
+            throw new OrderException($response['response']['message'], 70);
+        } else {
+            $Shipping->setValue('shipping_key', $response['response']['shipment']->key);
+            $Shipping->setValue('api_response', $response);
+            $Shipping->setValue('shipping_sent', date('Y-m-d H:i:s'));
+            $Shipping->setValue('shipping_sent_by', \rex::getUser()
+                ->getName());
+            $Order->setValue('shipping', Order::prepareData($Shipping));
+            $Order->save();
+        }
+
         return $response;
     }
 
-    public static function ext__completeOrder(\rex_extension_point $Ep)
+    public static function ext__getShippingKey(\rex_extension_point $Ep)
     {
-        $result   = $Ep->getSubject();
-        $Settings = \rex::getConfig('simpleshop.OmestShipping.Settings');
+        $subject  = $Ep->getSubject();
+        $Order    = $Ep->getParam('Order');
+        $Shipping = $Order->getValue('shipping');
 
-        if ($Settings['omest_pickup'] == 0 && $Settings['warehouse_key'] == 'OMEST S.A.S') {
-            $parcels  = [];
-            $Order    = $Ep->getParam('Order');
-            $Shipping = $Order->getValue('shipping');
-            $products = OrderProduct::query()
-                ->where('order_id', $Order->getId())
-                ->find();
+        if ($Shipping instanceof self) {
+            $subject = $Shipping->getValue('shipping_key');
 
-
-            foreach ($products as $product) {
-                for ($i = 0; $i < $product->getValue('cart_quantity'); $i++) {
-                    $parcels[] = new Parcel($product->getValue('length') / 10, $product->getValue('width') / 10, $product->getValue('height') / 10, $product->getValue('weight') / 1000);
-                }
-            }
-            $Shipping->setParcels($parcels);
-            $Order->setValue('shipping', $Shipping);
-
-            $response = self::api_createShipment($Order, $Settings);
-
-            if ($response['response']['status'] != 1) {
-                Utils::log('Omest.ext__completeOrder.create-shipment-failed', $response['response']['message'], 'Error', true);
-                throw new OrderException("Could not create Omest-Shipping for Order {$Order->getId()}", 70);
-            } else {
-                $Shipping->setValue('shipping_key', $response['response']['shipment']->key);
-                $Order->setValue('shipping', $Shipping);
-                $Order->save();
+            if ($Ep->getParam('forBarcode')) {
+                $subject = str_replace('OME', '', $subject);
             }
         }
-        return $result;
+        return $subject;
     }
+
+    //    public static function ext__completeOrder(\rex_extension_point $Ep)
+    //    {
+    //        $result   = $Ep->getSubject();
+    //        $Settings = \rex::getConfig('simpleshop.OmestShipping.Settings');
+    //
+    //        if ($Settings['omest_pickup'] == 0 && $Settings['warehouse_key'] == 'OMEST S.A.S') {
+    //            $parcels  = [];
+    //            $Order    = $Ep->getParam('Order');
+    //            $Shipping = $Order->getValue('shipping');
+    //            $products = OrderProduct::query()
+    //                ->where('order_id', $Order->getId())
+    //                ->find();
+    //
+    //
+    //            foreach ($products as $product) {
+    //                for ($i = 0; $i < $product->getValue('cart_quantity'); $i++) {
+    //                    $parcels[] = new Parcel($product->getValue('length') / 10, $product->getValue('width') / 10, $product->getValue('height') / 10, $product->getValue('weight') / 1000);
+    //                }
+    //            }
+    //            $Shipping->setParcels($parcels);
+    //            $Order->setValue('shipping', $Shipping);
+    //
+    //            $response = self::api_createShipment($Order, $Settings);
+    //
+    //            if ($response['response']['status'] != 1) {
+    //                Utils::log('Omest.ext__completeOrder.create-shipment-failed', $response['response']['message'], 'Error', true);
+    //                throw new OrderException("Could not create Omest-Shipping for Order {$Order->getId()}", 70);
+    //            } else {
+    //                $Shipping->setValue('shipping_key', $response['response']['shipment']->key);
+    //                $Order->setValue('shipping', Order::prepareData($Shipping));
+    //                $Order->save();
+    //            }
+    //        }
+    //        return $result;
+    //    }
 }
 
 class OmestShippingException extends \Exception

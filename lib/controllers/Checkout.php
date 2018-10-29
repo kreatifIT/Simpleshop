@@ -293,12 +293,12 @@ class CheckoutController extends Controller
             rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
         } else if (rex_post('action', 'string') == 'set-shipping-payment') {
             try {
-                $this->Order->setValue('shipping', Shipping::get(rex_post('shipment', 'string')));
+                $this->Order->setValue('shipping', Order::prepareData(Shipping::get(rex_post('shipment', 'string'))));
             } catch (RuntimeException $ex) {
             }
 
             try {
-                $this->Order->setValue('payment', Payment::get(rex_post('payment', 'string')));
+                $this->Order->setValue('payment', Order::prepareData(Payment::get(rex_post('payment', 'string'))));
             } catch (RuntimeException $ex) {
             }
 

@@ -13,6 +13,9 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Kreatif\Mpdf\Mpdf;
+
+
 \rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Category', 'ext_yform_data_delete']);
 \rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Feature', 'ext_yform_data_delete']);
 \rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\FeatureValue', 'ext_yform_data_delete']);
@@ -78,10 +81,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 });
 
 \rex_extension::register('PACKAGES_INCLUDED', function () {
-    $pdf_styles   = \rex::getProperty('mpdf-styles', []);
-    $pdf_styles[] = $this->getPath('assets/scss/pdf_styles.scss');
-
-    \rex::setProperty('mpdf-styles', $pdf_styles);
+    Mpdf::addCSSPath($this->getPath('assets/scss/pdf_styles.scss'));
 });
 
 \rex_view::setJsProperty('simpleshop', [

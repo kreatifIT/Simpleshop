@@ -11,16 +11,26 @@
  * file that was distributed with this source code.
  */
 
+$contact_prefix    = $this->getVar('contact_prefix', '');
+$contact_separator = $this->getVar('contact_separator', '<br/>');
+$contact_suffix    = $this->getVar('contact_suffix', '');
+
 
 ?>
-<strong>###company.full_name###</strong><br/>
-###company.street###<br/>
-###company.postal### ###company.location### (###company.province###)<br/>
-###company.region### - ###company.country###<br/>
-###label.vat_short###: ###company.vat###<br/>
-<br/>
-###company.phone###<br/>
-###company.fax###<br/>
-<br/>
-###company.email###<br/>
-###company.website###
+<?= $contact_prefix ?>
+        <div class="contact-company-data">
+            <strong>###company.full_name###</strong><br/>
+            ###company.street###<br/>
+            ###company.postal### ###company.location### (###company.province###)<br/>
+            ###company.region### - ###company.country###<br/>
+            ###label.vat_short###: ###company.vat###<br/>
+        </div>
+        <?= $contact_separator ?>
+        <div class="contact-contact-data">
+            ###company.phone###<br/>
+            ###company.fax###<br/>
+            <br/>
+            ###company.email###<br/>
+            ###company.website###
+        </div>
+<?= $contact_suffix ?>

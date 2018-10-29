@@ -21,7 +21,9 @@ $Country  = $address->valueIsset('country') ? Country::get($address->getValue('c
 ?>
 <div class="column margin-bottom">
     <div class="address">
+        <?php if (strlen($title)): ?>
         <h4 class="heading small"><?= $title ?></h4>
+        <?php endif; ?>
         <p>
             <?php
             if ($Customer) {

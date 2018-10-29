@@ -15,10 +15,11 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
     public function enterObject()
     {
         if (rex::isBackend() && $this->getParam('main_id')) {
-            $Order         = \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id'));
-            $table         = $this->getParam('main_table');
-            $use_invoicing = \FriendsOfREDAXO\Simpleshop\Utils::getSetting('use_invoicing', false);
-            $params        = [
+            $Order            = \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id'));
+            $table            = $this->getParam('main_table');
+            $use_invoicing    = \FriendsOfREDAXO\Simpleshop\Utils::getSetting('use_invoicing', false);
+            $use_packing_list = \FriendsOfREDAXO\Simpleshop\Utils::getSetting('packing_list_printing', false);
+            $params           = [
                 'data_id'    => $this->getParam('main_id'),
                 'table_name' => $table,
                 'func'       => 'edit',
@@ -41,6 +42,12 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                     case 'generate_pdf':
                         rex_response::cleanOutputBuffers();
                         $PDF = $Order->getInvoicePDF('invoice', false);
+                        $PDF->Output();
+                        exit;
+
+                    case 'generate_packing_list':
+                        rex_response::cleanOutputBuffers();
+                        $PDF = $Order->getPackingListPDF(false);
                         $PDF->Output();
                         exit;
 
@@ -107,6 +114,15 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                     ' . rex_i18n::msg('label.recalculate_sums') . '
                 </a>
             ';
+            if ($use_packing_list) {
+                $output[] = '
+                    <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'generate_packing_list'])) . '" class="btn btn-default">
+                        <i class="fa fa-ship"></i>&nbsp;
+                        Lieferschein drucken
+                    </a>
+                ';
+            }
+
             if ($use_invoicing) {
                 $output[] = '
                     <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'generate_pdf'])) . '" class="btn btn-default">

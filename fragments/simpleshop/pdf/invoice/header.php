@@ -17,15 +17,16 @@ $shipping_addr = $Order->getShippingAddress();
 
 
 if (file_exists(\rex_path::base('resources/img/logo300dpi.png'))) {
-    $logo = \rex_path::base('resources/img/email/logo300dpi.png');
+    $logo = \rex_path::base('resources/img/logo300dpi.png');
 } else {
     $logo = \rex_path::base('resources/img/email/logo.png');
 }
 
 ?>
-<div style="text-align:right;">
+<div id="logo-row">
     <img src="<?= $logo ?>" height="50"/>
 </div>
+
 <table width="100%" id="invoice-header-infos">
     <tr>
         <td width="50%" valign="top">

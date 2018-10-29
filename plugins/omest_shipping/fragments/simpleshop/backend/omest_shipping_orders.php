@@ -52,6 +52,10 @@ $pallet_types = [
                 $Shipping = $order->getValue('shipping');
                 $parcels = $Shipping->getValue('parcels');
 
+                if (!($Shipping instanceof Omest) || $Shipping->getValue('shipping_key') != '') {
+                    continue;
+                }
+
                 if (count($parcels) == 0) {
                     $parcels[] = new Parcel();
                 }

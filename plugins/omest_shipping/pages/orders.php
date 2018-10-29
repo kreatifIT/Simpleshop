@@ -13,6 +13,9 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Sprog\Wildcard;
+
+
 echo \rex_view::title('Simpleshop');
 
 $_FUNC     = rex_post('func', 'string');
@@ -42,15 +45,14 @@ if ($_FUNC == 'submit' && count($order_ids)) {
         Model::prepareData($Shipping);
 
         // update props
-        $Order->setValue('shipping', $Shipping);
-        $Order->save(false, true);
+        $Order->setValue('shipping', Order::prepareData($Shipping));
+        $Order->save();
 
         $_order_ids[] = $order_id;
     }
     try {
         $order_cnt = Omest::sendOrdersToOLC($_order_ids);
-    }
-    catch (OmestShippingException $ex) {
+    } catch (OmestShippingException $ex) {
         switch ($ex->getCode()) {
             case 1:
                 preg_match('!\[(\d+)\]!', $ex->getMessage(), $matches);
@@ -64,8 +66,7 @@ if ($_FUNC == 'submit' && count($order_ids)) {
                 $error = $ex->getMessage();
                 break;
         }
-    }
-    catch (WSConnectorException $ex) {
+    } catch (WSConnectorException $ex) {
         switch ($ex->getCode()) {
             case 1:
                 $error = strtr(Wildcard::get('error.ws_not_available'), ['{{service}}' => 'Omest OLC']);
@@ -84,16 +85,18 @@ if ($_FUNC == 'submit' && count($order_ids)) {
 
     if ($order_cnt <= 0) {
         echo \rex_view::error($this->i18n('omest_shipping.orders_not_submitted') . (strlen($error) ? ': "' . $error . '"' : ''));
-    }
-    else if (strlen($error)) {
+    } else if (strlen($error)) {
         echo \rex_view::error($error);
-    }
-    else {
+    } else {
         echo \rex_view::info(sprintf($this->i18n('omest_shipping.orders_submitted'), $order_cnt));
     }
 }
 
-$orders = Order::query()->where('status', 'IP')->where('shipping_key', '')->where('shipping', '', '!=')->orderBy('id')->find();
+$orders = Order::query()
+    ->where('status', 'IP')
+    ->where('shipping', '', '!=')
+    ->orderBy('id')
+    ->find();
 
 $sections = '';
 $fragment = new \rex_fragment();
