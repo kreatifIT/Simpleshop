@@ -134,26 +134,62 @@ class Omest extends ShippingAbstract
 
     public static function sendOrdersToOLC($order_ids)
     {
-        $procces_cnt = 0;
-        $Settings    = \rex::getConfig('simpleshop.OmestShipping.Settings');
+        $processed  = [];
+        $clientMail = Utils::getSetting('order_notification_email');
+        $Settings   = \rex::getConfig('simpleshop.OmestShipping.Settings');
+
 
         foreach ($order_ids as $order_id) {
-            $Order    = Order::get($order_id);
-            $response = self::api_createShipment($Order, $Settings);
+            $Order = Order::get($order_id);
+            self::api_createShipment($Order, $Settings);
 
-            if ($response['response']['status'] != 1) {
-                throw new OmestShippingException($response['response']['message']);
-            } else {
-                // save shipping key
-                $Shipping = $Order->getValue('shipping');
-                $Shipping->setValue('shipping_key', $response['response']['shipment']->key);
-                $Order->setValue('shipping', $Shipping);
-                $Order->save();
+            $PDF      = $Order->getPackingListPDF(false);
+            $filename = \rex_path::addonData('simpleshop', "packing_lists/{$Order->getId()}.pdf");
+            $PDF->Output($filename, \Mpdf\Output\Destination::FILE);
 
-                $procces_cnt++;
+            $orderInfo = [
+                'attachments' => [$filename],
+                'Order'       => $Order,
+                'sentToOmest' => false,
+            ];
+
+            if ($Settings['omest_pickup'] == 0 && $Settings['warehouse_key'] == 'OMEST S.A.S') {
+                // send mail to omest with packing list
+                $OMail = new Mail();
+                $OMail->addAddress($Settings['sandbox'] ? 'client@kreatif.it' : 'info@omest.com');
+                $OMail->addAttachment($filename, $Order->getShippingKey());
+                $OMail->setVar('body', "Hallo OMEST,<br/>bitte bereitet die Sendung <strong>{$Order->getShippingKey()}</strong> vor und versendet sie.<br/><br/>Danke", false);
+                $OMail->Subject = 'Sendung / Pacchetto ' . $Order->getShippingKey();
+
+                $orderInfo['sentToOmest'] = $OMail->send();
+            }
+            $processed[] = $orderInfo;
+        }
+
+        $Mail          = new Mail();
+        $orders        = [];
+        $Mail->Subject = strtr(Wildcard::get('simpleshop.omest.orderslist_sent_subject'), ['{COUNT}' => count($processed)]);
+        $Mail->addAddress($clientMail);
+
+        foreach ($processed as $item) {
+            $orders[] = $item['Order']->getReferenceId() . " ({$item['Order']->getShippingKey()})";
+
+            foreach ($item['attachments'] as $attachment) {
+                $Mail->addAttachment($attachment, $item['Order']->getShippingKey());
             }
         }
-        return $procces_cnt;
+
+        $Mail->setVar('body', strtr(Wildcard::get('simpleshop.omest.orderslist_sent'), ['{ORDERS}' => '<strong>' . implode('<br/>', $orders) . '</strong>']), false);
+        $Mail->send();
+
+
+        foreach ($processed as $item) {
+            foreach ($item['attachments'] as $attachment) {
+                unlink($attachment);
+            }
+        }
+
+        return count($processed);
     }
 
     protected static function api_createShipment($Order, $Settings)

@@ -518,7 +518,7 @@ class Order extends Model
         $content  = '';
         $refId    = $this->getReferenceId();
         $fragment = new \rex_fragment();
-        $Mpdf     = new Mpdf([
+        $Mpdf     = new \Kreatif\Mpdf\Mpdf([
             'orientation'      => 'L',
             'margin_left'      => 20,
             'margin_right'     => 15,

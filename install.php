@@ -12,6 +12,7 @@
  */
 
 rex_dir::create(rex_path::addonData('simpleshop', 'log'), true);
+rex_dir::create(rex_path::addonData('simpleshop', 'packing_lists'), true);
 
 if (!$this->hasConfig()) {
     $this->setConfig('installed', true);
