@@ -64,3 +64,7 @@ if (!$this->hasConfig()) {
     // install media manager types
     include_once __DIR__ . '/install/inc/mediatypes.inc.php';
 }
+
+\rex_sql_table::get(\FriendsOfREDAXO\Simpleshop\Variant::TABLE)
+    ->ensureColumn(new \rex_sql_column('prio', 'int(11)', false, 0))
+    ->alter();

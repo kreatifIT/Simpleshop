@@ -22,8 +22,7 @@ $product    = \FriendsOfREDAXO\Simpleshop\Product::get($product_id);
 if ($_FUNC == 'rm-variants') {
     $sql = \rex_sql::factory();
     $sql->setQuery("DELETE FROM " . Variant::TABLE . " WHERE product_id = :product_id", ['product_id' => $product_id]);
-}
-elseif ($_FUNC == 'apply-features') {
+} else if ($_FUNC == 'apply-features') {
     $features_ids = explode(',', rex_get('feature_ids', 'string'));
     $current_fids = explode(',', $product->getValue('features'));
     $product->setValue('features', implode(',', array_unique(array_filter(array_merge($features_ids, $current_fids)))));
@@ -42,17 +41,22 @@ $product_url = \rex_url::backendPage('yform/manager/data_edit', [
 if (!$product) {
     echo \rex_view::warning($this->i18n('error.no_product_choosen'));
     return;
-}
-else if (!$features && Variant::query()->where('product_id', $product_id)->count()) {
+} else if (!$features && Variant::query()
+        ->where('product_id', $product_id)
+        ->count()
+) {
     $features = [];
-    $variants = Variant::query()->where('product_id', $product_id)->find();
+    $variants = Variant::query()
+        ->where('product_id', $product_id)
+        ->find();
 
     foreach ($variants as $variant) {
         $_features = explode('|', $variant->getValue('variant_key'));
 
         foreach ($_features as $feature_id) {
             if (!isset($features[$feature_id])) {
-                $features[$feature_id] = FeatureValue::get($feature_id)->getValue('name', true);
+                $features[$feature_id] = FeatureValue::get($feature_id)
+                    ->getValue('name', true);
             }
         }
     }
@@ -74,8 +78,7 @@ else if (!$features && Variant::query()->where('product_id', $product_id)->count
     echo $fragment->parse('core/page/section.php');
     echo '</form>';
     return;
-}
-else if (!$features) {
+} else if (!$features) {
     echo \rex_view::info(strtr($this->i18n('error.product_has_attribute'), [
         '{{link}}'  => '<a href="' . $product_url . '" class="btn btn-info btn-sm">',
         '{{/link}}' => '</a>',
@@ -88,17 +91,12 @@ if ($_FUNC == 'save') {
     $data = rex_post('FORM', 'array');
 
     foreach ($data as $key => $values) {
-        $Variant = Variant::getOne(false, [
-            'filter' => [
-                ['product_id', $product_id],
-                ['variant_key', $key],
-            ],
-        ]);
+        $Variant = Variant::query()
+            ->where('product_id', $product_id)
+            ->where('variant_key', $key)
+            ->findOne();
 
-        if ($Variant) {
-            $Variant->setValue('updatedate', date('Y-m-d H:i:s'));
-        }
-        else {
+        if (!$Variant) {
             $Variant = Variant::create();
             $Variant->setValue('variant_key', $key);
             $Variant->setValue('product_id', $product_id);
@@ -110,14 +108,19 @@ if ($_FUNC == 'save') {
         $vIds[] = $Variant->getId();
     }
     // remove previously saved variants
-    \rex_sql::factory()->setQuery("DELETE FROM " . Variant::TABLE . " WHERE product_id = ? AND id NOT IN(" . implode(',', $vIds) . ")", [$product_id]);
+    \rex_sql::factory()
+        ->setQuery("DELETE FROM " . Variant::TABLE . " WHERE product_id = ? AND id NOT IN(" . implode(',', $vIds) . ")", [$product_id]);
 }
 
 // load all columns from yform
 $rows         = [];
 $featureNames = [];
 $featureKeys  = [];
-$variants     = Variant::getAll(false, ['filter' => [['product_id', $product_id]]]);
+
+$variants = Variant::query()
+    ->where('product_id', $product_id)
+    ->orderBy('prio')
+    ->find();
 
 // load all yform fields to place them into columns
 list ($labels, $fields) = Variant::be_getYFields();
@@ -156,8 +159,7 @@ foreach ($variants as $Variant) {
     if ($findex !== false) {
         // remove vkey from featurekeys
         unset($featureKeys[$findex]);
-    }
-    else {
+    } else {
         // by pass invalid feature-keys
         continue;
     }
