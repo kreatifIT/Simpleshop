@@ -333,7 +333,7 @@ abstract class Model extends \rex_yform_manager_dataset
         return $fields;
     }
 
-    public function getFields(array $filter = [])
+    public function getFields(array $filter = [], $use_notices = false)
     {
         $fields  = [];
         $_fields = parent::getFields($filter);
@@ -346,7 +346,7 @@ abstract class Model extends \rex_yform_manager_dataset
 
 
             if (!in_array($name, $this->excluded_fields)) {
-                if (!\rex::isBackend()) {
+                if (!\rex::isBackend() && !$use_notices) {
                     $field['notice'] = '';
                 }
                 if (isset ($this->field_data[$key])) {
@@ -490,11 +490,11 @@ abstract class Model extends \rex_yform_manager_dataset
         return $data;
     }
 
-    public static function getAllYformFields($filter = [])
+    public static function getAllYformFields($filter = [], $use_notices = false)
     {
         $table = self::create();
 
-        return $table->getFields($filter);
+        return $table->getFields($filter, $use_notices);
     }
 
     public static function getYformFieldByName($name)
