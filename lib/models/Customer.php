@@ -24,7 +24,7 @@ class Customer extends Model
 
     public static function getUserByEmail($email)
     {
-        return self::query()->where('email', $email)->findOne();
+        return self::query()->whereRaw('email LIKE :email', ['email' => trim($email)])->findOne();
     }
 
     public function save($prepare = false)
