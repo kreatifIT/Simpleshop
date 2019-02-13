@@ -13,18 +13,16 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-\rex_extension::register('YFORM_DATA_LIST', function ($params)
-{
+\rex_extension::register('YFORM_DATA_LIST', function ($params) {
     $list         = $params->getSubject();
     $list_params  = $list->getParams();
     $variant_type = \rex::getProperty('simpleshop.product_variants');
 
-    if ($variant_type && $list_params['table_name'] == Product::TABLE)
-    {
+    if ($variant_type && $list_params['table_name'] == Product::TABLE) {
         $url = \rex_url::backendPage('simpleshop/variants', [
             'table_name' => Variant::TABLE,
-            'data_id' => '-ID-',
-            'func' => 'edit',
+            'data_id'    => '-ID-',
+            'func'       => 'edit',
         ]);
         $list->addColumn('variants', $this->i18n('action.manage_variants'), count($list->getColumnNames()) - 2);
         $list->setColumnLabel('variants', $this->i18n('label.variants'));

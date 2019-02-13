@@ -14,15 +14,12 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 // TODO: to review
-\rex_extension::register('YFORM_DATA_LIST_SQL', function ($params)
-{
+\rex_extension::register('YFORM_DATA_LIST_SQL', function ($params) {
     $sql   = $params->getSubject();
     $table = $params->getParams()['table'];
 
-    if ($table->getTableName() == Category::TABLE)
-    {
-        if (stripos($sql, 'where') === FALSE)
-        {
+    if ($table->getTableName() == Category::TABLE) {
+        if (stripos($sql, 'where') === false) {
             $sql = preg_replace('/ORDER\sBY/i', 'where `parent_id` = \'\' ORDER BY', $sql);
         }
     }
