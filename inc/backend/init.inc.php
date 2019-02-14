@@ -24,6 +24,8 @@ namespace FriendsOfREDAXO\Simpleshop;
         $compiler->setScssFile([$this->getPath('assets/scss/backend.scss')]);
         $compiler->setCssFile($this->getAssetsPath('css/backend.css'));
         $compiler->compile();
+
+        copy($this->getPath('assets/backend.js'), $this->getAssetsPath('backend.js'));
     }
 
     \rex_view::addCssFile($this->getAssetsUrl('css/backend.css' . $mtime));
