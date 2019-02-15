@@ -32,6 +32,7 @@ label.generate_creditnote = Gutschrift erstellen
 label.msg_generate_creditnote = Gutschrift wurder erstellt
 label.clone_coupon = diesen Coupon klonen
 label.msg_clone = Es wurden {NUM} Coupons generiert
+label.link_product_rex_categories = Kategorien verlinken
 
 
 action.goto_creditnote = gehe zur Gutschrift

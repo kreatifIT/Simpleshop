@@ -1,5 +1,4 @@
 .pjax-loading {
-    transition: $global-transition;
     position: absolute;
     opacity: 0;
     top: 0;
@@ -13,67 +12,50 @@
         z-index: 999;
     }
 
-    .spinner {
-        width: 50px;
-        height: 40px;
-        text-align: center;
-        font-size: 10px;
-        position: absolute;
-        top: 50%;
+    & > .spinner {
+        display: inline-block;
+        position: relative;
         left: 50%;
+        top: 50%;
         transform: translate(-50%, -50%);
+        width: rem-calc(64);
+        height: rem-calc(64);
+
         &.top20 {
             top: 20%;
         }
-    }
 
-    .spinner > div {
-        background-color: #333;
-        height: 100%;
-        width: 6px;
-        display: inline-block;
+        div {
+            display: inline-block;
+            position: absolute;
+            left: 6px;
+            width: 13px;
+            background-color: #333;
+            animation: lds-pjax-spinner 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
 
-        -webkit-animation: sk-stretchdelay 1.2s infinite ease-in-out;
-        animation: sk-stretchdelay 1.2s infinite ease-in-out;
-    }
-
-    .spinner .rect2 {
-        -webkit-animation-delay: -1.1s;
-        animation-delay: -1.1s;
-    }
-
-    .spinner .rect3 {
-        -webkit-animation-delay: -1.0s;
-        animation-delay: -1.0s;
-    }
-
-    .spinner .rect4 {
-        -webkit-animation-delay: -0.9s;
-        animation-delay: -0.9s;
-    }
-
-    .spinner .rect5 {
-        -webkit-animation-delay: -0.8s;
-        animation-delay: -0.8s;
-    }
-
-    @-webkit-keyframes sk-stretchdelay {
-        0%, 40%, 100% {
-            -webkit-transform: scaleY(0.4)
-        }
-        20% {
-            -webkit-transform: scaleY(1.0)
+            &:nth-child(1) {
+                left: 6px;
+                animation-delay: -0.24s;
+            }
+            &:nth-child(2) {
+                left: 26px;
+                animation-delay: -0.12s;
+            }
+            &:nth-child(3) {
+                left: 45px;
+                animation-delay: 0;
+            }
         }
     }
 
-    @keyframes sk-stretchdelay {
-        0%, 40%, 100% {
-            transform: scaleY(0.4);
-            -webkit-transform: scaleY(0.4);
+    @keyframes lds-pjax-spinner {
+        0% {
+            top: 6px;
+            height: 51px;
         }
-        20% {
-            transform: scaleY(1.0);
-            -webkit-transform: scaleY(1.0);
+        50%, 100% {
+            top: 19px;
+            height: 26px;
         }
     }
 }

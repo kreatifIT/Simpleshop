@@ -42,7 +42,7 @@ var Simpleshop = (function ($) {
 
     function addLoading($container) {
         var css = $container.offset(),
-            $loading = $(rex.simpleshop.loadingDiv);
+            $loading = $('<div class="pjax-loading"><div class="spinner"><div></div><div></div><div></div></div></div>');
 
         css.height = $container.outerHeight();
         css.width = $container.outerWidth();
@@ -151,7 +151,7 @@ var Simpleshop = (function ($) {
                 }
             }).done(function (resp) {
                 $container.html(resp.message.cart_html);
-                $loading.remove();
+                // $loading.remove();
                 result.showOffcanvasCart();
             });
         },

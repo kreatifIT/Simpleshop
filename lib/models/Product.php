@@ -382,7 +382,7 @@ class Product extends Model
                 $Variant    = array_shift($collection['variants']);
 
                 if ($Variant) {
-                    $Object = $Variant;
+                    $Object                 = $Variant;
                     $Object->__feature_data = null;
                 } else {
                     \rex_response::setStatus(404);
@@ -418,6 +418,53 @@ class Product extends Model
             $collection = $result;
         }
         return $collection;
+    }
+
+    public static function ext_tableManagerInfo(\rex_extension_point $Ep)
+    {
+        $subject = $Ep->getSubject();
+        $Manager = $Ep->getParam('manager');
+
+        if ($Manager->table->getTablename() == Product::TABLE) {
+            $fragment = new \rex_fragment();
+            $content  = $fragment->parse('simpleshop/backend/product_list_functions.php');
+
+            if (strlen($content)) {
+                $fragment = new \rex_fragment();
+                $fragment->setVar('body', $content, false);
+                $fragment->setVar('class', 'action');
+                $subject = $fragment->parse('core/page/section.php');
+            }
+        }
+        return $subject;
+    }
+
+
+    public static function be_toggleRexCategoryId()
+    {
+        $request = \rex_api_simpleshop_be_api::$inst->request;
+        $Object  = self::get($request['id']);
+
+        if ($Object) {
+            $categories = $Object->getArrayValue('category');
+
+            if ($request['action'] == 'add') {
+                $categories[] = $request['cat_id'];
+            }
+            else {
+                $index = array_search($request['cat_id'], $categories);
+
+                if ($index !== false) {
+                    unset($categories[$index]);
+                }
+            }
+            $categories = array_unique($categories);
+
+            $Object->setValue('category', implode(',', $categories));
+            $Object->save();
+
+            \rex_api_simpleshop_be_api::$inst->response['categories'] = $categories;
+        }
     }
 }
 

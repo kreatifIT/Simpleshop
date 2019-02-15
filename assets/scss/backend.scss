@@ -139,3 +139,36 @@ table.table {
         }
     }
 }
+
+#linking-container {
+    .list-group {
+        font-size: 12px;
+        line-height: 1.4;
+
+        &.checklist {
+            & > li {
+                padding: 0;
+
+                &.active {
+                    color: #31708f;
+                    background-color: #d9edf7;
+                    border-color: #bce8f1;
+                }
+
+                & > label {
+                    display: block;
+                    cursor: pointer;
+                    position: relative;
+                    padding: 8px 8px 8px 30px;
+
+                    & > input[type=checkbox],
+                    & > input[type=radio] {
+                        position: absolute;
+                        top: 5px;
+                        left: 8px;
+                    }
+                }
+            }
+        }
+    }
+}

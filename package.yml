@@ -22,6 +22,9 @@ page:
         packing_list:
             title: packing_list
             hidden: true
+        yform_functions:
+            title: yform_functions
+            hidden: true
 
 
 

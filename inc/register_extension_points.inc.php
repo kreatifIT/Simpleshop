@@ -25,6 +25,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 \rex_extension::register('kreatif.Model.queryCollection', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_queryCollection']);
 \rex_extension::register('project.layoutBottom', ['\FriendsOfREDAXO\Simpleshop\CartController', 'ext_project_layoutBottom']);
 \rex_extension::register('project.setUrlObject', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_setUrlObject']);
+\rex_extension::register('YFORM_MANAGER_REX_INFO', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_tableManagerInfo']);
 
 
 \rex_extension::register('PACKAGES_INCLUDED', function (\rex_extension_point $Ep) {
@@ -86,15 +87,4 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 \rex_view::setJsProperty('simpleshop', [
     'ajax_url'   => \rex_url::frontendController(),
-    'loadingDiv' => '
-        <div class="pjax-loading">
-            <div class="spinner">
-                <div class="rect1"></div>
-                <div class="rect2"></div>
-                <div class="rect3"></div>
-                <div class="rect4"></div>
-                <div class="rect5"></div>
-            </div>
-        </div>
-    ',
 ]);

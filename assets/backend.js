@@ -1,9 +1,63 @@
 var Simpleshop = (function ($) {
+    var searchHandle = null,
+        functionListParams = {};
 
     $(document).ready(function () {
         initProductSelect();
         initVariantSelect();
+        initProductRexCategoryLink();
     });
+
+    function addLoading($container) {
+        var css = $container.offset(),
+            $loading = $('<div class="pjax-loading"><div class="spinner"><div></div><div></div><div></div></div></div>');
+
+        css.height = $container.outerHeight();
+        css.width = $container.outerWidth();
+        $('body').append($loading.addClass('show').css(css));
+
+        return $loading;
+    }
+
+    function initProductRexCategoryLink() {
+        var $container = $('#linking-container');
+
+        if ($container.length) {
+            var $input = $container.find('#REX_LINK_rex_category');
+
+            functionListParams.cat_id = 0;
+
+            window.setInterval(function () {
+                if (functionListParams.cat_id != $input.val()) {
+                    functionListParams.cat_id = $input.val();
+                    showFunctionList();
+                }
+            }, 1000);
+        }
+    }
+
+    function showFunctionList() {
+        var $ajContainer = $('#linking-container .pjax-container'),
+            $loading = addLoading($ajContainer);
+
+        $.ajax({
+            url: rex.simpleshop.ajax_url,
+            cache: false,
+            data: {
+                'debug': rex.debug,
+                'cat_id': functionListParams.cat_id,
+                'controller': 'BeApi.list_functions',
+                'fragment': 'link_product_rex_categories',
+                'rex-api-call': 'simpleshop_be_api',
+                'func': 'link_product_rex_categories',
+                'search': functionListParams.search || '',
+                'page': functionListParams.page || 0
+            }
+        }).done(function (resp) {
+            $ajContainer.html(resp.message.html);
+            $loading.remove();
+        });
+    }
 
     function initVariantSelect() {
         $('table.variants tbody').sortable({
@@ -53,10 +107,10 @@ var Simpleshop = (function ($) {
     };
 
     return {
-        saveVariants: function(_this) {
+        saveVariants: function (_this) {
             updateVariantPrio($(_this).find('table.variants'));
         },
-        cloneCoupon: function(_this) {
+        cloneCoupon: function (_this) {
             var $this = $(_this),
                 $input = $this.parent().find('input.coupon-clone-count');
 
@@ -89,6 +143,46 @@ var Simpleshop = (function ($) {
             $weights.after(__weights);
 
             return false;
+        },
+        selectFunctionListItem: function (_this) {
+            var $this = $(_this),
+                $li = $this.parents('li');
+
+            $li.toggleClass('active');
+
+            $.ajax({
+                url: rex.simpleshop.ajax_url,
+                method: 'GET',
+                data: {
+                    'debug': rex.debug,
+                    'id': _this.value,
+                    'cat_id': functionListParams.cat_id,
+                    'action': $li.hasClass('active') ? 'add' : 'remove',
+                    'controller': 'Product.be_toggleRexCategoryId',
+                    'rex-api-call': 'simpleshop_be_api',
+                }
+            }).done(function (resp) {
+            });
+        },
+        showFunctionListItems: function (_this, type) {
+            if (type === 'search') {
+                if (searchHandle) {
+                    window.clearTimeout(searchHandle);
+                }
+                searchHandle = window.setTimeout(function () {
+                    functionListParams.search = _this.value;
+                    functionListParams.page = 0;
+                    showFunctionList();
+                }, 800);
+            }
+            else if (type === 'paging') {
+                var page = $(_this).data('page');
+
+                if (page !== '') {
+                    functionListParams.page = $(_this).data('page');
+                    showFunctionList();
+                }
+            }
         }
-    }
+    };
 })(jQuery);
