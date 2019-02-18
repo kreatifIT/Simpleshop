@@ -151,7 +151,7 @@ var Simpleshop = (function ($) {
                 }
             }).done(function (resp) {
                 $container.html(resp.message.cart_html);
-                // $loading.remove();
+                $loading.remove();
                 result.showOffcanvasCart();
             });
         },
