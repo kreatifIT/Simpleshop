@@ -21,7 +21,7 @@ var Simpleshop = (function ($) {
         $offcanvasCart = $('.offcanvas-cart');
 
         $body.click(function (event) {
-            if (!$(event.target).closest('.offcanvas-cart').length) {
+            if ($body.hasClass('offcanvas-cart-open') && !$(event.target).closest('.offcanvas-cart').length) {
                 result.closeOffcanvasCart();
             }
         });
