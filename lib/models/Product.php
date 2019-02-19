@@ -450,8 +450,7 @@ class Product extends Model
 
             if ($request['action'] == 'add') {
                 $categories[] = $request['cat_id'];
-            }
-            else {
+            } else {
                 $index = array_search($request['cat_id'], $categories);
 
                 if ($index !== false) {
@@ -461,8 +460,11 @@ class Product extends Model
             $categories = array_unique($categories);
 
             $Object->setValue('category', implode(',', $categories));
-            $Object->save();
 
+            if (!$Object->save()) {
+                \rex_api_simpleshop_be_api::$inst->success = false;
+                \rex_api_simpleshop_be_api::$inst->errors  = array_merge(\rex_api_simpleshop_be_api::$inst->errors, $Object->getMessages());
+            }
             \rex_api_simpleshop_be_api::$inst->response['categories'] = $categories;
         }
     }

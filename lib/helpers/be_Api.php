@@ -14,8 +14,9 @@ class rex_api_simpleshop_be_api extends rex_api_function
 {
     public    $response  = [];
     public    $request   = [];
+    public    $errors    = [];
+    public    $success   = true;
     protected $published = true;
-    protected $success   = true;
 
     public static $inst = null;
 
@@ -70,6 +71,8 @@ class rex_api_simpleshop_be_api extends rex_api_function
         } catch (\rex_sql_exception $ex) {
             throw new ApiException($ex->getMessage());
         }
+
+        $this->response['errors'] = $this->errors;
 
         return new \rex_api_result($this->success, $this->response);
     }

@@ -162,6 +162,11 @@ var Simpleshop = (function ($) {
                     'rex-api-call': 'simpleshop_be_api',
                 }
             }).done(function (resp) {
+                if (!resp.succeeded) {
+                    for (var i in resp.message.errors) {
+                        KreatifAddon.showAlert(resp.message.errors[i]);
+                    }
+                }
             });
         },
         showFunctionListItems: function (_this, type) {
