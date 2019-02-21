@@ -26,7 +26,7 @@ class Customer extends Model
     public static function getUserByEmail($email)
     {
         return self::query()
-            ->where('email', $email)
+            ->whereRaw('email LIKE :email', ['email' => trim($email)])
             ->findOne();
     }
 
@@ -73,6 +73,7 @@ class Customer extends Model
     public static function register($email, $password, $attributes = [])
     {
         $result = null;
+        $email  = trim(mb_strtolower($email));
         $User   = self::getUserByEmail($email);
 
         // verify if a user with the given email already exist
@@ -82,18 +83,14 @@ class Customer extends Model
         $_this = parent::create();
 
         foreach ($attributes as $attr => $value) {
-            $_this->setValue($attr, $value);
+            $_this->setValue($attr, trim($value));
         }
 
         $statusField = self::getYformFieldByName('status');
-        $exclFields  = array_diff(FragmentConfig::getValue('yform_fields.rex_shop_customer._excludedFields'), ['created', 'updatedate', 'status']);
-
-        FragmentConfig::$data['yform_fields']['rex_shop_customer']['_excludedFields'] = $exclFields;
 
         $_this->setValue('email', $email);
         $_this->setValue('password', $password);
         $_this->setValue('status', $statusField->getElement('default'));
-        $_this->setValue('created', date('Y-m-d H:i:s'));
         $success  = $_this->save();
         $messages = $_this->getMessages();
 
@@ -108,7 +105,6 @@ class Customer extends Model
 
         if ($success) {
             $Mail          = new Mail();
-            $do_send       = true;
             $Mail->Subject = '###simpleshop.email.user_registration_subject###';
             $Mail->setFragmentPath('simpleshop/email/customer/registration.php');
 
@@ -117,15 +113,13 @@ class Customer extends Model
             $Mail->setVar('password', $password);
             $Mail->AddAddress($email);
 
-            $do_send = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.sendRegistrationEmail', $do_send, [
+            \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.sendRegistrationEmail', $do_send, [
                 'Mail'     => $Mail,
                 'User'     => $_this,
                 'password' => $password,
             ]));
 
-            if ($do_send) {
-                $Mail->send();
-            }
+            $Mail->send();
             $result = Customer::get($_this->getId());
         }
         return $result;
