@@ -326,6 +326,17 @@ class Product extends Model
         }
     }
 
+    public function getDiscountPercentage()
+    {
+        $result = 0;
+
+        if ($this->hasReducedPrice()) {
+            $Z      = $this->getValue('price') - $this->getValue('reduced_price');
+            $result = $Z * 100 / $this->getValue('price');
+        }
+        return $result;
+    }
+
     public function generatePath($lang_id, $path = '')
     {
         $_paths   = [];
