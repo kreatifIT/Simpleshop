@@ -40,14 +40,18 @@ var Simpleshop = (function ($) {
         });
     }
 
-    function addLoading($container) {
-        var css = $container.offset(),
-            $loading = $('<div class="pjax-loading"><div class="spinner"><div></div><div></div><div></div></div></div>');
+    function addLoading($container, position) {
+        var $loading = $('<div class="pjax-loading"><div class="spinner"><div></div><div></div><div></div></div></div>');
 
-        css.height = $container.outerHeight();
-        css.width = $container.outerWidth();
-        $('body').append($loading.addClass('show').css(css));
-
+        if (position === 'relative') {
+            $container.append($loading.addClass('show relative'));
+        }
+        else {
+            var css = $container.offset();
+            css.height = $container.outerHeight();
+            css.width = $container.outerWidth();
+            $('body').append($loading.addClass('show').css(css));
+        }
         return $loading;
     }
 
@@ -60,7 +64,7 @@ var Simpleshop = (function ($) {
             var $success = $offcanvasCart.find('.offcanvas-cart-success');
 
             if ($success.length) {
-                window.setTimeout(function() {
+                window.setTimeout(function () {
                     $success.fadeOut();
                 }, 3000);
             }
