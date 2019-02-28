@@ -87,6 +87,9 @@ class Customer extends Model
         }
 
         $statusField = self::getYformFieldByName('status');
+        $exclFields  = array_diff(FragmentConfig::getValue('yform_fields.rex_shop_customer._excludedFields'), ['created', 'updatedate', 'status']);
+
+        FragmentConfig::$data['yform_fields']['rex_shop_customer']['_excludedFields'] = $exclFields;
 
         $_this->setValue('email', $email);
         $_this->setValue('password', $password);
@@ -105,6 +108,7 @@ class Customer extends Model
 
         if ($success) {
             $Mail          = new Mail();
+            $do_send       = true;
             $Mail->Subject = '###simpleshop.email.user_registration_subject###';
             $Mail->setFragmentPath('simpleshop/email/customer/registration.php');
 
@@ -113,13 +117,15 @@ class Customer extends Model
             $Mail->setVar('password', $password);
             $Mail->AddAddress($email);
 
-            \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.sendRegistrationEmail', $do_send, [
+            $do_send = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.sendRegistrationEmail', $do_send, [
                 'Mail'     => $Mail,
                 'User'     => $_this,
                 'password' => $password,
             ]));
 
+            if ($do_send) {
             $Mail->send();
+            }
             $result = Customer::get($_this->getId());
         }
         return $result;
