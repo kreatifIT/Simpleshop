@@ -157,6 +157,8 @@ var Simpleshop = (function ($) {
                 $container.html(resp.message.cart_html);
                 $loading.remove();
                 result.showOffcanvasCart();
+
+                $(document).trigger('simpleshop:addToCart', [$container, resp]);
             });
         },
         removeCartItem: function (_this, vkey, layout, selector) {
@@ -177,6 +179,8 @@ var Simpleshop = (function ($) {
             }).done(function (resp) {
                 $container.html(resp.message.cart_html);
                 $loading.remove();
+
+                $(document).trigger('simpleshop:removeCartItem', [$container, resp]);
             });
         },
         changeCartAmount: function (_this, vkey, _max, selector) {
@@ -228,6 +232,8 @@ var Simpleshop = (function ($) {
                 }).done(function (resp) {
                     $container.html(resp.message.cart_html);
                     $loading.remove();
+
+                    $(document).trigger('simpleshop:changeCartAmount', [$container, resp]);
                 });
             }
         },
