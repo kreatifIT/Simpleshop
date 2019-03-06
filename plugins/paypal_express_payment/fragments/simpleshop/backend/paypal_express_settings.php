@@ -24,25 +24,19 @@ $Settings = $this->getVar('Settings');
     <dl class="rex-form-group form-group">
         <dt>Username:</dt>
         <dd>
-            <label class="form-label">
-                <input type="text" class="form-control" name="username" value="<?= from_array($Settings, 'username') ?>"/>
-            </label>
+            <input type="text" class="form-control" name="username" value="<?= from_array($Settings, 'username') ?>"/>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
         <dt>Password:</dt>
         <dd>
-            <label class="form-label">
-                <input type="password" class="form-control" name="password" value="<?= from_array($Settings, 'password') ?>"/>
-            </label>
+            <input type="password" class="form-control" name="password" value="<?= from_array($Settings, 'password') ?>"/>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
         <dt>Signature:</dt>
         <dd>
-            <label class="form-label">
-                <input type="text" class="form-control" name="signature" value="<?= from_array($Settings, 'signature') ?>"/>
-            </label>
+            <input type="text" class="form-control" name="signature" value="<?= from_array($Settings, 'signature') ?>"/>
         </dd>
     </dl>
 
@@ -51,38 +45,29 @@ $Settings = $this->getVar('Settings');
         <dt>Sandbox:</dt>
         <dd>
             <div class="form-label">
-                <div class="checkbox">
-                    <label class="form-label">
-                        <input type="checkbox" class="form-control" name="api_type" value="sandbox_" <?php if (from_array($Settings, 'api_type') == 'sandbox_') echo 'checked="checked"'; ?>/>
-                        <?= $Addon->i18n('paypal_express.use_sandbox'); ?>
-                        <span></span>
-                    </label>
-                </div>
+                <label class="form-label">
+                    <input type="checkbox" name="api_type" value="sandbox_" <?= from_array($Settings, 'api_type') == 'sandbox_' ? 'checked="checked"' : ''; ?>/>
+                    <?= $Addon->i18n('paypal_express.use_sandbox'); ?>
+                </label>
             </div>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
         <dt>SANDBOX Username:</dt>
         <dd>
-            <label class="form-label">
-                <input type="text" class="form-control" name="sandbox_username" value="<?= from_array($Settings, 'sandbox_username') ?>"/>
-            </label>
+            <input type="text" class="form-control" name="sandbox_username" value="<?= from_array($Settings, 'sandbox_username') ?>"/>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
         <dt>SANDBOX Password:</dt>
         <dd>
-            <label class="form-label">
-                <input type="password" class="form-control" name="sandbox_password" value="<?= from_array($Settings, 'sandbox_password') ?>"/>
-            </label>
+            <input type="password" class="form-control" name="sandbox_password" value="<?= from_array($Settings, 'sandbox_password') ?>"/>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
         <dt>SANDBOX Signature:</dt>
         <dd>
-            <label class="form-label">
-                <input type="text" class="form-control" name="sandbox_signature" value="<?= from_array($Settings, 'sandbox_signature') ?>"/>
-            </label>
+            <input type="text" class="form-control" name="sandbox_signature" value="<?= from_array($Settings, 'sandbox_signature') ?>"/>
         </dd>
     </dl>
 
