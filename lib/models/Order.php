@@ -162,6 +162,9 @@ class Order extends Model
         }
 
         $result = parent::save(true);
+        if (!$result) {
+            throw new OrderException(implode('<br/>', $this->getMessages()));
+        }
 
 
         if ($result && !$simple_save) {
