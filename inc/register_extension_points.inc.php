@@ -29,6 +29,9 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 
 \rex_extension::register('PACKAGES_INCLUDED', function (\rex_extension_point $Ep) {
+    \rex_login::startSession();
+
+
     if (rex_get('action', 'string') == 'logout') {
         Customer::logout();
     }
@@ -36,6 +39,9 @@ namespace FriendsOfREDAXO\Simpleshop;
         \rex_view::setJsProperty('simpleshop', [
             'ajax_url' => \rex_url::frontendController(),
         ]);
+    }
+    if (\rex_addon::get('kreatif-mpdf')->isAvailable()) {
+        Kreatif\Mpdf\Mpdf::addCSSPath($this->getPath('assets/scss/pdf_styles.scss'));
     }
     return $Ep->getSubject();
 });
@@ -77,12 +83,6 @@ namespace FriendsOfREDAXO\Simpleshop;
         }
     }
     return $subject;
-});
-
-\rex_extension::register('PACKAGES_INCLUDED', function () {
-    if (\rex_addon::get('kreatif-mpdf')->isAvailable()) {
-        Kreatif\Mpdf\Mpdf::addCSSPath($this->getPath('assets/scss/pdf_styles.scss'));
-    }
 });
 
 \rex_view::setJsProperty('simpleshop', [
