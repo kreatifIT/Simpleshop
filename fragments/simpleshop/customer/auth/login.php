@@ -33,11 +33,11 @@ if (rex_post('action', 'string') == 'login') {
 
         switch ($referer) {
             case 'account':
-                rex_redirect($Settings['linklist']['dashboard']);
+                rex_redirect($Settings['linklist']['dashboard'], null, ['ts' => time()]);
                 break;
             default:
                 if ($referer == '') {
-                    rex_redirect(\rex_article::getCurrentId(), null, $_GET);
+                    rex_redirect(\rex_article::getCurrentId(), null, array_merge($_GET, ['ts' => time()]));
                 } else if (strlen($referer)) {
                     header('Location: ' . $referer);
                     exit;

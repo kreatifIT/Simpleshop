@@ -14,4 +14,4 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-rex_redirect(null, null, ['action' => 'complete']);
+rex_redirect(null, null, ['action' => 'complete', 'ts' => time()]);

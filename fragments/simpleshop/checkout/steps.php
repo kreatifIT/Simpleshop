@@ -37,14 +37,14 @@ switch ($current_step) {
 <div class="row column margin-top margin-large-bottom">
     <div class="checkout-steps">
         <div class="checkout-step-wrapper">
-            <a href="<?= rex_getUrl(null, null, ['step' => 'invoice_address']) ?>" class="checkout-step <?= $step_number == 1 ? 'active' : '' ?>">
+            <a href="<?= rex_getUrl(null, null, ['step' => 'invoice_address', 'ts' => time()]) ?>" class="checkout-step <?= $step_number == 1 ? 'active' : '' ?>">
                 <span class="checkout-step-number">1</span>
                 <span class="checkout-step-name">###label.invoice_address###</span>
             </a>
         </div>
         <div class="checkout-step-wrapper">
             <a <?php if ($step_number >= 2) {
-                echo 'href="' . rex_getUrl(null, null, ['step' => 'shipping_address']) . '"';
+                echo 'href="' . rex_getUrl(null, null, ['step' => 'shipping_address', 'ts' => time()]) . '"';
             } ?> class="checkout-step <?php if ($step_number == 2) {
                 echo 'active';
             } else if ($step_number < 2) {
@@ -57,7 +57,7 @@ switch ($current_step) {
         <div class="checkout-step-wrapper">
 
             <a <?php if ($step_number >= 3) {
-                echo 'href="' . rex_getUrl(null, null, ['step' => FragmentConfig::$data['checkout']['steps'][2]]) . '"';
+                echo 'href="' . rex_getUrl(null, null, ['step' => FragmentConfig::$data['checkout']['steps'][2], 'ts' => time()]) . '"';
             } ?> class="checkout-step <?php if ($step_number == 3) {
                 echo 'active';
             } else if ($step_number < 3) {
@@ -69,7 +69,7 @@ switch ($current_step) {
         </div>
         <div class="checkout-step-wrapper">
             <a <?php if ($step_number == 4) {
-                echo 'href="' . rex_getUrl(null, null, ['step' => 'show-summary']) . '"';
+                echo 'href="' . rex_getUrl(null, null, ['step' => 'show-summary', 'ts' => time()]) . '"';
             } ?> class="checkout-step <?php if ($step_number == 4) {
                 echo 'active';
             } else if ($step_number < 4) {

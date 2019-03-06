@@ -94,7 +94,7 @@ class CheckoutController extends Controller
             }
         } else {
             // no products - redirect to shopping cart
-            rex_redirect($this->settings['linklist']['cart']);
+            rex_redirect($this->settings['linklist']['cart'], null, ['ts' => time()]);
         }
     }
 
@@ -151,7 +151,7 @@ class CheckoutController extends Controller
         $this->Order->setValue('status', 'CA');
         $this->Order->save();
 
-        rex_redirect($this->settings['linklist']['cart'], null, $_GET);
+        rex_redirect($this->settings['linklist']['cart'], null, array_merge($_GET, ['ts' => time()]));
     }
 
     protected function getShippingAddressView()
@@ -184,7 +184,7 @@ class CheckoutController extends Controller
                 Session::setCheckoutData('Order', $Order);
 
                 CheckoutController::setDoneStep($nextStep);
-                rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
+                rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
             }
         }
 
@@ -213,7 +213,7 @@ class CheckoutController extends Controller
             Session::setCheckoutData('Order', $Order);
 
             CheckoutController::setDoneStep($nextStep);
-            rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
+            rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
         }
         return $yform;
     }
@@ -260,7 +260,7 @@ class CheckoutController extends Controller
 
             if (CheckoutController::$callbackCheck['shipping']) {
                 CheckoutController::setDoneStep($nextStep);
-                rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
+                rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
             }
         } else if (!\rex::isBackend() && $table == CustomerAddress::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
             CheckoutController::$callbackCheck['shipping'] = true;
@@ -272,11 +272,12 @@ class CheckoutController extends Controller
             // NEEDED! to get data
             $Object->getValue('createdate');
             $Order->setValue('invoice_address', $Object);
+            $Order->setValue('customer_id', $Object->getId());
             Session::setCheckoutData('Order', $Order);
 
             if (CheckoutController::$callbackCheck['invoice']) {
                 CheckoutController::setDoneStep($nextStep);
-                rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
+                rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
             }
         }
         return $yform;
@@ -290,7 +291,7 @@ class CheckoutController extends Controller
         if (empty($shippings) && empty($payments)) {
             $nextStep = CheckoutController::getNextStep();
             CheckoutController::setDoneStep($nextStep);
-            rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
+            rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
         } else if (rex_post('action', 'string') == 'set-shipping-payment') {
             try {
                 $this->Order->setValue('shipping', Order::prepareData(Shipping::get(rex_post('shipment', 'string'))));
@@ -306,10 +307,10 @@ class CheckoutController extends Controller
 
             $nextStep = CheckoutController::getNextStep();
             CheckoutController::setDoneStep($nextStep);
-            rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
+            rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
         }
 
-        $this->setVar('currentStep', $currentStep);
+        $this->setVar('currentStep', $this->getCurrentStep());
         $this->setVar('shippings', $shippings);
         $this->setVar('payments', $payments);
         $this->fragment_path[] = 'simpleshop/checkout/shipping_and_payment/wrapper.php';
@@ -326,9 +327,6 @@ class CheckoutController extends Controller
                 try {
                     $code   = rex_post('coupon', 'string');
                     $coupon = Coupon::redeem($code);
-                    $this->setVar('code', $code);
-                    // save coupon to apply it also on page refresh
-                    Session::setCheckoutData('coupon_code', $code);
                 } catch (CouponException $ex) {
                     $warnings[] = ['label' => $ex->getLabelByCode()];
                 }
@@ -339,11 +337,27 @@ class CheckoutController extends Controller
                 $rma_accepted = rex_post('rma_accepted', 'int');
 
                 if ($tos_accepted && $rma_accepted) {
-                    rex_redirect(null, null, ['action' => 'init-payment']);
+                    try {
+                        $this->Order->setValue('status', 'OP');
+                        $this->Order->save(false);
+                        rex_redirect(null, null, ['action' => 'init-payment', 'ts' => time()]);
+                    } catch (OrderException $ex) {
+                        $warnings[] = ['label' => $ex->getMessage()];
+                    }
                 } else {
                     $warnings[] = ['label' => '###simpleshop.error.tos_rma_not_accepted###'];
                 }
                 break;
+        }
+
+        $coupon_code = Session::getCheckoutData('coupon_code');
+
+        if ($coupon_code != '') {
+            try {
+                Coupon::redeem($coupon_code);
+            } catch (CouponException $ex) {
+                $warnings[] = ['label' => $ex->getLabelByCode()];
+            }
         }
 
         try {
@@ -364,6 +378,7 @@ class CheckoutController extends Controller
         $this->fragment_path[] = 'simpleshop/checkout/summary/wrapper.php';
         $this->setVar('errors', $errors);
         $this->setVar('warnings', $warnings);
+        $this->setVar('coupon_code', $coupon_code);
         $this->setVar('cart_url', rex_getUrl($this->settings['linklist']['cart']));
     }
 

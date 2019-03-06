@@ -46,7 +46,7 @@ class Customer extends Model
 
             if (!$result) {
                 self::logout();
-                rex_redirect(\rex_article::getCurrentId());
+                rex_redirect(\rex_article::getCurrentId(), null, ['ts' => time()]);
             }
         }
         return $result;

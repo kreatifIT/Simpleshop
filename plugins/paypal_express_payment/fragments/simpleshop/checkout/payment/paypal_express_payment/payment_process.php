@@ -27,7 +27,7 @@ $payer_id = rex_get('PayerID', 'string');
 try
 {
     $Payment->processPayment($token, $payer_id, $Order->getValue('total'));
-    rex_redirect(null, null, ['action' => 'complete']);
+    rex_redirect(null, null, ['action' => 'complete', 'ts' => time()]);
 }
 catch (PaypalException $ex)
 {
