@@ -1,3 +1,9 @@
 package: simpleshop/default_shipping
 version: '1.0'
 author: FriendsOfREDAXO
+
+page:
+    title: Shipping
+    perm: shop[default_shipping]
+    subpages:
+        settings: { title: translate:settings, hidden: true }

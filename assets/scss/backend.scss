@@ -172,3 +172,25 @@ table.table {
         }
     }
 }
+
+.settings-table {
+    tr.offline {
+        opacity: 0.7;
+        background-color: #eee;
+    }
+
+    .formbe_table {
+        margin: 0 !important;
+
+        & > label {
+            display: none;
+        }
+        table {
+            margin: 0;
+
+        }
+        input {
+            background-color: #fff;
+        }
+    }
+}

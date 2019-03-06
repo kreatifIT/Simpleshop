@@ -15,6 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Sprog\Wildcard;
 
+
 class DefaultShipping extends ShippingAbstract
 {
     const NAME = 'simpleshop.shipping_default';
@@ -32,11 +33,24 @@ class DefaultShipping extends ShippingAbstract
     protected function calculatePrice($Order)
     {
         if ($this->price == 0) {
-            $Address = $Order->getShippingAddress();
-            $Country = $Address ? Country::get($Address->getValue('country')) : null;
+            $Address  = $Order->getShippingAddress();
+            $Country  = $Address ? Country::get($Address->getValue('country')) : null;
+            $Settings = \rex::getConfig('simpleshop.DefaultShipping.Settings');
 
-            if ($Country && $Country->valueIsset('shipping_costs')) {
-                $this->price = $Country->getValue('shipping_costs');
+
+            if ($Country && isset($Settings['costs'][$Country->getId()])) {
+                $total = Session::getTotal();
+                $cost  = 0;
+
+                foreach ($Settings['costs'][$Country->getId()] as $value => $_cost) {
+                    if ($total >= $value) {
+                        $cost = $_cost;
+                        break;
+                    }
+                }
+                $this->price = (float)$cost;
+            } else {
+                $this->price = (float)($Settings['general_costs'] ?: 0);
             }
         }
     }
