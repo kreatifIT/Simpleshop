@@ -60,8 +60,6 @@ class Session extends Model
     public static function getSession()
     {
         if (self::$session === null) {
-            \rex_login::startSession();
-
             $session_id    = session_id();
             $User          = Customer::getCurrentUser();
             $session       = parent::query()
@@ -243,6 +241,22 @@ class Session extends Model
         return $total;
     }
 
+    public static function getGrossTotals()
+    {
+        $totals   = [];
+        $products = self::_getCartItems();
+
+        foreach ($products as $product) {
+            $tax = Tax::get($product->getValue('tax'))
+                ->getValue('tax');
+
+            $cart_quantity = $product->getValue('cart_quantity');
+            $price         = $product->getPrice(false);
+            $totals[$tax]  += ($cart_quantity * $price);
+        }
+        return $totals;
+    }
+
     public static function addProduct($product_key, $quantity = 1, $extras = [])
     {
         $cart_items = self::_getCartItems(true, false);
@@ -272,6 +286,7 @@ class Session extends Model
     {
         $session = self::getSession();
         $session->writeSession(['cart_items' => []]);
+        self::setCheckoutData('coupon_code', null);
     }
 
     public static function clearCheckout()

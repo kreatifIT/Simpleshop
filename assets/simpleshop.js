@@ -237,6 +237,39 @@ var Simpleshop = (function ($) {
                 });
             }
         },
+        applyCoupon: function (_this, selector, container, event) {
+            var $this = $(_this),
+                $container = $(container),
+                chunks = selector.split('|'),
+                $loading = addLoading($container),
+                $input = $(_this).parents(chunks[0]).find(chunks[1]),
+                code = $input.val(),
+                url = $input.data('link');
+
+            if (typeof KreatifPjax == 'undefined') {
+                alert('KreatifPjax is not defined - Gruntfile?');
+                return false;
+            }
+            else if ($container.length == 0) {
+                alert('Load-More container "' + container + '" is not set!');
+                return false;
+            }
+            else if (url == '' || typeof url == 'undefined') {
+                alert('PJax url is not defined!');
+                return false;
+            }
+
+            KreatifPjax.submit(event, {
+                url: url + '?action=redeem_coupon&coupon_code=' + code,
+                push: false,
+                noLoading: true,
+                fragment: container,
+                container: container
+            }, function (event, xhr, options) {
+                $loading.remove();
+                $(document).trigger('simpleshop:loadMoreDone');
+            });
+        },
         loadMore: function (_this, container, fragment, event) {
             var $this = $(_this),
                 $fragment = $(fragment),
@@ -258,6 +291,7 @@ var Simpleshop = (function ($) {
 
             KreatifPjax.submit(event, {
                 url: $this.attr('href'),
+                noLoading: true,
                 fragment: fragment,
                 container: container
             }, function (event, xhr, options) {

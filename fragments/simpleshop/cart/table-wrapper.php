@@ -13,9 +13,17 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $products = $this->getVar('products', []);
+$discount = $this->getVar('discount', 0);
+$totals   = $this->getVar('totals', []);
 $config   = $this->getVar('cart_table_wrapper_config', FragmentConfig::getValue('cart.table-wrapper'));
+
+$tax      = 0;
 $styles   = FragmentConfig::getValue('styles');
 $settings = \rex::getConfig('simpleshop.Settings');
+
+foreach ($totals as $_tax => $total) {
+    $tax += $total * ($_tax / 100);
+}
 
 ?>
 <table class="cart <?= $config['class'] ?>" data-cart-item-container <?= $styles['table'] ?>>
@@ -32,6 +40,63 @@ $settings = \rex::getConfig('simpleshop.Settings');
     </tbody>
 </table>
 
+<?php if ($config['has_coupon']): ?>
+    <?php
+    $coupon_code = Session::getCheckoutData('coupon_code');
+    $Coupon      = Coupon::getByCode($coupon_code);
+    ?>
+    <div class="cart-coupon">
+        <div class="coupon-input-container">
+            <input type="text" class="coupon-input" placeholder="###label.insert_coupon###" data-link="<?= rex_getUrl() ?>" value="<?= $coupon_code ?>">
+            <button class="button coupon-submit" type="submit" onclick="Simpleshop.applyCoupon(this, '.cart-coupon|.coupon-input', '.cart-container');">
+                <span>###label.use_coupon###</span>
+                <i class="fal fa-chevron-circle-right"></i>
+            </button>
+        </div>
+
+        <?php if ($Coupon): ?>
+            <div class="label success">
+                "<strong><?= $Coupon->getName() ?></strong>"
+                ###label.applied###
+            </div>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
+
+<div class="cart-sum">
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <span>###simpleshop.brutto_total###</span>
+                <?php if ($discount > 0): ?>
+                    <span>###label.discount###</span>
+                <?php endif; ?>
+                <span>###label.tax###</span>
+            </td>
+            <td>
+                <span><?= format_price(array_sum($totals) + $discount) ?> &euro;</span>
+
+                <?php if ($discount > 0): ?>
+                    <span>-<?= format_price($discount) ?> &euro;</span>
+                <?php endif; ?>
+
+                <span>+<?= format_price($tax) ?> &euro;</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span>###simpleshop.total_sum###</span>
+            </td>
+            <td>
+                <span><?= format_price(array_sum($totals) + $tax) ?> &euro;</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
 <?php if ($config['has_go_ahead'] || strlen($config['back_url'])): ?>
     <div class="cart-buttons clearfix">
         <?php if (strlen($config['back_url'])): ?>
@@ -41,7 +106,7 @@ $settings = \rex::getConfig('simpleshop.Settings');
         <?php endif; ?>
 
         <?php if ($config['has_go_ahead']): ?>
-            <a href="<?= rex_getUrl($settings['linklist']['checkout']) ?>" class="cart-button-proceed button <?= $config['btn_ahead_class'] ?>">
+            <a href="<?= rex_getUrl($settings['linklist']['checkout'], null, ['ts' => time()]) ?>" class="cart-button-proceed button <?= $config['btn_ahead_class'] ?>">
                 ###action.proceed_to_checkout###
             </a>
         <?php endif; ?>

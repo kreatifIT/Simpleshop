@@ -25,21 +25,46 @@ class CartController extends Controller
             'products'   => null,
         ], $this->params);
 
-        $errors = [];
+        $errors     = [];
+        $totals     = [];
+        $discount   = 0;
+        $postAction = rex_request('action', 'string');
 
         try {
             if ($this->params['products'] === null) {
                 $this->products = Session::getCartItems(false, $this->params['check_cart']);
-            }
-            else {
+            } else {
                 $this->products = $this->params['products'];
             }
-        }
-        catch (CartException $ex) {
+        } catch (CartException $ex) {
             if ($ex->getCode() == 1) {
                 $errors = Session::$errors;
             }
             $this->products = Session::getCartItems();
+        }
+
+        switch ($postAction) {
+            case 'redeem_coupon':
+                $coupon_code = trim(rex_get('coupon_code', 'string'));
+
+                Session::setCheckoutData('coupon_code', $coupon_code);
+                break;
+        }
+
+        $totals      = Session::getGrossTotals();
+        $coupon_code = Session::getCheckoutData('coupon_code');
+        $Coupon      = $coupon_code != '' ? Coupon::getByCode($coupon_code) : null;
+
+        if ($Coupon) {
+            try {
+                $discount = $Coupon->applyToCart($totals);
+            } catch (CouponException $ex) {
+                Session::setCheckoutData('coupon_code', null);
+                $errors[] = ['label' => $ex->getLabelByCode()];
+            }
+        } else if ($coupon_code != '') {
+            Session::setCheckoutData('coupon_code', null);
+            $errors[] = ['label' => '###simpleshop.error.coupon_not_exists###'];
         }
 
         if (count($errors)) {
@@ -52,9 +77,10 @@ class CartController extends Controller
 
         if (count($this->products)) {
             $this->setVar('products', $this->products);
+            $this->setVar('totals', $totals);
+            $this->setVar('discount', $discount);
             $this->fragment_path[] = 'simpleshop/cart/table-wrapper.php';
-        }
-        else {
+        } else {
             $this->fragment_path[] = 'simpleshop/cart/empty.php';
         }
     }

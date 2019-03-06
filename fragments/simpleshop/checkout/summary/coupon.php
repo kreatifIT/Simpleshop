@@ -13,7 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$code = $this->getVar('code');
+$code = $this->getVar('coupon_code');
 
 ?>
 <div class="coupon row column margin-bottom">

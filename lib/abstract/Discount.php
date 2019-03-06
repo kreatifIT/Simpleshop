@@ -25,22 +25,36 @@ abstract class Discount extends Model
             $discount = $discount - $this->applyToNetPrices($discount, $brut_prices);
 
             $this->setValue('value', $discount);
-        }
-        else {
+        } else {
             if ($this->getValue('free_shipping')) {
                 $Order->setValue('shipping_costs', 0);
                 $discount = 0;
-            }
-            elseif ($this->getValue('discount_value') > 0) {
+            } else if ($this->getValue('discount_value') > 0) {
                 $discount = $this->getValue('discount_value');
-            }
-            elseif ($this->getValue('discount_percent') > 0) {
+            } else if ($this->getValue('discount_percent') > 0) {
                 $discount = array_sum($brut_prices) / 100 * $this->getValue('discount_percent');
             }
             $discount = $discount - $this->applyToGrossPrices($discount, $brut_prices);
 
             $this->setValue('value', $discount);
         }
+        return $discount;
+    }
+
+    public function applyToCart(&$brut_prices)
+    {
+        if ($this->getValue('free_shipping')) {
+            // nothing to do?
+            $discount = 0;
+        } else if ($this->getValue('discount_value') > 0) {
+            $discount = $this->getValue('discount_value');
+        } else if ($this->getValue('discount_percent') > 0) {
+            $discount = array_sum($brut_prices) / 100 * $this->getValue('discount_percent');
+        }
+        $discount = $discount - $this->applyToGrossPrices($discount, $brut_prices);
+
+        $this->setValue('value', $discount);
+
         return $discount;
     }
 
@@ -82,8 +96,7 @@ abstract class Discount extends Model
         if ($price < $diff) {
             $diff  = $diff - $price;
             $price = 0;
-        }
-        else {
+        } else {
             $price -= $diff;
             $diff  = 0;
         }

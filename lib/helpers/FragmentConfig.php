@@ -35,6 +35,7 @@ class FragmentConfig
         'cart'     => [
             'has_remove_button' => true,
             'has_image'         => true,
+            'has_coupons'       => true,
             'button'            => [
                 'has_quantity_control'   => true,
                 'has_quantity'           => true,
@@ -167,8 +168,7 @@ class FragmentConfig
                     $key = 'email_styles';
                 }
                 $result = $result[$key];
-            }
-            else {
+            } else {
                 $result = $default;
                 break;
             }
