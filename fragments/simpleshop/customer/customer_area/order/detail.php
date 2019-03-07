@@ -16,10 +16,6 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 $Order = $this->getVar('Order');
 $order_id = $Order->getValue('id');
-$SAdress = $Order->getShippingAddress();
-$IAdress = $Order->getInvoiceAddress();
-$shipping = $Order->getValue('shipping');
-$payment = $Order->getValue('payment');
 $Config = FragmentConfig::getValue('checkout');
 
 $products  = [];
