@@ -17,13 +17,11 @@ $discount = $this->getVar('discount', 0);
 $totals   = $this->getVar('totals', []);
 $config   = $this->getVar('cart_table_wrapper_config', FragmentConfig::getValue('cart.table-wrapper'));
 
-$tax      = 0;
-$styles   = FragmentConfig::getValue('styles');
-$settings = \rex::getConfig('simpleshop.Settings');
-
-foreach ($totals as $_tax => $total) {
-    $tax += $total * ($_tax / 100);
-}
+$tax         = 0;
+$coupon_code = Session::getCheckoutData('coupon_code');
+$styles      = FragmentConfig::getValue('styles');
+$settings    = \rex::getConfig('simpleshop.Settings');
+$Coupon      = Coupon::getByCode($coupon_code);
 
 ?>
 <table class="cart <?= $config['class'] ?>" data-cart-item-container <?= $styles['table'] ?>>
@@ -40,11 +38,7 @@ foreach ($totals as $_tax => $total) {
     </tbody>
 </table>
 
-<?php if ($config['has_coupon']): ?>
-    <?php
-    $coupon_code = Session::getCheckoutData('coupon_code');
-    $Coupon      = Coupon::getByCode($coupon_code);
-    ?>
+<?php if (!$config['hide_summary']): ?>
     <div class="cart-coupon">
         <div class="coupon-input-container">
             <input type="text" class="coupon-input" placeholder="###label.insert_coupon###" data-link="<?= rex_getUrl() ?>" value="<?= $coupon_code ?>">
@@ -61,41 +55,46 @@ foreach ($totals as $_tax => $total) {
             </div>
         <?php endif; ?>
     </div>
+
+    <div class="cart-sum">
+        <table>
+            <tbody>
+
+            <tr>
+                <td>
+                    <span>###simpleshop.brutto_total###</span>
+                    <?php if ($discount > 0): ?>
+                        <span>###label.discount###</span>
+                    <?php endif; ?>
+                    <span>###label.tax###</span>
+                </td>
+                <td>
+                    <span><?= format_price(array_sum($totals) + $discount) ?> &euro;</span>
+                    <?php if ($discount > 0): ?>
+                        <span>-<?= format_price($discount) ?> &euro;</span>
+                    <?php endif; ?>
+                    <span>
+                            <?php
+                            foreach ($totals as $_tax => $total) {
+                                $tax += $total * ($_tax / 100);
+                            }
+                            ?>
+                        +<?= format_price($tax) ?> &euro;
+                        </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span>###simpleshop.total_sum###</span>
+                </td>
+                <td>
+                    <span><?= format_price(array_sum($totals) + $tax) ?> &euro;</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 <?php endif; ?>
-
-<div class="cart-sum">
-    <table>
-        <tbody>
-        <tr>
-            <td>
-                <span>###simpleshop.brutto_total###</span>
-                <?php if ($discount > 0): ?>
-                    <span>###label.discount###</span>
-                <?php endif; ?>
-                <span>###label.tax###</span>
-            </td>
-            <td>
-                <span><?= format_price(array_sum($totals) + $discount) ?> &euro;</span>
-
-                <?php if ($discount > 0): ?>
-                    <span>-<?= format_price($discount) ?> &euro;</span>
-                <?php endif; ?>
-
-                <span>+<?= format_price($tax) ?> &euro;</span>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <span>###simpleshop.total_sum###</span>
-            </td>
-            <td>
-                <span><?= format_price(array_sum($totals) + $tax) ?> &euro;</span>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-
 
 <?php if ($config['has_go_ahead'] || strlen($config['back_url'])): ?>
     <div class="cart-buttons clearfix">
@@ -106,7 +105,7 @@ foreach ($totals as $_tax => $total) {
         <?php endif; ?>
 
         <?php if ($config['has_go_ahead']): ?>
-            <a href="<?= rex_getUrl($settings['linklist']['checkout'], null, ['ts' => time()]) ?>" class="cart-button-proceed button <?= $config['btn_ahead_class'] ?>">
+            <a href="<?= rex_getUrl($settings['linklist']['checkout'], null, ['ts' => time()]) ?>" class="cart-button-proceed button">
                 ###action.proceed_to_checkout###
             </a>
         <?php endif; ?>

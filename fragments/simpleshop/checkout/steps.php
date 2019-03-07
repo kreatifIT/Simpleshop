@@ -23,8 +23,8 @@ switch ($current_step) {
     case 'shipping_address' :
         $step_number = 2;
         break;
-    case 'shipping' :
     case 'payment' :
+    case 'shipping' :
     case 'shipping||payment' :
         $step_number = 3;
         break;
@@ -34,7 +34,7 @@ switch ($current_step) {
 }
 
 ?>
-<div class="row column margin-top margin-large-bottom">
+<div class="margin-top margin-bottom">
     <div class="checkout-steps">
         <div class="checkout-step-wrapper">
             <a href="<?= rex_getUrl(null, null, ['step' => 'invoice_address', 'ts' => time()]) ?>" class="checkout-step <?= $step_number == 1 ? 'active' : '' ?>">

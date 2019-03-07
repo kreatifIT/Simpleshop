@@ -19,7 +19,7 @@ $shipping_addr = $Order->getShippingAddress();
 ?>
 <!-- Adressen -->
 <div class="address-panels">
-    <div class="row medium-up-2 ">
+    <div class="grid-x grid-margin-x medium-up-2">
         <?php
         if ($invoice_addr) {
             $this->setVar('address', $invoice_addr);

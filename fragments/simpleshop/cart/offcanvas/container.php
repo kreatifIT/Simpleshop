@@ -25,7 +25,7 @@ if (count($products) == 0):
 else: ?>
     <?php if ($product_added): ?>
         <div class="offcanvas-cart-success">
-            <span class="check">✔</span>
+            <span class="check"><i class="far fa-check"></i></span>
             <span class="description">###simpleshop.add_to_cart_success###</span>
         </div>
     <?php endif; ?>
@@ -45,7 +45,7 @@ else: ?>
         </div>
 
         <div class="offcanvas-cart-buttons">
-            <a href="<?= rex_getUrl($Settings['linklist']['cart']) ?>" class="button secondary expanded margin-small-bottom">###action.proceed_to_checkout###</a>
+            <a href="<?= rex_getUrl($Settings['linklist']['cart']) ?>" class="button expanded margin-small-bottom">###action.proceed_to_checkout###</a>
         </div>
     </div>
 <?php endif; ?>

@@ -17,14 +17,12 @@ $payment   = $this->getVar('payment');
 $is_active = is_object($payment) && $payment->getPluginName() == $self->getPluginName();
 
 ?>
-<div class="column grid-item">
-    <div class="checkout-radio-panel <?= $is_active ? 'selected' : '' ?>">
-        <div class="custom-radio">
-            <label>
-                <?= $self->getName() ?>
-                <input type="radio" name="payment" value="<?= $self->getPluginName() ?>" <?= $is_active ? 'checked="checked"' : '' ?>/>
-                <span class="radio"></span>
-            </label>
-        </div>
+<div class="checkout-radio-panel <?= $is_active ? 'selected' : '' ?>">
+    <div class="custom-radio">
+        <label>
+            <?= $self->getName() ?>
+            <input type="radio" name="payment" value="<?= $self->getPluginName() ?>" <?= $is_active ? 'checked="checked"' : '' ?>/>
+            <span class="radio"></span>
+        </label>
     </div>
 </div>

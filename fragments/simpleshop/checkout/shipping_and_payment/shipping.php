@@ -27,11 +27,14 @@ $this->setVar('shipping', $shipping ?: $shippings[0]);
         <h2 class="heading medium">###label.shipping_method###</h2>
     </div>
 
-    <div class="row medium-up-2">
+    <div class="grid-x medium-up-<?= count($shippings) ?> grid-margin-x grid-margin-y">
         <?php
         foreach ($shippings as $index => $shipping) {
             $this->setVar('self', $shipping);
+
+            echo '<div class="cell">';
             $this->subfragment("simpleshop/checkout/shipping/{$shipping->getPluginName()}/item.php");
+            echo '</div>';
         }
         ?>
     </div>

@@ -19,7 +19,7 @@ $Customer = $this->getVar('customer');
 $Country  = $address->valueIsset('country') ? Country::get($address->getValue('country')) : null;
 
 ?>
-<div class="column margin-bottom">
+<div class="cell margin-bottom">
     <div class="address">
         <?php if (strlen($title)): ?>
         <h4 class="heading small"><?= $title ?></h4>

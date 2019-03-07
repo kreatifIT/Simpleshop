@@ -14,6 +14,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Kreatif\Resource;
 
+
 $product      = $this->getVar('product');
 $useTaxPrices = $this->getVar('use_tax_prices', true);
 
@@ -30,8 +31,8 @@ $discount    = $product->getValue('discount');
 
 $Category = $product->valueIsset('category_id') ? Category::get($product->getValue('category_id')) : null;
 
-$config         = $this->getVar('cart_config', FragmentConfig::getValue('cart'));
-$styles         = FragmentConfig::getValue('styles');
+$config = $this->getVar('cart_config', FragmentConfig::getValue('cart'));
+$styles = FragmentConfig::getValue('styles');
 
 if ($is_giftcard) {
     $config['has_quantity_control'] = false;
@@ -39,6 +40,13 @@ if ($is_giftcard) {
 
 ?>
 <tr class="cart-item" <?= $styles['prod-tr'] ?> data-cart-item>
+    <?php if ($config['has_remove_button']): ?>
+        <td class="cart-item-remove-wrapper">
+            <button class="cart-item-remove" type="button" onclick="Simpleshop.removeCartItem(this, '<?= $key ?>')">
+                <i class="fal fa-trash-alt"></i>
+            </button>
+        </td>
+    <?php endif; ?>
     <?php if ($config['has_image']): ?>
         <td class="cart-item-image-wrapper" <?= $styles['prod-td'] ?>>
             <a href="<?= $product_url ?>" class="cart-item-image">
@@ -66,6 +74,13 @@ if ($is_giftcard) {
             <?php endforeach; ?>
         <?php endif; ?>
     </td>
+    <td class="cart-item-price-wrapper" <?= $styles['prod-td'] ?>>
+        <span class="label-mobile"><?= $useTaxPrices ? '###simpleshop.single_price###' : '###simpleshop.single_price_no_vat###' ?>:</span>
+        <strong>&euro;&nbsp;<?= format_price($price) ?></strong>
+        <?php if ($discount): ?>
+            <div class="product-discount"><?= $discount->getName() ?></div>
+        <?php endif; ?>
+    </td>
     <td class="cart-item-amount-wrapper" <?= $styles['prod-td'] ?>>
         <?php
         $fragment = new \rex_fragment();
@@ -76,18 +91,8 @@ if ($is_giftcard) {
         echo $fragment->parse('simpleshop/cart/button.php');
         ?>
     </td>
-    <td class="cart-item-price-wrapper" <?= $styles['prod-td'] ?>>
-        <strong>&euro;&nbsp;<?= format_price($price) ?></strong>
-        <?php if ($discount): ?>
-            <div class="product-discount"><?= $discount->getName() ?></div>
-        <?php endif; ?>
-    </td>
     <td class="cart-item-total-wrapper" <?= $styles['prod-td'] ?>>
+        <span class="label-mobile">###label.total###:</span>
         <strong>&euro;&nbsp;<?= format_price($price * $quantity) ?></strong>
     </td>
-    <?php if ($config['has_remove_button']): ?>
-        <td class="cart-item-remove-wrapper">
-            <button class="cart-item-remove" type="button" onclick="Simpleshop.removeCartItem(this, '<?= $key ?>')"></button>
-        </td>
-    <?php endif; ?>
 </tr>

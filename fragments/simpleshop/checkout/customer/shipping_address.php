@@ -21,31 +21,31 @@ $back_url     = $this->getVar('back_url');
 
 ?>
 <div class="addresses-grid margin-top margin-large-bottom">
-    <div class="row column">
-        <h2>###label.shipping_address###</h2>
 
-        <form method="POST" action="" class="shipping-form">
-            <div class="address-toggle row column margin-top margin-large-bottom">
-                <div class="custom-checkbox">
-                    <label class="custom-checkbox">
-                        <input type="checkbox" name="shipping_address_is_idem" value="1" <?= $useShAddress ? '' : 'checked="checked"' ?> onchange="Simpleshop.toggleShipping(this, '.shipping-form|.address-wrapper')"/>
-                        ###simpleshop.shipping_address_is_idem###
-                        <span class="checkbox"></span>
-                    </label>
-                </div>
-            </div>
-            <div class="address-wrapper <?= $useShAddress ? '' : 'hide' ?>">
-                <?php
-                $this->setVar('only_fields', true);
-                $this->setVar('show_save_btn', false);
-                $this->subfragment('simpleshop/customer/customer_area/address_form.php');
-                ?>
-            </div>
+    <h2 class="heading large">###label.shipping_address###</h2>
 
-            <div class="row column margin-top">
-                <a href="<?= $back_url ?>" class="button">###action.go_back###</a>
-                <button type="submit" class="button secondary float-right">###action.go_ahead###</button>
+    <form method="POST" action="" class="shipping-form">
+        <div class="address-toggle margin-top margin-large-bottom">
+            <div class="custom-checkbox">
+                <label class="custom-checkbox">
+                    <input type="checkbox" name="shipping_address_is_idem" value="1" <?= $useShAddress ? '' : 'checked="checked"' ?>
+                           onchange="Simpleshop.toggleShipping(this, '.shipping-form|.address-wrapper')"/>
+                    ###simpleshop.shipping_address_is_idem###
+                    <span class="checkbox"></span>
+                </label>
             </div>
-        </form>
-    </div>
+        </div>
+        <div class="address-wrapper <?= $useShAddress ? '' : 'hide' ?>">
+            <?php
+            $this->setVar('only_fields', true);
+            $this->setVar('show_save_btn', false);
+            $this->subfragment('simpleshop/customer/customer_area/address_form.php');
+            ?>
+        </div>
+
+        <div class="margin-top">
+            <a href="<?= $back_url ?>" class="button hollow">###action.go_back###</a>
+            <button type="submit" class="button float-right">###action.go_ahead###</button>
+        </div>
+    </form>
 </div>

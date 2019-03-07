@@ -23,7 +23,7 @@ $tpl = count($Controller->getProducts()) ? 'simpleshop/cart/offcanvas/container.
     <div class="offcanvas-cart-inner">
 
         <button class="offcanvas-cart-continue-shopping" type="button" onclick="Simpleshop.closeOffcanvasCart();">
-            <?= file_get_contents(\rex_path::addonAssets('simpleshop', 'img/back.svg')); ?>
+            <i class="far fa-chevron-left"></i>
             ###label.continue_shopping###
         </button>
 

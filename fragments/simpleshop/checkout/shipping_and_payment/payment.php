@@ -27,11 +27,14 @@ $this->setVar('payment', $payment ?: $payments[0]);
         <h2 class="heading medium">###label.payment_method###</h2>
     </div>
 
-    <div class="row medium-up-2">
+    <div class="grid-x medium-up-<?= count($payments) ?> grid-margin-x grid-margin-y">
         <?php
         foreach ($payments as $index => $payment) {
             $this->setVar('self', $payment);
+
+            echo '<div class="cell">';
             $this->subfragment("simpleshop/checkout/payment/{$payment->getPluginName()}/item.php");
+            echo '</div>';
         }
         ?>
     </div>

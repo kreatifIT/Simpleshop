@@ -15,16 +15,15 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Kreatif\Resource;
 
+
 $products = $this->getVar('products', []);
 
 ?>
-
 <?php foreach ($products as $product) : ?>
 
     <?php
 
-    $images      = $product->getArrayValue('images');
-    $picture     = array_shift($images);
+    $picture     = $product->getValue('images');
     $price       = $product->getPrice();
     $quantity    = $product->getValue('cart_quantity');
     $product_url = $product->getUrl();
@@ -37,12 +36,16 @@ $products = $this->getVar('products', []);
             <?= Resource::getImgTag($picture, 'product_gallery_thumb') ?>
         </a>
         <div class="description">
-            <?php if ($quantity) : ?>
-                <span class="quantity"><?= $quantity ?> x </span>
-            <?php endif; ?>
             <span class="name"><?= $product->getName() ?></span>
-            <span class="price">&euro;&nbsp;<?= format_price($price) ?></span>
+            <div class="price-container">
+                <?php if ($quantity) : ?>
+                    <span class="quantity"><?= $quantity ?> x </span>
+                <?php endif; ?>
+                <span class="price">&euro;&nbsp;<?= format_price($price) ?></span>
+            </div>
         </div>
-        <div class="remove" onclick="Simpleshop.removeCartItem(this, '<?= $key ?>', 'offcanvas_cart')"></div>
+        <div class="remove" onclick="Simpleshop.removeCartItem(this, '<?= $key ?>', 'offcanvas_cart')">
+            <i class="fal fa-times"></i>
+        </div>
     </div>
 <?php endforeach; ?>
