@@ -14,13 +14,13 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-$Order    = $this->getVar('Order');
+$Order = $this->getVar('Order');
 $order_id = $Order->getValue('id');
-$SAdress  = $Order->getShippingAddress();
-$IAdress  = $Order->getInvoiceAddress();
+$SAdress = $Order->getShippingAddress();
+$IAdress = $Order->getInvoiceAddress();
 $shipping = $Order->getValue('shipping');
-$payment  = $Order->getValue('payment');
-$Config   = FragmentConfig::getValue('checkout');
+$payment = $Order->getValue('payment');
+$Config = FragmentConfig::getValue('checkout');
 
 $products  = [];
 $_products = OrderProduct::query()
@@ -38,15 +38,16 @@ foreach ($_products as $product) {
 
 ?>
 
-<div class="row">
-    <div class="column order-title margin-bottom">
-        <h1>###simpleshop.order_num### <?= $order_id ?></h1>
+    <div class="row">
+        <div class="column order-title margin-bottom">
+            <h1>###simpleshop.order_num### <?= $order_id ?></h1>
+        </div>
     </div>
-</div>
 
-<?php
+    <?php
 
-$Config['has_coupons'] = false;
+$Config['has_coupons']        = false;
+$Config['has_summary_footer'] = false;
 
 $fragment = new \rex_fragment();
 $fragment->setVar('Order', $Order);

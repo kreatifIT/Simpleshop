@@ -69,14 +69,15 @@ class FragmentConfig
             ],
         ],
         'checkout' => [
-            'has_coupons' => true,
-            'steps'       => [
+            'has_coupons'        => true,
+            'has_summary_footer' => true,
+            'steps'              => [
                 'invoice_address',
                 'shipping_address',
                 'shipping||payment',
                 'show-summary',
             ],
-            'email'       => [
+            'email'              => [
                 'is_order_complete'         => true,
                 'has_image'                 => false,
                 'has_remove_button'         => false,
