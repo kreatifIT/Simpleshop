@@ -124,7 +124,7 @@ class Coupon extends Discount
         $total  = $Order->getValue('initial_total');
 
         foreach ($orders as $order_id => $order_discount) {
-            $value -= $order_discount;
+            $value -= (float)$order_discount;
         }
         $orders[$Order->getValue('id')] = $total < $value ? $total : $value;
 
