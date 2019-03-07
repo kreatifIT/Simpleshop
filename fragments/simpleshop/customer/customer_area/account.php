@@ -18,10 +18,8 @@ $text  = $this->getVar('text');
 
 ?>
 <div class="member-area--address">
-    <div class="row column">
-        <h2 class="<?= strlen($text) ? 'margin-bottom' : '' ?>"><?= $title ?></h2>
-        <?= strlen($text) ? $text : '' ?>
-    </div>
+    <h2 class="<?= strlen($text) ? 'margin-bottom' : '' ?>"><?= $title ?></h2>
+    <?= strlen($text) ? $text : '' ?>
 
     <?php
     $fragment = new \rex_fragment();

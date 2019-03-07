@@ -14,17 +14,29 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 
 $User   = $this->getVar('User');
-$action = rex_get('action', 'string');
+$method = $this->getVar('method');
 
-$stmt = Order::query()
-    ->where('customer_id', $User->getId());
+if ($method == 'detail') {
+    $content  = 'detail.php';
+    $order_id = rex_get('order_id', 'int');
+    $Order    = $order_id > 0 ? Order::get($order_id) : null;
 
-$collection = $stmt->find();
+    if (!$Order || $Order->getValue('customer_id') != $User->getId()) {
+        $this->subfragment('simpleshop/customer/auth/no_permission.php');
+        return;
+    }
+    $this->setVar('Order', $Order);
+} else {
+    $content    = 'history_list.php';
+    $collection = Order::query()
+        ->where('customer_id', $User->getId())
+        ->find();
 
-$this->setVar('orders', $collection);
+    $this->setVar('orders', $collection);
+}
 
 ?>
 <div class="member-area--history">
     <?php $this->subfragment('simpleshop/customer/customer_area/title.php') ?>
-    <?php $this->subfragment('simpleshop/customer/customer_area/order/history_list.php') ?>
+    <?php $this->subfragment('simpleshop/customer/customer_area/order/' . $content) ?>
 </div>

@@ -26,7 +26,6 @@ class CartController extends Controller
         ], $this->params);
 
         $errors     = [];
-        $totals     = [];
         $discount   = 0;
         $postAction = rex_request('action', 'string');
 

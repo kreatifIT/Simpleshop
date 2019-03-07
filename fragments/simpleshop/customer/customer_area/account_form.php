@@ -37,7 +37,7 @@ $form->setObjectparams('getdata', true);
 $form->setObjectparams('debug', false);
 $form->setObjectparams('form_anchor', '-' . $sid);
 $form->setObjectparams('form_name', $sid);
-$form->setObjectparams('form_class', 'row');
+$form->setObjectparams('form_class', 'grid-x grid-margin-x');
 $form->setObjectparams('form_action', '');
 $form->setObjectparams('only_fields', $only_fields);
 

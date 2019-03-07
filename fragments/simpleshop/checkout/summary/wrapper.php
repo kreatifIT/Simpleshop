@@ -10,11 +10,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace FriendsOfREDAXO\Simpleshop;
 
 
 $Settings   = \rex::getConfig('simpleshop.Settings');
-$Config     = FragmentConfig::getValue('checkout');
+$Config     = $this->getVar('Config');
 $Order      = $this->getVar('Order');
 $errors     = $this->getVar('errors', []);
 $back_url   = $this->getVar('back_url');
@@ -26,22 +27,20 @@ $shipping   = $Order->getValue('shipping');
 ?>
 <div class="summary-wrapper">
 
-    <div class="row column margin-top margin-bottom">
+    <div class="margin-top margin-bottom">
         <h2>###simpleshop.summary_order###</h2>
     </div>
 
     <?php if (count($warnings)): ?>
-        <div class="row column">
-            <?php foreach ($warnings as $warning): ?>
-                <div class="callout alert margin-bottom">
-                    <p><?= isset($warning['replace']) ? strtr($warning['label'], ['{{replace}}' => $warning['replace']]) : $warning['label'] ?></p>
-                </div>
-            <?php endforeach; ?>
-        </div>
+        <?php foreach ($warnings as $warning): ?>
+            <div class="callout alert margin-bottom">
+                <p><?= isset($warning['replace']) ? strtr($warning['label'], ['{{replace}}' => $warning['replace']]) : $warning['label'] ?></p>
+            </div>
+        <?php endforeach; ?>
     <?php endif; ?>
 
     <?php if (count($errors)): ?>
-        <div class="row column margin-large-bottom">
+        <div class="margin-large-bottom">
             <div class="callout alert margin-bottom">
                 <p><?= implode('<br/>', $errors) ?></p>
             </div>
@@ -59,7 +58,7 @@ $shipping   = $Order->getValue('shipping');
 
         <?php
         if ($shipping || $payment) {
-            echo '<div class="row margin-bottom">';
+            echo '<div class="grid-x grid-margin-x margin-bottom">';
         }
         if ($shipping) {
             $this->setVar('shipping', $shipping);
@@ -82,7 +81,7 @@ $shipping   = $Order->getValue('shipping');
         ?>
 
         <?php if ($promotions): ?>
-            <div class="discounts row column margin-bottom">
+            <div class="discounts margin-bottom">
 
                 <h3>###simpleshop.promotions###</h3>
                 <p>###simpleshop.applied_promotion_text###</p>
@@ -96,7 +95,7 @@ $shipping   = $Order->getValue('shipping');
         <?php endif; ?>
 
         <!-- Warenkorb -->
-        <div class="checkout-summary-items row column margin-bottom">
+        <div class="checkout-summary-items margin-bottom">
             <?php
             $Controller = CartController::execute([
                 'products'                  => $Order->getProducts(false),
@@ -110,6 +109,7 @@ $shipping   = $Order->getValue('shipping');
                 ]),
                 'cart_table_wrapper_config' => array_merge(FragmentConfig::getValue('cart.table-wrapper'), [
                     'has_remove_button' => false,
+                    'hide_summary'      => true,
                     'has_go_ahead'      => false,
                 ]),
             ]);
@@ -122,35 +122,37 @@ $shipping   = $Order->getValue('shipping');
         $this->subfragment('simpleshop/checkout/summary/conclusion.php');
         ?>
 
-        <div class="checkout-summary-footer">
-            <form action="" method="post">
-                <!-- AGB -->
-                <div class="terms-of-service row column text-right">
-                    <div class="custom-checkbox align-right margin-small-bottom">
-                        <label>
-                            *&nbsp;###simpleshop.accept_tos###
-                            <input name="tos_accepted" value="1" type="checkbox"/>
-                            <span class="checkbox"></span>
-                        </label>
+        <?php if ($Config['has_summary_footer']): ?>
+            <div class="checkout-summary-footer">
+                <form action="" method="post">
+                    <!-- AGB -->
+                    <div class="terms-of-service text-right">
+                        <div class="custom-checkbox align-right margin-small-bottom">
+                            <label>
+                                *&nbsp;###simpleshop.accept_tos###
+                                <input name="tos_accepted" value="1" type="checkbox"/>
+                                <span class="checkbox"></span>
+                            </label>
+                        </div>
+                        <div class="custom-checkbox align-right margin-small-bottom">
+                            <label>
+                                *&nbsp;###simpleshop.cancellation_terms###
+                                <input name="rma_accepted" value="1" type="checkbox"/>
+                                <span class="checkbox"></span>
+                            </label>
+                        </div>
+                        <span class="required-fields-hint">* ###label.are_required_fields###</span>
                     </div>
-                    <div class="custom-checkbox align-right margin-small-bottom">
-                        <label>
-                            *&nbsp;###simpleshop.cancellation_terms###
-                            <input name="rma_accepted" value="1" type="checkbox"/>
-                            <span class="checkbox"></span>
-                        </label>
+                    <div class="margin-top margin-large-bottom">
+                        <a href="<?= $back_url ?>" class="button hollow">###action.go_back###</a>
+                        <button type="submit" name="action" value="place_order" class="button margin-bottom float-right">
+                            ###action.place_order###
+                        </button>
                     </div>
-                    <span class="required-fields-hint">* ###label.are_required_fields###</span>
-                </div>
-
-                <div class="row column margin-top margin-large-bottom">
-                    <a href="<?= $back_url ?>" class="button">###action.go_back###</a>
-                    <button type="submit" name="action" value="place_order" class="margin-bottom secondary button float-right">
-                        ###action.place_order###
-                    </button>
-                </div>
-            </form>
-        </div>
+                </form>
+            </div>
+        <?php endif; ?>
     <?php endif; ?>
 
 </div>
+

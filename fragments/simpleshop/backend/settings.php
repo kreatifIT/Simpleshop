@@ -17,10 +17,9 @@ namespace FriendsOfREDAXO\Simpleshop;
 $Addon    = $this->getVar('Addon');
 $Settings = $this->getVar('Settings');
 
-$ma_contents = (array) \rex_extension::registerPoint(new \rex_extension_point('simpleshop.memberarea.input_contents', [
-    'dashboard' => $Addon->i18n('settings.content_dashboard'),
-    'history'   => $Addon->i18n('settings.content_history'),
+$ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('simpleshop.memberarea.input_contents', [
     'account'   => $Addon->i18n('settings.content_account'),
+    'orders'    => $Addon->i18n('settings.content_history'),
     'addresses' => $Addon->i18n('settings.content_addresses'),
 ]));
 
@@ -101,7 +100,7 @@ $ma_contents = (array) \rex_extension::registerPoint(new \rex_extension_point('s
         <dd>
             <select name="membera_area_contents[]" class="form-control" size="6" multiple>
                 <?php foreach ($ma_contents as $key => $value): ?>
-                    <option value="<?= $key ?>" <?= in_array($key, (array) $Settings['membera_area_contents']) ? 'selected="selected"' : '' ?>><?= $value ?></option>
+                    <option value="<?= $key ?>" <?= in_array($key, (array)$Settings['membera_area_contents']) ? 'selected="selected"' : '' ?>><?= $value ?></option>
                 <?php endforeach; ?>
             </select>
         </dd>

@@ -16,14 +16,14 @@ $Address    = $this->getVar('Address');
 $canAddItem = $this->getVar('canAddItem', true);
 
 ?>
-<li class="row margin-small-bottom">
-    <div class="column medium-6">
+<li class="grid-x grid-margin-x margin-small-bottom">
+    <div class="cell medium-6">
         <?= $Address->getName() ?><br/>
         <?= $Address->getValue('street') ?>
         <?= $Address->valueIsset('street_additional') ? " - {$Address->getValue('street_additional')}" : '' ?><br/>
         <?= $Address->getValue('postal') ?> <?= $Address->getValue('location') ?><br/>
     </div>
-    <div class="column medium-6">
+    <div class="cell medium-6">
         <?php if ($canAddItem): ?>
             <a href="<?= rex_getUrl(null, null, [
                 'action'  => 'edit',

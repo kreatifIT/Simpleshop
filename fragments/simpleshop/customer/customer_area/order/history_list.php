@@ -22,7 +22,7 @@ if (count($orders)): ?>
     <table class="table stack">
         <thead>
         <tr>
-            <th>###shop.order_num###</th>
+            <th>#</th>
             <th>###label.date###</th>
             <th>###label.price###</th>
             <th>###label.status###</th>
@@ -35,11 +35,11 @@ if (count($orders)): ?>
             <tr>
                 <td><?= $order->getValue('id') ?></td>
                 <td><?= format_date($order->getValue('updatedate')) ?></td>
-                <td>&euro; <?= $order->getValue('total') ?></td>
+                <td><?= format_price($order->getValue('total')) ?> &euro;</td>
                 <td><?= Wildcard::get('shop.order_status_' . $order->getValue('status')) ?></td>
                 <td>
                     <a href="<?= rex_getUrl(null, null, [
-                        'ctrl'     => 'order.detail',
+                        'ctrl'     => 'orders.detail',
                         'order_id' => $order->getValue('id'),
                     ]) ?>">###label.details###</a>
                 </td>

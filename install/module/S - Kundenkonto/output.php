@@ -13,6 +13,11 @@
 
 use FriendsOfREDAXO\Simpleshop;
 
-$values     = rex_var::toArray('REX_VALUE[1]');
-$Controller = Simpleshop\AccountController::execute($values);
+
+$page     = rex_get('ctrl', 'string', $Settings['membera_area_contents'][0]);
+$Settings = \rex::getConfig('simpleshop.Settings');
+
+$Controller = Simpleshop\AccountController::execute([
+    'controller' => $page,
+]);
 echo $Controller->parse();

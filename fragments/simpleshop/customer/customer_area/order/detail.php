@@ -14,12 +14,13 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-$order    = $this->getVar('order');
-$order_id = $order->getValue('id');
-$SAdress  = $order->getShippingAddress();
-$IAdress  = $order->getInvoiceAddress();
-$shipping = $order->getValue('shipping');
-$payment  = $order->getValue('payment');
+$Order    = $this->getVar('Order');
+$order_id = $Order->getValue('id');
+$SAdress  = $Order->getShippingAddress();
+$IAdress  = $Order->getInvoiceAddress();
+$shipping = $Order->getValue('shipping');
+$payment  = $Order->getValue('payment');
+$Config   = FragmentConfig::getValue('checkout');
 
 $products  = [];
 $_products = OrderProduct::query()
@@ -29,76 +30,25 @@ $_products = OrderProduct::query()
 
 foreach ($_products as $product) {
     $_product = $product->getValue('data');
-    $_product->setValue('cart_quantity');
+    $_product->setValue('cart_quantity', $product->getValue('cart_quantity'));
     $_product->setValue('code', $product->getValue('code'));
     $products[] = $_product;
 }
+
 
 ?>
 
 <div class="row">
     <div class="column order-title margin-bottom">
-        <h1>Order #<?= $order_id ?></h1>
+        <h1>###simpleshop.order_num### <?= $order_id ?></h1>
     </div>
 </div>
 
-<div class="row">
-
-    <?php
-    $this->setVar('address', $IAdress);
-    $this->setVar('title', '###label.invoice_address###');
-    $this->setVar('has_edit_link', false);
-    $this->subfragment('simpleshop/checkout/summary/address_item.php');
-    ?>
-
-    <?php
-    $this->setVar('address', $SAdress);
-    $this->setVar('title', '###label.shipping_address###');
-    $this->setVar('has_edit_link', false);
-    $this->subfragment('simpleshop/checkout/summary/address_item.php');
-    ?>
-</div>
-
-<div class="row">
-    <?php if ($shipping): ?>
-        <div class="medium-6 columns margin-bottom">
-            <h3>###label.shipment###</h3>
-            <p><?= $shipping->getName() ?></p>
-        </div>
-    <?php endif; ?>
-
-    <div class="medium-6 columns margin-bottom">
-        <h3>###label.payment###</h3>
-        <p><?= $payment->getName() ?><br/><?= $payment->getValue('info') ?></p>
-    </div>
-</div>
-
-<table class="table stack">
-    <thead>
-    <tr>
-        <th>###shop.produt_code###</th>
-        <th>###simpleshop.single_price_no_vat###</th>
-        <th>###shop.amount###</th>
-        <th>###label.total###</th>
-    </tr>
-    </thead>
-    <tbody>
-
-    <?php
-    foreach ($products as $product) {
-        $this->setVar('product', $product);
-        $this->setVar('has_quantity_control', false);
-        $this->setVar('has_remove_button', false);
-        $this->setVar('has_image', false);
-        echo $this->subfragment('simpleshop/cart/item.php');
-    }
-    ?>
-
-    </tbody>
-</table>
-
-<!-- Summe -->
 <?php
-$this->subfragment('simpleshop/checkout/summary/conclusion.php');
-?>
 
+$Config['has_coupons'] = false;
+
+$fragment = new \rex_fragment();
+$fragment->setVar('Order', $Order);
+$fragment->setVar('Config', $Config);
+echo $fragment->parse('simpleshop/checkout/summary/wrapper.php');
