@@ -84,6 +84,36 @@ class rex_api_simpleshop_be_api extends rex_api_function
         self::$inst->response['html'] = $fragment->parse('simpleshop/backend/list_functions/' . self::$inst->request['fragment'] . '.php');
     }
 
+    public static function search_product()
+    {
+        $result = [];
+        $steps  = 20;
+        $offset = rex_get('page', 'int', 0) * $steps;
+        $label  = 'name_' . self::$inst->request['lang_id'];
+        $stmt   = \FriendsOfREDAXO\Simpleshop\Product::query()
+            ->resetSelect()
+            ->selectRaw('id, ' . $label . ' AS label')
+            ->where('status', 1)
+            ->whereRaw($label . ' LIKE :term', ['term' => '%'. self::$inst->request['term'] .'%'])
+            ->orderBy($label);
+
+        $count      = $stmt->count();
+        $collection = $stmt->limit($offset, $steps)
+            ->find();
+
+        foreach ($collection as $item) {
+            $result[] = [
+                'id'   => $item->getId(),
+                'text' => $item->getValue('label'),
+            ];
+        }
+
+        self::$inst->response['result'] = [
+            'results'    => $result,
+            'pagination' => ['more' => $count > $offset + $steps],
+        ];
+    }
+
 }
 
 
