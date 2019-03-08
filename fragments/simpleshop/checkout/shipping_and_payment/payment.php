@@ -21,12 +21,9 @@ $this->setVar('payment', $payment ?: $payments[0]);
 
 
 ?>
-<div class="payments margin-top margin-large-bottom">
+<div class="payments margin-top margin-bottom">
     <!-- Payment -->
-    <div class="row column">
-        <h2 class="heading medium">###label.payment_method###</h2>
-    </div>
-
+    <h2 class="heading medium">###label.payment_method###</h2>
     <div class="grid-x medium-up-<?= count($payments) ?> grid-margin-x grid-margin-y">
         <?php
         foreach ($payments as $index => $payment) {

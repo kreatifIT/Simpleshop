@@ -19,7 +19,7 @@ if (!strlen($title) && !strlen($text)) {
 }
 
 ?>
-<div class="row column margin-small-bottom">
+<div class="margin-small-bottom">
     <?php if (strlen($title)): ?>
         <h2 class="<?= strlen($text) ? 'margin-bottom' : '' ?>"><?= $title ?></h2>
     <?php endif; ?>

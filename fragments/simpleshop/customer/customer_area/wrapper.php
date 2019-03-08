@@ -14,35 +14,32 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $template = $this->getVar('template');
-$cur_area = $this->getVar('content');
+$cur_area = $this->getVar('area');
 $Settings = \rex::getConfig('simpleshop.Settings');
-
-$User = Customer::getCurrentUser();
+$User     = Customer::getCurrentUser();
 
 ?>
-<div class="customer-area margin-top margin-large-bottom">
-    <div class="row">
-        <?php if (count($Settings['membera_area_contents']) > 1): ?>
-            <div class="column large-3 sidebar margin-bottom">
-                <ul class="no-bullet">
-                    <?php foreach ($Settings['membera_area_contents'] as $area):
-                        if (!$User->hasPermission("fragment.customer-area--sidebar-article--{$area}")) {
-                            continue;
-                        }
-                        ?>
-                        <li <?= $cur_area == $area ? 'class="active"' : '' ?>>
-                            <a href="<?= rex_getUrl(null, null, ['ctrl' => $area]) ?>"><?= \Wildcard::get('simpleshop.account_area_'. $area) ?></a>
-                        </li>
-                    <?php endforeach; ?>
-                    <li>
-                        <a href="<?= rex_getUrl(null, null, ['action' => 'logout']) ?>">###action.logout###</a>
-                    </li>
-                </ul>
-            </div>
-        <?php endif; ?>
+<div class="grid-x grid-margin-x">
+    <?php if (count($Settings['membera_area_contents']) > 1): ?>
+        <div class="cell large-3 customer-area-sidebar">
+            <ul class="menu vertical">
+                <?php foreach ($Settings['membera_area_contents'] as $area):
+                    if (!$User->hasPermission("fragment.customer-area--sidebar-article--{$area}")) {
+                        continue;
+                    }
 
-        <div class="column container <?= count($Settings['membera_area_contents']) > 1 ? 'large-9' : '' ?>">
-            <?= $this->subfragment('simpleshop/customer/customer_area/' . $template); ?>
+                    ?>
+                    <li <?= $cur_area == $area ? 'class="active"' : '' ?>>
+                        <a href="<?= rex_getUrl(null, null, ['ctrl' => $area]) ?>"><?= \Wildcard::get('simpleshop.account_area_' . $area) ?></a>
+                    </li>
+                <?php endforeach; ?>
+                <li>
+                    <a href="<?= rex_getUrl(null, null, ['action' => 'logout']) ?>">###action.logout###</a>
+                </li>
+            </ul>
         </div>
+    <?php endif; ?>
+    <div class="cell container <?= count($Settings['membera_area_contents']) > 1 ? 'large-9' : '' ?>">
+        <?= $this->subfragment('simpleshop/customer/customer_area/' . $template); ?>
     </div>
 </div>

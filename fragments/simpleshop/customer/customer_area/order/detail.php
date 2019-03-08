@@ -19,9 +19,7 @@ $order_id = $Order->getValue('id');
 $Config = FragmentConfig::getValue('checkout');
 
 $products  = [];
-$_products = OrderProduct::query()
-    ->where('order_id', $order_id)
-    ->find();
+$_products = OrderProduct::query()->where('order_id', $order_id)->find();
 
 
 foreach ($_products as $product) {
@@ -33,13 +31,7 @@ foreach ($_products as $product) {
 
 
 ?>
-
-    <div class="row">
-        <div class="column order-title margin-bottom">
-            <h1>###simpleshop.order_num### <?= $order_id ?></h1>
-        </div>
-    </div>
-
+    <h1 class="heading">###simpleshop.order_num### <?= $order_id ?></h1>
     <?php
 
 $Config['has_coupons']        = false;

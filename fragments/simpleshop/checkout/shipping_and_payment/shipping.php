@@ -23,9 +23,7 @@ $this->setVar('shipping', $shipping ?: $shippings[0]);
 ?>
 <div class="shippings margin-top margin-large-bottom">
     <!-- Shipment -->
-    <div class="row column">
-        <h2 class="heading medium">###label.shipping_method###</h2>
-    </div>
+    <h2 class="heading medium">###label.shipping_method###</h2>
 
     <div class="grid-x medium-up-<?= count($shippings) ?> grid-margin-x grid-margin-y">
         <?php

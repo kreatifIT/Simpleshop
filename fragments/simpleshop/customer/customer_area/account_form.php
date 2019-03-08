@@ -43,7 +43,7 @@ $form->setObjectparams('only_fields', $only_fields);
 
 if ($show_save_btn) {
     // Submit
-    $form->setValueField('html', ['', '<div class="row"><div class="column margin-small-top"><div class="column">']);
+    $form->setValueField('html', ['', '<div class="cell margin-small-top">']);
 
     if ($back_url) {
         $form->setValueField('html', ['', '<a href="' . $back_url . '" class="button">###action.go_back###</a>']);
@@ -56,7 +56,7 @@ if ($show_save_btn) {
         'labels'      => $btn_label,
         'css_classes' => 'button',
     ]);
-    $form->setValueField('html', ['', '</div></div></div>']);
+    $form->setValueField('html', ['', '</div>']);
 }
 
 $formOutput = $Customer->executeForm($form);

@@ -14,7 +14,7 @@
 $payment = $this->getVar('payment');
 
 ?>
-<div class="medium-6 column margin-bottom">
+<div class="cell medium-6 margin-bottom">
     <h3 class="heading small">###label.payment_method###</h3>
     <?= $payment->getName() ?>
 </div>

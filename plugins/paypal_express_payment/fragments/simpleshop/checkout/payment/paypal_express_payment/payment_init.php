@@ -59,7 +59,7 @@ catch (WSConnectorException $ex)
 Utils::resetLocale();
 
 if (count($errors)): ?>
-    <div class="row column">
+    <div class="cell">
         <div class="margin-top margin-bottom">
             <?php foreach ($errors as $error): ?>
                 <div class="callout alert"><?= $error ?></div>

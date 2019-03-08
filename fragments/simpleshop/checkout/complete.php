@@ -20,9 +20,7 @@ $additional_info = \rex_extension::registerPoint(new \rex_extension_point('simpl
 
 ?>
 <div class="order-complete margin-large-top margin-large-bottom">
-    <div class="row column">
-        <h2 class="text-center margin-bottom">###simpleshop.order_placed###</h2>
-    </div>
+    <h2 class="text-center margin-bottom">###simpleshop.order_placed###</h2>
     <?php
     if ($Order->getValue('total') > 0 && $Order->getValue('payment')) {
         $this->subfragment('simpleshop/checkout/payment/' . $Payment->plugin_name . '/order_complete.php');
@@ -33,10 +31,8 @@ $additional_info = \rex_extension::registerPoint(new \rex_extension_point('simpl
     ?>
 
     <?php if (strlen($additional_info)): ?>
-        <div class="row column text-center margin-bottom">
+        <div class="text-center">
             <p><?= $additional_info ?></p>
         </div>
     <?php endif; ?>
 </div>
-
-

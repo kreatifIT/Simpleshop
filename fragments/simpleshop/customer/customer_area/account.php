@@ -17,7 +17,7 @@ $title = $this->getVar('title', '###label.account_data###');
 $text  = $this->getVar('text');
 
 ?>
-<div class="member-area--address">
+<div class="customer-area-address">
     <h2 class="<?= strlen($text) ? 'margin-bottom' : '' ?>"><?= $title ?></h2>
     <?= strlen($text) ? $text : '' ?>
 

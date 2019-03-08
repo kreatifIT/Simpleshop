@@ -18,7 +18,7 @@ $action     = rex_get('action', 'string');
 $canAddItem = $User->hasPermission('fragment.customer-area--addresses--add-new');
 
 ?>
-<div class="member-area--address">
+<div class="customer-area-address">
 
     <?php if ($canAddItem && $action == 'edit'): ?>
         <?php

@@ -14,7 +14,7 @@
 $shipping = $this->getVar('shipping');
 
 ?>
-<div class="medium-6 column margin-bottom">
+<div class="cell medium-6 margin-bottom">
     <h3 class="heading small">###label.shipping_method###</h3>
     <?= $shipping->getName() ?>
 </div>

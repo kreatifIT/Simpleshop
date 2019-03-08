@@ -13,7 +13,7 @@
 
 
 ?>
-<div class="member-area--rma">
+<div class="customer-area-rma">
     <h2>###simpleshop.memberarea_rma_title###</h2>
     <p>###simpleshop.memberarea_rma_text###</p>
 </div>
