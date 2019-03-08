@@ -465,7 +465,7 @@ class Order extends Model
     {
         $content    = '';
         $fragment   = new \rex_fragment();
-        $Mpdf       = $_Mpdf ?: new Kreatif\Mpdf\Mpdf([
+        $Mpdf       = $_Mpdf ?: new \Kreatif\Mpdf\Mpdf([
             'margin_left'   => 20,
             'margin_right'  => 15,
             'margin_top'    => 10,
