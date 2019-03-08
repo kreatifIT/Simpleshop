@@ -21,6 +21,7 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
     'account'   => $Addon->i18n('settings.content_account'),
     'orders'    => $Addon->i18n('settings.content_history'),
     'addresses' => $Addon->i18n('settings.content_addresses'),
+    'rma'       => $Addon->i18n('settings.content_rma'),
 ]));
 
 ?>

@@ -36,7 +36,7 @@ if ($method == 'detail') {
 }
 
 ?>
-<div class="member-area--history">
+<div class="member-area--orders">
     <?php $this->subfragment('simpleshop/customer/customer_area/title.php') ?>
     <?php $this->subfragment('simpleshop/customer/customer_area/order/' . $content) ?>
 </div>
