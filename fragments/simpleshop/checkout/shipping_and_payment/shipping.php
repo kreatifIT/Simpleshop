@@ -21,7 +21,7 @@ $this->setVar('shipping', $shipping ?: $shippings[0]);
 
 
 ?>
-<div class="shippings margin-top margin-large-bottom">
+<div class="shippings margin-top margin-bottom">
     <!-- Shipment -->
     <h2 class="heading medium">###label.shipping_method###</h2>
 

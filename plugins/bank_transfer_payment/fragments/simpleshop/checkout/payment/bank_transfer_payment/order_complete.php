@@ -17,7 +17,7 @@ use Sprog\Wildcard;
 $Order = $this->getVar('Order');
 
 ?>
-<div class="row column margin-bottom">
+<div class="cell margin-bottom">
     <p class="text-center"><?= strtr(Wildcard::get('simpleshop.banktransfer_order_complete_text'), [
             '{{total}}'    => '<strong>&euro;&nbsp;' . format_price($Order->getValue('total')) . '</strong>',
             '{{order_id}}' => $Order->getValue('id'),

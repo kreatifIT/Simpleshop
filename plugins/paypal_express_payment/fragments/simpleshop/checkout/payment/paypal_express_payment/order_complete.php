@@ -14,4 +14,4 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 ?>
-<div class="row margin-bottom"></div>
+<div class="margin-bottom"></div>
