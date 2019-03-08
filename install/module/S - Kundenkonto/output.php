@@ -14,8 +14,8 @@
 use FriendsOfREDAXO\Simpleshop;
 
 
-$page     = rex_get('ctrl', 'string', $Settings['membera_area_contents'][0]);
 $Settings = \rex::getConfig('simpleshop.Settings');
+$page     = rex_get('ctrl', 'string', $Settings['membera_area_contents'][0]);
 
 $Controller = Simpleshop\AccountController::execute([
     'controller' => $page,
