@@ -86,7 +86,7 @@ class Omest extends ShippingAbstract
 
         $data = [
             'shipmentTypeKey'    => 'PARCEL',
-            'shippingServiceKey' => $this->getValue('extension'),
+            'shippingServiceKey' => $this->getValue('extension') ?: 'EC',
             'amountCOD'          => 0,
             'amountInsured'      => 0,
             'parcels'            => [],
@@ -214,14 +214,14 @@ class Omest extends ShippingAbstract
         if (count($products) < 1) {
             throw new OmestShippingException("Order [{$Order->getId()}] has no products", 1);
         }
-        if (count($parcels) < 1) {
-            throw new OmestShippingException("Order [{$Order->getId()}] has no parcels", 2);
-        }
+//        if (count($parcels) < 1) {
+//            throw new OmestShippingException("Order [{$Order->getId()}] has no parcels", 4);
+//        }
 
         $data = [
             'key'                => $Shipping->getValue('shipping_key'),
             'reference1'         => $Order->getReferenceId(),
-            'shippingServiceKey' => $Shipping->getValue('extension'),
+            'shippingServiceKey' => $Shipping->getValue('extension') ?: 'EC',
             'shipmentTypeKey'    => 'PARCEL',
             'parcels'            => [],
             'pickupAddress'      => [
@@ -244,20 +244,20 @@ class Omest extends ShippingAbstract
             ],
         ];
 
-        foreach ($parcels as $parcel) {
-            $_parcel = [
-                'key'    => null,
-                'weight' => $parcel->getValue('weight') / 1000,
-                'width'  => $parcel->getValue('width'),
-                'length' => $parcel->getValue('length'),
-                'height' => $parcel->getValue('height'),
-            ];
-            if ($parcel->getValue('pallett')) {
-                $data['shipmentTypeKey']  = 'PALLET';
-                $_parcel['palletTypeKey'] = $parcel->getValue('pallett');
-            }
-            $data['parcels'][] = $_parcel;
-        }
+//        foreach ($parcels as $parcel) {
+//            $_parcel = [
+//                'key'    => null,
+//                'weight' => $parcel->getValue('weight') / 1000,
+//                'width'  => $parcel->getValue('width'),
+//                'length' => $parcel->getValue('length'),
+//                'height' => $parcel->getValue('height'),
+//            ];
+//            if ($parcel->getValue('pallett')) {
+//                $data['shipmentTypeKey']  = 'PALLET';
+//                $_parcel['palletTypeKey'] = $parcel->getValue('pallett');
+//            }
+//            $data['parcels'][] = $_parcel;
+//        }
 
         $sdata = html_entity_decode(http_build_query([
             'api_key'      => $Settings['api_key'],
@@ -357,6 +357,8 @@ class OmestShippingException extends \Exception
                 break;
             case 3:
                 $errors = '###simpleshop.error.shipping_no_price###';
+                break;
+            case 4:
                 break;
             default:
                 $errors = $this->getMessage();

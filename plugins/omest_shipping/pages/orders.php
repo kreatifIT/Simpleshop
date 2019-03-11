@@ -58,7 +58,7 @@ if ($_FUNC == 'submit' && count($order_ids)) {
                 preg_match('!\[(\d+)\]!', $ex->getMessage(), $matches);
                 $error = sprintf($this->i18n('omest_shipping.error.order_has_no_product'), $matches[1]);
                 break;
-            case 2:
+            case 4:
                 preg_match('!\[(\d+)\]!', $ex->getMessage(), $matches);
                 $error = sprintf($this->i18n('omest_shipping.error.prop_not_set_msg'), $matches[1]);
                 break;
