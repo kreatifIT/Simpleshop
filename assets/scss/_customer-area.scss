@@ -1,0 +1,71 @@
+.customer-area-section {
+
+}
+
+.customer-area-sidebar {
+    .menu {
+        background-color: $primary-color;
+        & > li {
+            display: block;
+            background-color: $primary-color;
+            &:not(:last-child) {
+                border-bottom: 1px solid rgba($white, 0.25);
+            }
+            & > a {
+                display: block;
+                line-height: $global-lineheight;
+                padding: rem-calc(10 20);
+                font-weight: $global-weight-bold;
+                text-transform: uppercase;
+                font-size: rem-calc(14);
+                color: rgba($white, 0.75);
+                transition: color 0.3s ease;
+            }
+            &:hover {
+                & > a {
+                    color: $white;
+                }
+            }
+            &.active {
+                & > a {
+                    color: $white;
+                }
+            }
+        }
+    }
+}
+
+.customer-area-orders {
+    .table {
+        & > thead {
+            & tr {
+                & > th {
+                    background-color: $primary-color;
+                    color: $white;
+                }
+            }
+        }
+        & > tbody {
+            & tr {
+                border-bottom: 1px solid $light-gray;
+                & > td {
+
+                }
+            }
+        }
+    }
+}
+
+.customer-area-rma {
+
+}
+
+.customer-area-sidebar {
+
+}
+
+.customer-area-address {
+
+}
+
+
