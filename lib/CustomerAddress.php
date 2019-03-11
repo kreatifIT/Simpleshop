@@ -17,7 +17,7 @@ class CustomerAddress extends Model
 {
     const TABLE = 'rex_shop_customer_address';
 
-    public function getName()
+    public function getName($lang_id = true)
     {
         return $this->getValue('firstname') .' '. $this->getValue('lastname');
     }
