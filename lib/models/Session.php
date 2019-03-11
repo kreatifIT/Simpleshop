@@ -216,7 +216,7 @@ class Session extends Model
         $cartItemCnt = 0;
         if ($cartItems) {
             foreach ($cartItems as $item) {
-                $cartItemCnt += $item['quantity'];
+                $cartItemCnt += isset($item['quantity']) ? $item['quantity'] : 0;
             }
         }
         return $cartItemCnt;
