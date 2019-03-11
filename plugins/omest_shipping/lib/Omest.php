@@ -54,6 +54,12 @@ class Omest extends ShippingAbstract
         return parent::getName();
     }
 
+    public function usedForFrontend()
+    {
+        $Settings  = \rex::getConfig('simpleshop.OmestShipping.Settings');
+        return from_array($Settings, 'used_in_frontend', 1);
+    }
+
     /**
      * @param $Order
      * @param $products

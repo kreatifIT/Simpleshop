@@ -53,6 +53,12 @@ if (!empty($_POST)) {
                 <input type="text" class="form-control expanded" name="general_costs" value="<?= from_array($Settings, 'general_costs') ?>"/>
             </dd>
         </dl>
+        <dl class="rex-form-group form-group">
+            <dt><?= $this->i18n('default_shipping.general_free_shipping'); ?>:</dt>
+            <dd>
+                <input type="text" class="form-control expanded" name="general_free_shipping" value="<?= from_array($Settings, 'general_free_shipping') ?>"/>
+            </dd>
+        </dl>
     </fieldset>
 
 <?php if ($countries): ?>
@@ -73,7 +79,7 @@ if (!empty($_POST)) {
                             'label'   => '',
                             'columns' => implode(',', [
                                 'number|min_order|' . $this->i18n('default_shipping.min_order') . '|10|2|0|||',
-                                'number|min_order|' . $this->i18n('default_shipping.shipping_costs') . '|10|2|0|||',
+                                'number|shipping_costs|' . $this->i18n('default_shipping.shipping_costs') . '|10|2|0|||',
                             ]),
                         ]);
                         $field->setId($name);
@@ -85,6 +91,8 @@ if (!empty($_POST)) {
                                 $_value[] = [$col1, $col2];
                             }
                             $field->setValue(json_encode($_value));
+                        } else {
+                            $field->setValue('{}');
                         }
                         $field->init();
                         $field->enterObject();

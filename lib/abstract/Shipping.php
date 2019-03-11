@@ -38,6 +38,11 @@ abstract class ShippingAbstract extends PluginAbstract
         return $this->hasCosts;
     }
 
+    public function usedForFrontend()
+    {
+        return true;
+    }
+
     public function setParcels($parcels)
     {
         $_parcels = [];

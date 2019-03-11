@@ -52,7 +52,7 @@ $pallet_types = [
                 $Shipping = $order->getValue('shipping');
                 $parcels = $Shipping->getValue('parcels');
 
-                if (!($Shipping instanceof Omest) || $Shipping->getValue('shipping_key') != '') {
+                if (!($Shipping instanceof Omest) && !($Shipping instanceof DefaultShipping) || $Shipping->getValue('shipping_key') != '') {
                     continue;
                 }
 

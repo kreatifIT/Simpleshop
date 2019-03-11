@@ -35,11 +35,11 @@ class DefaultShipping extends ShippingAbstract
         $Address  = $Order->getShippingAddress();
         $Country  = $Address ? Country::get($Address->getValue('country')) : null;
         $Settings = \rex::getConfig('simpleshop.DefaultShipping.Settings');
+        $total    = Session::getTotal();
 
 
         if ($Country && isset($Settings['costs'][$Country->getId()])) {
-            $total = Session::getTotal();
-            $cost  = 0;
+            $cost = 0;
 
             foreach ($Settings['costs'][$Country->getId()] as $value => $_cost) {
                 if ($total >= $value) {
@@ -49,7 +49,13 @@ class DefaultShipping extends ShippingAbstract
             }
             $this->price = (float)$cost;
         } else {
-            $this->price = (float)($Settings['general_costs'] ?: 0);
+            $freeShipping = (float)$Settings['general_free_shipping'];
+
+            if ($freeShipping > 0 && $total >= $freeShipping) {
+                $this->price = 0;
+            } else {
+                $this->price = (float)($Settings['general_costs'] ?: 0);
+            }
         }
     }
 

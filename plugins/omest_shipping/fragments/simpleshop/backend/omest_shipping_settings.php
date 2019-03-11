@@ -23,6 +23,18 @@ $serviceTypes = (array)from_array($Settings, 'service_types', []);
 
     <legend>Konfiguration</legend>
     <dl class="rex-form-group form-group">
+        <?php
+        $frontend_use = from_array($Settings, 'used_in_frontend', 1);
+        ?>
+        <dt>Als Option im Frontend anzeigen:</dt>
+        <dd>
+            <select class="form-control" name="used_in_frontend">
+                <option value="1"><?= $Addon->i18n('yes'); ?></option>
+                <option value="0" <?= !$frontend_use ? 'selected="selected"' : '' ?>><?= $Addon->i18n('no'); ?></option>
+            </select>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
         <dt>Versandarten</dt>
         <dd>
             <select class="form-control" name="service_types[]" multiple>

@@ -285,8 +285,15 @@ class CheckoutController extends Controller
 
     protected function getShippingPaymentView()
     {
-        $shippings = Shipping::getAll();
-        $payments  = Payment::getAll();
+        $shippings  = [];
+        $_shippings = Shipping::getAll();
+        $payments   = Payment::getAll();
+
+        foreach ($_shippings as $shipping) {
+            if ($shipping->usedForFrontend()) {
+                $shippings[] = $shipping;
+            }
+        }
 
         if (empty($shippings) && empty($payments)) {
             $nextStep = CheckoutController::getNextStep();

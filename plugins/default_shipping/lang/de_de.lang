@@ -1,4 +1,5 @@
 default_shipping.general_costs = Allgemeine Kosten
+default_shipping.general_free_shipping = Allgemeine Gratisversand ab
 default_shipping.costs_per_country = Versandkosten / Land
 default_shipping.min_order = Mindestbestellung
 default_shipping.shipping_costs = Versandkosten
