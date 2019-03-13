@@ -44,8 +44,9 @@ class Order extends Model
         $Country  = null;
 
         if ($Customer->isCompany()) {
-            $Address = $this->getInvoiceAddress();
-            $Country = Country::get($Address->getValue('country'));
+            $Address  = $this->getInvoiceAddress();
+            $countrId = $Address ? $Address->getValue('country') : null;
+            $Country  = $countrId ? Country::get($countrId) : null;
         }
 
         return $Country && !$Country->getValue('b2b_has_tax');
