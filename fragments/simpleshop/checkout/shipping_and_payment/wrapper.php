@@ -18,7 +18,7 @@ $back_url    = $this->getVar('back_url');
 
 ?>
 <div class="shipping-payment">
-    <form action="" method="post">
+    <form action="<?= rex_getUrl(null, null, array_merge($_GET, ['ts' => time()])) ?>" method="post">
         <?php
         if ($currentStep == 'shipping||payment' || $currentStep == 'shipping') {
             $this->subfragment('simpleshop/checkout/shipping_and_payment/shipping.php');

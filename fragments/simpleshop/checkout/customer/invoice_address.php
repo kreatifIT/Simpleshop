@@ -18,7 +18,7 @@ $this->setVar('btn_label', '###action.go_ahead###');
 ?>
 <div class="addresses-grid margin-top margin-large-bottom">
     <h2 class="heading large">###label.invoice_address###</h2>
-    <form action="" method="POST">
+    <form action="<?= rex_getUrl(null, null, array_merge($_GET, ['ts' => time()])) ?>" method="POST">
         <?php
         $this->setVar('only_fields', true);
 
