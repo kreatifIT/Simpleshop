@@ -11,10 +11,14 @@
  * file that was distributed with this source code.
  */
 
+$Settings = \FriendsOfREDAXO\Simpleshop\Utils::getConfig();
+
 ?>
-<div class="text-right">
-    <a href="<?= rex_url::backendPage('simpleshop/yform_functions', ['action' => 'link_product_rex_categories']) ?>" class="btn btn-default btn-sm">
-        <i class="fa fa-link"></i>
-        <?= $this->i18n('label.link_product_rex_categories') ?>
-    </a>
-</div>
+<?php if (from_array($Settings, 'category_linking') == 1): ?>
+    <div class="text-right">
+        <a href="<?= rex_url::backendPage('simpleshop/yform_functions', ['action' => 'link_product_rex_categories']) ?>" class="btn btn-default btn-sm">
+            <i class="fa fa-link"></i>
+            <?= $this->i18n('label.link_product_rex_categories') ?>
+        </a>
+    </div>
+<?php endif; ?>
