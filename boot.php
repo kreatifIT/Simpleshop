@@ -10,9 +10,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- *
- * // Set Variant by setting/overwriting the simpleshop.product_variants property [NULL|variants]
- * \rex::setProperty('simpleshop.product_variants', 'variant');
  */
 
 namespace FriendsOfREDAXO\Simpleshop;
