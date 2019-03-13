@@ -24,7 +24,7 @@ $back_url     = $this->getVar('back_url');
 
     <h2 class="heading large">###label.shipping_address###</h2>
 
-    <form method="POST" action="" class="shipping-form">
+    <form method="POST" action="<?= rex_getUrl(null, null, array_merge($_GET, ['ts' => time()])) ?>" class="shipping-form">
         <div class="address-toggle margin-top margin-large-bottom">
             <div class="custom-checkbox">
                 <label class="custom-checkbox">

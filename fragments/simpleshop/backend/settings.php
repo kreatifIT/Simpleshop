@@ -32,9 +32,8 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
         <dt><?= $Addon->i18n('settings.brutto_prices'); ?></dt>
         <dd>
             <label class="form-label">
-                <input type="checkbox" name="brutto_prices" value="1" <?php if (from_array($Settings, 'brutto_prices') == 1) {
-                    echo 'checked="checked"';
-                } ?>/><span></span><?= $Addon->i18n('settings.brutto_prices_info'); ?>
+                <input type="checkbox" name="brutto_prices" value="1" <?= from_array($Settings, 'brutto_prices') == 1 ? 'checked="checked"' : '' ?>/>
+                <span></span><?= $Addon->i18n('settings.brutto_prices_info'); ?>
             </label>
         </dd>
     </dl>
@@ -42,9 +41,8 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
         <dt><?= $Addon->i18n('label.packing_list_title'); ?></dt>
         <dd>
             <label class="form-label">
-                <input type="checkbox" name="packing_list_printing" value="1" <?php if (from_array($Settings, 'packing_list_printing') == 1) {
-                    echo 'checked="checked"';
-                } ?>/><span></span><?= $Addon->i18n('action.print_packing_list'); ?>
+                <input type="checkbox" name="packing_list_printing" value="1" <?= from_array($Settings, 'packing_list_printing') == 1 ? 'checked="checked"' : '' ?>/>
+                <span></span><?= $Addon->i18n('action.print_packing_list'); ?>
             </label>
         </dd>
     </dl>
@@ -52,9 +50,9 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
         <dt><?= $Addon->i18n('label.accounting'); ?></dt>
         <dd>
             <label class="form-label">
-                <input type="checkbox" name="use_invoicing" value="1" <?php if (from_array($Settings, 'use_invoicing') == 1) {
-                    echo 'checked="checked"';
-                } ?>/><span></span><?= $Addon->i18n('action.use_invoicing'); ?>
+                <input type="checkbox" name="use_invoicing" value="1" <?= from_array($Settings, 'use_invoicing') == 1 ? 'checked="checked"' : '' ?>/>
+                <span></span>
+                <?= $Addon->i18n('action.use_invoicing'); ?>
             </label>
         </dd>
     </dl>
@@ -69,9 +67,13 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
         <legend><?= $Addon->i18n('settings.discount_settings'); ?></legend>
         <dl class="rex-form-group form-group">
             <dt><?= $Addon->i18n('settings.discount_application'); ?></dt>
-            <dd><label class="form-label"><input type="checkbox" name="discounts_are_accumulable" value="1" <?php if (from_array($Settings, 'discounts_are_accumulable') == 1) {
-                        echo 'checked="checked"';
-                    } ?>/><span></span><?= $Addon->i18n('settings.discounts_are_accumulable'); ?></label></dd>
+            <dd>
+                <label class="form-label">
+                    <input type="checkbox" name="discounts_are_accumulable" value="1" <?= from_array($Settings, 'discounts_are_accumulable') == 1 ? 'checked="checked"' : '' ?>/>
+                    <span></span>
+                    <?= $Addon->i18n('settings.discounts_are_accumulable'); ?>
+                </label>
+            </dd>
         </dl>
     <?php endif; ?>
 
@@ -104,6 +106,18 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
                     <option value="<?= $key ?>" <?= in_array($key, (array)$Settings['membera_area_contents']) ? 'selected="selected"' : '' ?>><?= $value ?></option>
                 <?php endforeach; ?>
             </select>
+        </dd>
+    </dl>
+
+    <legend><?= $Addon->i18n('settings.shop_functions'); ?></legend>
+    <dl class="rex-form-group form-group">
+        <dt><?= $Addon->i18n('settings.category_linking_label'); ?></dt>
+        <dd>
+            <label class="form-label">
+                <input type="checkbox" name="category_linking" value="1" <?= from_array($Settings, 'category_linking') == 1 ? 'checked="checked"' : '' ?>/>
+                <span></span>
+                <?= $Addon->i18n('settings.category_linking_input_label'); ?>
+            </label>
         </dd>
     </dl>
 

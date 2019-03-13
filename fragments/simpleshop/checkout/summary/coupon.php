@@ -17,7 +17,7 @@ $code = $this->getVar('coupon_code');
 
 ?>
 <div class="coupon margin-bottom">
-    <form action="" method="post">
+    <form action="<?= rex_getUrl(null, null, array_merge($_GET, ['ts' => time()])) ?>" method="post">
         <h3>###label.coupon###</h3>
         <input type="text" name="coupon" value="<?= $code ?>"/>
         <button type="submit" class="button coupon-btn" name="action" value="redeem_coupon">
