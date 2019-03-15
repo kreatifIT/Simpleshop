@@ -82,12 +82,6 @@ class Session extends Model
 
                     self::$session = $user_session;
                     self::$session->setValue('session_id', $session_id);
-
-                    \rex_sql::factory()
-                        ->setTable(self::TABLE)
-                        ->setWhere('customer_id = :cid OR session_id = :sid', ['cid' => $User->getId(), 'sid' => $session_id])
-                        ->delete();
-
                     self::$session->writeSession(['cart_items' => $cart_items]);
                 }
             }
@@ -116,6 +110,23 @@ class Session extends Model
             $this->setValue('customer_id', $User->getValue('id'));
         }
         $this->save();
+
+        $stmt = \rex_sql::factory();
+        $stmt->setTable(Session::TABLE);
+
+        if ($User) {
+            $stmt->setWhere('id != :id AND (session_id = :sid OR customer_id = :cid)', [
+                'id'  => $this->getId(),
+                'sid' => session_id(),
+                'cid' => $User->getId(),
+            ]);
+        } else {
+            $stmt->setWhere('id != :id AND session_id = :sid', [
+                'id'  => $this->getId(),
+                'sid' => session_id(),
+            ]);
+        }
+        $stmt->delete();
     }
 
     private static function _getCartItems($raw = false, $throwErrors = false)
