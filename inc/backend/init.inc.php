@@ -13,8 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-\rex::setProperty('simpleshop.product_variants', 'variants');
-
 \rex_extension::register('PACKAGES_INCLUDED', function () {
     $mtime = '';
 

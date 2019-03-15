@@ -436,7 +436,7 @@ class Product extends Model
         $subject = $Ep->getSubject();
         $Manager = $Ep->getParam('manager');
 
-        if ($Manager->table->getTablename() == Product::TABLE) {
+        if ($Manager && $Manager->table->getTablename() == Product::TABLE) {
             $fragment = new \rex_fragment();
             $content  = $fragment->parse('simpleshop/backend/product_list_functions.php');
 

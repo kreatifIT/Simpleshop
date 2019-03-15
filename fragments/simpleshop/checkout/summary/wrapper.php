@@ -124,7 +124,7 @@ $shipping   = $Order->getValue('shipping');
 
         <?php if ($Config['has_summary_footer']): ?>
             <div class="checkout-summary-footer">
-                <form action="" method="post">
+                <form action="<?= rex_getUrl(null, null, array_merge($_GET, ['ts' => time()])) ?>" method="post">
                     <!-- AGB -->
                     <div class="terms-of-service text-right">
                         <div class="custom-checkbox align-right margin-small-bottom">
