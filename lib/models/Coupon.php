@@ -85,7 +85,7 @@ class Coupon extends Discount
         $end     = $this->getValue('end_time') != '' ? strtotime($this->getValue('end_time')) : null;
         $value   = $this->getValue('discount_value');
         $percent = $this->getValue('discount_percent');
-        $orders  = (array)$this->getValue('orders');
+        $orders  = array_filter((array)$this->getValue('orders'));
 
         // calculate residual balance
         if ($value && count($orders)) {
@@ -120,7 +120,7 @@ class Coupon extends Discount
     public function linkToOrder($Order)
     {
         $orders = (array)$this->getValue('orders');
-        $value  = $this->getValue('discount_value');
+        $value  = $this->getValue('value');
         $total  = $Order->getValue('initial_total');
 
         foreach ($orders as $order_id => $order_discount) {
