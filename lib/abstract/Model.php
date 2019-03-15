@@ -110,7 +110,7 @@ abstract class Model extends \rex_yform_manager_dataset
             $stmt->groupByRaw($params['groupBy']);
         }
 
-        if (count($params['select'])) {
+        if (isset($params['select']) && count($params['select'])) {
             $stmt->selectRaw(implode(', ', (array) $params['select']));
         }
 

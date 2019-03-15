@@ -150,7 +150,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
         }
     }
 
-    public function getDefinitions()
+    public function getDefinitions($values = [])
     {
         return [
             'is_hiddeninlist' => true,

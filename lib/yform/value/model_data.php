@@ -97,9 +97,9 @@ class rex_yform_value_model_data extends rex_yform_value_textarea
         return 'model_data|name|label|defaultwert|[no_db]|';
     }
 
-    function getDefinitions()
+    function getDefinitions($values = [])
     {
-        $parent         = parent::getDefinitions();
+        $parent         = parent::getDefinitions($values);
         $parent['name'] = 'model_data';
         return $parent;
     }

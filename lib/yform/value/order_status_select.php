@@ -38,7 +38,7 @@ class rex_yform_value_order_status_select extends rex_yform_value_select
         return parent::enterObject();
     }
 
-    public function getDefinitions()
+    public function getDefinitions($values = [])
     {
         return [
             'type'            => 'value',

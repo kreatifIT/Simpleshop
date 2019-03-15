@@ -51,3 +51,19 @@ if (!$this->hasConfig()) {
     $content = file_get_contents($this->getPath('install') . "/tableset.json");
     \rex_yform_manager_table_api::importTablesets($content);
 }
+
+
+// do update
+rex_yform_manager_table_api::removeTablefield(\FriendsOfREDAXO\Simpleshop\Order::TABLE, 'subtotal');
+rex_yform_manager_table_api::removeTablefield(\FriendsOfREDAXO\Simpleshop\OrderProduct::TABLE, 'order_id');
+
+$updatefolders = glob($this->getPath('install/update*'));
+
+foreach ($updatefolders as $updatefolder) {
+    $files = glob($updatefolder . '/*.json');
+
+    foreach ($files as $file) {
+        $content = file_get_contents($file);
+        \rex_yform_manager_table_api::importTablesets($content);
+    }
+}

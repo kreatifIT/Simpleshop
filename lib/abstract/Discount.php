@@ -15,26 +15,45 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 abstract class Discount extends Model
 {
-    public function applyToOrder($Order)
+    public function applyToOrder($Order, &$brut_prices, $name = '')
     {
         if (!$Order) {
             return false;
         }
-        if ($this->getValue('free_shipping')) {
-            $Order->setValue('shipping_costs', 0);
-            $Order->setValue('initial_shipping_costs', 0);
-        }
-        else if ($this->getValue('discount_value') > 0 || $this->getValue('discount_percent') > 0) {
-            $net_prices = $Order->getValue('net_prices');
-            $shipping   = $Order->getValue('shipping_costs');
-            $_discount  = $this->getValue('discount_value') ?: ($this->getValue('discount_percent') ? array_sum($net_prices) / 100 * $this->getValue('discount_percent') : 0);
-            $discount   = $_discount - $this->applyToNetPrices($_discount, $net_prices, $shipping);
+        if ($name == 'manual_discount') {
+            $discount = $this->getValue('discount_value');
+            $discount = $discount - $this->applyToNetPrices($discount, $brut_prices);
 
-            $Order->setValue('net_prices', $net_prices);
-            $Order->setValue('shipping_costs', $shipping);
-            $Order->setValue('discount', $Order->getValue('discount') + $discount);
+            $this->setValue('value', $discount);
+        } else {
+            if ($this->getValue('free_shipping')) {
+                $Order->setValue('shipping_costs', 0);
+                $discount = 0;
+            } else if ($this->getValue('discount_value') > 0) {
+                $discount = $this->getValue('discount_value');
+            } else if ($this->getValue('discount_percent') > 0) {
+                $discount = array_sum($brut_prices) / 100 * $this->getValue('discount_percent');
+            }
+            $discount = $discount - $this->applyToGrossPrices($discount, $brut_prices);
+
+            $this->setValue('value', $discount);
         }
-        return $this;
+        return $discount;
+    }
+
+    protected function applyToGrossPrices($_discount, &$brut_prices)
+    {
+        // sort by tax percent
+        krsort($brut_prices);
+
+        foreach ($brut_prices as &$brut_price) {
+            $brut_price = $this->calcPriceAndDiff($brut_price, $_discount);
+
+            if ($_discount <= 0) {
+                break;
+            }
+        }
+        return $_discount;
     }
 
     protected function applyToNetPrices($_discount, &$net_prices, &$shipping)
