@@ -71,12 +71,13 @@ class Session extends Model
                 $user_session = parent::query()
                     ->where('customer_id', $User->getId())
                     ->where('session_id', $session_id, '!=')
+                    ->orderBy('last_cart_update', 'DESC')
                     ->orderBy('lastupdate', 'DESC')
                     ->findOne();
 
                 if ($user_session) {
                     // merge sessions because we found to sessions for the same user
-                    $cart_items = (array)$user_session->getValue('cart_items') + (array)self::$session->getValue('cart_items');
+                    $cart_items = array_merge((array)$user_session->getValue('cart_items'), (array)self::$session->getValue('cart_items'));
                     unset($cart_items[0]);
 
                     self::$session = $user_session;
