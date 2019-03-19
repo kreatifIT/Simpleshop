@@ -212,46 +212,52 @@ class Order extends Model
 
             // set order products
             foreach ($products as $product) {
-                $prod_data = Model::prepare($product);
-                $quantity  = $product->getValue('cart_quantity');
-
-                foreach ($prod_data as $name => $value) {
-                    $product->setValue($name, $value);
-                }
-                if (self::$_finalizeOrder) {
-                    if ($product->getValue('inventory') == 'F') {
-                        // update inventory
-                        if ($product->getValue('variant_key')) {
-                            $Variant = Variant::getByVariantKey($product->getValue('key'));
-                            $Variant->setValue('amount', $Variant->getValue('amount') - $quantity);
-                            $Variant->save();
-                        } else {
-                            $product->setValue('amount', $product->getValue('amount') - $quantity);
-                            $product->save();
-                        }
-                    }
-                    if ($product->getValue('type') == 'giftcard') {
-                        Coupon::createGiftcard($this, $product);
-                    }
-                }
-
-                $OrderProduct = OrderProduct::create();
-                $OrderProduct->setValue('data', $product);
-                $OrderProduct->setValue('product_id', $product->getValue('id'));
-                $OrderProduct->setValue('code', $product->getValue('code'));
-                $OrderProduct->setValue('cart_quantity', $quantity);
-                $OrderProduct->setValue('order_id', $order_id);
-                $OrderProduct->setValue('createdate', $date_now);
-
-                $OrderProduct = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.saveOrderProduct', $OrderProduct, [
-                    'Order' => $this,
-                ]));
-
-                $OrderProduct->save(true);
+                $this->saveOrderProduct($product, self::$_finalizeOrder);
             }
         }
         Utils::resetLocale();
         return $result;
+    }
+
+    public function saveOrderProduct($product, $trackInventory = false, $OrderProduct = null)
+    {
+        $prod_data = Model::prepare($product);
+        $quantity  = $product->getValue('cart_quantity');
+
+        foreach ($prod_data as $name => $value) {
+            $product->setValue($name, $value);
+        }
+        if ($trackInventory) {
+            if ($product->getValue('inventory') == 'F') {
+                // update inventory
+                if ($product->getValue('variant_key')) {
+                    $Variant = Variant::getByVariantKey($product->getValue('key'));
+                    $Variant->setValue('amount', $Variant->getValue('amount') - $quantity);
+                    $Variant->save();
+                } else {
+                    $product->setValue('amount', $product->getValue('amount') - $quantity);
+                    $product->save();
+                }
+            }
+            if ($product->getValue('type') == 'giftcard') {
+                Coupon::createGiftcard($this, $product);
+            }
+        }
+
+        if (!$OrderProduct) {
+            $OrderProduct = OrderProduct::create();
+        }
+        $OrderProduct->setValue('data', $product);
+        $OrderProduct->setValue('product_id', $product->getValue('id'));
+        $OrderProduct->setValue('code', $product->getValue('code'));
+        $OrderProduct->setValue('cart_quantity', $quantity);
+        $OrderProduct->setValue('order_id', $this->getId());
+
+        $OrderProduct = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.saveOrderProduct', $OrderProduct, [
+            'Order' => $this,
+        ]));
+
+        $OrderProduct->save(true);
     }
 
     public function recalculateDocument($products = [], $promotions = [], $errors = [])
@@ -556,6 +562,99 @@ class Order extends Model
         $Mpdf->WriteHTML($html);
 
         return $Mpdf;
+    }
+
+    public static function be__addProduct()
+    {
+        $product_id = \rex_api_simpleshop_be_api::$inst->request['productId'];
+        $order_id   = \rex_api_simpleshop_be_api::$inst->request['orderId'];
+        $Product    = $product_id ? Product::get($product_id) : null;
+        $Order      = $order_id ? self::get($order_id) : null;
+
+        if (!$Product) {
+            \rex_api_simpleshop_be_api::$inst->errors[] = 'Product not found with ID: ' . $product_id;
+        } else if (!$Order) {
+            \rex_api_simpleshop_be_api::$inst->errors[] = 'Oder not found with ID: ' . $order_id;
+        } else {
+            $Product->setValue('cart_quantity', 1);
+            $Order->saveOrderProduct($Product, true);
+
+            $fragment = new \rex_fragment();
+            $fragment->setVar('Order', $Order);
+            \rex_api_simpleshop_be_api::$inst->response['html'] = $fragment->parse('simpleshop/backend/order_products.php');
+        }
+    }
+
+    public static function be__removeProduct()
+    {
+        $product_id   = \rex_api_simpleshop_be_api::$inst->request['productId'];
+        $order_id     = \rex_api_simpleshop_be_api::$inst->request['orderId'];
+        $oldAmount    = \rex_api_simpleshop_be_api::$inst->request['old_amount'];
+        $OrderProduct = $product_id ? OrderProduct::get($product_id) : null;
+        $Order        = $order_id ? self::get($order_id) : null;
+
+        if (!$OrderProduct) {
+            \rex_api_simpleshop_be_api::$inst->errors[] = 'OderProduct not found with ID: ' . $product_id;
+        } else if (!$Order) {
+            \rex_api_simpleshop_be_api::$inst->errors[] = 'Oder not found with ID: ' . $order_id;
+        } else {
+            $Product = $OrderProduct->getValue('data');
+
+            // update inventory
+            if ($Product->getValue('inventory') == 'F') {
+                if ($Product->getValue('variant_key')) {
+                    $Variant = Variant::getByVariantKey($Product->getValue('key'));
+                    $Variant->setValue('amount', $Variant->getValue('amount') + $oldAmount);
+                    $Variant->save();
+                } else {
+                    $Product->setValue('amount', $Product->getValue('amount') + $oldAmount);
+                    $Product->save();
+                }
+            }
+            // remove the order product
+            $OrderProduct->delete();
+
+            $fragment = new \rex_fragment();
+            $fragment->setVar('Order', $Order);
+            \rex_api_simpleshop_be_api::$inst->response['html'] = $fragment->parse('simpleshop/backend/order_products.php');
+        }
+    }
+
+    public static function be__changeProductQuantity()
+    {
+        $product_id   = \rex_api_simpleshop_be_api::$inst->request['productId'];
+        $order_id     = \rex_api_simpleshop_be_api::$inst->request['orderId'];
+        $amount       = \rex_api_simpleshop_be_api::$inst->request['new_amount'];
+        $oldAmount    = \rex_api_simpleshop_be_api::$inst->request['old_amount'];
+        $OrderProduct = $product_id ? OrderProduct::get($product_id) : null;
+        $Order        = $order_id ? self::get($order_id) : null;
+
+        if (!$OrderProduct) {
+            \rex_api_simpleshop_be_api::$inst->errors[] = 'OderProduct not found with ID: ' . $product_id;
+        } else if (!$Order) {
+            \rex_api_simpleshop_be_api::$inst->errors[] = 'Oder not found with ID: ' . $order_id;
+        } else {
+            $Product = $OrderProduct->getValue('data');
+
+            // update inventory
+            if ($Product->getValue('inventory') == 'F') {
+                if ($Product->getValue('variant_key')) {
+                    $Variant = Variant::getByVariantKey($Product->getValue('key'));
+                    $Variant->setValue('amount', $Variant->getValue('amount') + $oldAmount);
+                    $Variant->save();
+                } else {
+                    $Product->setValue('amount', $Product->getValue('amount') + $oldAmount);
+                    $Product->save();
+                }
+            }
+
+            $Product->setValue('cart_quantity', $amount);
+            $Order->saveOrderProduct($Product, true, $OrderProduct);
+
+            $fragment = new \rex_fragment();
+            $fragment->setVar('Order', $Order);
+            \rex_api_simpleshop_be_api::$inst->response['html'] = $fragment->parse('simpleshop/backend/order_products.php');
+        }
     }
 }
 
