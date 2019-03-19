@@ -74,6 +74,9 @@ class rex_api_simpleshop_be_api extends rex_api_function
 
         $this->response['errors'] = $this->errors;
 
+        if (count($this->response['errors'])) {
+            $this->success = false;
+        }
         return new \rex_api_result($this->success, $this->response);
     }
 
