@@ -624,7 +624,7 @@ class Order extends Model
     {
         $product_id   = \rex_api_simpleshop_be_api::$inst->request['productId'];
         $order_id     = \rex_api_simpleshop_be_api::$inst->request['orderId'];
-        $amount       = \rex_api_simpleshop_be_api::$inst->request['new_amount'];
+        $amount       = \rex_api_simpleshop_be_api::$inst->request['quantity'];
         $oldAmount    = \rex_api_simpleshop_be_api::$inst->request['old_amount'];
         $OrderProduct = $product_id ? OrderProduct::get($product_id) : null;
         $Order        = $order_id ? self::get($order_id) : null;
@@ -649,6 +649,12 @@ class Order extends Model
             }
 
             $Product->setValue('cart_quantity', $amount);
+
+            \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.before_be__changeProductQuantity', $Product, [
+                'Order'        => $Order,
+                'OrderProduct' => $OrderProduct,
+            ]));
+
             $Order->saveOrderProduct($Product, true, $OrderProduct);
 
             $fragment = new \rex_fragment();

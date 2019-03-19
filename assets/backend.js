@@ -279,22 +279,29 @@ var Simpleshop = (function ($) {
         },
 
         changeOrderProductQuantity: function (_this, orderId, productId, oldAmount) {
-            var $container = $(_this).parents('#order-product-container'),
+            var formData = {},
+                $container = $(_this).parents('#order-product-container'),
+                $tr = $(_this).parents('tr'),
+                serialized = $tr.find('input, select, textarea').serialize().split('&'),
                 loading = addLoading($container);
+
+            for (var i in serialized) {
+                var chunks = serialized[i].split('=');
+                formData[chunks[0]] = chunks[1];
+            }
 
             $.ajax({
                 url: rex.simpleshop.ajax_url,
                 method: 'GET',
                 cache: false,
-                data: {
+                data: $.extend(formData, {
                     'debug': rex.debug,
                     'orderId': orderId,
                     'productId': productId,
                     'old_amount': oldAmount,
-                    'new_amount': $(_this).val(),
                     'controller': 'Order.be__changeProductQuantity',
                     'rex-api-call': 'simpleshop_be_api'
-                }
+                })
             }).done(function (resp) {
                 if (resp.succeeded) {
                     $container.html(resp.message.html);
