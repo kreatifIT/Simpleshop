@@ -188,6 +188,10 @@ class Order extends Model
                 $prod_data = Model::prepare($product);
                 $quantity  = $product->getValue('cart_quantity');
 
+                if (!$quantity) {
+                    $quantity  = $product->getValue('quantity');
+                }
+
                 foreach ($prod_data as $name => $value) {
                     $product->setValue($name, $value);
                 }
@@ -249,6 +253,10 @@ class Order extends Model
             // calculate products total
             foreach ($products as $product) {
                 $quantity = $product->getValue('cart_quantity');
+
+                if (!$quantity) {
+                    $quantity = $product->getValue('quantity');
+                }
                 $tax_perc = $this->isTaxFree() ? 0 : Tax::get($product->getValue('tax'))
                     ->getValue('tax');
 

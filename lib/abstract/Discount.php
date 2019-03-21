@@ -56,14 +56,11 @@ abstract class Discount extends Model
         return $_discount;
     }
 
-    protected function applyToNetPrices($_discount, &$net_prices, &$shipping)
+    protected function applyToNetPrices($_discount, &$net_prices)
     {
         // sort by tax percent
         krsort($net_prices);
 
-        if ($shipping) {
-            $shipping = $this->calcPriceAndDiff($shipping, $_discount);
-        }
         foreach ($net_prices as &$net_price) {
             $net_price = $this->calcPriceAndDiff($net_price, $_discount);
 

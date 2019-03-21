@@ -22,7 +22,8 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
             // set user lang id
             if ($Customer) {
                 \rex_clang::setCurrentId($Customer->getValue('lang_id', false, \rex_clang::getCurrentId()));
-                setlocale(LC_ALL, \rex_clang::getCurrent()->getValue('clang_setlocale'));
+                setlocale(LC_ALL, \rex_clang::getCurrent()
+                    ->getValue('clang_setlocale'));
             }
 
             switch ($action) {
@@ -54,23 +55,10 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                     exit;
 
                 case 'recalculate_sums':
-                    $products       = [];
-                    $order_products = \FriendsOfREDAXO\Simpleshop\OrderProduct::getAll(true, ['filter' => [['order_id', $Order->getId()]], 'orderBy' => 'm.id']);
                     $promotions     = $Order->getValue('promotions', false, []);
-                    $abos           = $Order->getValue('abos');
-                    $discount       = 0;
+                    $order_products = $Order->getProducts(false);
 
-                    foreach ($order_products as $order_product) {
-                        $product = $order_product->getValue('data');
-                        $product->setValue('cart_quantity', $order_product->getValue('quantity'));
-                        $products[] = $product;
-                    }
-
-                    foreach ($abos as $abo) {
-                        $discount += $abo['value'];
-                    }
-                    $Order->setValue('manual_discount', $discount);
-                    $Order->recalculateDocument($products, $promotions);
+                    $Order->recalculateDocument($order_products, $promotions);
                     $Order->save();
 
                     unset($_GET['ss-action']);
@@ -88,20 +76,38 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
 
                     if ($Customer) {
                         $output[] = '
-                            <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'resend_email'])) . '" class="btn btn-default">
+                        <a href="' . rex_url::currentBackendPage([
+                                'table_name' => rex_get('table_name', 'string'),
+                                'data_id'    => rex_get('data_id', 'int'),
+                                'func'       => rex_get('func', 'string'),
+                                'ss-action'  => 'resend_email',
+                                'ts'         => time(),
+                            ]) . '" class="btn btn-default">
                                 <i class="fa fa-send"></i>&nbsp;
                                 ' . rex_i18n::msg('label.resend_email') . '
                             </a>
                         ';
                     }
                     $output[] = '
-                        <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'recalculate_sums'])) . '" class="btn btn-default">
+                        <a href="' . rex_url::currentBackendPage([
+                            'table_name' => rex_get('table_name', 'string'),
+                            'data_id'    => rex_get('data_id', 'int'),
+                            'func'       => rex_get('func', 'string'),
+                            'ss-action'  => 'recalculate_sums',
+                            'ts'         => time(),
+                        ]) . '" class="btn btn-default">
                             <i class="fa fa-calculator"></i>&nbsp;
                             ' . rex_i18n::msg('label.recalculate_sums') . '
                         </a>
                     ';
                     $output[] = '
-                        <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'generate_pdf'])) . '" class="btn btn-default">
+                        <a href="' . rex_url::currentBackendPage([
+                            'table_name' => rex_get('table_name', 'string'),
+                            'data_id'    => rex_get('data_id', 'int'),
+                            'func'       => rex_get('func', 'string'),
+                            'ss-action'  => 'generate_pdf',
+                            'ts'         => time(),
+                        ]) . '" class="btn btn-default">
                             <i class="fa fa-file"></i>&nbsp;
                             PDF drucken
                         </a>
@@ -115,24 +121,38 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
 
                         if ($CreditNote) {
                             $output[] = '
-                                <a href="' . rex_url::currentBackendPage(['table_name' => 'rex_shop_order', 'data_id' => $CreditNote->getId(), 'func' => 'edit']) . '" class="btn btn-primary">
+                                <a href="' . rex_url::currentBackendPage([
+                                    'table_name' => 'rex_shop_order',
+                                    'data_id'    => $CreditNote->getId(),
+                                    'func'       => 'edit',
+                                    'ts'         => time(),
+                                ]) . '" class="btn btn-primary">
                                     <i class="fa fa-money"></i>&nbsp;
                                     ' . rex_i18n::msg('action.goto_creditnote') . '
                                 </a>
                             ';
-                        }
-                        else {
+                        } else {
                             $output[] = '
-                                <a href="' . rex_url::currentBackendPage(array_merge($_GET, ['ss-action' => 'generate_creditnote'])) . '" class="btn btn-default">
+                                <a href="' . rex_url::currentBackendPage([
+                                    'table_name' => rex_get('table_name', 'string'),
+                                    'data_id'    => rex_get('data_id', 'int'),
+                                    'func'       => rex_get('func', 'string'),
+                                    'ss-action'  => 'generate_creditnote',
+                                    'ts'         => time(),
+                                ]) . '" class="btn btn-default">
                                     <i class="fa fa-money"></i>&nbsp;
                                     ' . rex_i18n::msg('label.generate_creditnote') . '
                                 </a>
                             ';
                         }
-                    }
-                    else if ($Order->valueIsset('ref_order_id')) {
+                    } else if ($Order->valueIsset('ref_order_id')) {
                         $output[] = '
-                                <a href="' . rex_url::currentBackendPage(['table_name' => 'rex_shop_order', 'data_id' => $Order->getValue('ref_order_id'), 'func' => 'edit']) . '" class="btn btn-primary">
+                                <a href="' . rex_url::currentBackendPage([
+                                'table_name' => 'rex_shop_order',
+                                'data_id'    => $Order->getValue('ref_order_id'),
+                                'func'       => 'edit',
+                                'ts'         => time(),
+                            ]) . '" class="btn btn-primary">
                                     <i class="fa fa-file-text-o"></i>&nbsp;
                                     ' . rex_i18n::msg('action.goto_order') . '
                                 </a>
