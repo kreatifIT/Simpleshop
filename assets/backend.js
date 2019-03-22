@@ -188,6 +188,131 @@ var Simpleshop = (function ($) {
                     showFunctionList();
                 }
             }
+        },
+
+        addOrderProduct: function (_this, orderId) {
+            var $table = $(_this).parents('table'),
+                $container = $(_this).parents('#order-product-container');
+
+            $table.append('<tr><td colspan="15"><select class="select2 form-control"></select></td></tr>');
+
+            var $select = $table.find('select.select2').select2({
+                debug: true,
+                cache: false,
+                ajax: {
+                    url: rex.simpleshop.ajax_url,
+                    data: function (params) {
+                        return {
+                            'rex-api-call': 'simpleshop_api',
+                            controller: 'Package.selectProducts',
+                            page: params.page,
+                            term: params.term
+                        }
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 0;
+                        return data.message.result
+                    }
+                }
+            });
+
+            $select.on('change', function (e) {
+                var loading = addLoading($container);
+
+                $.ajax({
+                    url: rex.simpleshop.ajax_url,
+                    method: 'GET',
+                    cache: false,
+                    data: {
+                        'debug': rex.debug,
+                        'orderId': orderId,
+                        'productId': $(this).val(),
+                        'controller': 'Order.be__addProduct',
+                        'rex-api-call': 'simpleshop_be_api'
+                    }
+                }).done(function (resp) {
+                    if (resp.succeeded) {
+                        $container.html(resp.message.html);
+                        loading.remove();
+                    }
+                    else {
+                        for (var i in resp.message.errors) {
+                            KreatifAddon.showAlert(resp.message.errors[i]);
+                        }
+                    }
+                });
+            });
+        },
+
+        removeOrderProduct: function (_this, orderId, productId, oldAmount, msg) {
+            if (productId == '') {
+                $(_this).parents('tr').remove();
+            }
+            else if (confirm(msg)) {
+                var $container = $(_this).parents('#order-product-container'),
+                    loading = addLoading($container);
+
+                $.ajax({
+                    url: rex.simpleshop.ajax_url,
+                    method: 'GET',
+                    cache: false,
+                    data: {
+                        'debug': rex.debug,
+                        'orderId': orderId,
+                        'productId': productId,
+                        'old_amount': oldAmount,
+                        'controller': 'Order.be__removeProduct',
+                        'rex-api-call': 'simpleshop_be_api'
+                    }
+                }).done(function (resp) {
+                    if (resp.succeeded) {
+                        $container.html(resp.message.html);
+                        loading.remove();
+                    }
+                    else {
+                        for (var i in resp.message.errors) {
+                            KreatifAddon.showAlert(resp.message.errors[i]);
+                        }
+                    }
+                });
+            }
+        },
+
+        changeOrderProductQuantity: function (_this, orderId, productId, oldAmount) {
+            var formData = {},
+                $container = $(_this).parents('#order-product-container'),
+                $tr = $(_this).parents('tr'),
+                serialized = $tr.find('input, select, textarea').serialize().split('&'),
+                loading = addLoading($container);
+
+            for (var i in serialized) {
+                var chunks = serialized[i].split('=');
+                formData[chunks[0]] = chunks[1];
+            }
+
+            $.ajax({
+                url: rex.simpleshop.ajax_url,
+                method: 'GET',
+                cache: false,
+                data: $.extend(formData, {
+                    'debug': rex.debug,
+                    'orderId': orderId,
+                    'productId': productId,
+                    'old_amount': oldAmount,
+                    'controller': 'Order.be__changeProductQuantity',
+                    'rex-api-call': 'simpleshop_be_api'
+                })
+            }).done(function (resp) {
+                if (resp.succeeded) {
+                    $container.html(resp.message.html);
+                    loading.remove();
+                }
+                else {
+                    for (var i in resp.message.errors) {
+                        KreatifAddon.showAlert(resp.message.errors[i]);
+                    }
+                }
+            });
         }
     };
 })(jQuery);
