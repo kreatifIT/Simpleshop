@@ -15,34 +15,36 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 abstract class Discount extends Model
 {
-    public function applyToOrder($Order, &$brut_prices, $name = '')
+    public function applyToOrder($Order, &$gross_prices, $name = '')
     {
         if (!$Order) {
             return false;
         }
+        $discount = 0;
+
         if ($name == 'manual_discount') {
             $discount = $this->getValue('discount_value');
-            $discount = $discount - $this->applyToNetPrices($discount, $brut_prices);
-
-            $this->setValue('value', $discount);
-        } else {
-            if ($this->getValue('free_shipping')) {
-                $Order->setValue('shipping_costs', 0);
-                $discount = 0;
-            } else if ($this->getValue('discount_value') > 0) {
-                $discount = $this->getValue('discount_value');
-            } else if ($this->getValue('discount_percent') > 0) {
-                $discount = array_sum($brut_prices) / 100 * $this->getValue('discount_percent');
-            }
-            $discount = $discount - $this->applyToGrossPrices($discount, $brut_prices);
-
-            $this->setValue('value', $discount);
+        } else if ($this->getValue('free_shipping')) {
+            $Order->setValue('shipping_costs', 0);
+            $discount = 0;
+        } else if ($this->getValue('discount_value') > 0) {
+            $discount = $this->getValue('discount_value');
+        } else if ($this->getValue('discount_percent') > 0) {
+            $discount = array_sum($gross_prices) / 100 * $this->getValue('discount_percent');
         }
+
+        if ($discount > 0) {
+            $discount = $discount - $this->applyToGrossPrices($discount, $gross_prices);
+        }
+        $this->setValue('value', $discount);
+        
         return $discount;
     }
 
     public function applyToCart(&$brut_prices)
     {
+        $discount = 0;
+
         if ($this->getValue('free_shipping')) {
             // nothing to do?
             $discount = 0;
@@ -51,44 +53,28 @@ abstract class Discount extends Model
         } else if ($this->getValue('discount_percent') > 0) {
             $discount = array_sum($brut_prices) / 100 * $this->getValue('discount_percent');
         }
-        $discount = $discount - $this->applyToGrossPrices($discount, $brut_prices);
 
+        if ($discount > 0) {
+            $discount = $discount - $this->applyToGrossPrices($discount, $gross_prices);
+        }
         $this->setValue('value', $discount);
 
         return $discount;
     }
 
-    protected function applyToGrossPrices($_discount, &$brut_prices)
+    protected function applyToGrossPrices($_discount, &$gross_prices)
     {
         // sort by tax percent
-        krsort($brut_prices);
+        krsort($gross_prices);
 
-        foreach ($brut_prices as &$brut_price) {
-            $brut_price = $this->calcPriceAndDiff($brut_price, $_discount);
+        foreach ($gross_prices as $tax => &$gross_price) {
+            $gross_price = $this->calcPriceAndDiff($gross_price, $_discount);
 
             if ($_discount <= 0) {
                 break;
             }
         }
         return $_discount;
-    }
-
-    protected function applyToNetPrices($_discount, &$brut_prices)
-    {
-        // sort by tax percent
-        krsort($brut_prices);
-        $brut_discount = 0;
-
-        foreach ($brut_prices as $tax => &$brut_price) {
-            $net_price     = $brut_price + ($brut_price / 100 * $tax);
-            $brut_discount += $_discount / (100 + $tax) * $tax;
-            $brut_price    = $this->calcPriceAndDiff($net_price, $_discount) / (100 + $tax) * 100;
-
-            if ($_discount <= 0) {
-                break;
-            }
-        }
-        return $brut_discount - $_discount;
     }
 
     protected function calcPriceAndDiff($price, &$diff)
