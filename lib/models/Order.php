@@ -129,13 +129,11 @@ class Order extends Model
             $this->setValue('createdate', $date_now);
         }
 
-        if (self::$_finalizeOrder && ($this->getValue('invoice_num') === null || $this->getValue('invoice_num') === 0)) {
-
-            $sql->setQuery('SELECT MAX(invoice_num) as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"');
-            $value = $sql->getValue('num');
-            $num   = (int)substr($value, 2) + 1;
-            $num   = date('y') . str_pad($num, 5, '0', STR_PAD_LEFT);
-            $num   = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoice_num', $num, ['Order' => $this, 'value' => $value]));
+        if (self::$_finalizeOrder && ($this->getValue('invoice_num') === null || (int)$this->getValue('invoice_num') === 0)) {
+            $query = 'SELECT MAX(invoice_num) as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"';
+            $sql->setQuery($query);
+            $num = $sql->getValue('num');
+            $num = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoice_num', $num, ['Order' => $this, 'value' => $value]));
 
             if ($num == 0) {
                 $num = null;
@@ -189,7 +187,7 @@ class Order extends Model
                 $quantity  = $product->getValue('cart_quantity');
 
                 if (!$quantity) {
-                    $quantity  = $product->getValue('quantity');
+                    $quantity = $product->getValue('quantity');
                 }
 
                 foreach ($prod_data as $name => $value) {
@@ -212,7 +210,7 @@ class Order extends Model
                     }
                 }
                 $OrderProduct = OrderProduct::create();
-                $OrderProduct->setValue('order_id', $order_id.'a');
+                $OrderProduct->setValue('order_id', $order_id . 'a');
                 $OrderProduct->setValue('product_id', $product->getValue('id'));
                 $OrderProduct->setValue('code', $product->getValue('code'));
                 $OrderProduct->setValue('quantity', $quantity);
@@ -236,18 +234,18 @@ class Order extends Model
     {
         Utils::setCalcLocale();
 
-        $net_prices          = [];
-        $this->quantity      = 0;
-        $this->discount      = 0;
-        $this->initial_total = 0;
-        $manual_discount     = $this->getValue('manual_discount', false, 0);
+        $gross_prices    = [];
+        $net_prices      = [];
+        $this->quantity  = 0;
+        $this->discount  = 0;
+        $manual_discount = $this->getValue('manual_discount', false, 0);
 
         if ($this->getValue('status') == 'CN') {
             // calculate credit note total
             $ROrder = Order::get($this->getValue('ref_order_id'));
 
             if ($ROrder) {
-                $net_prices = $this->calculateCreditNote($ROrder);
+                $gross_prices = $this->calculateCreditNote($ROrder);
             }
         } else {
             // calculate products total
@@ -260,9 +258,9 @@ class Order extends Model
                 $tax_perc = $this->isTaxFree() ? 0 : Tax::get($product->getValue('tax'))
                     ->getValue('tax');
 
-                $net_prices[$tax_perc] += (float)$product->getPrice(!$this->isTaxFree()) * $quantity;
-                $this->initial_total   += (float)$product->getPrice(!$this->isTaxFree()) * $quantity;
-                $this->quantity        += $quantity;
+                $net_prices[$tax_perc]   += (float)$product->getPrice(false) * $quantity;
+                $gross_prices[$tax_perc] += (float)$product->getPrice(!$this->isTaxFree()) * $quantity;
+                $this->quantity          += $quantity;
             }
         }
         // get shipping costs
@@ -281,11 +279,15 @@ class Order extends Model
         } else {
             $this->setValue('shipping_costs', 0);
         }
+        ksort($gross_prices);
         ksort($net_prices);
+
 
         $this->setValue('updatedate', date('Y-m-d H:i:s'));
         $this->setValue('net_prices', $net_prices);
-        $this->setValue('total', array_sum($net_prices));
+        $this->setValue('brut_prices', $gross_prices);
+        $this->setValue('initial_total', array_sum($gross_prices));
+        $this->setValue('total', array_sum($gross_prices));
 
         // calculate manual discount8
         if ($manual_discount > 0) {
@@ -298,7 +300,7 @@ class Order extends Model
         }
 
         // set promotions for order history
-        list($_errors, $promotions) = $this->calculatePrices($promotions, $net_prices);
+        list($_errors, $promotions) = $this->calculatePrices($promotions);
 
         $errors = array_merge((array)$errors, (array)$_errors);
 
@@ -323,49 +325,37 @@ class Order extends Model
 
     public function calculateCreditNote(Order $ReferenceOrder)
     {
-        $total      = $ReferenceOrder->getValue('total') * -1;
-        $net_prices = $ReferenceOrder->getValue('net_prices');
-
-        foreach ($net_prices as &$net_price) {
-            $net_price = $net_price * -1;
-        }
+        $gross_prices = $ReferenceOrder->getValue('brut_prices');
+        $net_prices   = $ReferenceOrder->getValue('net_prices');
+        $total        = $ReferenceOrder->getValue('total') * -1;
 
         $this->setValue('customer_id', $ReferenceOrder->getValue('customer_id'));
         $this->setValue('status', 'CN');
         $this->setValue('initial_total', $total);
+        $this->setValue('total', $total);
+        $this->setValue('brut_prices', $gross_prices);
         $this->setValue('net_prices', $net_prices);
         $this->setValue('address_1', $ReferenceOrder->getValue('address_1'));
         $this->setValue('ip_address', rex_server('REMOTE_ADDR', 'string', 'notset'));
-        $this->setValue('total', $total);
         $this->setValue('ref_order_id', $ReferenceOrder->getId());
 
         self::$_finalizeOrder = true;
 
-        return $net_prices;
+        return $gross_prices;
     }
 
-    private function calculatePrices($promotions, $net_prices)
+    private function calculatePrices($promotions)
     {
-        $taxes       = [];
-        $errors      = [];
-        $_promotions = [];
-        $brut_prices = [];
-        $discount    = 0;
-
-        $this->setValue('net_prices', $net_prices);
-
-        // set gross prices
-        foreach ($net_prices as $tax => $net_price) {
-            $brut_prices[$tax] += (float)$net_price / (100 + $tax) * 100;
-        }
-
-        $this->setValue('brut_prices', $brut_prices);
+        $discount     = 0;
+        $taxes        = [];
+        $errors       = [];
+        $_promotions  = [];
+        $gross_prices = $this->getValue('brut_prices');
 
         foreach ($promotions as $name => $promotion) {
             try {
                 if (is_object($promotion)) {
-
-                    $discount += $promotion->applyToOrder($this, $brut_prices, $name);
+                    $discount += $promotion->applyToOrder($this, $gross_prices, $name);
                 }
             } catch (\Exception $ex) {
                 $errors[]  = ['label' => $ex->getLabelByCode()];
@@ -377,8 +367,8 @@ class Order extends Model
         }
 
         // set tax costs
-        foreach ($brut_prices as $tax => $brut_price) {
-            $taxes[$tax] += (float)$brut_price * ($tax / 100);
+        foreach ($gross_prices as $tax => $gross_price) {
+            $taxes[$tax] += (float)$gross_price / ($tax + 100) * $tax;
         }
 
         // set shipping costs
@@ -396,7 +386,8 @@ class Order extends Model
 
         $this->setValue('taxes', $taxes);
         $this->setValue('discount', $discount);
-        $this->setValue('total', $this->getValue('shipping_costs') + array_sum($brut_prices) + array_sum($taxes)) - $discount;
+        $this->setValue('brut_prices', $gross_prices);
+        $this->setValue('total', $this->getValue('shipping_costs') + array_sum($gross_prices));
 
         return [$errors, $_promotions];
     }
@@ -443,7 +434,7 @@ class Order extends Model
 
     public function getInvoicePDF($type = 'invoice', $debug = false, Mpdf $_Mpdf = null)
     {
-        if (!class_exists('Mpdf')) {
+        if (!class_exists('Kreatif\Mpdf\Mpdf')) {
             return false;
         }
 
@@ -456,8 +447,8 @@ class Order extends Model
             $type = 'order';
         }
 
+        $discounts = [];
         $docTitle  = $type == 'invoice' ? 'simpleshop.invoice_title' : 'simpleshop.orderdocument_title';
-        $discounts = (array)$this->getValue('abos');
         $mdiscount = $this->getValue('manual_discount');
 
         $Mpdf->SetProtection(['print']);

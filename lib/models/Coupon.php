@@ -75,7 +75,7 @@ class Coupon extends Discount
         $orders  = array_filter((array)$this->getValue('orders'));
 
         // calculate residual balance
-        if ($value && count($orders)) {
+        if ($this->getValue('is_multi_use') != 1 && $value && count($orders)) {
             $_value = $value;
             foreach ($orders as $order_id => $order_discount) {
                 $value -= (float)$order_discount;
