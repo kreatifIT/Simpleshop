@@ -130,10 +130,10 @@ class Order extends Model
         }
 
         if (self::$_finalizeOrder && ($this->getValue('invoice_num') === null || (int)$this->getValue('invoice_num') === 0)) {
-            $query = 'SELECT MAX(invoice_num) as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"';
+            $query = 'SELECT MAX(invoice_num) + 1 as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"';
             $sql->setQuery($query);
             $num = $sql->getValue('num');
-            $num = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoice_num', $num, ['Order' => $this, 'value' => $value]));
+            $num = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoice_num', $num, ['Order' => $this]));
 
             if ($num == 0) {
                 $num = null;
