@@ -153,13 +153,16 @@ class Order extends Model
             $this->setValue('createdate', $date_now);
         }
 
-        if (self::$_finalizeOrder && ($this->getValue('invoice_num') === null || $this->getValue('invoice_num') === 0)) {
-            $sql->setQuery('SELECT MAX(invoice_num) as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"');
-            $value = $sql->getValue('num');
-            $num   = (int)substr($value, 2) + 1;
-            $num   = date('y') . str_pad($num, 5, '0', STR_PAD_LEFT);
+        if (self::$_finalizeOrder && ($this->getValue('invoice_num') === null || (int)$this->getValue('invoice_num') === 0)) {
+            $query = 'SELECT MAX(invoice_num) + 1 as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"';
+            $sql->setQuery($query);
+            $num = $sql->getValue('num');
+            $num = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoice_num', $num, ['Order' => $this, 'value' => $value]));
 
-            $this->setValue('invoice_num', \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoice_num', $num, ['Order' => $this, 'value' => $value])));
+            if ($num == 0) {
+                $num = null;
+            }
+            $this->setValue('invoice_num', $num);
         }
 
         $result = parent::save(true);
