@@ -81,14 +81,14 @@ class Coupon extends Discount
 
     protected function apply($method, $Order, &$brut_prices)
     {
-        $start   = strtotime($this->getValue('start_time'));
-        $end     = $this->getValue('end_time') != '' ? strtotime($this->getValue('end_time')) : null;
+        $start   = strtotime($this->getValue('start_time') . ' 00:00:00');
+        $end     = $this->getValue('end_time') != '' ? strtotime($this->getValue('end_time') . ' 23:59:59') : null;
         $value   = $this->getValue('discount_value');
         $percent = $this->getValue('discount_percent');
         $orders  = array_filter((array)$this->getValue('orders'));
 
         // calculate residual balance
-        if ($value && count($orders)) {
+        if ($this->getValue('is_multi_use') != 1 && $value && count($orders)) {
             $_value = $value;
             foreach ($orders as $order_id => $order_discount) {
                 $value -= (float)$order_discount;
@@ -97,7 +97,7 @@ class Coupon extends Discount
         }
 
         // do some checks
-        if (count($orders) && ($value <= 0 || $percent)) {
+        if ($this->getValue('is_multi_use') != 1 && count($orders) && ($value <= 0 || $percent)) {
             throw new CouponException('Coupon consumed', 2);
         } else if ($start > time()) {
             throw new CouponException('Coupon not yet valid', 3);
