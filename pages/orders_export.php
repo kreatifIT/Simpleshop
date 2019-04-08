@@ -57,6 +57,38 @@ if ($_FUNC == 'export-csv' && count($order_ids)) {
     $fragment->setVar('statuses', $statuses);
     echo $fragment->parse('simpleshop/backend/export/orders_export_csv.php');
     exit;
+} else if ($_FUNC == 'export-xml' && count($order_ids)) {
+    $zip         = new \ZipArchive();
+    $folder      = \rex_path::addonData('simpleshop', 'invoice_xml/' . date('Y') . '/' . date('m'));
+    $archiveName = date('Y-m-d_His') . '.zip';
+
+    \rex_response::cleanOutputBuffers();
+    \rex_dir::create($folder . '/' . date('Ymd'), true);
+
+    $zip->open($folder . '/' . $archiveName, \ZipArchive::CREATE);
+
+    foreach ($order_ids as $order_id) {
+        $Order = Order::get($order_id);
+        $XMLi  = $Order->getXML();
+
+        if ($XMLi) {
+            $XMLi->buildXML();
+            $xml   = $XMLi->getXMLFormated();
+            $iDate = date('Y-m-d', strtotime($Order->getValue('createdate')));
+
+            $filename = \rex::getServerName() . '_' . $Order->getValue('id') . '_' . $iDate . '__' . $Order->getValue('invoice_num') . '.xml';
+            \rex_file::put($folder . '/' . date('Ymd') . '/' . $filename, \Wildcard::parse($xml));
+
+            $zip->addFile($folder . '/' . date('Ymd') . '/' . $filename, $filename);
+        }
+    }
+    $zip->close();
+
+    \rex_dir::deleteFiles($folder . '/' . date('Ymd') . '/');
+    \rex_dir::delete($folder . '/' . date('Ymd') . '/');
+    \rex_response::sendCacheControl();
+    \rex_response::sendFile($folder . '/' . $archiveName, 'application/zip', 'attachment');
+    exit;
 } else if ($_FUNC == 'export-pdf' && count($order_ids)) {
     ob_clean();
 

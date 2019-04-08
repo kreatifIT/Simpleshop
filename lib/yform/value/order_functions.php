@@ -45,6 +45,29 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                         $PDF->Output();
                         exit;
 
+                    case 'download_xml':
+                        rex_response::cleanOutputBuffers();
+                        $iDateTs = strtotime($Order->getValue('createdate'));
+                        $iDate   = date('Y-m-d', $iDateTs);
+
+                        $XMLi = $Order->getXML();
+
+                        if ($XMLi) {
+                            $XMLi->buildXML();
+                            $xml = $XMLi->getXMLFormated();
+
+                            $folder   = rex_path::addonData('simpleshop', 'invoice_xml/' . date('Y', $iDateTs) . '/' . date('m', $iDateTs));
+                            $filename = rex::getServerName() . '_' . $iDate . '__' . $Order->getValue('invoice_num') . '.xml';
+
+                            rex_dir::create($folder, true);
+                            rex_file::put($folder . '/' . $filename, Wildcard::parse($xml));
+
+                            rex_response::setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
+                            rex_response::sendContent($xml, 'text/xml');
+                            exit;
+                        }
+                        break;
+
                     case 'generate_packing_list':
                         rex_response::cleanOutputBuffers();
                         $PDF = $Order->getPackingListPDF(false);
@@ -147,6 +170,18 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                         PDF drucken
                     </a>
                 ';
+                $output[] = '
+                    <a href="' . rex_url::currentBackendPage([
+                        'table_name' => rex_get('table_name', 'string'),
+                        'data_id'    => rex_get('data_id', 'int'),
+                        'func'       => rex_get('func', 'string'),
+                        'ss-action'  => 'download_xml',
+                        'ts'         => time(),
+                    ]) . '" class="btn btn-default">
+                                <i class="fa fa-code"></i>&nbsp;
+                                XML downloaden
+                            </a>
+                        ';
             }
 
             if ($Order->getValue('status') == 'CA') {
