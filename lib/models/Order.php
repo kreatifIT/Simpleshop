@@ -15,6 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 
 use Kreatif\Mpdf\Mpdf;
+use Kreatif\Project\Settings;
 
 
 class Order extends Model
@@ -489,6 +490,48 @@ class Order extends Model
         $Mpdf->WriteHTML($html);
 
         return $Mpdf;
+    }
+
+    public function getXML()
+    {
+        if ((int)$this->getValue('invoice_num') <= 0) {
+            return null;
+        }
+
+        $XMLInvoice  = XMLInvoice::factory();
+        $Customer    = $this->getInvoiceAddress();
+        $xmlData     = $XMLInvoice->getData();
+        $iDateTs     = strtotime($this->getValue('createdate'));
+        $iDate       = date('Y-m-d', $iDateTs);
+        $totalnetto  = number_format(abs($this->getValue('total')) / 122 * 100, 2, '.', '');
+        $totalbrutto = number_format($totalnetto * 1.22, 2, '.', '');
+
+        $xmlData["document_lines"]                 = [];
+        $xmlData['document_type']                  = $this->getValue('status') == 'CN' ? 'TD04' : 'TD01';
+        $xmlData['receiver_name']                  = trim($Customer->getName());
+        $xmlData['receiver_private_vat_number']    = mb_strtoupper($Customer->getValue('fiscal_code'));
+        $xmlData['receiver_head_quarter_street']   = $Customer->getValue('street');
+        $xmlData['receiver_head_quarter_zip']      = $Customer->getValue('postal');
+        $xmlData['receiver_head_quarter_city']     = $Customer->getValue('location');
+        $xmlData['receiver_head_quarter_province'] = 'BZ';
+        $xmlData['receiver_head_quarter_nation']   = 'IT';
+
+        $xmlData['document_date']   = $iDate;
+        $xmlData['document_number'] = $this->getValue('invoice_num');
+
+        $xmlData["document_lines"][1]["line_number"]         = 1;
+        $xmlData["document_lines"][1]["line_description"]    = Settings::INVOICE_LINE_DESC;
+        $xmlData["document_lines"][1]["line_quantity"]       = 1;
+        $xmlData["document_lines"][1]["line_single_price"]   = $totalnetto;
+        $xmlData["document_lines"][1]["line_total_price"]    = $totalnetto;
+        $xmlData["document_lines"][1]["line_vat_percentage"] = 22;
+
+        $xmlData["sales_totale_netto"] = $totalnetto;
+        $xmlData["sales_totale_vat"]   = $totalnetto * 0.22;
+        $xmlData["sales_totale"]       = $totalbrutto;
+
+        $XMLInvoice->setData($xmlData);
+        return $XMLInvoice;
     }
 }
 

@@ -39,6 +39,8 @@ $months         = $this->getVar('months');
         &nbsp;&nbsp;&nbsp;
         <button class="btn btn-apply float-left" type="submit" name="func" value="export-csv">CSV <?= $this->i18n("action.export") ?></button>
         &nbsp;&nbsp;&nbsp;
+        <button class="btn btn-apply float-left" type="submit" name="func" value="export-xml">XML <?= $this->i18n("action.export") ?></button>
+        &nbsp;&nbsp;&nbsp;
 
         <?php
         $this->subfragment('simpleshop/backend/export/action_bar_extra_btn.php');

@@ -13,6 +13,9 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Kreatif\Project\Settings;
+
+
 echo \rex_view::title('Simpleshop');
 
 $_FUNC     = rex_post('func', 'string');
@@ -24,7 +27,9 @@ list ($year, $month) = explode('-', rex_request('year-month', 'string', date('Y-
 
 $statuses     = [];
 $_status_opts = [];
-$_options     = explode(',', \rex_yform_manager_table::get(Order::TABLE)->getValueField('status')->getElement('options'));
+$_options     = explode(',', \rex_yform_manager_table::get(Order::TABLE)
+    ->getValueField('status')
+    ->getElement('options'));
 
 foreach ($_options as $option) {
     list ($value, $key) = explode('=', $option);
@@ -46,8 +51,7 @@ if ($_FUNC == 'export-csv' && count($order_ids)) {
     if ($output == 'file') {
         header('Content-Type: text/csv; charset=utf-8');
         header("Content-Disposition: attachment;filename=orders-{$year}-{$month}.csv");
-    }
-    else {
+    } else {
         header('Content-Type: text/html; charset=utf-8');
     }
     $fragment = new \rex_fragment();
@@ -56,8 +60,39 @@ if ($_FUNC == 'export-csv' && count($order_ids)) {
     $fragment->setVar('statuses', $statuses);
     echo $fragment->parse('simpleshop/backend/export/orders_export_csv.php');
     exit;
-}
-else if ($_FUNC == 'export-pdf' && count($order_ids)) {
+} else if ($_FUNC == 'export-xml' && count($order_ids)) {
+    $zip         = new \ZipArchive();
+    $folder      = \rex_path::addonData('simpleshop', 'invoice_xml/' . date('Y') . '/' . date('m'));
+    $archiveName = date('Y-m-d_His') . '.zip';
+
+    \rex_response::cleanOutputBuffers();
+    \rex_dir::create($folder . '/' . date('Ymd'), true);
+
+    $zip->open($folder . '/' . $archiveName, \ZipArchive::CREATE);
+
+    foreach ($order_ids as $order_id) {
+        $Order = Order::get($order_id);
+        $XMLi  = $Order->getXML();
+
+        if ($XMLi) {
+            $XMLi->buildXML();
+            $xml   = $XMLi->getXMLFormated();
+            $iDate = date('Y-m-d', strtotime($Order->getValue('createdate')));
+
+            $filename = \rex::getServerName() . '_' . $Order->getValue('id') . '_' . $iDate . '__' . $Order->getValue('invoice_num') . '.xml';
+            \rex_file::put($folder . '/' . date('Ymd') . '/' . $filename, \Wildcard::parse($xml));
+
+            $zip->addFile($folder . '/' . date('Ymd') . '/' . $filename, $filename);
+        }
+    }
+    $zip->close();
+
+    \rex_dir::deleteFiles($folder . '/' . date('Ymd') . '/');
+    \rex_dir::delete($folder . '/' . date('Ymd') . '/');
+    \rex_response::sendCacheControl();
+    \rex_response::sendFile($folder . '/' . $archiveName, 'application/zip', 'attachment');
+    exit;
+} else if ($_FUNC == 'export-pdf' && count($order_ids)) {
     ob_clean();
 
     if ($output == 'file') {
@@ -68,8 +103,7 @@ else if ($_FUNC == 'export-pdf' && count($order_ids)) {
         header('Cache-Control: public, must-revalidate, max-age=0');
         header('Pragma: public');
         $tpl = 'orders_export_pdf.php';
-    }
-    else {
+    } else {
         header('Content-Type: text/html; charset=utf-8');
         $tpl = 'orders_export_csv.php';
     }
@@ -81,7 +115,10 @@ else if ($_FUNC == 'export-pdf' && count($order_ids)) {
     exit;
 }
 
-$orders = Order::query()->where('createdate', "{$year}-{$month}-01", '>=')->where('createdate', date('Y-m-d 23:59:59', strtotime("{$year}-{$month} next month -1 day")), '<=')->orderBy('id');
+$orders = Order::query()
+    ->where('createdate', "{$year}-{$month}-01", '>=')
+    ->where('createdate', date('Y-m-d 23:59:59', strtotime("{$year}-{$month} next month -1 day")), '<=')
+    ->orderBy('id');
 
 if ($status != '') {
     $orders->where('status', $status);

@@ -17,6 +17,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
         if ($this->getParam('send') == 0 && $this->getParam('main_id') > 0 && rex::isBackend()) {
             $action   = rex_get('ss-action', 'string');
             $Order    = \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id'));
+            $Settings = rex::getConfig('simpleshop.Settings');
             $Customer = $Order->getValue('customer_id') ? \FriendsOfREDAXO\Simpleshop\Customer::get($Order->getValue('customer_id')) : $Order->getInvoiceAddress();;
 
             // set user lang id
@@ -32,6 +33,29 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                     $PDF = $Order->getInvoicePDF('invoice', false);
                     $PDF->Output();
                     exit;
+
+                case 'download_xml':
+                    rex_response::cleanOutputBuffers();
+                    $iDateTs = strtotime($Order->getValue('createdate'));
+                    $iDate   = date('Y-m-d', $iDateTs);
+
+                    $XMLi = $Order->getXML();
+
+                    if ($XMLi) {
+                        $XMLi->buildXML();
+                        $xml = $XMLi->getXMLFormated();
+
+                        $folder   = rex_path::addonData('simpleshop', 'invoice_xml/' . date('Y', $iDateTs) . '/' . date('m', $iDateTs));
+                        $filename = rex::getServerName() . '_' . $iDate . '__' . $Order->getValue('invoice_num') . '.xml';
+
+                        rex_dir::create($folder, true);
+                        rex_file::put($folder . '/' . $filename, Wildcard::parse($xml));
+
+                        rex_response::setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
+                        rex_response::sendContent($xml, 'text/xml');
+                        exit;
+                    }
+                    break;
 
                 case 'resend_email':
                     $Controller = new \FriendsOfREDAXO\Simpleshop\CheckoutController();
@@ -157,6 +181,21 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                                     ' . rex_i18n::msg('action.goto_order') . '
                                 </a>
                             ';
+                    }
+
+                    if ($Settings['use_invoicing']) {
+                        $output[] = '
+                            <a href="' . rex_url::currentBackendPage([
+                                'table_name' => rex_get('table_name', 'string'),
+                                'data_id'    => rex_get('data_id', 'int'),
+                                'func'       => rex_get('func', 'string'),
+                                'ss-action'  => 'download_xml',
+                                'ts'         => time(),
+                            ]) . '" class="btn btn-default">
+                                <i class="fa fa-code"></i>&nbsp;
+                                XML downloaden
+                            </a>
+                        ';
                     }
                     $this->params['form_output'][$this->getId()] = '
                         <div class="row nested-panel">
