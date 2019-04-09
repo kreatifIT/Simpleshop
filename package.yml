@@ -19,6 +19,9 @@ page:
         variants:
             title: translate:label.variants
             hidden: true
+        product_sort:
+            title: translate:label.sort_products
+            hidden: true
         packing_list:
             title: packing_list
             hidden: true

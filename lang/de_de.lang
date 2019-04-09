@@ -18,6 +18,7 @@ label.orders_export = %d Bestellungen exportieren
 label.filter = Filter
 label.all = Alle
 label.activated = aktiviert
+label.sort_products = Produkte sortieren
 label.packing_list_title = Lieferschein
 label.shipping_address = Lieferadresse
 label.return_address = Absenderadresse
@@ -35,7 +36,9 @@ label.generate_creditnote = Gutschrift erstellen
 label.msg_generate_creditnote = Gutschrift wurder erstellt
 label.clone_coupon = diesen Coupon klonen
 label.msg_clone = Es wurden {NUM} Coupons generiert
+label.no_product_available = Kein Produkt verfügbar
 label.link_product_rex_categories = Kategorien verlinken
+label.sort_products_for_cat_title = Produkte sortieren in der Kategorie: "{CATNAME}"
 
 
 action.goto_creditnote = gehe zur Gutschrift
