@@ -54,13 +54,13 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
 
                         if ($XMLi) {
                             $XMLi->buildXML();
-                            $xml = $XMLi->getXMLFormated();
+                            $xml = Wildcard::parse($XMLi->getXMLFormated());
 
                             $folder   = rex_path::addonData('simpleshop', 'invoice_xml/' . date('Y', $iDateTs) . '/' . date('m', $iDateTs));
                             $filename = rex::getServerName() . '_' . $iDate . '__' . $Order->getValue('invoice_num') . '.xml';
 
                             rex_dir::create($folder, true);
-                            rex_file::put($folder . '/' . $filename, Wildcard::parse($xml));
+                            rex_file::put($folder . '/' . $filename, $xml);
 
                             rex_response::setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
                             rex_response::sendContent($xml, 'text/xml');
