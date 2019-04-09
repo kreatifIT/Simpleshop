@@ -131,7 +131,7 @@ class Order extends Model
         }
 
         if (self::$_finalizeOrder && ($this->getValue('invoice_num') === null || (int)$this->getValue('invoice_num') === 0)) {
-            $query = 'SELECT MAX(invoice_num) + 1 as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"';
+            $query = 'SELECT IFNULL(MAX(invoice_num), 0) + 1 as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"';
             $sql->setQuery($query);
             $num = $sql->getValue('num');
             $num = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoice_num', $num, ['Order' => $this]));
@@ -494,7 +494,9 @@ class Order extends Model
 
     public function getXML()
     {
-        if ((int)$this->getValue('invoice_num') <= 0) {
+        $invoice_num = $this->getInvoiceNum();
+
+        if (!$invoice_num) {
             return null;
         }
 
@@ -517,7 +519,7 @@ class Order extends Model
         $xmlData['receiver_head_quarter_nation']   = 'IT';
 
         $xmlData['document_date']   = $iDate;
-        $xmlData['document_number'] = $this->getValue('invoice_num');
+        $xmlData['document_number'] = $invoice_num;
 
         $xmlData["document_lines"][1]["line_number"]         = 1;
         $xmlData["document_lines"][1]["line_description"]    = Settings::INVOICE_LINE_DESC;

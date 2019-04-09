@@ -180,12 +180,12 @@ class XMLInvoice
         $CedenteSede->addChild("Provincia", $this->data["company_head_quarter_province"]);
         $CedenteSede->addChild("Nazione", $this->data["company_head_quarter_nation"]);
 
-        $IscrizioneREA = $CedentePrestatore->addChild("IscrizioneREA");
-        $IscrizioneREA->addChild("Ufficio", $this->data["company_rea_office"]);
-        $IscrizioneREA->addChild("NumeroREA", $this->data["company_rea_no"]);
-        $IscrizioneREA->addChild("CapitaleSociale", number_format($this->data["company_rea_capital"], 2, ".", ""));
-        $IscrizioneREA->addChild("SocioUnico", $this->data["company_rea_single_shareholder"]);
-        $IscrizioneREA->addChild("StatoLiquidazione", $this->data["company_rea_liquidation"]);
+//        $IscrizioneREA = $CedentePrestatore->addChild("IscrizioneREA");
+//        $IscrizioneREA->addChild("Ufficio", $this->data["company_rea_office"]);
+//        $IscrizioneREA->addChild("NumeroREA", $this->data["company_rea_no"]);
+//        $IscrizioneREA->addChild("CapitaleSociale", number_format($this->data["company_rea_capital"], 2, ".", ""));
+//        $IscrizioneREA->addChild("SocioUnico", $this->data["company_rea_single_shareholder"]);
+//        $IscrizioneREA->addChild("StatoLiquidazione", $this->data["company_rea_liquidation"]);
 
         $CessionarioCommittente    = $FatturaElettronicaHeader->addChild("CessionarioCommittente");
         $CessionarioDatiAnagrafici = $CessionarioCommittente->addChild("DatiAnagrafici");

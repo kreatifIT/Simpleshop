@@ -52,7 +52,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                         rex_file::put($folder . '/' . $filename, Wildcard::parse($xml));
 
                         rex_response::setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
-                        rex_response::sendContent($xml, 'text/xml');
+                        rex_response::sendContent(Wildcard::parse($xml), 'text/xml');
                         exit;
                     }
                     break;
