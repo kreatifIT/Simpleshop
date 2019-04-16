@@ -124,34 +124,93 @@ class Customer extends Model
             ]));
 
             if ($do_send) {
-            $Mail->send();
+                $Mail->send();
             }
             $result = Customer::get($_this->getId());
         }
         return $result;
     }
 
+    public static function registerFromBeUser($email, $attributes = [])
+    {
+        $sql        = \rex_sql::factory();
+        $password   = random_string(self::MIN_PWD_LEN);
+        $attributes = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.registerFromBeUser.attributes', array_merge([
+            'ctype'      => 'person',
+            'status'     => 1,
+            'created'    => date('Y-m-d H:i:s'),
+            'updatedate' => date('Y-m-d H:i:s'),
+        ], $attributes), [
+            'email' => $email,
+        ]));
+
+        foreach ($attributes as $key => $value) {
+            $sql->setValue($key, $value);
+        }
+
+        $sql->setTable(self::TABLE);
+        $sql->setValue('email', $email);
+        $sql->setWhere('email', $email);
+        $sql->setValue('password_hash', self::getPasswordHash($password));
+        $sql->insertOrUpdate();
+
+        try {
+            self::login($email, $password);
+        } catch (CustomerException $ex) {
+        }
+    }
+
     public static function login($email, $password)
     {
-        $result = null;
-        $user   = self::getUserByEmail($email);
+        $result   = null;
+        $email    = trim($email);
+        $password = trim($password);
 
-        if ($user && $user->getValue('status') == 1) {
+        if ($password == '' || $email == '') {
+            return null;
+        }
+
+        $sql    = \rex_sql::factory();
+        $user   = self::getUserByEmail($email);
+        $query  = 'SELECT * FROM rex_user WHERE email LIKE :email AND status = 1';
+        $beuser = $sql->getArray($query, ['email' => $email])[0];
+
+        if ($beuser) {
+            if (\rex::getUser()) {
+                $loginCheck = true;
+            } else {
+                $login = new \rex_backend_login();
+                $login->setLogin($beuser['login'], $password);
+                $loginCheck = $login->checkLogin();
+            }
+        }
+
+        if ($user && ($user->getValue('status') == 1 || $beuser)) {
             $pwd = $user->getValue('password_hash');
+
             // prevent login for empty passwords!
             // and verify hash
-            if (strlen($pwd) >= self::MIN_PWD_LEN && self::getPasswordHash($password) == $pwd) {
+            if ((strlen($pwd) >= self::MIN_PWD_LEN && self::getPasswordHash($password) == $pwd) || $loginCheck) {
                 // logged in
                 $_SESSION['customer']['user'] = ['id' => $user->getValue('id')];
                 // update login timestamp
-                $user->setValue('lastlogin', date('Y-m-d H:i:s'));
-                $user->setValue('lang_id', \rex_clang::getCurrentId());
-                $user->save();
+                $sql->setTable(self::TABLE);
+                $sql->setValue('lastlogin', date('Y-m-d H:i:s'));
+                $sql->setValue('lang_id', \rex_clang::getCurrentId());
+                $sql->setWhere('id', $user->getId());
+                $sql->update();
 
                 $result = \rex_extension::registerPoint(new \rex_extension_point('Customer.logged_in', $user, [
                     'password' => $password,
                 ]));
             }
+        } else if ($beuser && $loginCheck && $beuser['email']) {
+            $namechunks = explode(' ', $beuser['name']);
+
+            Customer::registerFromBeUser($beuser['email'], [
+                'firstname' => array_shift($namechunks),
+                'lastname'  => implode(' ', $namechunks),
+            ]);
         }
         // cleanup sessions
         Session::cleanupSessions();

@@ -35,13 +35,32 @@ namespace FriendsOfREDAXO\Simpleshop;
 
     if (rex_get('action', 'string') == 'logout') {
         Customer::logout();
+
+        $login = new \rex_backend_login();
+        $login->setLogout(true);
+        $login->checkLogin();
+
+        \rex_response::sendRedirect(rex_getUrl(null, null, ['ts' => time()]));
     }
-    if (\rex::isBackend() && \rex::getUser()) {
-        \rex_view::setJsProperty('simpleshop', [
-            'ajax_url' => \rex_url::frontendController(),
-        ]);
+
+    $beUser = \rex::getUser();
+
+    if ($beUser) {
+        $Customer = Customer::getCurrentUser();
+
+        if (!$Customer) {
+            Customer::login($beUser->getEmail(), 'backend');
+        }
+
+        if (\rex::isBackend()) {
+            \rex_view::setJsProperty('simpleshop', [
+                'ajax_url' => \rex_url::frontendController(),
+            ]);
+        }
     }
-    if (\rex_addon::get('kreatif-mpdf')->isAvailable()) {
+    if (\rex_addon::get('kreatif-mpdf')
+        ->isAvailable()
+    ) {
         \Kreatif\Mpdf\Mpdf::addCSSPath($this->getPath('assets/scss/pdf_styles.scss'));
     }
     return $Ep->getSubject();
@@ -59,8 +78,9 @@ namespace FriendsOfREDAXO\Simpleshop;
         if ($list && $list->getValue('ref_order_id')) {
             $options = ['CN' => $options['CN']];
         } else if ($list && count(Order::query()
-            ->where('ref_order_id', $list->getValue('id'))
-            ->find())) {
+                ->where('ref_order_id', $list->getValue('id'))
+                ->find())
+        ) {
             $options = ['CA' => $options['CA']];
         } else {
             unset($options['CN']);
@@ -87,5 +107,5 @@ namespace FriendsOfREDAXO\Simpleshop;
 });
 
 \rex_view::setJsProperty('simpleshop', [
-    'ajax_url'   => \rex_url::frontendController(),
+    'ajax_url' => \rex_url::frontendController(),
 ]);
