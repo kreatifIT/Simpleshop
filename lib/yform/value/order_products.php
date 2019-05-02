@@ -15,8 +15,8 @@ class rex_yform_value_order_products extends rex_yform_value_abstract
 
     public function enterObject()
     {
-        if (rex::isBackend() && $this->getParam('main_id')) {
-            $Order = \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id'));
+        if (rex::isBackend()) {
+            $Order = $this->getParam('main_id') ? \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id')) : null;
 
             $this->params['form_output'][$this->getId()] = $this->parse('value.order_products.tpl.php', [
                 'Order' => $Order,

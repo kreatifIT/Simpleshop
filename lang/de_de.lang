@@ -39,6 +39,7 @@ label.msg_clone = Es wurden {NUM} Coupons generiert
 label.no_product_available = Kein Produkt verfügbar
 label.link_product_rex_categories = Kategorien verlinken
 label.sort_products_for_cat_title = Produkte sortieren in der Kategorie: "{CATNAME}"
+label.save_order_for_order_products = Sie müssen zuerst die Bestellung erstellen, erst dann können Sie Produkte hinzufügen. Klicken Sie einfach am Ende der Seite auf "Übernehmen"
 
 
 action.goto_creditnote = gehe zur Gutschrift

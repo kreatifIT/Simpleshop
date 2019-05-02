@@ -16,12 +16,16 @@
     <label><?= $this->getLabel() ?></label>
 
     <div id="order-product-container">
-        <?php
-
-        $fragment = new rex_fragment();
-        $fragment->setVar('Order', $Order);
-        echo $fragment->parse('simpleshop/backend/order_products.php');
-
-        ?>
+        <?php if ($Order): ?>
+            <?php
+            $fragment = new rex_fragment();
+            $fragment->setVar('Order', $Order);
+            echo $fragment->parse('simpleshop/backend/order_products.php');
+            ?>
+        <?php else: ?>
+            <div class="alert alert-info">
+                <?= rex_i18n::msg('label.save_order_for_order_products') ?>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
