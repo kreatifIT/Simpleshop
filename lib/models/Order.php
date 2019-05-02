@@ -38,9 +38,23 @@ class Order extends Model
         return $this->getValue('invoice_address');
     }
 
+    public function getCustomerData()
+    {
+        $CustomerData = $this->getValue('customer_data');
+        $customerId   = $this->getValue('customer_id');
+
+        if ($this->getId() && (!$CustomerData || ($customerId && $CustomerData->getId() != $customerId))) {
+            $CustomerData = $customerId ? Customer::get($customerId) : self::getInvoiceAddress();
+
+            $this->setValue('customer_data', $CustomerData);
+            $this->save();
+        }
+        return $CustomerData;
+    }
+
     public function isTaxFree()
     {
-        $Customer = $this->getValue('customer_data');
+        $Customer = $this->getCustomerData();
         $Country  = null;
 
         if ($Customer->isCompany()) {
@@ -145,9 +159,17 @@ class Order extends Model
 
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['finalize_order' => self::$_finalizeOrder, 'simple_save' => $simple_save]));
 
-        $sql      = \rex_sql::factory();
-        $date_now = date('Y-m-d H:i:s');
-        $products = $this->getProducts(false);
+        $sql          = \rex_sql::factory();
+        $date_now     = date('Y-m-d H:i:s');
+        $products     = $this->getProducts(false);
+        $CustomerData = $this->getCustomerData();
+        $customerId   = $this->getValue('customer_id');
+
+        if (!$CustomerData || ($customerId && $CustomerData->getId() != $customerId)) {
+            $CustomerData = $customerId ? Customer::get($customerId) : self::getInvoiceAddress();
+
+            $this->setValue('customer_data', $CustomerData);
+        }
 
         if (!$this->valueIsset('createdate')) {
             $this->setValue('createdate', $date_now);
@@ -520,7 +542,7 @@ class Order extends Model
 
     public function getPackingListPDF($debug = false)
     {
-        $Customer = $this->getValue('customer_data');
+        $Customer = $this->getCustomerData();
 
         if ($Customer->valueIsset('lang_id')) {
             \Kreatif\Utils::setCLang($Customer->getValue('lang_id'));
