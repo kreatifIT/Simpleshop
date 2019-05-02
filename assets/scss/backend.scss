@@ -211,6 +211,16 @@ table.table {
 
 #order-product-container {
     table {
+        tr.info {
+            color: #fff;
+
+            a {
+                color: #fff;
+                display: block;
+                text-align: center;
+            }
+        }
+        
         td {
             vertical-align: middle;
 
