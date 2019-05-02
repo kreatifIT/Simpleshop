@@ -238,10 +238,11 @@ class Session extends Model
     }
     
     public static function getGAProducts() {
-        $items = Session::getCartItems();
+        $items = Session::getCartItems(true, false);
         $products = [];
         $label_name = sprogfield("name");
-        foreach($items as $item) {
+        foreach($items as $itemId => $cart) {
+            $item = Product::get($itemId);
             $variantId = explode("|",$item->getValue('key'));
             $variantId = $variantId[1];
             $variants = $item->getFeatureVariants();
@@ -262,7 +263,7 @@ class Session extends Model
                 'category' => $item->generatePath(\rex_clang::getCurrentId()),
                 'variant' => $variantName,
                 'price' => number_format($Variant->getPrice(TRUE),2,'.',','),
-                'quantity' => $item->getValue('cart_quantity'),
+                'quantity' => $cart['quantity'],
             ];
         }
         return $products;
