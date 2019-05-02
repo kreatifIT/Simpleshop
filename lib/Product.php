@@ -283,7 +283,8 @@ class Product extends Model
     public function generatePath($lang_id, $path = '')
     {
         $_paths   = [];
-        $category = Category::get($this->getValue('category_id'));
+        $catId    = $this->getValue('category_id');
+        $category = $catId ? Category::get($catId) : null;
 
         if ($category) {
             $parents = $category->getParentTree();
