@@ -374,9 +374,10 @@ class Product extends Model
     public static function ext_setUrlObject(\rex_extension_point $Ep)
     {
         $Object = $Ep->getSubject();
-        $vkey   = trim(rex_get('vkey', 'string'));
 
-        if ($Ep->getParam('table') == self::TABLE) {
+        if ($Object && $Object->getTableName() == self::TABLE) {
+            $vkey = trim(rex_get('vkey', 'string'));
+
             if ($vkey != '') {
                 try {
                     $Object = $Object->getVariant($vkey);
