@@ -31,7 +31,7 @@ class rex_yform_value_product_functions extends rex_yform_value_abstract
                 $output[] = '
                     <a href="' . $Product->getUrl(['ts' => time()]) . '" class="btn btn-default" target="_blank">
                         <i class="fa fa-external-link"></i>&nbsp;
-                        ' . rex_i18n::msg('label.goto_product') . '
+                        ' . rex_i18n::msg('action.goto_product') . '
                     </a>
                 ';
             }
