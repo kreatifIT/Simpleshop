@@ -97,7 +97,10 @@ class rex_api_simpleshop_be_api extends rex_api_function
             ->resetSelect()
             ->selectRaw('id, ' . $label . ' AS label')
             ->where('status', 1)
-            ->whereRaw($label . ' LIKE :term', ['term' => '%'. self::$inst->request['term'] .'%'])
+            ->whereRaw($label . ' LIKE :term OR code = :code', [
+                'term' => '%' . self::$inst->request['term'] . '%',
+                'code' => self::$inst->request['term'],
+            ])
             ->orderBy($label);
 
         $count      = $stmt->count();
