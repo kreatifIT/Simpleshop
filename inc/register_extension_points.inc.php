@@ -27,7 +27,6 @@ namespace FriendsOfREDAXO\Simpleshop;
 \rex_extension::register('kreatif.Model.queryCollection', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_queryCollection']);
 \rex_extension::register('project.layoutBottom', ['\FriendsOfREDAXO\Simpleshop\CartController', 'ext_project_layoutBottom']);
 \rex_extension::register('kreatif.setUrlObject', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_setUrlObject']);
-\rex_extension::register('project.setUrlObject', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_setUrlObject']); // used for the URL Addon 1.x
 
 
 \rex_extension::register('PACKAGES_INCLUDED', function (\rex_extension_point $Ep) {
