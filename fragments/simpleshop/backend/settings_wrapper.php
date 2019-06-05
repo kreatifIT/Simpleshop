@@ -17,7 +17,6 @@ $_FUNC   = rex_post('func', 'string');
 $title   = $this->getVar('title', 'Simpleshop');
 $key     = $this->getVar('key');
 $path    = $this->getVar('fragment_path');
-$Addon   = $this->getVar('Addon');
 
 echo \rex_view::title($title);
 
@@ -25,7 +24,7 @@ if ($_FUNC == 'save')
 {
     unset($_POST['func']);
     \rex::setConfig($key, $_POST);
-    echo \rex_view::info($Addon->i18n('label.data_saved'));
+    echo \rex_view::info(\rex_i18n::msg('label.data_saved'));
 }
 
 $this->setVar('Settings', \rex::getConfig($key));
@@ -36,7 +35,7 @@ $content = ob_get_clean();
 $fragment = new \rex_fragment();
 $fragment->setVar('body', $content, FALSE);
 $fragment->setVar('class', 'edit', FALSE);
-$fragment->setVar('title', $Addon->i18n('setup'), FALSE);
+$fragment->setVar('title', \rex_i18n::msg('setup'), FALSE);
 $sections = $fragment->parse('core/page/section.php');
 
 $formElements = [
