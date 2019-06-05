@@ -151,7 +151,7 @@ class CheckoutController extends Controller
         $this->Order->setValue('status', 'CA');
         $this->Order->save();
 
-        rex_redirect($this->settings['linklist']['cart'], null, array_merge($_GET, ['ts' => time()]));
+        rex_redirect(null, null, ['step' => 'show-summary', 'ts' => time()]);
     }
 
     protected function getShippingAddressView()
