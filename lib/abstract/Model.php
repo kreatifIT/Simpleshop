@@ -101,7 +101,7 @@ abstract class Model extends \Kreatif\Model
                     }
 
                     foreach ($data as $name => $value) {
-                        $Object->setValue($name, $value);
+                        $Object->setValue($name, self::unprepare($value));
                     }
                     $value = $Object;
                 } else if (is_array($value)) {
