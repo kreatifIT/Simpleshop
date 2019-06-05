@@ -15,7 +15,6 @@ rex_dir::create(rex_path::addonData('simpleshop', 'log'), true);
 rex_dir::create(rex_path::addonData('simpleshop', 'packing_lists'), true);
 
 if (!$this->hasConfig()) {
-    $this->setConfig('installed', true);
 
     $sql     = rex_sql::factory();
     $modules = glob(__DIR__ . '/install/module/*/');
@@ -68,3 +67,4 @@ if (!$this->hasConfig()) {
 \rex_sql_table::get(\FriendsOfREDAXO\Simpleshop\Variant::TABLE)
     ->ensureColumn(new \rex_sql_column('prio', 'int(11)', false, 0))
     ->alter();
+    $this->setConfig('installed', true);
