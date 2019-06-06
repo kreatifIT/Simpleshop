@@ -151,7 +151,7 @@ class CheckoutController extends Controller
         $this->Order->setValue('status', 'CA');
         $this->Order->save();
 
-        rex_redirect(null, null, ['step' => 'show-summary', 'ts' => time()]);
+        rex_redirect(null, null, ['step' => 'show-summary', 'ca-info' => 1, 'ts' => time()]);
     }
 
     protected function getShippingAddressView()
@@ -380,6 +380,9 @@ class CheckoutController extends Controller
             $errors[] = Wildcard::get('shop.error_summary_no_product_available');
         }
 
+        if ($this->Order->getValue('status') && rex_get('ca-info', 'int') == 1) {
+            $warnings[] = ['label' => '###simpleshop.payment_cancelled###'];
+        }
         Session::setCheckoutData('Order', $this->Order);
 
         $this->fragment_path[] = 'simpleshop/checkout/summary/wrapper.php';
