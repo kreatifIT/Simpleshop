@@ -14,11 +14,39 @@
 rex_dir::create(rex_path::addonData('simpleshop', 'log'), true);
 rex_dir::create(rex_path::addonData('simpleshop', 'packing_lists'), true);
 
+$sql             = rex_sql::factory();
+$migrations_done = $this->getConfig('migrations', []);
+$migrations_done = [];
+$migrations      = glob($this->getPath('install') . '/db_migrations/*.php');
+
+
+if ($this->getConfig('installed')) {
+    // for backward compatibility skip the initial migration file
+    $migrations_done[] = $this->getPath('install') . '/db_migrations/2019-06-06 09-00-00__init.php';
+}
+
+foreach ($migrations as $migration) {
+    if (in_array($migration, $migrations_done)) {
+        continue;
+    }
+
+    try {
+        $sql->beginTransaction();
+
+        include_once $migration;
+
+        $sql->commit();
+
+        $migrations_done[] = $migration;
+    } catch (ErrorException  $ex) {
+        $sql->rollBack();
+    }
+}
+$this->setConfig('migrations', $migrations_done);
+
+
 if (!$this->hasConfig()) {
-
-    $sql     = rex_sql::factory();
     $modules = glob(__DIR__ . '/install/module/*/');
-
 
     foreach ($modules as $module) {
         $name   = trim(substr($module, strrpos($module, '/', -2)), '/');
@@ -49,12 +77,7 @@ if (!$this->hasConfig()) {
 
 
     // import tables
-    $tablesets = glob($this->getPath('install') . '/tablesets/*.json');
     $sql_files = glob($this->getPath('install') . '/sql/*.sql');
-
-    foreach ($tablesets as $tableset) {
-        \rex_yform_manager_table_api::importTablesets(file_get_contents($tableset));
-    }
 
     foreach ($sql_files as $sql_file) {
         $sql->setQuery(file_get_contents($sql_file));
@@ -62,9 +85,6 @@ if (!$this->hasConfig()) {
 
     // install media manager types
     include_once __DIR__ . '/install/inc/mediatypes.inc.php';
-}
 
-\rex_sql_table::get(\FriendsOfREDAXO\Simpleshop\Variant::TABLE)
-    ->ensureColumn(new \rex_sql_column('prio', 'int(11)', false, 0))
-    ->alter();
     $this->setConfig('installed', true);
+}
