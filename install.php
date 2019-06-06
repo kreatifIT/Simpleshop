@@ -16,7 +16,6 @@ rex_dir::create(rex_path::addonData('simpleshop', 'packing_lists'), true);
 
 $sql             = rex_sql::factory();
 $migrations_done = $this->getConfig('migrations', []);
-$migrations_done = [];
 $migrations      = glob($this->getPath('install') . '/db_migrations/*.php');
 
 
@@ -45,7 +44,7 @@ foreach ($migrations as $migration) {
 $this->setConfig('migrations', $migrations_done);
 
 
-if (!$this->hasConfig()) {
+if (!$this->getConfig('installed')) {
     $modules = glob(__DIR__ . '/install/module/*/');
 
     foreach ($modules as $module) {
