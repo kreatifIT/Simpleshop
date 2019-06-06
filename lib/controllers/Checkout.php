@@ -140,6 +140,29 @@ class CheckoutController extends Controller
         Session::setCheckoutData('steps_done', $doneSteps);
     }
 
+    public static function processIPN()
+    {
+        $order_id        = rex_get('order_id', 'int');
+        $data['SERVER']  = $_SERVER;
+        $data['POST']    = $_POST;
+        $data['Order']   = $order_id ? Order::get($order_id) : null;
+        $data['Payment'] = $data['Order'] ? $data['Order']->getValue('payment') : null;
+
+        \rex_file::put(\rex_path::addonData('simpleshop', 'ipn/' . date('Ymd-His') . '.log'), print_r($data, true));
+
+        if ($data['Payment']) {
+            try {
+                $data['Payment']->processIPN($data['Order'], $_POST);
+                $data['Order']->setValue('status', 'IP');
+                $data['Order']->setValue('payment', Order::prepareData($data['Payment']));
+                $data['Order']->save();
+            } catch (\Exception $ex) {
+                Utils::log('Checkout.processIPN', $ex->getMessage() . "\n" . print_r($data, true), 'ERROR', true);
+            }
+        }
+        exit;
+    }
+
     public function setOrder(Order $Order)
     {
         $this->Order = $Order;
