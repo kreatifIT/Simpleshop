@@ -2,18 +2,15 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$type        = $this->getVar('type', 'invoice');
-$Order       = $this->getVar('Order');
-$shipping    = $Order->getValue('shipping_costs');
-$summary     = $Order->getValue($type == 'invoice' ? 'brut_prices' : 'net_prices');
-$discount    = $Order->getValue('discount');
-$total       = $Order->getValue('total');
-$taxes       = $Order->getValue('taxes');
-$promotions  = (array)$Order->getValue('promotions');
-
-if ($type != 'invoice' && $Order->getValue('shipping')) {
-    $shipping = (float) $Order->getValue('shipping')->getNetPrice($Order);
-}
+$type           = $this->getVar('type', 'invoice');
+$Order          = $this->getVar('Order');
+$summary        = $Order->getValue($type == 'invoice' ? 'net_prices' : 'brut_prices');
+$discount       = $Order->getValue('discount');
+$total          = $Order->getValue('total');
+$taxes          = $Order->getValue('taxes');
+$shipping       = $Order->getValue('shipping');
+$promotions     = (array)$Order->getValue('promotions');
+$shipping_costs = $shipping && $type == 'invoice' ? $shipping->getPrice($Order) : $Order->getValue('shipping_costs');
 
 ?>
 <table id="invoice-summary" width="100%">
@@ -43,13 +40,13 @@ if ($type != 'invoice' && $Order->getValue('shipping')) {
             </tr>
         <?php endforeach; ?>
 
-        <?php if ($Order->getValue('shipping')): ?>
+        <?php if ($shipping): ?>
             <tr>
                 <td>
                     + ###simpleshop.shipping_costs###
                 </td>
                 <td align="right">
-                    &euro;&nbsp;<?= format_price($shipping) ?>
+                    &euro;&nbsp;<?= format_price($shipping_costs) ?>
                 </td>
             </tr>
         <?php endif; ?>
@@ -60,7 +57,7 @@ if ($type != 'invoice' && $Order->getValue('shipping')) {
                     ###simpleshop.brutto_total###
                 </td>
                 <td align="right">
-                    &euro;&nbsp;<?= format_price(array_sum($summary) + $shipping - $discount) ?>
+                    &euro;&nbsp;<?= format_price(array_sum($summary) + $shipping_costs - $discount) ?>
                 </td>
             </tr>
 

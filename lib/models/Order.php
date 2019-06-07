@@ -309,7 +309,7 @@ class Order extends Model
                 $tax_perc = $this->isTaxFree() ? 0 : Tax::get($product->getValue('tax'))
                     ->getValue('tax');
 
-                $net_prices[$tax_perc]   += (float)$product->getPrice(!$this->isTaxFree()) * $quantity;
+                $net_prices[$tax_perc]   += (float)$product->getPrice(false) * $quantity;
                 $gross_prices[$tax_perc] += (float)$product->getPrice(!$this->isTaxFree()) * $quantity;
                 $this->quantity          += $quantity;
             }
@@ -337,7 +337,6 @@ class Order extends Model
         $this->setValue('net_prices', $net_prices);
         $this->setValue('brut_prices', $gross_prices);
         $this->setValue('initial_total', array_sum($gross_prices));
-        $this->setValue('total', array_sum($gross_prices));
 
         // calculate manual discount8
         if ($manual_discount > 0) {
@@ -420,7 +419,7 @@ class Order extends Model
 
         // set tax costs
         foreach ($gross_prices as $tax => $gross_price) {
-            $taxes[$tax] += (float)$gross_price * ($tax / 100);
+            $taxes[$tax] += (float)($gross_price / ($tax + 100) * $tax);
         }
 
         // set shipping costs
@@ -428,8 +427,9 @@ class Order extends Model
             $tax = $this->getValue('shipping')
                 ->getTaxPercentage();
 
+
             if ($tax > 0) {
-                $this->setValue('shipping_costs', (float)$this->getValue('shipping_costs') / (100 + $tax) * 100);
+                $this->setValue('net_shipping_costs', (float)$this->getValue('shipping_costs') / (100 + $tax) * 100);
                 $taxes[$tax] += $this->getValue('shipping')
                     ->getTax();
             }
