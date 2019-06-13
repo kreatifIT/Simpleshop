@@ -56,7 +56,7 @@ class Omest extends ShippingAbstract
 
     public function usedForFrontend()
     {
-        $Settings  = \rex::getConfig('simpleshop.OmestShipping.Settings');
+        $Settings = \rex::getConfig('simpleshop.OmestShipping.Settings');
         return from_array($Settings, 'used_in_frontend', 1);
     }
 
@@ -200,6 +200,7 @@ class Omest extends ShippingAbstract
 
     protected static function api_createShipment($Order, $Settings)
     {
+        $Settings = \rex::getConfig('simpleshop.OmestShipping.Settings');
         $IAddress = $Order->getInvoiceAddress();
         $DAddress = $Order->getShippingAddress();
         $Country  = Country::get($DAddress->getValue('country'));
@@ -210,20 +211,13 @@ class Omest extends ShippingAbstract
             ->where('order_id', $Order->getId())
             ->find();
 
-        // SKIP if no products
-        if (count($products) < 1) {
-            throw new OmestShippingException("Order [{$Order->getId()}] has no products", 1);
-        }
-        if (count($parcels) < 1) {
-            throw new OmestShippingException("Order [{$Order->getId()}] has no parcels", 4);
-        }
-
         $data = [
             'key'                => $Shipping->getValue('shipping_key'),
             'reference1'         => $Order->getReferenceId(),
             'shippingServiceKey' => $Shipping->getValue('extension') ?: 'EC',
             'shipmentTypeKey'    => 'PARCEL',
             'parcels'            => [],
+            'content'            => [],
             'pickupAddress'      => [
                 'companyName'  => $Settings['pickup_company_name'],
                 'street'       => $Settings['pickup_street'],
@@ -244,19 +238,43 @@ class Omest extends ShippingAbstract
             ],
         ];
 
-        foreach ($parcels as $parcel) {
-            $_parcel = [
-                'key'    => null,
-                'weight' => $parcel->getValue('weight') / 1000,
-                'width'  => $parcel->getValue('width'),
-                'length' => $parcel->getValue('length'),
-                'height' => $parcel->getValue('height'),
-            ];
-            if ($parcel->getValue('pallett')) {
-                $data['shipmentTypeKey']  = 'PALLET';
-                $_parcel['palletTypeKey'] = $parcel->getValue('pallett');
+
+        if ($Settings['submit_order_products'] == 1) {
+            $products = $Order->getProducts();
+
+            foreach ($products as $order_product) {
+                $Product = $order_product->getValue('data');
+
+                $data['content'][] = [
+                    'quantity'    => $Product->getValue('cart_quantity'),
+                    'code'        => $Product->getValue('code'),
+                    'description' => $Product->getName(),
+                    'amount'      => number_format($Product->getPrice(), 2, '.', ''),
+                ];
             }
-            $data['parcels'][] = $_parcel;
+        } else {
+            // SKIP if no products
+            if (count($products) < 1) {
+                throw new OmestShippingException("Order [{$Order->getId()}] has no products", 1);
+            }
+            if (count($parcels) < 1) {
+                throw new OmestShippingException("Order [{$Order->getId()}] has no parcels", 4);
+            }
+
+            foreach ($parcels as $parcel) {
+                $_parcel = [
+                    'key'    => null,
+                    'weight' => $parcel->getValue('weight') / 1000,
+                    'width'  => $parcel->getValue('width'),
+                    'length' => $parcel->getValue('length'),
+                    'height' => $parcel->getValue('height'),
+                ];
+                if ($parcel->getValue('pallett')) {
+                    $data['shipmentTypeKey']  = 'PALLET';
+                    $_parcel['palletTypeKey'] = $parcel->getValue('pallett');
+                }
+                $data['parcels'][] = $_parcel;
+            }
         }
 
         $sdata = html_entity_decode(http_build_query([
