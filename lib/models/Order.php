@@ -159,11 +159,12 @@ class Order extends Model
 
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['finalize_order' => self::$_finalizeOrder, 'simple_save' => $simple_save]));
 
-        $sql          = \rex_sql::factory();
-        $date_now     = date('Y-m-d H:i:s');
-        $products     = $this->getProducts(false);
-        $CustomerData = $this->getCustomerData();
-        $customerId   = $this->getValue('customer_id');
+        $sql            = \rex_sql::factory();
+        $date_now       = date('Y-m-d H:i:s');
+        $products       = $this->getProducts(false);
+        $CustomerData   = $this->getCustomerData();
+        $customerId     = $this->getValue('customer_id');
+        $already_exists = $this->getValue('invoice_num') != '';
 
         if (!$CustomerData || ($customerId && $CustomerData->getId() != $customerId)) {
             $CustomerData = $customerId ? Customer::get($customerId) : self::getInvoiceAddress();
@@ -211,21 +212,23 @@ class Order extends Model
                 'orderBy' => 'id',
             ]);
 
-            foreach ($order_products as $order_product) {
-                if ($order_product->getValue('cart_quantity')) {
-                    $_product = $order_product->getValue('data');
-                    $quantity = $order_product->getValue('cart_quantity');
+            if ($already_exists) {
+                foreach ($order_products as $order_product) {
+                    if ($order_product->getValue('cart_quantity')) {
+                        $_product = $order_product->getValue('data');
+                        $quantity = $order_product->getValue('cart_quantity');
 
-                    if ($_product->getValue('inventory') == 'F') {
-                        // update inventory
-                        if ($_product->getValue('variant_key')) {
-                            $Variant = Variant::getByVariantKey($_product->getValue('key'));
-                            $Variant->setValue('amount', $Variant->getValue('amount') + $quantity);
-                            $Variant->save();
-                        } else {
-                            $product = Product::get($_product->getId());
-                            $product->setValue('amount', $product->getValue('amount') + $quantity);
-                            $product->save();
+                        if ($_product->getValue('inventory') == 'F') {
+                            // update inventory
+                            if ($_product->getValue('variant_key')) {
+                                $Variant = Variant::getByVariantKey($_product->getValue('key'));
+                                $Variant->setValue('amount', $Variant->getValue('amount') + $quantity);
+                                $Variant->save();
+                            } else {
+                                $product = Product::get($_product->getId());
+                                $product->setValue('amount', $product->getValue('amount') + $quantity);
+                                $product->save();
+                            }
                         }
                     }
                 }
