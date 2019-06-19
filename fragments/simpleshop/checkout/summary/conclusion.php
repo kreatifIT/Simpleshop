@@ -13,20 +13,20 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$Order       = $this->getVar('Order');
-$shipping    = $Order->getValue('shipping_costs');
-$brut_prices = $Order->getValue('brut_prices');
-$discount    = $Order->getValue('discount');
-$total       = $Order->getValue('total');
-$taxes       = $Order->getValue('taxes');
-$promotions  = (array)$Order->getValue('promotions');
+$Order      = $this->getVar('Order');
+$net_prices = $Order->getValue('net_prices');
+$discount   = $Order->getValue('discount');
+$total      = $Order->getValue('total');
+$taxes      = $Order->getValue('taxes');
+$shipping   = $Order->getValue('shipping');
+$promotions = (array)$Order->getValue('promotions');
 
 ?>
 <div class="margin-bottom">
     <div class="checkout-summary-total">
         <div class="subtotal">
             <span class="label">###simpleshop.subtotal###</span>
-            <span class="price">&euro;&nbsp;<?= format_price(array_sum($brut_prices)) ?></span>
+            <span class="price">&euro;&nbsp;<?= format_price(array_sum($net_prices)) ?></span>
         </div>
 
         <?php foreach ($promotions as $promotion):
@@ -40,17 +40,17 @@ $promotions  = (array)$Order->getValue('promotions');
             </div>
         <?php endforeach; ?>
 
-        <?php if ($Order->getValue('shipping')): ?>
+        <?php if ($shipping): ?>
             <div class="shipping">
                 <span class="label">+ ###simpleshop.shipping_costs###</span>
-                <span class="price">&euro;&nbsp;<?= format_price($shipping) ?></span>
+                <span class="price">&euro;&nbsp;<?= format_price($shipping->getPrice($Order)) ?></span>
             </div>
         <?php endif; ?>
 
         <?php if (!$Order->isTaxFree()): ?>
             <div class="gross-price margin-small-top">
                 <span class="label">###simpleshop.brutto_total###</span>
-                <span class="price">&euro;&nbsp;<?= format_price(array_sum($brut_prices) + $shipping - $discount) ?></span>
+                <span class="price">&euro;&nbsp;<?= format_price(array_sum($net_prices) + ($shipping ? $shipping->getPrice($Order) : 0) - $discount) ?></span>
             </div>
 
             <?php foreach ($taxes as $percent => $tax): ?>

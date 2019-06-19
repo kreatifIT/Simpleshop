@@ -61,20 +61,4 @@ $useInvoice = from_array($Settings, 'use_invoicing') == 1;
         </tbody>
     </table>
 
-
-    <!--    <br/>-->
-    <!---->
-    <!--    <legend>--><? //= $Addon->i18n('url_settings');
-    ?><!--</legend>-->
-    <!--    <p>--><? //= $Addon->i18n('setup_column_creating_text');
-    ?><!--</p>-->
-    <!--    <div class="row">-->
-    <!--        <div class="col-sm-12">-->
-    <!--            <div class="rex-select-style">-->
-    <!--                --><? //= \rex_var_linklist::getWidget(1, 'test', '')
-    ?>
-    <!--            </div>-->
-    <!--        </div>-->
-    <!--    </div>-->
-
 </fieldset>

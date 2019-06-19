@@ -125,6 +125,15 @@ $serviceTypes = (array)from_array($Settings, 'service_types', []);
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
+        <dt>Submit order products:</dt>
+        <dd>
+            <select class="form-control" name="submit_order_products">
+                <option value="0"><?= $Addon->i18n('no'); ?></option>
+                <option value="1" <?= from_array($Settings, 'submit_order_products') ? 'selected="selected"' : '' ?>><?= $Addon->i18n('yes'); ?></option>
+            </select>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
         <dt>Api-Key:</dt>
         <dd>
             <input type="text" class="form-control" name="api_key" value="<?= from_array($Settings, 'api_key') ?>"/>

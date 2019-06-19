@@ -1,0 +1,9 @@
+package: simpleshop/nexi_credit_card
+version: '1.0'
+author: FriendsOfREDAXO
+
+page:
+    title: Nexi
+    perm: shop[nexi_credit_card]
+    subpages:
+        settings: { title: translate:settings, hidden: true }
