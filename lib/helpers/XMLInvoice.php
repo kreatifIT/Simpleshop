@@ -195,7 +195,7 @@ class XMLInvoice
             $CessionarioIdFiscaleIVA->addChild("IdPaese", $this->data["receiver_country_code"]);
             $CessionarioIdFiscaleIVA->addChild("IdCodice", $this->data["receiver_vat_number"]);
         }
-        $CessionarioDatiAnagrafici->addChild("CodiceFiscale", $this->data["receiver_private_vat_number"]);
+        $CessionarioDatiAnagrafici->addChild("CodiceFiscale", mb_strtoupper($this->data["receiver_private_vat_number"]));
         $CessionarioAnagrafica = $CessionarioDatiAnagrafici->addChild("Anagrafica");
         $CessionarioAnagrafica->addChild("Denominazione", htmlspecialchars($this->data["receiver_name"], ENT_QUOTES, "utf-8"));
         //                    $CessionarioDatiAnagrafici->addChild("RegimeFiscale",$this->data["receiver_fiscal_code"]);
@@ -208,16 +208,19 @@ class XMLInvoice
         $CessionarioSede->addChild("Provincia", $this->data["receiver_head_quarter_province"]);
         $CessionarioSede->addChild("Nazione", $this->data["receiver_head_quarter_nation"]);
 
-        $TerzoIntermediarioOSoggettoEmittente = $FatturaElettronicaHeader->addChild("TerzoIntermediarioOSoggettoEmittente");
-        $TerzoIntermediarioDatiAnagrafici     = $TerzoIntermediarioOSoggettoEmittente->addChild("DatiAnagrafici");
-        $TerzoIntermediarioIdFiscaleIVA       = $TerzoIntermediarioDatiAnagrafici->addChild("IdFiscaleIVA");
-        $TerzoIntermediarioIdFiscaleIVA->addChild("IdPaese", $this->data["third_party_country_code"]);
-        $TerzoIntermediarioIdFiscaleIVA->addChild("IdCodice", $this->data["third_party_vat_number"]);
-//        $TerzoIntermediarioDatiAnagrafici->addChild("CodiceFiscale", $this->data["receiver_private_vat_number"]);
-        $TerzoIntermediarioAnagrafica = $TerzoIntermediarioDatiAnagrafici->addChild("Anagrafica");
-        $TerzoIntermediarioAnagrafica->addChild("Denominazione", $this->data["third_party_name"]);
+        if ($this->data["third_party_name"]) {
+            $TerzoIntermediarioOSoggettoEmittente = $FatturaElettronicaHeader->addChild("TerzoIntermediarioOSoggettoEmittente");
+            $TerzoIntermediarioDatiAnagrafici     = $TerzoIntermediarioOSoggettoEmittente->addChild("DatiAnagrafici");
+            $TerzoIntermediarioIdFiscaleIVA       = $TerzoIntermediarioDatiAnagrafici->addChild("IdFiscaleIVA");
+            $TerzoIntermediarioIdFiscaleIVA->addChild("IdPaese", $this->data["third_party_country_code"]);
+            $TerzoIntermediarioIdFiscaleIVA->addChild("IdCodice", $this->data["third_party_vat_number"]);
+            //        $TerzoIntermediarioDatiAnagrafici->addChild("CodiceFiscale", $this->data["receiver_private_vat_number"]);
+            $TerzoIntermediarioAnagrafica = $TerzoIntermediarioDatiAnagrafici->addChild("Anagrafica");
+            $TerzoIntermediarioAnagrafica->addChild("Denominazione", $this->data["third_party_name"]);
 
-        $FatturaElettronicaHeader->addChild("SoggettoEmittente", $this->data["third_party_code"]);
+            $FatturaElettronicaHeader->addChild("SoggettoEmittente", $this->data["third_party_code"]);
+        }
+
 
         $FatturaElettronicaBody = $this->xml->addChild("FatturaElettronicaBody");
         $FatturaElettronicaBody->addAttribute('xmlns', "");
