@@ -345,6 +345,18 @@ class CheckoutController extends Controller
 
                 if ($tos_accepted && $rma_accepted) {
                     try {
+                        $Payment = $this->Order->getValue('payment');
+
+                        if (!$Payment) {
+                            $payments = Payment::getAll();
+
+                            if (count($payments)) {
+                                $this->Order->setValue('payment', current($payments));
+                            }
+                            else {
+                                throw new OrderException('No payment gateway available');
+                            }
+                        }
                         $this->Order->setValue('status', 'OP');
                         $this->Order->save(false);
                         rex_redirect(null, null, ['action' => 'init-payment', 'ts' => time()]);
