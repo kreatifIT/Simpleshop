@@ -390,6 +390,13 @@ class CheckoutController extends Controller
                     $warnings[] = ['label' => '###simpleshop.error.tos_rma_not_accepted###'];
                 }
                 break;
+            default:
+                $warnings = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.summaryDefaultAction', $warnings, [
+                    "Order"      => $this->Order,
+                    "postAction" => $postAction,
+                ]));
+
+                break;
         }
 
         $coupon_code = Session::getCheckoutData('coupon_code');
