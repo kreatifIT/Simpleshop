@@ -470,7 +470,22 @@ class CheckoutController extends Controller
         if (\rex_addon::get('kreatif-mpdf')
             ->isAvailable()
         ) {
-            $PDF = $this->Order->getInvoicePDF($type, false);
+            $PDF = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.setInvoicePDF', null, [
+                'type'  => $type,
+                'User'  => $Customer,
+                'Order' => $this->Order,
+            ]));
+            $PDF = $this->Order->getInvoicePDF($type, $debug === 1, $PDF);
+            $PDF = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.getInvoicePDF', $PDF, [
+                'type'  => $type,
+                'User'  => $Customer,
+                'Order' => $this->Order,
+            ]));
+
+            if ($debug === 2) {
+                $PDF->Output();
+                exit;
+            }
             $Mail->addStringAttachment($PDF->Output('', 'S'), \rex::getServerName() . ' - ' . Wildcard::get('label.' . $type) . '.pdf', 'base64', 'application/pdf');
         }
 

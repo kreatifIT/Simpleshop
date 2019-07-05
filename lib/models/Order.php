@@ -490,7 +490,7 @@ class Order extends Model
         return $result;
     }
 
-    public function getInvoicePDF($type = 'invoice', $debug = false, Mpdf $_Mpdf = null)
+    public function getInvoicePDF($type = 'invoice', $debug = false, \Kreatif\Mpdf\Mpdf $_Mpdf = null)
     {
         if (!class_exists('Kreatif\Mpdf\Mpdf')) {
             return false;
