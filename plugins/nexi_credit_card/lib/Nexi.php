@@ -138,6 +138,11 @@ class Nexi extends PaymentAbstract
 
         if (isset($responses['initPayment']['payment_id']) && $responses['initPayment']['payment_id'] == $post_data['paymentid']) {
             $responses['processIPN'] = $post_data;
+            $this->setValue('responses', $responses);
+
+            $Order = Session::getCurrentOrder();
+            $Order->setValue('payment', Order::prepareData($this));
+            $Order->save();
 
             if ($post_data['result'] == 'APPROVED') {
                 Utils::log('Nexi.processIPN', 'successfull', 'INFO');
@@ -147,7 +152,6 @@ class Nexi extends PaymentAbstract
             } else {
                 throw new NexiException("Nexi.processIPN.result - Payment transaction failed [result = {$post_data['result']}]", 30);
             }
-            $this->setValue('responses', $responses);
         } else {
             throw new NexiException("Nexi.processIPN - POST-PaymentID [{$post_data['paymentid']}] did not correspond to Payment.payment_id [{$responses['initPayment']['payment_id']}]", 31);
         }
