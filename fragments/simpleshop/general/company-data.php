@@ -19,7 +19,7 @@ $contact_suffix    = $this->getVar('contact_suffix', '');
 ?>
 <?= $contact_prefix ?>
     <div class="contact-company-data">
-        <strong>###company.full_name###</strong><br/>
+        <strong>###company.name###</strong><br/>
         ###company.street###<br/>
         ###company.postal### ###company.location### (###company.province###)<br/>
         ###company.region### - ###company.country###<br/>
