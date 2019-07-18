@@ -436,6 +436,7 @@ class CheckoutController extends Controller
         $this->setVar('errors', $errors);
         $this->setVar('warnings', $warnings);
         $this->setVar('coupon_code', $coupon_code);
+        $this->setVar('products', $this->Order->getValue('products'));
         $this->setVar('Config', FragmentConfig::getValue('checkout'));
         $this->setVar('cart_url', rex_getUrl($this->settings['linklist']['cart']));
     }

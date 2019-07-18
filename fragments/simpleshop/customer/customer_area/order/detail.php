@@ -40,4 +40,5 @@ $Config['has_summary_footer'] = false;
 $fragment = new \rex_fragment();
 $fragment->setVar('Order', $Order);
 $fragment->setVar('Config', $Config);
+$fragment->setVar('products', $Order->getProducts(false));
 echo $fragment->parse('simpleshop/checkout/summary/wrapper.php');

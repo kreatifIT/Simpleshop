@@ -1,0 +1,9 @@
+package: simpleshop/nexi_xpay
+version: '1.0'
+author: FriendsOfREDAXO
+
+page:
+    title: nexi XPay
+    perm: shop[nexi_xpay]
+    subpages:
+        settings: { title: translate:settings, hidden: true }
