@@ -301,7 +301,7 @@ class CheckoutController extends Controller
             // NEEDED! to get data
             $Object->getValue('createdate');
             $Order->setValue('invoice_address', $Object);
-            $Order->setValue('customer_id', $Object->getId());
+            $Order->setValue('customer_id', $Object->getValue('customer_id'));
             Session::setCheckoutData('Order', $Order);
 
             if (CheckoutController::$callbackCheck['invoice']) {
