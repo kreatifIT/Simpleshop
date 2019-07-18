@@ -23,7 +23,7 @@ $real_field_names = $this->getVar('real_field_names', false);
 $only_fields      = $this->getVar('only_fields', false);
 $btn_label        = $this->getVar('btn_label', ucfirst(\Wildcard::get('action.save')));
 $Address          = $this->getVar('Address', CustomerAddress::create());
-$Customer         = Customer::getCurrentUser();
+$Customer         = $this->getVar('Customer', Customer::getCurrentUser());
 
 
 $id   = 'form-data-' . \rex_article::getCurrentId();
