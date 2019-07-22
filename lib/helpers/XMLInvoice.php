@@ -195,7 +195,7 @@ class XMLInvoice
             $CessionarioIdFiscaleIVA->addChild("IdPaese", $this->data["receiver_country_code"]);
             $CessionarioIdFiscaleIVA->addChild("IdCodice", $this->data["receiver_vat_number"]);
         }
-        $CessionarioDatiAnagrafici->addChild("CodiceFiscale", $this->data["receiver_private_vat_number"]);
+        $CessionarioDatiAnagrafici->addChild("CodiceFiscale", mb_strtoupper($this->data["receiver_private_vat_number"]));
         $CessionarioAnagrafica = $CessionarioDatiAnagrafici->addChild("Anagrafica");
         $CessionarioAnagrafica->addChild("Denominazione", htmlspecialchars($this->data["receiver_name"], ENT_QUOTES, "utf-8"));
         //                    $CessionarioDatiAnagrafici->addChild("RegimeFiscale",$this->data["receiver_fiscal_code"]);
