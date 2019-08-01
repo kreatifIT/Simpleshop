@@ -230,7 +230,7 @@ class XMLInvoice
         $DatiGeneraliDocumento->addChild("Divisa", $this->data["document_currency"]);
         $DatiGeneraliDocumento->addChild("Data", $this->data["document_date"]);
         $DatiGeneraliDocumento->addChild("Numero", $this->data["document_number"]);
-        $DatiGeneraliDocumento->addChild("ImportoTotaleDocumento", $this->data["sales_totale"]);
+        $DatiGeneraliDocumento->addChild("ImportoTotaleDocumento", number_format($this->data["sales_totale"], 2, '.', ''));
 
         $DatiBeniServizi = $FatturaElettronicaBody->addChild("DatiBeniServizi");
         foreach ($this->data["document_lines"] as $key => $line) {
