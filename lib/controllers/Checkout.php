@@ -30,6 +30,7 @@ class CheckoutController extends Controller
     {
         $this->params = array_merge([
             'show_steps_fragment' => true,
+            'Customer'            => Customer::getCurrentUser(),
         ], $this->params);
 
         $this->products = Session::getCartItems(true);
@@ -140,6 +141,29 @@ class CheckoutController extends Controller
         Session::setCheckoutData('steps_done', $doneSteps);
     }
 
+    public static function processIPN()
+    {
+        $order_id        = rex_get('order_id', 'int');
+        $data['SERVER']  = $_SERVER;
+        $data['POST']    = $_POST;
+        $data['Order']   = $order_id ? Order::get($order_id) : null;
+        $data['Payment'] = $data['Order'] ? $data['Order']->getValue('payment') : null;
+
+        \rex_file::put(\rex_path::addonData('simpleshop', 'ipn/' . date('Ymd-His') . '.log'), print_r($data, true));
+
+        if ($data['Payment']) {
+            try {
+                $data['Payment']->processIPN($data['Order'], $_POST);
+                $data['Order']->setValue('status', 'IP');
+                $data['Order']->setValue('payment', Order::prepareData($data['Payment']));
+                $data['Order']->save();
+            } catch (\Exception $ex) {
+                Utils::log('Checkout.processIPN', $ex->getMessage() . "\n" . print_r($data, true), 'ERROR', true);
+            }
+        }
+        exit;
+    }
+
     public function setOrder(Order $Order)
     {
         $this->Order = $Order;
@@ -151,24 +175,25 @@ class CheckoutController extends Controller
         $this->Order->setValue('status', 'CA');
         $this->Order->save();
 
-        rex_redirect($this->settings['linklist']['cart'], null, array_merge($_GET, ['ts' => time()]));
+        rex_redirect(null, null, ['step' => 'show-summary', 'ca-info' => 1, 'ts' => time()]);
     }
 
     protected function getShippingAddressView()
     {
         $Address      = $this->Order->getValue('shipping_address');
         $useShAddress = Session::getCheckoutData('use_shipping_address', false);
-        $Customer     = Customer::getCurrentUser();
+        $customer_id  = $this->params['Customer']->getId();
 
-        if (!$Address) {
-            $addresses = CustomerAddress::getAll(true, [
-                'filter'  => [['customer_id', $Customer->getId()]],
-                'limit'   => 1,
-                'orderBy' => 'id',
-                'order'   => 'desc',
-            ])
-                ->toArray();
-            $Address   = array_shift($addresses);
+        if (!$Address && $customer_id > 0) {
+            if (isset($this->params['Address'])) {
+                $Address = $this->params['Address'];
+            } else {
+                $stmt = CustomerAddress::query();
+                $stmt->where('status', 1);
+                $stmt->orderBy('id', 'desc');
+                $stmt->where('customer_id', $customer_id);
+                $Address = $stmt->findOne();
+            }
         }
 
         if (!empty($_POST)) {
@@ -220,17 +245,21 @@ class CheckoutController extends Controller
 
     protected function getInvoiceAddressView()
     {
-        $Address  = $this->Order->getInvoiceAddress();
-        $Customer = Customer::getCurrentUser();
+        $Address     = $this->Order->getInvoiceAddress();
+        $customer_id = $this->params['Customer']->getId();
 
         CheckoutController::$callbackCheck = ['invoice' => false, 'shipping' => false];
 
-        if (!$Address) {
-            $Address = CustomerAddress::query()
-                ->where('status', 1)
-                ->where('customer_id', $Customer->getId())
-                ->orderBy('id', 'desc')
-                ->findOne();
+        if (!$Address && $customer_id > 0) {
+            if (isset($this->params['Address'])) {
+                $Address = $this->params['Address'];
+            } else {
+                $stmt = CustomerAddress::query();
+                $stmt->where('status', 1);
+                $stmt->orderBy('id', 'desc');
+                $stmt->where('customer_id', $customer_id);
+                $Address = $stmt->findOne();
+            }
         }
 
         $this->setVar('Address', $Address ?: CustomerAddress::create());
@@ -272,7 +301,7 @@ class CheckoutController extends Controller
             // NEEDED! to get data
             $Object->getValue('createdate');
             $Order->setValue('invoice_address', $Object);
-            $Order->setValue('customer_id', $Object->getId());
+            $Order->setValue('customer_id', $Object->getValue('customer_id'));
             Session::setCheckoutData('Order', $Order);
 
             if (CheckoutController::$callbackCheck['invoice']) {
@@ -345,6 +374,17 @@ class CheckoutController extends Controller
 
                 if ($tos_accepted && $rma_accepted) {
                     try {
+                        $Payment = $this->Order->getValue('payment');
+
+                        if (!$Payment) {
+                            $payments = Payment::getAll();
+
+                            if (count($payments)) {
+                                $this->Order->setValue('payment', current($payments));
+                            } else {
+                                throw new OrderException('No payment gateway available');
+                            }
+                        }
                         $this->Order->setValue('status', 'OP');
                         $this->Order->save(false);
                         rex_redirect(null, null, ['action' => 'init-payment', 'ts' => time()]);
@@ -354,6 +394,13 @@ class CheckoutController extends Controller
                 } else {
                     $warnings[] = ['label' => '###simpleshop.error.tos_rma_not_accepted###'];
                 }
+                break;
+            default:
+                $warnings = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.summaryDefaultAction', $warnings, [
+                    "Order"      => $this->Order,
+                    "postAction" => $postAction,
+                ]));
+
                 break;
         }
 
@@ -380,12 +427,16 @@ class CheckoutController extends Controller
             $errors[] = Wildcard::get('shop.error_summary_no_product_available');
         }
 
+        if ($this->Order->getValue('status') && rex_get('ca-info', 'int') == 1) {
+            $warnings[] = ['label' => '###simpleshop.payment_cancelled###'];
+        }
         Session::setCheckoutData('Order', $this->Order);
 
         $this->fragment_path[] = 'simpleshop/checkout/summary/wrapper.php';
         $this->setVar('errors', $errors);
         $this->setVar('warnings', $warnings);
         $this->setVar('coupon_code', $coupon_code);
+        $this->setVar('products', $this->Order->getValue('products'));
         $this->setVar('Config', FragmentConfig::getValue('checkout'));
         $this->setVar('cart_url', rex_getUrl($this->settings['linklist']['cart']));
     }
@@ -425,7 +476,22 @@ class CheckoutController extends Controller
         if (\rex_addon::get('kreatif-mpdf')
             ->isAvailable()
         ) {
-            $PDF = $this->Order->getInvoicePDF($type, false);
+            $PDF = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.setInvoicePDF', null, [
+                'type'  => $type,
+                'User'  => $Customer,
+                'Order' => $this->Order,
+            ]));
+            $PDF = $this->Order->getInvoicePDF($type, $debug === 1, $PDF);
+            $PDF = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.getInvoicePDF', $PDF, [
+                'type'  => $type,
+                'User'  => $Customer,
+                'Order' => $this->Order,
+            ]));
+
+            if ($debug === 2) {
+                $PDF->Output();
+                exit;
+            }
             $Mail->addStringAttachment($PDF->Output('', 'S'), \rex::getServerName() . ' - ' . Wildcard::get('label.' . $type) . '.pdf', 'base64', 'application/pdf');
         }
 

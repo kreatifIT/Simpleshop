@@ -26,5 +26,20 @@ class Mail extends \Kreatif\Mail
         FragmentConfig::$data['email_styles']['use_mail_styles'] = true;
         return $this;
     }
+
+    public function send($debug = false, $use_master_tpl = true)
+    {
+        if ($use_master_tpl) {
+
+            try {
+                $this->Body = $this->fragment->parse('simpleshop/email/master.php');
+            }
+            catch (\rex_exception $ex){
+                $this->Body = $this->fragment->parse('kreatif/email/master.php');
+            }
+        }
+
+        return parent::send($debug, false);
+    }
 }
 

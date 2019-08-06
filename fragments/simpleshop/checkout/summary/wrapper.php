@@ -17,6 +17,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 $Settings   = \rex::getConfig('simpleshop.Settings');
 $Config     = $this->getVar('Config');
 $Order      = $this->getVar('Order');
+$products   = $this->getVar('products', []);
 $errors     = $this->getVar('errors', []);
 $back_url   = $this->getVar('back_url');
 $warnings   = $this->getVar('warnings', []);
@@ -98,7 +99,7 @@ $shipping   = $Order->getValue('shipping');
         <div class="checkout-summary-items margin-bottom">
             <?php
             $Controller = CartController::execute([
-                'products'                  => $Order->getProducts(false),
+                'products'                  => $products,
                 'use_tax_prices'            => false,
                 'cart_config'               => array_merge(FragmentConfig::getValue('cart'), [
                     'has_remove_button' => false,

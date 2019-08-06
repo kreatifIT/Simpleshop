@@ -21,7 +21,7 @@ $show_save_btn    = $this->getVar('show_save_btn', true);
 $real_field_names = $this->getVar('real_field_names', false);
 $only_fields      = $this->getVar('only_fields', false);
 $btn_label        = $this->getVar('btn_label', ucfirst(\Wildcard::get('action.save')));
-$Customer         = Customer::getCurrentUser();
+$Customer         = $this->getVar('Customer', Customer::getCurrentUser());
 
 
 $id  = 'form-data-' . \rex_article::getCurrentId();
@@ -33,7 +33,7 @@ $form->setObjectparams('real_field_names', $real_field_names);
 $form->setObjectparams('form_ytemplate', 'custom,foundation,bootstrap');
 $form->setObjectparams('error_class', 'form-warning');
 $form->setObjectparams('form_showformafterupdate', true);
-$form->setObjectparams('getdata', true);
+$form->setObjectparams('getdata', $Customer->getId() > 0);
 $form->setObjectparams('debug', false);
 $form->setObjectparams('form_anchor', '-' . $sid);
 $form->setObjectparams('form_name', $sid);

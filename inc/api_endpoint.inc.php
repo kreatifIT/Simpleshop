@@ -13,6 +13,15 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+\rex_extension::register('PACKAGES_INCLUDED', function ($params) {
+    if (!\rex::isBackend()) {
+        $action = rex_get('action', 'string');
+
+        if ($action == 'process_ipn') {
+            CheckoutController::processIPN();
+        }
+    }
+});
 \rex_extension::register('FE_OUTPUT', function ($params) {
     if (!\rex::isBackend()) {
         // api endpoint

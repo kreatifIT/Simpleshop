@@ -23,45 +23,46 @@ namespace FriendsOfREDAXO\Simpleshop;
 \rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Order', 'ext_yform_data_delete']);
 \rex_extension::register('YFORM_DATASET_FORM_SETVALUEFIELD', ['\FriendsOfREDAXO\Simpleshop\Model', 'ext_setValueField']);
 \rex_extension::register('YFORM_DATASET_FORM_SETVALIDATEFIELD', ['\FriendsOfREDAXO\Simpleshop\Model', 'ext_setValidateField']);
+\rex_extension::register('YFORM_MANAGER_REX_INFO', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_tableManagerInfo']);
 \rex_extension::register('kreatif.Model.queryCollection', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_queryCollection']);
 \rex_extension::register('project.layoutBottom', ['\FriendsOfREDAXO\Simpleshop\CartController', 'ext_project_layoutBottom']);
-\rex_extension::register('project.setUrlObject', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_setUrlObject']);
-\rex_extension::register('YFORM_MANAGER_REX_INFO', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_tableManagerInfo']);
+\rex_extension::register('kreatif.setUrlObject', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_setUrlObject']);
 
 
 \rex_extension::register('PACKAGES_INCLUDED', function (\rex_extension_point $Ep) {
-    \rex_login::startSession();
+    if ($this->getConfig('installed')) {
+        \rex_login::startSession();
 
+        if (rex_get('action', 'string') == 'logout') {
+            Customer::logout();
 
-    if (rex_get('action', 'string') == 'logout') {
-        Customer::logout();
+            $login = new \rex_backend_login();
+            $login->setLogout(true);
+            $login->checkLogin();
 
-        $login = new \rex_backend_login();
-        $login->setLogout(true);
-        $login->checkLogin();
-
-        \rex_response::sendRedirect(rex_getUrl(null, null, ['ts' => time()]));
-    }
-
-    $beUser = \rex::getUser();
-
-    if ($beUser) {
-        $Customer = Customer::getCurrentUser();
-
-        if (!$Customer) {
-            Customer::login($beUser->getEmail(), 'backend');
+            \rex_response::sendRedirect(rex_getUrl(null, null, ['ts' => time()]));
         }
 
-        if (\rex::isBackend()) {
-            \rex_view::setJsProperty('simpleshop', [
-                'ajax_url' => \rex_url::frontendController(),
-            ]);
+        $beUser = \rex::getUser();
+
+        if ($beUser) {
+            $Customer = Customer::getCurrentUser();
+
+            if (!$Customer) {
+                Customer::login($beUser->getEmail(), 'backend');
+            }
+
+            if (\rex::isBackend()) {
+                \rex_view::setJsProperty('simpleshop', [
+                    'ajax_url' => \rex_url::frontendController(),
+                ]);
+            }
         }
-    }
-    if (\rex_addon::get('kreatif-mpdf')
-        ->isAvailable()
-    ) {
-        \Kreatif\Mpdf\Mpdf::addCSSPath($this->getPath('assets/scss/pdf_styles.scss'));
+        if (\rex_addon::get('kreatif-mpdf')
+            ->isAvailable()
+        ) {
+            \Kreatif\Mpdf\Mpdf::addCSSPath($this->getPath('assets/scss/pdf_styles.scss'));
+        }
     }
     return $Ep->getSubject();
 });
