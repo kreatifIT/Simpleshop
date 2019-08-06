@@ -25,9 +25,10 @@ class Customer extends Model
 
     public static function getUserByEmail($email)
     {
-        return self::query()
-            ->whereRaw('email LIKE :email', ['email' => trim($email)])
-            ->findOne();
+        $stmt = self::query();
+        $stmt->whereRaw('email LIKE :email', ['email' => trim($email)]);
+        $User = $stmt->findOne();
+        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.getUserByEmail', $User, ['uname' => $email]));
     }
 
     public function save($prepare = false)
@@ -70,18 +71,22 @@ class Customer extends Model
         ]));
     }
 
-    public static function register($email, $password, $attributes = [])
+    public static function register($email, $password, $attributes = [], $User = null)
     {
         $result = null;
         $email  = trim(mb_strtolower($email));
-        $User   = self::getUserByEmail($email);
 
-        // verify if a user with the given email already exist
         if ($User) {
-            throw new CustomerException("User with given email already exist", 1);
-        }
-        $_this = parent::create();
+            $_this = $User;
+        } else {
+            $User = self::getUserByEmail($email);
 
+            // verify if a user with the given email already exist
+            if ($User) {
+                throw new CustomerException("User with given email already exist", 1);
+            }
+            $_this = parent::create();
+        }
         foreach ($attributes as $attr => $value) {
             $_this->setValue($attr, trim($value));
         }
@@ -94,6 +99,7 @@ class Customer extends Model
         $_this->setValue('email', $email);
         $_this->setValue('password', $password);
         $_this->setValue('status', $statusField->getElement('default'));
+
         $success  = $_this->save();
         $messages = $_this->getMessages();
 
@@ -184,6 +190,7 @@ class Customer extends Model
                 $loginCheck = $login->checkLogin();
             }
         }
+
 
         if ($user && ($user->getValue('status') == 1 || $beuser)) {
             $pwd = $user->getValue('password_hash');
