@@ -240,14 +240,14 @@ class Session extends Model
         return $product_id . '|' . implode(',', $feature_value_ids);
     }
 
-    public static function getTotal()
+    public static function getTotal($include_tax = true)
     {
         $total    = 0;
         $products = self::_getCartItems();
 
         foreach ($products as $product) {
             $cart_quantity = $product->getValue('cart_quantity');
-            $price         = $product->getPrice();
+            $price         = $product->getPrice($include_tax);
             $total         += ($cart_quantity * $price);
         }
         return $total;
