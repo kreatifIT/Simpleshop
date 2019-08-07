@@ -30,6 +30,7 @@ class CheckoutController extends Controller
     {
         $this->params = array_merge([
             'show_steps_fragment' => true,
+            'Customer'            => Customer::getCurrentUser(),
         ], $this->params);
 
         $this->products = Session::getCartItems(true);
@@ -181,17 +182,18 @@ class CheckoutController extends Controller
     {
         $Address      = $this->Order->getValue('shipping_address');
         $useShAddress = Session::getCheckoutData('use_shipping_address', false);
-        $Customer     = Customer::getCurrentUser();
+        $customer_id  = $this->params['Customer']->getId();
 
-        if (!$Address) {
-            $addresses = CustomerAddress::getAll(true, [
-                'filter'  => [['customer_id', $Customer->getId()]],
-                'limit'   => 1,
-                'orderBy' => 'id',
-                'order'   => 'desc',
-            ])
-                ->toArray();
-            $Address   = array_shift($addresses);
+        if (!$Address && $customer_id > 0) {
+            if (isset($this->params['Address'])) {
+                $Address = $this->params['Address'];
+            } else {
+                $stmt = CustomerAddress::query();
+                $stmt->where('status', 1);
+                $stmt->orderBy('id', 'desc');
+                $stmt->where('customer_id', $customer_id);
+                $Address = $stmt->findOne();
+            }
         }
 
         if (!empty($_POST)) {
@@ -243,17 +245,21 @@ class CheckoutController extends Controller
 
     protected function getInvoiceAddressView()
     {
-        $Address  = $this->Order->getInvoiceAddress();
-        $Customer = Customer::getCurrentUser();
+        $Address     = $this->Order->getInvoiceAddress();
+        $customer_id = $this->params['Customer']->getId();
 
         CheckoutController::$callbackCheck = ['invoice' => false, 'shipping' => false];
 
-        if (!$Address) {
-            $Address = CustomerAddress::query()
-                ->where('status', 1)
-                ->where('customer_id', $Customer->getId())
-                ->orderBy('id', 'desc')
-                ->findOne();
+        if (!$Address && $customer_id > 0) {
+            if (isset($this->params['Address'])) {
+                $Address = $this->params['Address'];
+            } else {
+                $stmt = CustomerAddress::query();
+                $stmt->where('status', 1);
+                $stmt->orderBy('id', 'desc');
+                $stmt->where('customer_id', $customer_id);
+                $Address = $stmt->findOne();
+            }
         }
 
         $this->setVar('Address', $Address ?: CustomerAddress::create());
@@ -295,7 +301,7 @@ class CheckoutController extends Controller
             // NEEDED! to get data
             $Object->getValue('createdate');
             $Order->setValue('invoice_address', $Object);
-            $Order->setValue('customer_id', $Object->getId());
+            $Order->setValue('customer_id', $Object->getValue('customer_id'));
             Session::setCheckoutData('Order', $Order);
 
             if (CheckoutController::$callbackCheck['invoice']) {
@@ -375,8 +381,7 @@ class CheckoutController extends Controller
 
                             if (count($payments)) {
                                 $this->Order->setValue('payment', current($payments));
-                            }
-                            else {
+                            } else {
                                 throw new OrderException('No payment gateway available');
                             }
                         }

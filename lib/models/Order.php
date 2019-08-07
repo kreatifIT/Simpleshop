@@ -43,11 +43,13 @@ class Order extends Model
         $CustomerData = $this->getValue('customer_data');
         $customerId   = $this->getValue('customer_id');
 
-        if ($this->getId() && (!$CustomerData || ($customerId && $CustomerData->getId() != $customerId))) {
+        if (!$CustomerData || ($customerId && $CustomerData->getId() != $customerId)) {
             $CustomerData = $customerId ? Customer::get($customerId) : self::getInvoiceAddress();
-
             $this->setValue('customer_data', $CustomerData);
-            $this->save();
+
+            if ($this->getId()) {
+                $this->save();
+            }
         }
         return $CustomerData;
     }
