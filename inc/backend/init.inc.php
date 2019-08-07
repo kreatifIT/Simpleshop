@@ -16,7 +16,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 \rex_extension::register('PACKAGES_INCLUDED', function () {
     $mtime = '';
 
-    if ($this->getProperty('compile')) {
+    if ($this->getProperty('compile') || !file_exists($this->getAssetsPath('css/backend.css'))) {
         $mtime       = '?mtime=' . time();
         $compiler = new \rex_scss_compiler();
         $compiler->setScssFile([$this->getPath('assets/scss/backend.scss')]);
