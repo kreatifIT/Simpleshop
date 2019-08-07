@@ -34,9 +34,8 @@ class DefaultShipping extends ShippingAbstract
     {
         $Address  = $Order->getShippingAddress();
         $Country  = $Address ? Country::get($Address->getValue('country')) : null;
+        $total    = $Order->getValue('initial_total');
         $Settings = \rex::getConfig('simpleshop.DefaultShipping.Settings');
-        $total    = Session::getTotal();
-
 
         if ($Country && isset($Settings['costs'][$Country->getId()])) {
             $cost = 0;

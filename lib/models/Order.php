@@ -319,11 +319,20 @@ class Order extends Model
                 $this->quantity          += $quantity;
             }
         }
+        ksort($gross_prices);
+        ksort($net_prices);
+
+        $this->setValue('updatedate', date('Y-m-d H:i:s'));
+        $this->setValue('net_prices', $net_prices);
+        $this->setValue('brut_prices', $gross_prices);
+        $this->setValue('initial_total', array_sum($gross_prices));
+
+
         // get shipping costs
         if ($this->getValue('shipping')) {
             try {
-                $this->setValue('shipping_costs', (float)$this->getValue('shipping')
-                    ->getNetPrice($this, $products));
+                $shipping = $this->getValue('shipping');
+                $this->setValue('shipping_costs', (float)$shipping->getNetPrice($this, $products));
             } catch (\Exception $ex) {
                 $msg = trim($ex->getLabelByCode());
 
@@ -335,13 +344,6 @@ class Order extends Model
         } else {
             $this->setValue('shipping_costs', 0);
         }
-        ksort($gross_prices);
-        ksort($net_prices);
-
-        $this->setValue('updatedate', date('Y-m-d H:i:s'));
-        $this->setValue('net_prices', $net_prices);
-        $this->setValue('brut_prices', $gross_prices);
-        $this->setValue('initial_total', array_sum($gross_prices));
 
         // calculate manual discount8
         if ($manual_discount > 0) {
