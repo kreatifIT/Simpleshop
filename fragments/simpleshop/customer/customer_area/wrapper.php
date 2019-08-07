@@ -34,7 +34,7 @@ $User     = Customer::getCurrentUser();
                     </li>
                 <?php endforeach; ?>
                 <li>
-                    <a href="<?= rex_getUrl(null, null, ['action' => 'logout']) ?>">###action.logout###</a>
+                    <a href="<?= rex_getUrl(null, null, ['action' => 'logout', 'ts' => time()]) ?>">###action.logout###</a>
                 </li>
             </ul>
         </div>
