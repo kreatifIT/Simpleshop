@@ -18,6 +18,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
             $Order            = \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id'));
             $CustomerData     = $Order->getCustomerData();
             $table            = $this->getParam('main_table');
+            $main_id          = $this->getParam('main_id');
             $use_invoicing    = \FriendsOfREDAXO\Simpleshop\Utils::getSetting('use_invoicing', false);
             $use_packing_list = \FriendsOfREDAXO\Simpleshop\Utils::getSetting('packing_list_printing', false);
 
@@ -120,9 +121,9 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
             if ($Customer) {
                 $output[] = '
                 <a href="' . rex_url::currentBackendPage([
-                        'table_name' => rex_get('table_name', 'string'),
-                        'data_id'    => rex_get('data_id', 'int'),
-                        'func'       => rex_get('func', 'string'),
+                        'table_name' => $table,
+                        'data_id'    => $main_id,
+                        'func'       => rex_request('func', 'string'),
                         'ss-action'  => 'resend_email',
                         'ts'         => time(),
                     ]) . '" class="btn btn-default">
@@ -133,9 +134,9 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
             }
             $output[] = '
                     <a href="' . rex_url::currentBackendPage([
-                    'table_name' => rex_get('table_name', 'string'),
-                    'data_id'    => rex_get('data_id', 'int'),
-                    'func'       => rex_get('func', 'string'),
+                    'table_name' => $table,
+                    'data_id'    => $main_id,
+                    'func'       => rex_request('func', 'string'),
                     'ss-action'  => 'recalculate_sums',
                     'ts'         => time(),
                 ]) . '" class="btn btn-default">
@@ -146,9 +147,9 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
             if ($use_packing_list) {
                 $output[] = '
                     <a href="' . rex_url::currentBackendPage([
-                        'table_name' => rex_get('table_name', 'string'),
-                        'data_id'    => rex_get('data_id', 'int'),
-                        'func'       => rex_get('func', 'string'),
+                        'table_name' => $table,
+                        'data_id'    => $main_id,
+                        'func'       => rex_request('func', 'string'),
                         'ss-action'  => 'generate_packing_list',
                         'ts'         => time(),
                     ]) . '" class="btn btn-default">
@@ -161,9 +162,9 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
             if ($use_invoicing) {
                 $output[] = '
                     <a href="' . rex_url::currentBackendPage([
-                        'table_name' => rex_get('table_name', 'string'),
-                        'data_id'    => rex_get('data_id', 'int'),
-                        'func'       => rex_get('func', 'string'),
+                        'table_name' => $table,
+                        'data_id'    => $main_id,
+                        'func'       => rex_request('func', 'string'),
                         'ss-action'  => 'generate_pdf',
                         'ts'         => time(),
                     ]) . '" class="btn btn-default">
@@ -173,9 +174,9 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                 ';
                 $output[] = '
                     <a href="' . rex_url::currentBackendPage([
-                        'table_name' => rex_get('table_name', 'string'),
-                        'data_id'    => rex_get('data_id', 'int'),
-                        'func'       => rex_get('func', 'string'),
+                        'table_name' => $table,
+                        'data_id'    => $main_id,
+                        'func'       => rex_request('func', 'string'),
                         'ss-action'  => 'download_xml',
                         'ts'         => time(),
                     ]) . '" class="btn btn-default">
@@ -194,7 +195,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                 if ($CreditNote) {
                     $output[] = '
                         <a href="' . rex_url::currentBackendPage([
-                            'table_name' => 'rex_shop_order',
+                            'table_name' => $table,
                             'data_id'    => $CreditNote->getId(),
                             'func'       => 'edit',
                             'ts'         => time(),
@@ -206,9 +207,9 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                 } else {
                     $output[] = '
                         <a href="' . rex_url::currentBackendPage([
-                            'table_name' => rex_get('table_name', 'string'),
-                            'data_id'    => rex_get('data_id', 'int'),
-                            'func'       => rex_get('func', 'string'),
+                            'table_name' => $table,
+                            'data_id'    => $main_id,
+                            'func'       => rex_request('func', 'string'),
                             'ss-action'  => 'generate_creditnote',
                             'ts'         => time(),
                         ]) . '" class="btn btn-default">
@@ -220,7 +221,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
             } else if ($Order->valueIsset('ref_order_id')) {
                 $output[] = '
                     <a href="' . rex_url::currentBackendPage([
-                        'table_name' => 'rex_shop_order',
+                        'table_name' => $table,
                         'data_id'    => $Order->getValue('ref_order_id'),
                         'func'       => 'edit',
                         'ts'         => time(),
