@@ -11,9 +11,9 @@
  * file that was distributed with this source code.
  */
 
-$type     = $this->getVar('type');
-$Order    = $this->getVar('Order');
-$products = (array)$Order->getProducts(false);
+$show_tax_info = $this->getVar('show_tax_info', true);
+$Order         = $this->getVar('Order');
+$products      = (array)$Order->getProducts(false);
 
 if (count($products) == 0) {
     return;
@@ -57,8 +57,8 @@ if (count($products) == 0) {
                 <?php endif; ?>
             </td>
             <td align="center"><?= $quantity ?></td>
-            <td align="right">&euro; <?= format_price($product->getPrice($type != 'invoice')) ?></td>
-            <td align="right">&euro; <?= format_price($product->getPrice($type != 'invoice') * $quantity) ?></td>
+            <td align="right">&euro; <?= format_price($product->getPrice(!$show_tax_info)) ?></td>
+            <td align="right">&euro; <?= format_price($product->getPrice(!$show_tax_info) * $quantity) ?></td>
         </tr>
     <?php endforeach; ?>
 
