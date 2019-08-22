@@ -512,9 +512,9 @@ class Order extends Model
         $xmlData['document_type']                  = $this->getValue('status') == 'CN' ? 'TD04' : 'TD01';
         $xmlData['receiver_name']                  = trim($Customer->getName());
         $xmlData['receiver_private_vat_number']    = mb_strtoupper($Customer->getValue('fiscal_code'));
-        $xmlData['receiver_head_quarter_street']   = $Customer->getValue('street');
-        $xmlData['receiver_head_quarter_zip']      = $Customer->getValue('postal');
-        $xmlData['receiver_head_quarter_city']     = $Customer->getValue('location');
+        $xmlData['receiver_head_quarter_street']   = $Customer->getValue('street', false, 'Via/Str');
+        $xmlData['receiver_head_quarter_zip']      = $Customer->getValue('postal', false, '00000');
+        $xmlData['receiver_head_quarter_city']     = $Customer->getValue('location', false, 'I');
         $xmlData['receiver_head_quarter_province'] = 'BZ';
         $xmlData['receiver_head_quarter_nation']   = 'IT';
 
