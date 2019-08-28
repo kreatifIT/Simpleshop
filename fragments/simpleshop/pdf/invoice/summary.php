@@ -2,15 +2,16 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$show_tax_info  = $this->getVar('show_tax_info', true);
 $Order          = $this->getVar('Order');
-$summary        = $Order->getValue($show_tax_info ? 'net_prices' : 'brut_prices');
+$config         = \FriendsOfREDAXO\Simpleshop\FragmentConfig::getValue('checkout');
+
 $discount       = $Order->getValue('discount');
 $total          = $Order->getValue('total');
 $taxes          = $Order->getValue('taxes');
 $shipping       = $Order->getValue('shipping');
 $promotions     = (array)$Order->getValue('promotions');
-$shipping_costs = $shipping && $show_tax_info ? $shipping->getPrice($Order) : $Order->getValue('shipping_costs');
+$shipping_costs = $shipping && $config['show_tax_info'] ? $shipping->getPrice($Order) : $Order->getValue('shipping_costs');
+$summary        = $Order->getValue($config['show_tax_info'] ? 'net_prices' : 'brut_prices');
 
 ?>
 <table id="invoice-summary" width="100%">
@@ -51,7 +52,7 @@ $shipping_costs = $shipping && $show_tax_info ? $shipping->getPrice($Order) : $O
             </tr>
         <?php endif; ?>
 
-        <?php if ($show_tax_info && !$Order->isTaxFree()): ?>
+        <?php if ($config['show_tax_info'] && !$Order->isTaxFree()): ?>
             <tr>
                 <td>
                     ###simpleshop.brutto_total###

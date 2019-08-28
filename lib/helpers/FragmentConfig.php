@@ -73,6 +73,7 @@ class FragmentConfig
         'checkout'                     => [
             'has_coupons'        => true,
             'has_summary_footer' => true,
+            'show_tax_info'      => true,
             'steps'              => [
                 'invoice_address',
                 'shipping_address',
