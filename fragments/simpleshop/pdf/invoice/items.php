@@ -11,9 +11,9 @@
  * file that was distributed with this source code.
  */
 
-$show_tax_info = $this->getVar('show_tax_info', true);
-$Order         = $this->getVar('Order');
-$products      = (array)$Order->getProducts(false);
+$Order    = $this->getVar('Order');
+$products = (array)$Order->getProducts(false);
+$config   = \FriendsOfREDAXO\Simpleshop\FragmentConfig::getValue('checkout');
 
 if (count($products) == 0) {
     return;
@@ -57,8 +57,8 @@ if (count($products) == 0) {
                 <?php endif; ?>
             </td>
             <td align="center"><?= $quantity ?></td>
-            <td align="right">&euro; <?= format_price($product->getPrice(!$show_tax_info)) ?></td>
-            <td align="right">&euro; <?= format_price($product->getPrice(!$show_tax_info) * $quantity) ?></td>
+            <td align="right">&euro; <?= format_price($product->getPrice(!$config['show_tax_info'])) ?></td>
+            <td align="right">&euro; <?= format_price($product->getPrice(!$config['show_tax_info']) * $quantity) ?></td>
         </tr>
     <?php endforeach; ?>
 
