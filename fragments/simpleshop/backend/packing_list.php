@@ -24,7 +24,7 @@ $SAddress = $Order->getShippingAddress();
 
 
 if (strlen($barCode)) {
-    $Code = new \Barcode($barCode, 4);
+    $Code = new \Barcode($barCode, 4, null, 12);
 
     ob_start();
     imagepng($Code->image());

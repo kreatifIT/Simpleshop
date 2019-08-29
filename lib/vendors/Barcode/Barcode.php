@@ -63,7 +63,7 @@ class Barcode
      * lower than 2 or greater than 12.
      */
 
-    public function __construct ($number, $scale, $fontpath=null)
+    public function __construct ($number, $scale, $fontpath=null, $max_length = 13)
     {
         /* Get the parity key, which is based on the first digit. */
         $this->_key = self::$PARITY_KEY[substr($number,0,1)];
@@ -87,7 +87,7 @@ class Barcode
 
         /* The checksum (13th digit) can be calculated or supplied */
         $this->number = $number;
-        if ($len === 12)
+        if ($len === 12 && $max_length > 12)
             $this->number .= self::checksum($number);
 
         $this->_bars = $this->_encode();

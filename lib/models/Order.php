@@ -135,7 +135,7 @@ class Order extends Model
         $key = $this->getShippingKey(true);
 
         if (strlen($key) == 12 || strlen($key) == 13) {
-            $Code = new \Barcode($key, 4);
+            $Code = new \Barcode($key, 4, null, 12);
 
             ob_start();
             imagepng($Code->image());
