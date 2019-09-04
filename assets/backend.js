@@ -279,48 +279,54 @@ var Simpleshop = (function ($) {
         },
 
         changeOrderProductQuantity: function (_this, orderId, productId, oldAmount, event) {
-            if (window.event.which == 13 || window.event.which == 27) {
-                var formData = {},
-                    name = $(_this).prop('name'),
-                    $container = $(_this).parents('#order-product-container'),
-                    $tr = $(_this).parents('tr'),
-                    serialized = $tr.find('input, select, textarea').serialize().split('&'),
-                    loading = addLoading($container);
+            if (window.event.which == 13 || window.event.which == 27 || window.event.which == 9) {
+                var which = window.event.which;
 
-                for (var i in serialized) {
-                    var chunks = serialized[i].split('=');
-                    formData[chunks[0]] = chunks[1];
-                }
+                window.setTimeout(function () {
+                    var formData = {},
+                        name = $(which == 9 ? document.activeElement : _this).prop('name'),
+                        $container = $(_this).parents('#order-product-container'),
+                        $tr = $(_this).parents('tr'),
+                        serialized = $tr.find('input, select, textarea').serialize().split('&'),
+                        loading = addLoading($container);
 
-                $.ajax({
-                    url: rex.simpleshop.ajax_url,
-                    method: 'GET',
-                    cache: false,
-                    data: $.extend(formData, {
-                        'debug': rex.debug,
-                        'orderId': orderId,
-                        'productId': productId,
-                        'old_amount': oldAmount,
-                        'controller': 'Order.be__changeProductQuantity',
-                        'rex-api-call': 'simpleshop_be_api'
-                    })
-                }).done(function (resp) {
-                    if (resp.succeeded) {
-                        $container.html(resp.message.html);
-                        var $input = $('[name='+ name +']'),
-                            value = $input.val();
-                        $input.focus();
-                        $input.val('');
-                        $input.val(value);
-                        loading.remove();
+                    for (var i in serialized) {
+                        var chunks = serialized[i].split('=');
+                        formData[chunks[0]] = chunks[1];
                     }
-                    else {
-                        for (var i in resp.message.errors) {
-                            KreatifAddon.showAlert(resp.message.errors[i]);
+
+                    $.ajax({
+                        url: rex.simpleshop.ajax_url,
+                        method: 'GET',
+                        cache: false,
+                        data: $.extend(formData, {
+                            'debug': rex.debug,
+                            'orderId': orderId,
+                            'productId': productId,
+                            'old_amount': oldAmount,
+                            'controller': 'Order.be__changeProductQuantity',
+                            'rex-api-call': 'simpleshop_be_api'
+                        })
+                    }).done(function (resp) {
+                        if (resp.succeeded) {
+                            $container.html(resp.message.html);
+                            var $input = $('[name=' + name + ']'),
+                                value = $input.val();
+                            $input.focus();
+                            $input.val('');
+                            $input.val(value);
+                            loading.remove();
                         }
-                    }
-                });
-                window.event.preventDefault();
+                        else {
+                            for (var i in resp.message.errors) {
+                                KreatifAddon.showAlert(resp.message.errors[i]);
+                            }
+                        }
+                    });
+                }, 100);
+                if (window.event.which != 9) {
+                    window.event.preventDefault();
+                }
             }
         }
     };
