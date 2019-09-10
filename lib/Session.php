@@ -250,11 +250,14 @@ class Session extends Model
             $features = $Variant ? $Variant->getValue('features', false, []) : [];
 
             $variantName = "";
-            foreach($features as $data) {
-                if($variantName != "")
-                    $variantName .= ", ";
-                if($data->getValue($label_name) != "")
-                    $variantName .= $data->getValue($label_name);
+
+            if (is_array($features)) {
+                foreach($features as $data) {
+                    if($variantName != "")
+                        $variantName .= ", ";
+                    if($data->getValue($label_name) != "")
+                        $variantName .= $data->getValue($label_name);
+                }
             }
 
             $products[] = [
