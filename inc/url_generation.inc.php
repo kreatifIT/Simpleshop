@@ -22,10 +22,10 @@ namespace FriendsOfREDAXO\Simpleshop;
     switch ($params->getParam('table')->name)
     {
         case Category::TABLE:
-            $path = Category::get($data['id'])->generatePath($lang_id);
+            $path = Category::query()->findId($data['id'])->generatePath($lang_id);
             break;
         case Product::TABLE:
-            $path = Product::get($data['id'])->generatePath($lang_id, $path);
+            $path = Product::query()->findId($data['id'])->generatePath($lang_id, $path);
             break;
     }
     return $path;
