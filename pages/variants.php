@@ -203,7 +203,7 @@ $fragment     = new \rex_fragment();
 $fragment->setVar('elements', $formElements, false);
 $buttons = $fragment->parse('core/form/submit.php');
 
-echo '<form action="" method="post" onsubmit="Simpleshop.saveVariants(this)">';
+echo '<form action="" method="post" onsubmit="SimpleshopBackend.saveVariants(this)">';
 $fragment = new \rex_fragment();
 $fragment->setVar('class', 'edit', false);
 $fragment->setVar('title', $product->getName() . ' [' . $product_id . ']');

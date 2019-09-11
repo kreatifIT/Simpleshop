@@ -94,7 +94,7 @@ $pallet_types = [
                         <?php endforeach; ?>
                     </td>
                     <td>
-                        <a href="#" onclick="return Simpleshop.addShippingPackage(this);"><?= $Addon->i18n('omest_shipping.add_package'); ?></a>
+                        <a href="#" onclick="return SimpleshopBackend.addShippingPackage(this);"><?= $Addon->i18n('omest_shipping.add_package'); ?></a>
                     </td>
                 </tr>
             <?php endforeach; ?>

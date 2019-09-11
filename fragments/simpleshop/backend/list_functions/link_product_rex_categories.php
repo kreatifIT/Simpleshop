@@ -50,7 +50,7 @@ namespace FriendsOfREDAXO\Simpleshop;
     <div class="products" style="margin-top:20px;">
         <div class="form-group">
             <label>Suche</label>
-            <input class="form-control" type="text" value="<?= $search ?>" onkeyup="Simpleshop.showFunctionListItems(this, 'search');">
+            <input class="form-control" type="text" value="<?= $search ?>" onkeyup="SimpleshopBackend.showFunctionListItems(this, 'search');">
         </div>
 
         <?php if (count($collection)): ?>
@@ -68,7 +68,7 @@ namespace FriendsOfREDAXO\Simpleshop;
                                 </li>
                             <?php else: ?>
                                 <li class="rex-page <?= $item['type'] == 'active' ? 'active' : '' ?>">
-                                    <a href="javascript:;" onclick="Simpleshop.showFunctionListItems(this, 'paging');" data-page="<?= $item['page'] ?>">
+                                    <a href="javascript:;" onclick="SimpleshopBackend.showFunctionListItems(this, 'paging');" data-page="<?= $item['page'] ?>">
                                         <?= $item['text'] ?>
                                     </a>
                                 </li>
@@ -86,7 +86,7 @@ namespace FriendsOfREDAXO\Simpleshop;
                     ?>
                     <li class="list-group-item <?= in_array($cat_id, $categories) ? 'active' : '' ?>">
                         <label>
-                            <input type="checkbox" name="products[]" value="<?= $item->getId() ?>" onchange="Simpleshop.selectFunctionListItem(this)" <?= in_array($cat_id, $categories) ? 'checked="checked"' : '' ?>>
+                            <input type="checkbox" name="products[]" value="<?= $item->getId() ?>" onchange="SimpleshopBackend.selectFunctionListItem(this)" <?= in_array($cat_id, $categories) ? 'checked="checked"' : '' ?>>
                             <?= $item->getName() ?>
                             (<?= $item->getValue('code') ?>)
                         </label>
@@ -104,7 +104,7 @@ namespace FriendsOfREDAXO\Simpleshop;
                                 </li>
                             <?php else: ?>
                                 <li class="rex-page <?= $item['type'] == 'active' ? 'active' : '' ?>">
-                                    <a href="javascript:;" onclick="Simpleshop.showFunctionListItems(this, 'paging');" data-page="<?= $item['page'] ?>">
+                                    <a href="javascript:;" onclick="SimpleshopBackend.showFunctionListItems(this, 'paging');" data-page="<?= $item['page'] ?>">
                                         <?= $item['text'] ?>
                                     </a>
                                 </li>

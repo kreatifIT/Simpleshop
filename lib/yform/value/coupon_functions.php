@@ -72,7 +72,7 @@ class rex_yform_value_coupon_functions extends rex_yform_value_abstract
                 <div class="coupon-functions">
                     <input type="text" class="form-control coupon-clone-count" value="1"/>
                     <div class="inline-text">X</div>
-                    <a href="' . rex_url::currentBackendPage(array_merge($_GET, $params, ['ss-action' => 'clone', 'count' => ''])) . '" onclick="return Simpleshop.cloneCoupon(this)" class="btn btn-default">
+                    <a href="' . rex_url::currentBackendPage(array_merge($_GET, $params, ['ss-action' => 'clone', 'count' => ''])) . '" onclick="return SimpleshopBackend.cloneCoupon(this)" class="btn btn-default">
                         ' . rex_i18n::msg('label.clone_coupon') . '
                     </a>
                 </div>
