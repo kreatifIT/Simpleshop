@@ -36,7 +36,7 @@ $products = $Order->getProducts();
             <td class="text-center"><?= $index + 1 ?></td>
             <td><?= $Product->getValue('code') ?></td>
             <td><?= $Product->getName() ?></td>
-            <td><input type="text" name="quantity" value="<?= $Product->getValue('cart_quantity') ?>" size="8" class="text-center form-control" onkeyup="Simpleshop.changeOrderProductQuantity(this, <?= $Order->getId() ?>, '<?= $order_product->getId() ?>', '<?= $Product->getValue('cart_quantity') ?>');"></td>
+            <td><input type="text" name="quantity" value="<?= $Product->getValue('cart_quantity') ?>" size="8" class="text-center form-control" onkeydown="Simpleshop.changeOrderProductQuantity(this, <?= $Order->getId() ?>, '<?= $order_product->getId() ?>', '<?= $Product->getValue('cart_quantity') ?>');"></td>
             <td><?= format_price($Product->getPrice(false)) ?> &euro;</td>
             <td>
                 <a href="javascript:;" onclick="return Simpleshop.removeOrderProduct(this, <?= $Order->getId() ?>, '<?= $order_product->getId() ?>', '<?= $Product->getValue('cart_quantity') ?>', '<?= $Addon->i18n('label.really_delete_entry') ?>');">
