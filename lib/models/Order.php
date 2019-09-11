@@ -131,17 +131,26 @@ class Order extends Model
 
     public function getBarCodeImg()
     {
-        $img = null;
-        $key = $this->getShippingKey(true);
+        $image = '';
+        $key   = $this->getShippingKey(true);
 
         if (strlen($key) == 12 || strlen($key) == 13) {
-            $Code = new \Barcode($key, 4);
-
+            $Barcode = new \barcode_generator();
+            $image   = $Barcode->render_image('code-128', $key, [
+                'ph' => 0,
+                'sf' => 1,
+                'sx' => 2,
+                'pt' => 0,
+                'pb' => 16,
+                'ts' => 12,
+                'th' => 16,
+                'wq' => 0,
+            ]);
             ob_start();
-            imagepng($Code->image());
-            $img = 'data:image/png;base64,' . base64_encode(ob_get_clean());
+            imagepng($image);
+            $image = 'data:image/png;base64,' . base64_encode(ob_get_clean());
         }
-        return $img;
+        return $image;
     }
 
     public function completeOrder()
