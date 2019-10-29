@@ -21,8 +21,6 @@ abstract class Discount extends Model
             return false;
         }
 
-        $brut_prices[22] += $Order->getValue('shipping_costs');
-
         if ($name == 'manual_discount') {
             $discount = $this->getValue('discount_value');
             $discount = $discount - $this->applyToNetPrices($discount, $brut_prices);

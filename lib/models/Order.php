@@ -331,14 +331,15 @@ class Order extends Model
         $brut_prices = [];
         $discount    = 0;
 
-        $this->setValue('net_prices', $net_prices);
 
         // set gross prices
         foreach ($net_prices as $tax => $net_price) {
             $brut_prices[$tax] += (float)$net_price / (100 + $tax) * 100;
         }
+        $this->setValue('product_sum', $brut_prices);
 
-        $this->setValue('brut_prices', $brut_prices);
+        $net_prices[22] += $this->getValue('shipping_costs');
+
 
         foreach ($promotions as $name => $promotion) {
             try {
@@ -354,9 +355,17 @@ class Order extends Model
             }
         }
 
+        $brut_prices = [];
+        foreach ($net_prices as $tax => $net_price) {
+            $brut_prices[$tax] += (float)$net_price / (100 + $tax) * 100;
+        }
+
+        $this->setValue('net_prices', $net_prices);
+        $this->setValue('brut_prices', $brut_prices);
+
         // set tax costs
-        foreach ($brut_prices as $tax => $brut_price) {
-            $taxes[$tax] += (float)$brut_price * ($tax / 100);
+        foreach ($net_prices as $tax => $net_price) {
+            $taxes[$tax] += (float)$net_price / (100 + $tax) * $tax;;
         }
 
         // set shipping costs
@@ -366,15 +375,15 @@ class Order extends Model
 
             if ($tax > 0) {
                 $this->setValue('shipping_costs', (float)$this->getValue('shipping_costs') / (100 + $tax) * 100);
-                $taxes[$tax] += $this->getValue('shipping')
-                    ->getTax();
+//                $taxes[$tax] += $this->getValue('shipping')
+//                    ->getTax();
             }
         }
         ksort($taxes);
 
         $this->setValue('taxes', $taxes);
         $this->setValue('discount', $discount);
-        $this->setValue('total', $this->getValue('shipping_costs') + array_sum($brut_prices) + array_sum($taxes)) - $discount;
+        $this->setValue('total', array_sum($brut_prices) + array_sum($taxes));
 
         return [$errors, $_promotions];
     }

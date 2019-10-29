@@ -21,7 +21,7 @@ else if ($type == 'invoice') {
     $title = '###simpleshop.invoice_num###: ' . $Order->getInvoiceNum();
 }
 else {
-    $title = '###simpleshop.order_num###: ' . $Order->getId();
+    $title = '###simpleshop.order_confirmation###: ' . $Order->getId();
 }
 
 ?>
