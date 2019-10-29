@@ -70,7 +70,7 @@ class Coupon extends Discount
         $end     = $this->getValue('end_time') != '' ? strtotime($this->getValue('end_time')) : null;
         $value   = $this->getValue('discount_value');
         $percent = $this->getValue('discount_percent');
-        $orders  = (array) $this->getValue('orders');
+        $orders  = array_filter((array) $this->getValue('orders'));
 
         // calculate residual balance
         if ($value && count($orders)) {
