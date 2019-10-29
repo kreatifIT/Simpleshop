@@ -343,7 +343,7 @@ class Order extends Model
         foreach ($promotions as $name => $promotion) {
             try {
                 if (is_object($promotion)) {
-                    $discount += $promotion->applyToOrder($this, $brut_prices, $name);
+                    $discount += $promotion->applyToOrder($this, $net_prices, $name);
                 }
             } catch (\Exception $ex) {
                 $errors[]  = ['label' => $ex->getLabelByCode()];
