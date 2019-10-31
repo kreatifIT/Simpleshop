@@ -231,8 +231,11 @@ class Customer extends Model
 
         if ($User && $User->getValue('status') == 1) {
             $password = random_string(self::MIN_PWD_LEN);
-            $User->setValue('password', $password)
-                ->save();
+            $sql      = \rex_sql::factory();
+            $sql->setTable(self::TABLE);
+            $sql->setValue('password_hash', self::getPasswordHash($password));
+            $sql->setWhere('id = :id', ['id' => $User->getId()]);
+            $sql->update();
 
             $Mail          = new Mail();
             $do_send       = true;
