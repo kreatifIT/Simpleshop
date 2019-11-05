@@ -53,12 +53,16 @@ class Customer extends Model
         return $result;
     }
 
-    public function getName($lang_id = null)
+    public function getName($lang_id = null, $companyFallback = false)
     {
-        if ($this->getValue('ctype') == 'company') {
+        if ($this->getValue('ctype') == 'company' && trim($this->getValue('company_name')) != '') {
             $name = $this->getValue('company_name');
         } else {
             $name = $this->getValue('firstname') . ' ' . $this->getValue('lastname');
+
+            if (trim($name) == '' && $companyFallback) {
+                $name = $this->getValue('company_name');
+            }
         }
         return $name;
     }
