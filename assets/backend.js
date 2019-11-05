@@ -7,6 +7,7 @@ var SimpleshopBackend = (function ($) {
     $(document).ready(function () {
         initProductSelect();
         initVariantSelect();
+        initAddressSelect();
         initProductRexCategoryLink();
     });
 
@@ -58,6 +59,17 @@ var SimpleshopBackend = (function ($) {
         }).done(function (resp) {
             $ajContainer.html(resp.message.html);
             $loading.remove();
+        });
+    }
+
+    function initAddressSelect() {
+        $('select.address-select').select2({
+            width: 'style',
+            ajax: {
+                processResults: function(data) {
+                    return data.message;
+                }
+            }
         });
     }
 

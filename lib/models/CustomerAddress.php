@@ -54,4 +54,34 @@ class CustomerAddress extends Model
         }
         return $form;
     }
+
+    public static function be__searchAddress()
+    {
+        $term = \rex_api_simpleshop_be_api::$inst->request['term'];
+        $stmt = self::query();
+        $stmt->alias('m');
+        $stmt->resetSelect();
+        $stmt->selectRaw('CONCAT("KUNDE: [ID=", jt1.id, "] ", IF(jt1.company_name != "", jt1.company_name, TRIM(CONCAT(jt1.firstname, " ", jt1.lastname))), " --> ADRESSE: [ID=", m.id, "] ", IF(m.company_name != "", m.company_name, TRIM(CONCAT(m.firstname, " ",m.lastname))), " | ", m.street, " | ", m.postal, " ", m.location) AS text, m.id');
+        $stmt->leftJoin(Customer::TABLE, 'jt1', 'jt1.id', 'm.customer_id');
+        $stmt->orderBy('jt1.id');
+        $stmt->whereRaw('(
+            m.company_name LIKE :term
+            OR m.firstname LIKE :term
+            OR m.lastname LIKE :term
+            OR m.street LIKE :term
+            OR m.location LIKE :term
+            OR m.customer_id = :id
+            OR jt1.company_name LIKE :term
+            OR jt1.firstname LIKE :term
+            OR jt1.lastname LIKE :term
+            OR jt1.id = :id
+        )', ['term' => "%{$term}%", 'id' => $term]);
+        $collection = $stmt->find();
+
+        $result = [];
+        foreach ($collection as $item) {
+            $result[] = $item->getData();
+        }
+        \rex_api_simpleshop_be_api::$inst->response['results'] = $result;
+    }
 }
