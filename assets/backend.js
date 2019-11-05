@@ -66,6 +66,10 @@ var SimpleshopBackend = (function ($) {
         $('select.address-select').select2({
             width: 'style',
             ajax: {
+                data: function(params) {
+                    params.customer_id = $(this).data('customer-id');
+                    return params;
+                },
                 processResults: function(data) {
                     return data.message;
                 }

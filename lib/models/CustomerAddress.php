@@ -57,7 +57,9 @@ class CustomerAddress extends Model
 
     public static function be__searchAddress()
     {
-        $term = \rex_api_simpleshop_be_api::$inst->request['term'];
+        $term       = \rex_api_simpleshop_be_api::$inst->request['term'];
+        $customerId = \rex_api_simpleshop_be_api::$inst->request['customer_id'];
+
         $stmt = self::query();
         $stmt->alias('m');
         $stmt->resetSelect();
@@ -66,18 +68,24 @@ class CustomerAddress extends Model
         $stmt->orderBy('jt1.id');
         $stmt->orderBy('m.id');
         $stmt->orderBy('m.id');
-        $stmt->whereRaw('(
-            m.company_name LIKE :term
-            OR m.firstname LIKE :term
-            OR m.lastname LIKE :term
-            OR m.street LIKE :term
-            OR m.location LIKE :term
-            OR m.id = :id
-            OR m.customer_id = :id
-            OR jt1.company_name LIKE :term
-            OR jt1.firstname LIKE :term
-            OR jt1.lastname LIKE :term
-        )', ['term' => "%{$term}%", 'id' => $term]);
+
+        if ($term == '' && $customerId > 0) {
+            $stmt->where('m.customer_id', $customerId);
+        } else {
+            $term = trim($term);
+            $stmt->whereRaw('(
+                m.company_name LIKE :term
+                OR m.firstname LIKE :term
+                OR m.lastname LIKE :term
+                OR m.street LIKE :term
+                OR m.location LIKE :term
+                OR m.id = :id
+                OR m.customer_id = :id
+                OR jt1.company_name LIKE :term
+                OR jt1.firstname LIKE :term
+                OR jt1.lastname LIKE :term
+            )', ['term' => "%{$term}%", 'id' => $term]);
+        }
         $collection = $stmt->find();
 
         $result = [];

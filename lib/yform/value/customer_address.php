@@ -17,14 +17,14 @@ class rex_yform_value_customer_address extends rex_yform_value_abstract
     public function enterObject()
     {
         if (rex::isBackend()) {
-
             if ($this->params['send'] == 1) {
                 $this->params['value_pool']['email'][$this->getName()] = $this->getValue();
                 $this->params['value_pool']['sql'][$this->getName()]   = $this->getValue();
 
-                $address = \FriendsOfREDAXO\Simpleshop\CustomerAddress::get($this->getValue());
-
-                $this->params['value_pool']['sql']['customer_id'] = $address->getValue('customer_id');
+                if ($this->getValue() != '') {
+                    $address = \FriendsOfREDAXO\Simpleshop\CustomerAddress::get($this->getValue());
+                    $this->params['value_pool']['sql']['customer_id'] = $address->getValue('customer_id');
+                }
             }
 
             $this->params['form_output'][$this->getId()] = $this->parse('value.customer_address.tpl.php');
