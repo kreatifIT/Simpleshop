@@ -92,6 +92,7 @@ var SimpleshopBackend = (function ($) {
     function initProductSelect() {
         $('select.product-select2').select2({
             debug: true,
+            width: 'style',
             ajax: {
                 url: rex.simpleshop.ajax_url,
                 data: function (params) {
@@ -217,6 +218,7 @@ var SimpleshopBackend = (function ($) {
         var $select = $table.find('select.select2').select2({
             debug: true,
             cache: false,
+            width: 'style',
             ajax: {
                 url: rex.simpleshop.ajax_url,
                 data: function (params) {
