@@ -124,7 +124,7 @@ class PayPalExpress extends PaymentAbstract
             'PWD'       => $api_pwd,
             'SIGNATURE' => $api_signature,
 
-            'PAYMENTREQUEST_0_AMT'          => (float) $total_amount,
+            'PAYMENTREQUEST_0_AMT'          => (float) number_format($total_amount, 2),
             'PAYMENTREQUEST_0_CURRENCYCODE' => 'EUR',
         ];
 
