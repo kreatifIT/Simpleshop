@@ -212,6 +212,7 @@ class CheckoutController extends Controller
                 $Order    = Session::getCurrentOrder();
 
                 $Order->setValue('shipping_address', null);
+                $Order->setValue('shipping_address_id', null);
                 Session::setCheckoutData('Order', $Order);
 
                 CheckoutController::setDoneStep($nextStep);
@@ -241,6 +242,7 @@ class CheckoutController extends Controller
             // NEEDED! to get data
             $Object->getValue('createdate');
             $Order->setValue('shipping_address', $Object);
+            $Order->setValue('shipping_address_id', $Object->getId());
             Session::setCheckoutData('Order', $Order);
 
             CheckoutController::setDoneStep($nextStep);

@@ -16,17 +16,14 @@ class rex_yform_value_customer_address extends rex_yform_value_abstract
 
     public function enterObject()
     {
+        $this->params['value_pool']['email'][$this->getName()] = $this->getValue();
+        $this->params['value_pool']['sql'][$this->getName()]   = $this->getValue();
+
         if (rex::isBackend()) {
-            if ($this->params['send'] == 1) {
-                $this->params['value_pool']['email'][$this->getName()] = $this->getValue();
-                $this->params['value_pool']['sql'][$this->getName()]   = $this->getValue();
-
-                if ($this->getValue() != '') {
-                    $address = \FriendsOfREDAXO\Simpleshop\CustomerAddress::get($this->getValue());
-                    $this->params['value_pool']['sql']['customer_id'] = $address->getValue('customer_id');
-                }
+            if ($this->params['send'] == 1 && $this->getValue() != '') {
+                $address                                          = \FriendsOfREDAXO\Simpleshop\CustomerAddress::get($this->getValue());
+                $this->params['value_pool']['sql']['customer_id'] = $address->getValue('customer_id');
             }
-
             $this->params['form_output'][$this->getId()] = $this->parse('value.customer_address.tpl.php');
         }
     }
@@ -38,7 +35,10 @@ class rex_yform_value_customer_address extends rex_yform_value_abstract
 
         if ($address) {
             $customer = \FriendsOfREDAXO\Simpleshop\Customer::get($address->getValue('customer_id'));
-            $value    = $customer ? $customer->getName(null, true) : $address->getName();
+            $value    = implode(' | ', array_filter([
+                $address->getName(),
+                $customer ? $customer->getName(null, true) : '',
+            ]));
         }
         return $value;
     }
