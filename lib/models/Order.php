@@ -199,10 +199,6 @@ class Order extends Model
             $this->setValue('invoice_num', $num);
         }
 
-        // update variables
-        $shippingAddress = $this->getShippingAddress();
-        $this->setValue('shipping_address_id', $shippingAddress ? $shippingAddress->getId() : null);
-
         $result = parent::save(true);
 
         if (!$result) {

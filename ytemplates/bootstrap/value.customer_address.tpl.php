@@ -27,7 +27,7 @@ $apiUrl      = rex_url::frontend('index.php?' . http_build_query(['rex-api-call'
         <?php if ($address): ?>
             <option value="<?= $address->getId() ?>" <?= $addressId == $address->getId() ? 'selected="selected"' : '' ?>>
                 KUNDE: [ID=<?= $customer->getId() ?>]
-                <?= $customer->getName() ?>
+                <?= $customer->getName(null, true) ?>
                 ---> ADRESSE: [ID=<?= $address->getId() ?>]
                 <?= $address->getName() ?>
                 | <?= $address->getValue('street') ?>

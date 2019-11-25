@@ -15,11 +15,13 @@ class rex_yform_value_model_data extends rex_yform_value_textarea
 
     public function enterObject()
     {
-        parent::enterObject();
+        if ($this->params['value_pool']['sql'][$this->getName()] == '') {
+            $this->params['value_pool']['sql'][$this->getName()] = trim($this->getValue());
+        }
+        $this->setValue($this->params['value_pool']['sql'][$this->getName()]);
 
         if (rex::isBackend()) {
-            $value       = $this->getValue();
-            $Object      = \FriendsOfREDAXO\Simpleshop\Model::unprepare($value);
+            $Object      = \FriendsOfREDAXO\Simpleshop\Model::unprepare($this->getValue());
             $content     = $this->unprepare($Object);
             $attributes  = $this->getAttributeElements(["name" => $this->getFieldName()]);
             $content_cnt = count($content);
@@ -107,9 +109,20 @@ class rex_yform_value_model_data extends rex_yform_value_textarea
 
     public function getDefinitions($values = [])
     {
-        $parent                    = parent::getDefinitions();
-        $parent['name']            = 'model_data';
-        $parent['values']['value'] = ['type' => 'text', 'label' => 'Object-Values (durch , getrennt)'];
-        return $parent;
+        return [
+            'type'        => 'value',
+            'name'        => 'model_data',
+            'values'      => [
+                'name'   => ['type' => 'name', 'label' => rex_i18n::msg('yform_values_defaults_name')],
+                'label'  => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_label')],
+                'value'  => ['type' => 'text', 'label' => 'Object-Values (durch , getrennt)'],
+                'notice' => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_notice')],
+            ],
+            'description' => rex_i18n::msg('yform_values_textarea_description'),
+            'db_type'     => ['text', 'mediumtext'],
+            'search'      => false,
+            'list_hidden' => true,
+            'famous'      => true,
+        ];
     }
 }
