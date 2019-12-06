@@ -549,7 +549,7 @@ class Order extends Model
         $html = $fragment->parse('simpleshop/pdf/invoice/wrapper.php');
 
         if ($debug) {
-            echo "<div style='background:#666;height:100vh;padding:20px;'><div style='max-width:800px;margin:0px auto;background:#fff;'>{$html}</div></div>";
+            echo \Wildcard::parse("<div style='background:#666;height:100vh;padding:20px;'><div style='max-width:800px;margin:0px auto;background:#fff;'>{$html}</div></div>");
             exit;
         }
         $Mpdf->WriteHTML($html);
