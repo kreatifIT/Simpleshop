@@ -43,6 +43,9 @@ class rex_api_simpleshop_be_api extends rex_api_function
             if (!method_exists($class, $method)) {
                 throw new ApiException("Controller '{$class}.{$method}' doesn't exist");
             }
+            else if (!rex::getUser()) {
+                throw new ApiException("You must be logged in");
+            }
 
             // do some param parsing/preparing
             $this->request = array_merge($_REQUEST, $this->request);
