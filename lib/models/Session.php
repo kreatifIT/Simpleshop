@@ -142,15 +142,15 @@ class Session extends Model
             foreach ($cart_items as $key => $item) {
                 if (is_array($item)) {
                     try {
-                        $product            = Product::getProductByKey($key, $item['quantity'], $item['extras']);
-                        self::$has_shipping = self::$has_shipping || $product->getValue('type') == 'product';
+                        $product = Product::getProductByKey($key, $item['quantity'], $item['extras']);
                     } catch (ProductException $ex) {
                         if ($throwErrors) {
                             throw new ProductException($ex->getMessage(), $ex->getCode());
                         }
                     }
                     if ($product) {
-                        $results[] = $product;
+                        self::$has_shipping = self::$has_shipping || $product->getValue('type') == 'product';
+                        $results[]          = $product;
                     }
                 }
             }
