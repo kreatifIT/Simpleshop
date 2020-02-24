@@ -17,13 +17,20 @@ $discount = $this->getVar('discount', 0);
 $totals   = $this->getVar('totals', []);
 $config   = $this->getVar('cart_table_wrapper_config', FragmentConfig::getValue('cart.table-wrapper'));
 
-$tax         = 0;
 $coupon_code = Session::getCheckoutData('coupon_code');
 $styles      = FragmentConfig::getValue('styles');
 $settings    = \rex::getConfig('simpleshop.Settings');
 $Coupon      = Coupon::getByCode($coupon_code);
+$hasCoupons  = FragmentConfig::getValue('cart.has_coupons');
 
 ?>
+<?php if ($Coupon): ?>
+    <div class="callout success">
+        <strong><?= $Coupon->getName() ?></strong>
+        ###label.applied###
+    </div>
+<?php endif; ?>
+
 <table class="cart <?= $config['class'] ?>" data-cart-item-container <?= $styles['table'] ?>>
     <thead>
     <?= $this->subfragment('simpleshop/cart/table-head.php'); ?>
@@ -39,60 +46,43 @@ $Coupon      = Coupon::getByCode($coupon_code);
 </table>
 
 <?php if (!$config['hide_summary']): ?>
-    <div class="cart-coupon">
-        <div class="coupon-input-container">
-            <input type="text" class="coupon-input" placeholder="###label.insert_coupon###" data-link="<?= rex_getUrl() ?>" value="<?= $coupon_code ?>">
-            <button class="button coupon-submit" type="submit" onclick="Simpleshop.applyCoupon(this, '.cart-coupon|.coupon-input', '.cart-container');">
-                <span>###label.use_coupon###</span>
-                <i class="fal fa-chevron-circle-right"></i>
-            </button>
+    <div class="cart-sum grid-x grid-margin-x">
+        <div class="cell large-6">
+            <?php if ($hasCoupons): ?>
+                <div class="cart-coupon">
+                    <div class="coupon-input-container">
+                        <input type="text" class="coupon-input" placeholder="###label.insert_coupon###" data-link="<?= rex_getUrl() ?>" value="<?= $coupon_code ?>">
+                        <button class="button coupon-submit" type="submit" onclick="Simpleshop.applyCoupon(this, '.cart-coupon|.coupon-input', '[data-cart-container]');">
+                            <span>###label.use_coupon###</span>
+                            <i class="fal fa-chevron-circle-right"></i>
+                        </button>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
 
-        <?php if ($Coupon): ?>
-            <div class="label success">
-                "<strong><?= $Coupon->getName() ?></strong>"
-                ###label.applied###
+        <div class="cell large-6">
+            <div class="margin-bottom">
+                <div class="checkout-summary-total">
+                    <?php if ($discount > 0): ?>
+                        <div class="subtotal">
+                            <span class="label">###simpleshop.subtotal###</span>
+                            <span class="price">&euro;&nbsp;<?= format_price(array_sum($totals)) ?></span>
+                        </div>
+
+                        <div class="promotions ">
+                            <span class="label">###label.discount###</span>
+                            <span class="price">&euro;&nbsp;-<?= format_price($discount) ?></span>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="total">
+                        <span class="label">###label.total_sum###</span>
+                        <span class="price">&euro;&nbsp;<?= format_price(array_sum($totals) - $discount) ?></span>
+                    </div>
+                </div>
             </div>
-        <?php endif; ?>
-    </div>
-
-    <div class="cart-sum">
-        <table>
-            <tbody>
-
-            <tr>
-                <td>
-                    <span>###simpleshop.brutto_total###</span>
-                    <?php if ($discount > 0): ?>
-                        <span>###label.discount###</span>
-                    <?php endif; ?>
-                    <span>###label.tax###</span>
-                </td>
-                <td>
-                    <span><?= format_price(array_sum($totals) + $discount) ?> &euro;</span>
-                    <?php if ($discount > 0): ?>
-                        <span>-<?= format_price($discount) ?> &euro;</span>
-                    <?php endif; ?>
-                    <span>
-                            <?php
-                            foreach ($totals as $_tax => $total) {
-                                $tax += $total * ($_tax / 100);
-                            }
-                            ?>
-                        +<?= format_price($tax) ?> &euro;
-                        </span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span>###simpleshop.total_sum###</span>
-                </td>
-                <td>
-                    <span><?= format_price(array_sum($totals) + $tax) ?> &euro;</span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        </div>
     </div>
 <?php endif; ?>
 

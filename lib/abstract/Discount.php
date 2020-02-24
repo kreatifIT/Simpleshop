@@ -55,7 +55,7 @@ abstract class Discount extends Model
         }
 
         if ($discount > 0) {
-            $discount = $discount - $this->applyToGrossPrices($discount, $gross_prices);
+            $discount = $discount - $this->applyToGrossPrices($discount, $brut_prices);
         }
         $this->setValue('value', $discount);
 

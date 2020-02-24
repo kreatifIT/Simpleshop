@@ -253,7 +253,7 @@ class Session extends Model
         return $total;
     }
 
-    public static function getGrossTotals()
+    public static function getNetTotals()
     {
         $totals   = [];
         $products = self::_getCartItems();
@@ -264,6 +264,22 @@ class Session extends Model
 
             $cart_quantity = $product->getValue('cart_quantity');
             $price         = $product->getPrice(false);
+            $totals[$tax]  += ($cart_quantity * $price);
+        }
+        return $totals;
+    }
+
+    public static function getGrossTotals()
+    {
+        $totals   = [];
+        $products = self::_getCartItems();
+
+        foreach ($products as $product) {
+            $tax = Tax::get($product->getValue('tax'))
+                ->getValue('tax');
+
+            $cart_quantity = $product->getValue('cart_quantity');
+            $price         = $product->getPrice(true);
             $totals[$tax]  += ($cart_quantity * $price);
         }
         return $totals;

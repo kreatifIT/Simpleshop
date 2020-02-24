@@ -50,13 +50,14 @@ class CartController extends Controller
                 break;
         }
 
-        $totals      = Session::getGrossTotals();
-        $coupon_code = Session::getCheckoutData('coupon_code');
-        $Coupon      = $coupon_code != '' ? Coupon::getByCode($coupon_code) : null;
+        $grossTotals  = Session::getGrossTotals();
+        $coupon_code  = Session::getCheckoutData('coupon_code');
+        $grossTotals2 = $grossTotals;
+        $Coupon       = $coupon_code != '' ? Coupon::getByCode($coupon_code) : null;
 
         if ($Coupon) {
             try {
-                $discount = $Coupon->applyToCart($totals);
+                $discount = $Coupon->applyToCart($grossTotals2);
             } catch (CouponException $ex) {
                 Session::setCheckoutData('coupon_code', null);
                 $errors[] = ['label' => $ex->getLabelByCode()];
@@ -76,7 +77,7 @@ class CartController extends Controller
 
         if (count($this->products)) {
             $this->setVar('products', $this->products);
-            $this->setVar('totals', $totals);
+            $this->setVar('totals', $grossTotals);
             $this->setVar('discount', $discount);
             $this->fragment_path[] = 'simpleshop/cart/table-wrapper.php';
         } else {
