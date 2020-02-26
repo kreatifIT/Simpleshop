@@ -53,6 +53,10 @@ class Product extends Model
         return parent::getUrl($params, $lang_id);
     }
 
+    public function getKey()
+    {
+        return rtrim($this->getId() .'|'. $this->getValue('variant_key'), '|');
+    }
 
     public function getFeatures()
     {
