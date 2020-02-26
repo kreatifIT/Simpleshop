@@ -42,7 +42,7 @@ $Country  = $address->valueIsset('country') ? Country::get($address->getValue('c
             ?>
             <?= $address->getValue('postal') ?>
             <?= $address->getValue('location') ?> <?= $address->valueIsset('province') ? '- ' . $address->getValue('province') : '' ?><br>
-            <?= $Country->getName() ?><br>
+            <?= $Country ? $Country->getName() : '' ?><br>
 
             <?php
             if ($Customer) {

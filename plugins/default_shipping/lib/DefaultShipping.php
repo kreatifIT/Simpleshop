@@ -32,10 +32,11 @@ class DefaultShipping extends ShippingAbstract
 
     protected function calculatePrice($Order)
     {
-        $Address  = $Order->getShippingAddress();
-        $Country  = $Address ? Country::get($Address->getValue('country')) : null;
-        $total    = $Order->getValue('initial_total');
-        $Settings = \rex::getConfig('simpleshop.DefaultShipping.Settings');
+        $Address   = $Order->getShippingAddress();
+        $countryId = $Address ? $Address->getValue('country') : null;
+        $Country   = $countryId ? Country::get($countryId) : null;
+        $total     = $Order->getValue('initial_total');
+        $Settings  = \rex::getConfig('simpleshop.DefaultShipping.Settings');
 
         if ($Country && isset($Settings['costs'][$Country->getId()])) {
             $cost = 0;
