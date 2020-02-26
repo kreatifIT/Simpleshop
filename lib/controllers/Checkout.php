@@ -131,10 +131,16 @@ class CheckoutController extends Controller
 
     public static function getNextStep()
     {
+        $i           = 0;
         $currentStep = self::getCurrentStep();
-        $nextSteps   = FragmentConfig::getValue('checkout.steps');
-        $index       = array_search($currentStep, FragmentConfig::getValue('checkout.steps'));
-        return $nextSteps[$index + 1];
+        $steps       = FragmentConfig::getValue('checkout.steps');
+        $key         = current($steps);
+
+        while ($key != $currentStep && $i < count($steps)) {
+            $key = next($steps);
+            $i++;
+        }
+        return next($steps);
     }
 
     public static function setDoneStep($step)

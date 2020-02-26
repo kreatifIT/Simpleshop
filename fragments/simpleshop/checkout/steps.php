@@ -13,72 +13,73 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$current_step = $this->getVar('current_step');
-$step_number  = array_search($current_step, FragmentConfig::$data['checkout']['steps']);
-
-switch ($current_step) {
-    case 'invoice_address' :
-        $step_number = 1;
-        break;
-    case 'shipping_address' :
-        $step_number = 2;
-        break;
-    case 'payment' :
-    case 'shipping' :
-    case 'shipping||payment' :
-        $step_number = 3;
-        break;
-    case 'show-summary' :
-        $step_number = 4;
-        break;
-}
+$step_number      = 0;
+$current_step     = $this->getVar('current_step');
+$current_step_num = array_search($current_step, FragmentConfig::$data['checkout']['steps']) + 1;
+$stepConfig       = FragmentConfig::getValue('checkout.steps');
 
 ?>
 <div class="margin-top margin-bottom">
     <div class="checkout-steps">
-        <div class="checkout-step-wrapper">
-            <a href="<?= rex_getUrl(null, null, ['step' => 'invoice_address', 'ts' => time()]) ?>" class="checkout-step <?= $step_number == 1 ? 'active' : '' ?>">
-                <span class="checkout-step-number">1</span>
-                <span class="checkout-step-name">###label.invoice_address###</span>
-            </a>
-        </div>
-        <div class="checkout-step-wrapper">
-            <a <?php if ($step_number >= 2) {
-                echo 'href="' . rex_getUrl(null, null, ['step' => 'shipping_address', 'ts' => time()]) . '"';
-            } ?> class="checkout-step <?php if ($step_number == 2) {
-                echo 'active';
-            } else if ($step_number < 2) {
-                echo 'disabled';
-            } ?>">
-                <span class="checkout-step-number">2</span>
-                <span class="checkout-step-name">###label.shipping_address###</span>
-            </a>
-        </div>
-        <div class="checkout-step-wrapper">
 
-            <a <?php if ($step_number >= 3) {
-                echo 'href="' . rex_getUrl(null, null, ['step' => FragmentConfig::$data['checkout']['steps'][2], 'ts' => time()]) . '"';
-            } ?> class="checkout-step <?php if ($step_number == 3) {
-                echo 'active';
-            } else if ($step_number < 3) {
-                echo 'disabled';
-            } ?>">
-                <span class="checkout-step-number">3</span>
-                <span class="checkout-step-name">###label.shipment_payment###</span>
-            </a>
-        </div>
-        <div class="checkout-step-wrapper">
-            <a <?php if ($step_number == 4) {
-                echo 'href="' . rex_getUrl(null, null, ['step' => 'show-summary', 'ts' => time()]) . '"';
-            } ?> class="checkout-step <?php if ($step_number == 4) {
-                echo 'active';
-            } else if ($step_number < 4) {
-                echo 'disabled';
-            } ?>">
-                <span class="checkout-step-number">4</span>
-                <span class="checkout-step-name">###label.order###</span>
-            </a>
-        </div>
+        <?php if (in_array('invoice_address', $stepConfig)): ?>
+            <?php $step_number++ ?>
+            <div class="checkout-step-wrapper">
+                <a href="<?= rex_getUrl(null, null, ['step' => 'invoice_address', 'ts' => time()]) ?>" class="checkout-step <?= $step_number == $current_step ? 'active' : '' ?>">
+                    <span class="checkout-step-number"><?= $step_number ?></span>
+                    <span class="checkout-step-name">###label.invoice_address###</span>
+                </a>
+            </div>
+        <?php endif; ?>
+
+        <?php if (in_array('shipping_address', $stepConfig)): ?>
+            <?php $step_number++ ?>
+            <div class="checkout-step-wrapper">
+                <a <?php if ($current_step_num >= $step_number) {
+                    echo 'href="' . rex_getUrl(null, null, ['step' => 'shipping_address', 'ts' => time()]) . '"';
+                } ?> class="checkout-step <?php if ($current_step_num == $step_number) {
+                    echo 'active';
+                } else if ($current_step_num < $step_number) {
+                    echo 'disabled';
+                } ?>">
+                    <span class="checkout-step-number"><?= $step_number ?></span>
+                    <span class="checkout-step-name">###label.shipping_address###</span>
+                </a>
+            </div>
+        <?php endif; ?>
+
+        <?php if (in_array('payment', $stepConfig) || in_array('shipping', $stepConfig) || in_array('shipping||payment', $stepConfig)): ?>
+            <?php $step_number++; ?>
+            <div class="checkout-step-wrapper">
+                <a <?php if ($current_step_num >= $step_number) {
+                    echo 'href="' . rex_getUrl(null, null, ['step' => FragmentConfig::$data['checkout']['steps'][2], 'ts' => time()]) . '"';
+                } ?> class="checkout-step <?php if ($current_step_num == $step_number) {
+                    echo 'active';
+                } else if ($current_step_num < $step_number) {
+                    echo 'disabled';
+                } ?>">
+                    <span class="checkout-step-number"><?= $step_number ?></span>
+                    <span class="checkout-step-name">###label.shipment_payment###</span>
+                </a>
+            </div>
+        <?php endif; ?>
+
+        <?php if (in_array('show-summary', $stepConfig)): ?>
+            <?php $step_number++ ?>
+            <div class="checkout-step-wrapper">
+                <a <?php if ($current_step_num == $step_number) {
+                    echo 'href="' . rex_getUrl(null, null, ['step' => 'show-summary', 'ts' => time()]) . '"';
+                } ?> class="checkout-step <?php if ($current_step_num == $step_number) {
+                    echo 'active';
+                } else if ($current_step_num < $step_number) {
+                    echo 'disabled';
+                } ?>">
+                    <span class="checkout-step-number"><?= $step_number ?></span>
+                    <span class="checkout-step-name">###label.order###</span>
+                </a>
+            </div>
+        <?php endif; ?>
+
     </div>
 </div>
 
