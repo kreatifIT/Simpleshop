@@ -108,13 +108,13 @@ class rex_api_simpleshop_api extends rex_api_function
 
         $Controller->setVar('product_added', true);
 
-        $products   = $Controller->getProducts();
-        $result     = [
+        $products = $Controller->getProducts();
+        $result   = [
             'total' => 0,
             'html'  => $Controller->parse($ctrlTpl),
             'count' => count($products),
         ];
-        $result = rex_extension::registerPoint(new rex_extension_point('Api.Cart.getCartContent', $result, ['products' => $products]));
+        $result   = rex_extension::registerPoint(new rex_extension_point('Api.Cart.getCartContent', $result, ['products' => $products]));
 
         $this->response['cart_html']       = \Sprog\Wildcard::parse($result['html']);
         $this->response['total']           = $result['total'];
@@ -192,6 +192,16 @@ class rex_api_simpleshop_api extends rex_api_function
         $this->response['cart_item_cnt']    = \FriendsOfREDAXO\Simpleshop\Session::getCartItemCount();
 
         $this->api__cart_getcartcontent($layout);
+    }
+
+    private function api__custom_callback()
+    {
+        $callback = trim(rex_request('callback', 'string'));
+
+        if ($callback == '') {
+            throw new ApiException("Callback is not set");
+        }
+        $this->response = array_merge(call_user_func($callback), $this->response);
     }
 }
 
