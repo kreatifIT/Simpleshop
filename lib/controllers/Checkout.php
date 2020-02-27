@@ -400,6 +400,9 @@ class CheckoutController extends Controller
                             }
                         }
                         $this->Order->setValue('status', 'OP');
+
+                        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.beforePlaceOrder', $this->Order, []));
+
                         $this->Order->save(false);
                         rex_redirect(null, null, ['action' => 'init-payment', 'ts' => time()]);
                     } catch (OrderException $ex) {
