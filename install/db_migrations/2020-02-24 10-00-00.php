@@ -17,13 +17,13 @@ $sql->setQuery('SET FOREIGN_KEY_CHECKS = 0');
 
 try {
     rex_sql_table::get('rex_shop_product_has_feature')
-        ->ensureColumn(new rex_sql_column('prio', 'int(11)', false, null, null))
+        ->ensureColumn(new rex_sql_column('prio', 'int(11)'))
         ->ensure();
 
     rex_sql_table::get('rex_shop_product')
-        ->ensureColumn(new rex_sql_column('amount', 'int(11)', false, null, null))
-        ->ensureColumn(new rex_sql_column('price', 'decimal(10,2)', false, null, null))
-        ->ensureColumn(new rex_sql_column('reduced_price', 'decimal(10,2)', false, null, null))
+        ->ensureColumn(new rex_sql_column('amount', 'int(11)', false, 0))
+        ->ensureColumn(new rex_sql_column('price', 'decimal(10,2)', false, 0))
+        ->ensureColumn(new rex_sql_column('reduced_price', 'decimal(10,2)', false, 0))
         ->ensure();
 
     $sql->setQuery('

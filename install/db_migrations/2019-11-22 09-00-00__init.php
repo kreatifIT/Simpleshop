@@ -6,7 +6,7 @@ $sql->setQuery('SET FOREIGN_KEY_CHECKS = 0');
 try {
 
     rex_sql_table::get(\FriendsOfREDAXO\Simpleshop\Order::TABLE)
-        ->ensureColumn(new rex_sql_column('shipping_address_id', 'int(11)', false, null, null))
+        ->ensureColumn(new rex_sql_column('shipping_address_id', 'int(11)', true, null, null))
         ->ensure();
 
     $fieldId = $sql->getArray('SELECT id FROM rex_yform_field WHERE table_name = :table AND name = :field AND type_id = :type', [

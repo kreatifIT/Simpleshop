@@ -75,6 +75,7 @@ class rex_yform_value_customer_address extends rex_yform_value_abstract
     public function getDefinitions($values = [])
     {
         return [
+            'db_null'     => true,
             'dbtype'      => 'int',
             'type'        => 'value',
             'name'        => 'customer_address',
