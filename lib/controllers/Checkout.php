@@ -24,8 +24,6 @@ class CheckoutController extends Controller
     protected $products = [];
     protected $Order    = null;
 
-    public static $callbackCheck = null;
-
     protected function _execute()
     {
         $this->params = array_merge([
@@ -194,39 +192,57 @@ class CheckoutController extends Controller
     {
         $Address      = $this->Order->getValue('shipping_address');
         $useShAddress = Session::getCheckoutData('use_shipping_address', false);
+        $Order        = Session::getCurrentOrder();
         $customer_id  = $this->params['Customer']->getId();
 
-        if (!$Address && $customer_id > 0) {
+        $stmt = CustomerAddress::query();
+        $stmt->where('status', 1);
+        $stmt->where('customer_id', $customer_id);
+        $stmt->where('id', $this->params['Customer']->getValue('invoice_address_id'), '!=');
+        $stmt->orderBy('id', 'Desc');
+        $addresses = $stmt->find();
+
+        if (!$Address) {
             if (isset($this->params['Address'])) {
                 $Address = $this->params['Address'];
             } else {
-                $stmt = CustomerAddress::query();
-                $stmt->where('status', 1);
-                $stmt->orderBy('id', 'desc');
-                $stmt->where('customer_id', $customer_id);
-                $Address = $stmt->findOne();
+                $Address = $Order->getShippingAddress();
             }
         }
 
         if (!empty($_POST)) {
-            $notUseShAddress = rex_post('shipping_address_is_idem', 'int', 0);
+            $goAhead        = false;
+            $shippingIsIdem = rex_post('shipping_address_is_idem', 'int', 0);
+            $addressId      = rex_post('shipping-address', 'int', 0);
+            $address        = $addressId ? CustomerAddress::get($addressId) : null;
 
-            Session::setCheckoutData('use_shipping_address', !$notUseShAddress);
+            Session::setCheckoutData('use_shipping_address', !$shippingIsIdem);
+            $Order->setValue('shipping_address', null);
+            $Order->setValue('shipping_address_id', null);
 
-            if ($notUseShAddress) {
+            if ($shippingIsIdem) {
+                $goAhead = true;
+            } else if ($address) {
+                $goAhead = true;
+                $Order->setValue('shipping_address', $address);
+                $Order->setValue('shipping_address_id', $addressId);
+            }
+
+            Session::setCheckoutData('Order', $Order);
+
+            if ($goAhead) {
                 $nextStep = CheckoutController::getNextStep();
-                $Order    = Session::getCurrentOrder();
-
-                $Order->setValue('shipping_address', null);
-                $Order->setValue('shipping_address_id', null);
-                Session::setCheckoutData('Order', $Order);
-
                 CheckoutController::setDoneStep($nextStep);
                 rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
             }
         }
 
+        $excludedFields = FragmentConfig::$data['yform_fields']['rex_shop_customer_address']['_excludedFields'];
+        $excludedFields = array_merge($excludedFields, FragmentConfig::$data['checkout']['shipping_excl_fields']);
+
         $this->setVar('use_shipping_address', $useShAddress);
+        $this->setVar('excluded_fields', $excludedFields);
+        $this->setVar('addresses', $addresses);
         $this->setVar('Address', $Address ?: CustomerAddress::create());
 
         \rex_extension::register('YFORM_DATA_ADDED', ['\FriendsOfREDAXO\Simpleshop\CheckoutController', 'shippingAddressCallback']);
@@ -262,11 +278,11 @@ class CheckoutController extends Controller
         $Address     = $this->Order->getInvoiceAddress();
         $customer_id = $this->params['Customer']->getId();
 
-        CheckoutController::$callbackCheck = ['invoice' => false, 'shipping' => false];
-
         if (!$Address && $customer_id > 0) {
             if (isset($this->params['Address'])) {
                 $Address = $this->params['Address'];
+            } else if ($this->params['Customer']->getvalue('invoice_address_id') > 0) {
+                $Address = CustomerAddress::get($this->params['Customer']->getvalue('invoice_address_id'));
             } else {
                 $stmt = CustomerAddress::query();
                 $stmt->where('status', 1);
@@ -276,6 +292,10 @@ class CheckoutController extends Controller
             }
         }
 
+        $excludedFields = FragmentConfig::$data['yform_fields']['rex_shop_customer_address']['_excludedFields'];
+        $excludedFields = array_merge($excludedFields, FragmentConfig::$data['checkout']['invoice_excl_fields']);
+
+        $this->setVar('excluded_fields', $excludedFields);
         $this->setVar('Address', $Address ?: CustomerAddress::create());
 
         \rex_extension::register('YFORM_DATA_ADDED', ['\FriendsOfREDAXO\Simpleshop\CheckoutController', 'invoiceAddressCallback']);
@@ -289,24 +309,7 @@ class CheckoutController extends Controller
         $table = $Ep->getParam('table')
             ->getTableName();
 
-        if (!\rex::isBackend() && $table == Customer::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
-            CheckoutController::$callbackCheck['invoice'] = true;
-
-            $Object   = $Ep->getParam('data');
-            $Order    = Session::getCurrentOrder();
-            $nextStep = CheckoutController::getNextStep();
-
-            // NEEDED! to get data
-            $Object->getValue('createdate');
-            $Order->setValue('customer_data', $Object);
-            Session::setCheckoutData('Order', $Order);
-
-            if (CheckoutController::$callbackCheck['shipping']) {
-                CheckoutController::setDoneStep($nextStep);
-                rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
-            }
-        } else if (!\rex::isBackend() && $table == CustomerAddress::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
-            CheckoutController::$callbackCheck['shipping'] = true;
+        if (!\rex::isBackend() && $table == CustomerAddress::TABLE && $yform->isSend() && !$yform->hasWarnings()) {
 
             $Object   = $Ep->getParam('data');
             $Order    = Session::getCurrentOrder();
@@ -318,10 +321,8 @@ class CheckoutController extends Controller
             $Order->setValue('customer_id', $Object->getValue('customer_id'));
             Session::setCheckoutData('Order', $Order);
 
-            if (CheckoutController::$callbackCheck['invoice']) {
-                CheckoutController::setDoneStep($nextStep);
-                rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
-            }
+            CheckoutController::setDoneStep($nextStep);
+            rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
         }
         return $yform;
     }
@@ -461,7 +462,7 @@ class CheckoutController extends Controller
     public function sendMail($debug = false)
     {
         $do_send  = true;
-        $Mail     = new \FriendsOfREDAXO\Simpleshop\Mail();
+        $Mail     = new Mail();
         $Settings = \rex::getConfig('simpleshop.Settings');
         $Customer = $this->Order->getValue('customer_data');
 

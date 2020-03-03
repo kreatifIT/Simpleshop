@@ -14,7 +14,7 @@
 $content = $this->getVar('content');
 $title   = $this->getVar('title');
 $debug   = $this->getVar('debug', false);
-$css_url = $debug ? rex_url::addonAssets('kreatif-mpdf', 'css/styles.css') : rex_path::addonAssets('kreatif-mpdf', 'css/styles.css');
+$css_url = $debug ? rex_url::addonAssets('kreatif-mpdf', 'css/styles.css?ts='. time()) : rex_path::addonAssets('kreatif-mpdf', 'css/styles.css');
 
 ?>
 <html>

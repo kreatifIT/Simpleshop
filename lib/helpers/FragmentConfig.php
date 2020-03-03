@@ -21,9 +21,7 @@ class FragmentConfig
         'auth'                         => [
             'has_registration'         => true,
             'has_password_recovery'    => true,
-            'registration_excl_fields' => [
-                'fiscal_code',
-            ],
+            'registration_excl_fields' => [],
             'css_class'                => [
                 'wrapper' => 'margin-large-top margin-large-bottom',
                 'buttons' => 'expanded margin-bottom',
@@ -71,16 +69,16 @@ class FragmentConfig
             ],
         ],
         'checkout'                     => [
-            'has_coupons'        => true,
-            'has_summary_footer' => true,
-            'show_tax_info'      => true,
-            'steps'              => [
+            'has_coupons'          => true,
+            'has_summary_footer'   => true,
+            'show_tax_info'        => true,
+            'steps'                => [
                 'invoice_address',
                 'shipping_address',
                 'shipping||payment',
                 'show-summary',
             ],
-            'email'              => [
+            'email'                => [
                 'is_order_complete'         => true,
                 'has_image'                 => false,
                 'has_remove_button'         => false,
@@ -88,6 +86,8 @@ class FragmentConfig
                 'has_global_refresh_button' => false,
                 'has_edit_link'             => false,
             ],
+            'invoice_excl_fields'  => [],
+            'shipping_excl_fields' => ['ctype', 'vat_num', 'fiscal_code'],
         ],
 
         'styles' => [
@@ -130,30 +130,15 @@ class FragmentConfig
         // FIELD DEFINITIONS
         'yform_fields' => [
             'rex_shop_customer_address' => [
-                '_fieldDefaults'  => ['css_class' => 'column medium-6'],
+                '_fieldDefaults'  => ['css_class' => 'cell medium-6'],
                 '_excludedFields' => ['status', 'customer_id'],
                 'country'         => [
                     'just_names' => true,
                 ],
             ],
             'rex_shop_customer'         => [
-                '_fieldDefaults'  => ['css_class' => 'column medium-6'],
-                '_excludedFields' => ['lang_id', 'addresses', 'status', 'lastlogin', 'updatedate', 'created'],
-                'ctype'           => [
-                    'select_class' => '" onchange="Simpleshop.changeCType(this, \'form\')"',
-                ],
-                'company_name'    => [
-                    'css_class' => 'column medium-6 company-field',
-                ],
-                'vat_num'         => [
-                    'css_class' => 'column medium-6 company-field',
-                ],
-                'firstname'       => [
-                    'css_class' => 'column medium-6 person-field',
-                ],
-                'lastname'        => [
-                    'css_class' => 'column medium-6 person-field',
-                ],
+                '_fieldDefaults'  => ['css_class' => 'cell medium-6'],
+                '_excludedFields' => ['invoice_address_id', 'lang_id', 'addresses', 'status', 'lastlogin', 'updatedate', 'created'],
             ],
         ],
     ];

@@ -18,6 +18,8 @@ $cur_area = $this->getVar('area');
 $Settings = \rex::getConfig('simpleshop.Settings');
 $User     = Customer::getCurrentUser();
 
+\emailobfuscator::whitelistEmail($User->getValue('email'));
+
 ?>
 <div class="grid-x grid-margin-x">
     <?php if (count($Settings['membera_area_contents']) > 1): ?>

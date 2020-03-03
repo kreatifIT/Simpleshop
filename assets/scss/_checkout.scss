@@ -172,3 +172,21 @@
         font-size: rem-calc(14);
     }
 }
+
+.addresses-grid {
+    .address-item-wrapper {
+        border: 1px solid $medium-gray;
+        padding: rem-calc(20);
+
+        label {
+            padding-left: rem-calc(40);
+
+            &>span {
+                &.radio,
+                &.checkbox {
+                    top: rem-calc(12);
+                }
+            }
+        }
+    }
+}

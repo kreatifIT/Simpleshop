@@ -14,7 +14,7 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-$fields           = $this->getVar('excluded_fields', []);
+$excludedFields   = $this->getVar('excluded_fields', []);
 $form             = $this->getVar('Form', null);
 $redirect_url     = $this->getVar('redirect_url', '');
 $back_url         = $this->getVar('back_url', '');
@@ -28,7 +28,7 @@ $Customer         = $this->getVar('Customer', Customer::getCurrentUser());
 
 $id   = 'form-data-' . \rex_article::getCurrentId();
 $sid  = "form-{$id}";
-$form = $Address->getForm($form, $fields, $Customer->getId());
+$form = $Address->getForm($form, $excludedFields, $Customer->getId());
 
 $form->setObjectparams('debug', false);
 $form->setObjectparams('submit_btn_show', false);
@@ -39,7 +39,7 @@ $form->setObjectparams('form_showformafterupdate', true);
 $form->setObjectparams('getdata', $Address->getId() > 0);
 $form->setObjectparams('form_anchor', '-' . $sid);
 $form->setObjectparams('form_name', $sid);
-$form->setObjectparams('form_class', 'grid-x medium-up-2 grid-margin-x');
+$form->setObjectparams('fields_class', 'grid-x medium-up-2 grid-margin-x');
 $form->setObjectparams('form_action', '');
 $form->setObjectparams('only_fields', $only_fields);
 

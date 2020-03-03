@@ -55,16 +55,14 @@ class Customer extends Model
 
     public function getName($lang_id = null, $companyFallback = false)
     {
-        if ($this->getValue('ctype') == 'company' && trim($this->getValue('company_name')) != '') {
-            $name = $this->getValue('company_name');
-        } else {
-            $name = $this->getValue('firstname') . ' ' . $this->getValue('lastname');
+        $address = $this->getAddress();
+        return $address ? $address->getName($lang_id, $companyFallback) : '';
+    }
 
-            if (trim($name) == '' && $companyFallback) {
-                $name = $this->getValue('company_name');
-            }
-        }
-        return $name;
+    public function getAddress()
+    {
+        $addressId = $this->getValue('invoice_address_id');
+        return $addressId ? CustomerAddress::get($addressId) : null;
     }
 
     public function hasPermission($permission)
@@ -117,6 +115,26 @@ class Customer extends Model
         ]));
 
         if ($success) {
+            // create customer address
+            $address = CustomerAddress::create();
+
+            foreach ($attributes as $attr => $value) {
+                $address->setValue($attr, trim($value));
+            }
+            $address->save();
+
+            $sql = \rex_sql::factory();
+            $sql->setTable(CustomerAddress::TABLE);
+            $sql->setValue('customer_id', $_this->getId());
+            $sql->setValue('status', 1);
+            $sql->setWhere('id = :id', ['id' => $address->getId()]);
+            $sql->update();
+
+            $sql->setTable(self::TABLE);
+            $sql->setValue('invoice_address_id', $address->getId());
+            $sql->setWhere('id = :id', ['id' => $_this->getId()]);
+            $sql->update();
+
             $Mail          = new Mail();
             $do_send       = true;
             $Mail->Subject = '###simpleshop.email.user_registration_subject###';
@@ -146,7 +164,6 @@ class Customer extends Model
         $sql        = \rex_sql::factory();
         $password   = random_string(self::MIN_PWD_LEN);
         $attributes = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.registerFromBeUser.attributes', array_merge([
-            'ctype'      => 'person',
             'status'     => 1,
             'created'    => date('Y-m-d H:i:s'),
             'updatedate' => date('Y-m-d H:i:s'),
@@ -216,12 +233,7 @@ class Customer extends Model
                 ]));
             }
         } else if ($beuser && $loginCheck && $beuser['email']) {
-            $namechunks = explode(' ', $beuser['name']);
-
-            Customer::registerFromBeUser($beuser['email'], [
-                'firstname' => array_shift($namechunks),
-                'lastname'  => implode(' ', $namechunks),
-            ]);
+            Customer::registerFromBeUser($beuser['email']);
         }
         // cleanup sessions
         Session::cleanupSessions();
@@ -280,11 +292,6 @@ class Customer extends Model
     public static function isLoggedIn()
     {
         return (!empty($_SESSION['customer']['user']) && (int)$_SESSION['customer']['user']['id'] > 0);
-    }
-
-    public function isCompany()
-    {
-        return $this->getValue('ctype') == 'company';
     }
 }
 

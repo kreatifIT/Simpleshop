@@ -13,6 +13,7 @@
 
 use FriendsOfREDAXO\Simpleshop;
 
+
 if (rex::isBackend()) {
     echo '
         <div class="modul-content">
@@ -25,6 +26,7 @@ if (rex::isBackend()) {
 }
 
 $Controller = Simpleshop\CheckoutController::execute([
+    'debug'  => false,
     'action' => rex_get('action', 'string', 'address'),
 ]);
 echo $Controller->parse();

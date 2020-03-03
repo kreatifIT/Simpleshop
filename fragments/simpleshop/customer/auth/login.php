@@ -65,219 +65,107 @@ $texts = [
 ];
 
 ?>
-<div id="<?= $sid ?>" class="section-wrapper auth-wrapper <?= $Config['css_class']['wrapper'] ?>" data-auth-wrapper>
-    <div class="login-form <?= $action == 'recover' || $action == 'register' ? 'hide' : '' ?>">
-        <div class="grid-x align-center">
-            <div class="large-4 medium-6 cell">
-                <form action="<?= rex_getUrl(null, null, array_merge($_GET, ['ts' => time()])) ?>#-<?= $sid ?>" method="post">
-                    <div class="login-panel background-gray">
-                        <h2 class="margin-small-bottom heading"><?= ucfirst(\Sprog\Wildcard::get('action.login')) ?></h2>
+<div id="<?= $sid ?>" class="section-wrapper auth-wrapper <?= $Config['css_class']['wrapper'] ?>" data-auth-wrapper data-scroll-offset="100">
+    <div class="grid-x grid-margin-x <?= $Config['has_registration'] ? '' : 'align-center' ?>">
 
-                        <?php if (strlen($texts['login_info_text'])): ?>
-                            <p><?= $texts['login_info_text'] ?></p>
-                        <?php endif; ?>
+        <div class="login-form large-4 medium-6 cell <?= $action == 'recover' ? 'hide' : '' ?>">
+            <form action="<?= rex_getUrl(null, null, array_merge($_GET, ['ts' => time()])) ?>#-<?= $sid ?>" method="post">
+                <div class="login-panel background-gray">
+                    <h2 class="margin-small-bottom heading"><?= ucfirst(\Sprog\Wildcard::get('action.login')) ?></h2>
 
-                        <?php if (count($errors)): ?>
-                            <div class="callout alert">
-                                <?= implode('<br/>', $errors) ?>
-                            </div>
-                        <?php endif; ?>
+                    <?php if (strlen($texts['login_info_text'])): ?>
+                        <p><?= $texts['login_info_text'] ?></p>
+                    <?php endif; ?>
 
-                        <div class="input-group">
-                            <input type="email" class="input-group-field" name="uname"
-                                   value="<?= rex_post('uname', 'string') ?>" placeholder="###label.email###"
-                                   tabindex="103"/>
+                    <?php if (count($errors)): ?>
+                        <div class="callout alert">
+                            <?= implode('<br/>', $errors) ?>
                         </div>
-                        <div class="input-group">
-                            <input type="password" class="input-group-field" name="pwd" value=""
-                                   placeholder="###label.password###" tabindex="104"/>
-                        </div>
-                        <button type="submit" class="button <?= $Config['css_class']['buttons'] ?>" tabindex="105" name="action"
-                                value="login"><?= ucfirst(\Sprog\Wildcard::get('action.login')) ?></button>
+                    <?php endif; ?>
 
-                        <?php if ($Config['has_password_recovery']): ?>
-                            <div class="login-form-passwort-reset">
-                                <a class="text-link" href="javascript:;"
-                                   onclick="Simpleshop.toggleAuth(this, '.recovery-form')">###action.reset_password###.</a>
-                            </div>
-                        <?php endif; ?>
-                        <?php if ($Config['has_registration']): ?>
-                            <div class="login-form-register">
-                                <span class="label">###label.no_login_data###:</span class="login-form-register-label">
-                                <a class="text-link" href="javascript:;"
-                                   onclick="Simpleshop.toggleAuth(this, '.register-form')">###label.register_now###</a>
-                            </div>
-                        <?php endif; ?>
+                    <div class="input-group">
+                        <input type="email" class="input-group-field" name="uname"
+                               value="<?= rex_post('uname', 'string') ?>" placeholder="###label.email###"
+                               tabindex="103"/>
                     </div>
-                </form>
+                    <div class="input-group">
+                        <input type="password" class="input-group-field" name="pwd" value=""
+                               placeholder="###label.password###" tabindex="104"/>
+                    </div>
+                    <button type="submit" class="button <?= $Config['css_class']['buttons'] ?>" tabindex="105" name="action"
+                            value="login"><?= ucfirst(\Sprog\Wildcard::get('action.login')) ?></button>
 
-            </div>
+                    <?php if ($Config['has_password_recovery']): ?>
+                        <div class="login-form-passwort-reset">
+                            <a class="text-link" href="javascript:;"
+                               onclick="Simpleshop.toggleAuth(this, '.recovery-form', '.login-form')">###action.reset_password###.</a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </form>
         </div>
+
+        <?php if ($Config['has_password_recovery']): ?>
+            <?php
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // PASSWORD RECOVERY
+            ?>
+            <div class="recovery-form large-4 medium-6 cell <?= $action == 'recover' ? '' : 'hide' ?>">
+                <div class="login-panel background-gray">
+                    <h2 class="margin-small-bottom heading"><?= ucfirst(\Sprog\Wildcard::get('label.password_forgotten')) ?></h2>
+
+                    <?php if (strlen($texts['pwd_recovery_info_text'])): ?>
+                        <p><?= $texts['pwd_recovery_info_text'] ?></p>
+                    <?php endif; ?>
+
+                    <?php
+                    $recoverySuccess = false;
+
+                    if (rex_post('action', 'string') == 'recover') {
+                        $recoverySuccess = true;
+                        $email           = rex_post('uname', 'string');
+                        Customer::resetPassword($email);
+                    }
+
+                    ?>
+                    <?php if ($recoverySuccess): ?>
+                        <div class="callout success">###notif.password_reset_msg###</div>
+                    <?php else: ?>
+                        <form action="#-<?= $sid ?>" method="post">
+                            <input type="email" name="uname" placeholder="###label.email###"
+                                   value="<?= rex_post('uname', 'string'); ?>">
+                            <button type="submit" class="button <?= $Config['css_class']['buttons'] ?>"
+                                    name="action" value="recover">
+                                ###action.reset###
+                            </button>
+                        </form>
+                    <?php endif ?>
+                    <div class="margin-small-top">
+                        <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.login-form', '.recovery-form')"
+                           class="text-link">###action.back_to_login###</a>.
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($Config['has_registration']): ?>
+            <?php
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // REGISTRATION
+            ?>
+            <div class="register-form large-8 medium-7 cell">
+                <div class="login-panel background-gray">
+                    <h2 class="margin-small-bottom heading"><?= ucfirst(\Sprog\Wildcard::get('action.register')) ?></h2>
+                    <?php if (strlen($texts['registration_info_text'])): ?>
+                        <p><?= $texts['registration_info_text'] ?></p>
+                    <?php endif; ?>
+
+                    <?php
+                    $this->subfragment('simpleshop/customer/auth/registration.php');
+                    ?>
+                </div>
+            </div>
+        <?php endif; ?>
+
     </div>
-
-    <?php if ($Config['has_password_recovery']): ?>
-        <?php
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // PASSWORD RECOVERY
-        ?>
-        <div class="recovery-form <?= $action == 'recover' ? '' : 'hide' ?>">
-            <div class="grid-x align-center">
-                <div class="large-4 medium-6 cell">
-                    <div class="login-panel background-gray">
-                        <h2 class="margin-small-bottom heading"><?= ucfirst(\Sprog\Wildcard::get('label.password_forgotten')) ?></h2>
-
-                        <?php if (strlen($texts['pwd_recovery_info_text'])): ?>
-                            <p><?= $texts['pwd_recovery_info_text'] ?></p>
-                        <?php endif; ?>
-
-                        <?php
-                        $recoverySuccess = false;
-
-                        if (rex_post('action', 'string') == 'recover') {
-                            $recoverySuccess = true;
-                            $email           = rex_post('uname', 'string');
-                            Customer::resetPassword($email);
-                        }
-
-                        ?>
-                        <?php if ($recoverySuccess): ?>
-                            <div class="callout success">###notif.password_reset_msg###</div>
-                        <?php else: ?>
-                            <form action="#-<?= $sid ?>" method="post">
-                                <input type="email" name="uname" placeholder="###label.email###"
-                                       value="<?= rex_post('uname', 'string'); ?>">
-                                <button type="submit" class="button <?= $Config['css_class']['buttons'] ?>"
-                                        name="action" value="recover">
-                                    ###action.reset###
-                                </button>
-                            </form>
-                        <?php endif ?>
-                        <div class="margin-small-top">
-                            <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.login-form')"
-                               class="text-link">###action.back_to_login###</a>.
-                            <br>
-                            <?php if ($Config['has_registration']): ?>
-                                ###label.no_login_data###: <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.register-form')"
-                                                              class="text-link">###label.register_now###</a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-
-    <?php if ($Config['has_registration']): ?>
-        <?php
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // REGISTRATION
-        $fields    = Customer::getAllYformFields();
-        $form      = Form::factory();
-        $excFields = FragmentConfig::getValue('yform_fields.rex_shop_customer._excludedFields');
-        $excFields = array_merge($excFields, FragmentConfig::getValue('auth.registration_excl_fields'));
-
-        FragmentConfig::$data['yform_fields']['rex_shop_customer']['_excludedFields'] = $excFields;
-
-        $Config = FragmentConfig::getValue('yform_fields.rex_shop_customer');
-
-        // Options
-        $form->setObjectparams('form_anchor', '-' . $sid);
-        $form->setObjectparams('submit_btn_show', false);
-        $form->setObjectparams('real_field_names', true);
-        $form->setObjectparams('form_ytemplate', 'custom,foundation,bootstrap');
-        $form->setObjectparams('error_class', 'form-warning');
-        $form->setObjectparams('form_showformafterupdate', true);
-
-
-        foreach ($fields as $index => $field) {
-            // exclude types
-            if (in_array($field->getElement('name'), $excFields)) {
-                continue;
-            }
-
-            if ($field->getElement('type_id') == 'value') {
-                $params = array_merge($field->toArray(), (array)$Config[$field->getElement('name')], [
-                    'notice' => null,
-                ]);
-
-                $params['css_class'] .= ' cell medium-6';
-
-                if ($field->getElement('type_name') == 'be_manager_relation') {
-                    $params['field'] = strtr($params['field'], ['_1' => '_' . \rex_clang::getCurrentId()]);
-                }
-                $form->setValueField($field->getElement('type_name'), $params);
-            } else if ($field->getElement('type_id') == 'validate') {
-                $form->setValidateField($field->getElement('type_name'), $field->toArray());
-            }
-        }
-
-
-        // validate empty password
-        $form->setValidateField('empty', [
-            'type_id'   => 'validate',
-            'type_name' => 'empty',
-            'name'      => 'password',
-            'message'   => '###error.password_policy###',
-        ]);
-
-
-        // Submit
-        $form->setValueField('html', ['', '<div class="margin-small-top">']);
-        $form->setValueField('submit', [
-            'name'        => 'submit',
-            'no_db'       => 'no_db',
-            'labels'      => strtoupper(\Wildcard::get('action.register')),
-            'css_classes' => 'button expanded ' . $Config['css_class']['buttons'],
-        ]);
-        $form->setValueField('html', ['', '</div>']);
-        $form->setValueField('html', ['', '<input type="hidden" name="action" value="register">']);
-
-        $customerError = false;
-        $formOutput    = $form->getForm();
-
-        if (rex_post('action', 'string') == 'register' && $form->isSend() && !$form->hasWarnings()) {
-            $values = $form->getFormEmailValues();
-
-            // register customer
-            try {
-                Customer::register($values['email'], $values['password'], $values);
-                Customer::login($values['email'], $values['password']);
-            } catch (CustomerException $ex) {
-                $customerError = true;
-                $formOutput    = '<div class="callout alert">' . $ex->getMessage() . '</div>' . $formOutput;
-            }
-        }
-
-        ?>
-        <div class="register-form <?= $action == 'register' ? '' : 'hide' ?>">
-            <div class="grid-x align-center">
-                <div class="large-4 medium-6 cell">
-                    <div class="login-panel background-gray">
-                        <h2 class="margin-small-bottom heading"><?= ucfirst(\Sprog\Wildcard::get('action.register')) ?></h2>
-                        <?php if (strlen($texts['registration_info_text'])): ?>
-                            <p><?= $texts['registration_info_text'] ?></p>
-                        <?php endif; ?>
-
-                        <?php if ($form->isSend() && !$form->hasWarnings() && !$customerError):
-                            $referer = rex_session('login_referer', 'string');
-                            rex_unset_session('login_referer');
-
-                            if (strlen($referer)) {
-                                header('Location: ' . $referer);
-                                exit;
-                            }
-                            ?>
-                            <div class="callout success">###label.registration_sucessfull###</div>
-                        <?php else: ?>
-                            <?= $formOutput ?>
-                            <div class="margin-small-top">
-                                <a href="javascript:;" onclick="Simpleshop.toggleAuth(this, '.login-form')"
-                                   class="text-link">###action.back_to_login###</a>.
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
 </div>

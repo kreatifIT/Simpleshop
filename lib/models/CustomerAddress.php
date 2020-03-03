@@ -19,25 +19,35 @@ class CustomerAddress extends Model
     const TABLE = 'rex_shop_customer_address';
 
 
-    public function getName($lang_id = null)
+    public function getName($lang_id = null, $companyFallback = false)
     {
-        $name = [];
-
-        if ($this->valueIsset('company_name')) {
+        $name  = [];
+        $ctype = $this->getValue('ctype');
+        if (in_array($ctype, ['company', '']) && trim($this->getValue('company_name')) != '') {
             $name[] = trim($this->getValue('company_name'));
         }
-        if ($this->valueIsset('firstname') || $this->valueIsset('lastname')) {
-            $name[] = trim($this->getValue('firstname') . ' ' . $this->getValue('lastname'));
+        if (in_array($ctype, ['person', ''])) {
+            $_name = trim($this->getValue('firstname') . ' ' . $this->getValue('lastname'));
+
+            if ($_name != '') {
+                $name[] = $_name;
+            } else if ($companyFallback && empty($name)) {
+                $name[] = trim($this->getValue('company_name'));
+            }
         }
-        return implode(' - ', $name);
+        return implode(' - <br/>', $name);
+    }
+
+    public function isCompany()
+    {
+        return $this->getValue('ctype') == 'company';
     }
 
     public function getForm($yform = null, $excludedFields = [], $customerId = null)
     {
         if (\rex::isBackend()) {
             $form = parent::getForm();
-        }
-        else {
+        } else {
             $form = parent::getForm($yform, $excludedFields);
             $form->setValueField('hidden', ['customer_id', $customerId]);
 
@@ -48,7 +58,8 @@ class CustomerAddress extends Model
                 $form->setValueField('hidden', ['lastname', rex_post('lastname', 'string')]);
             }
             if (!$form->getObjectparams('main_id')) {
-                $defaultStatus = self::getYformFieldByName('status')->getElement('default');
+                $defaultStatus = self::getYformFieldByName('status')
+                    ->getElement('default');
                 $form->setValueField('hidden', ['status', $defaultStatus]);
             }
         }

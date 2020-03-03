@@ -56,12 +56,11 @@ class Order extends Model
 
     public function isTaxFree()
     {
-        $Customer = $this->getCustomerData();
-        $Country  = null;
+        $Address = $this->getInvoiceAddress();
+        $Country = null;
 
-        if ($Customer->isCompany()) {
-            $Address  = $this->getInvoiceAddress();
-            $countrId = $Address ? $Address->getValue('country') : null;
+        if ($Address->isCompany()) {
+            $countrId = $Address->getValue('country');
             $Country  = $countrId ? Country::get($countrId) : null;
         }
 
@@ -712,7 +711,7 @@ class Order extends Model
         }
 
         $XMLInvoice  = XMLInvoice::factory();
-        $Customer    = $this->getInvoiceAddress();
+        $address     = $this->getInvoiceAddress();
         $xmlData     = $XMLInvoice->getData();
         $iDateTs     = strtotime($this->getValue('createdate'));
         $iDate       = date('Y-m-d', $iDateTs);
@@ -721,11 +720,11 @@ class Order extends Model
 
         $xmlData["document_lines"]                 = [];
         $xmlData['document_type']                  = $this->getValue('status') == 'CN' ? 'TD04' : 'TD01';
-        $xmlData['receiver_name']                  = trim($Customer->getName());
-        $xmlData['receiver_private_vat_number']    = mb_strtoupper($Customer->getValue('fiscal_code'));
-        $xmlData['receiver_head_quarter_street']   = $Customer->getValue('street');
-        $xmlData['receiver_head_quarter_zip']      = $Customer->getValue('postal');
-        $xmlData['receiver_head_quarter_city']     = $Customer->getValue('location');
+        $xmlData['receiver_name']                  = trim($address->getName());
+        $xmlData['receiver_private_vat_number']    = mb_strtoupper($address->getValue('fiscal_code'));
+        $xmlData['receiver_head_quarter_street']   = $address->getValue('street');
+        $xmlData['receiver_head_quarter_zip']      = $address->getValue('postal');
+        $xmlData['receiver_head_quarter_city']     = $address->getValue('location');
         $xmlData['receiver_head_quarter_province'] = 'BZ';
         $xmlData['receiver_head_quarter_nation']   = 'IT';
 

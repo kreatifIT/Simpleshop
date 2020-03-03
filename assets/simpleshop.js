@@ -77,23 +77,35 @@ var Simpleshop = (function ($) {
             window.event.stopPropagation();
         },
 
-        toggleAuth: function (_this, selector) {
+        toggleAuth: function (_this, selector, hideSelector) {
             var $this = $(_this),
                 $wrapper = $this.parents('[data-auth-wrapper]');
 
-            $wrapper.children('div').addClass('hide');
-            $wrapper.children(selector).removeClass('hide');
+            $this.parents(hideSelector).addClass('hide');
+            $wrapper.find(selector).removeClass('hide');
         },
-        toggleShipping: function (_this, selector) {
+        toggleShipping: function (_this, selector, inverted) {
             var $this = $(_this),
                 chunks = selector.split('|'),
-                $address = $this.parents(chunks[0]).find(chunks[1]);
+                $container = $this.parents(chunks[0]),
+                $address = $container.find(chunks[1]);
 
-            if ($this.is(':checked')) {
-                $address.addClass('hide');
-            }
-            else {
-                $address.removeClass('hide');
+            $container.find('[data-shipping-addresses] input').prop('checked', false);
+
+            if (inverted) {
+                if ($this.is(':checked')) {
+                    $address.addClass('hide');
+                }
+                else {
+                    $address.removeClass('hide');
+                }
+            } else {
+                if ($this.is(':checked')) {
+                    $address.removeClass('hide');
+                }
+                else {
+                    $address.addClass('hide');
+                }
             }
         },
         changeCType: function (_this, selector) {

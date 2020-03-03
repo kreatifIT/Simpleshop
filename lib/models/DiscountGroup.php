@@ -35,7 +35,8 @@ class DiscountGroup extends Discount
         $Settings   = \rex::getConfig('simpleshop.Settings');
         $apply_all  = from_array($Settings, 'discounts_are_accumulable', 0);
         $discounts  = self::query()->where('status', 1)->orderBy('prio')->find();
-        $Cctype     = $Customer ? $Customer->getValue('ctype') : 'person';
+        $address    = $Customer ? $Customer->getAddress() : null;
+        $Cctype     = $address ? $address->getValue('ctype') : 'person';
 
         foreach ($discounts as $discount) {
             $dfound = false;
