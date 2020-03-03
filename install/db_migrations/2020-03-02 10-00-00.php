@@ -83,7 +83,7 @@ try {
         
         UPDATE rex_yform_table SET list_sortfield = "id", list_amount = 100, list_sortorder = "DESC" WHERE table_name = "rex_shop_customer";
         UPDATE rex_yform_field SET field = "id" WHERE `table` = "rex_shop_customer";
-        UPDATE rex_yform_field SET field = "company_name," ",firstname," ",lastname" WHERE `table` = "rex_shop_customer_address";
+        UPDATE rex_yform_field SET field = "company_name,\" \",firstname,\" \",lastname" WHERE `table` = "rex_shop_customer_address";
         UPDATE rex_yform_field SET no_db = 1 WHERE `table` = "rex_shop_customer" AND type_id = "value" AND `name` = "password";
         
         UPDATE rex_yform_field SET type_name = "choice", db_type = "text", options="", `default`="person", `table_name`="rex_shop_customer_address", choices="{\"###label.private_person###\":\"person\",\"###label.company###\":\"company\"}" WHERE table_name = "rex_shop_customer" AND type_id = "value" AND name = "ctype";

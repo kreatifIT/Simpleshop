@@ -34,8 +34,6 @@ try {
     } else {
         $sql->insert();
     }
-
-    pr('migration done');
 }
 finally {
     $sql = rex_sql::factory();
