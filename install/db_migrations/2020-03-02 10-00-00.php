@@ -35,23 +35,46 @@ try {
         ->removeColumn('fiscal_code')
         ->ensure();
 
+    $item = $sql->getArray('SELECT id FROM rex_yform_field WHERE table_name = :table AND type_id = :type AND name = :name', ['table' => 'rex_shop_customer', 'type' => 'value', 'name' => 'name'])[0];
+    if (!$item) {
+        $sql->setTable('rex_yform_field');
+        $sql->setValue('table_name', 'rex_shop_customer');
+        $sql->setValue('prio', 1);
+        $sql->setValue('type_id', 'value');
+        $sql->setValue('type_name', 'list_name');
+        $sql->setValue('db_type', 'none');
+        $sql->setValue('list_hidden', 0);
+        $sql->setValue('search', 0);
+        $sql->setValue('name', 'name');
+        $sql->setValue('label', 'Name');
+        $sql->insert();
+    }
     $item = $sql->getArray('SELECT id FROM rex_yform_field WHERE table_name = :table AND type_id = :type AND name = :name', ['table' => 'rex_shop_customer', 'type' => 'value', 'name' => 'invoice_address_id'])[0];
     if (!$item) {
         $sql->setTable('rex_yform_field');
         $sql->setValue('table_name', 'rex_shop_customer');
-        $sql->setValue('prio', 5);
+        $sql->setValue('prio', 2);
         $sql->setValue('type_id', 'value');
-        $sql->setValue('type_name', 'be_manager_relation');
+        $sql->setValue('type_name', 'hidden_input');
         $sql->setValue('db_type', 'int');
-        $sql->setValue('list_hidden', 0);
-        $sql->setValue('search', 1);
+        $sql->setValue('list_hidden', 1);
+        $sql->setValue('search', 0);
+        $sql->setValue('no_db', 0);
         $sql->setValue('name', 'invoice_address_id');
-        $sql->setValue('label', 'Kunden-Adresse');
-        $sql->setValue('type', 2);
-        $sql->setValue('empty_value', 'Bitte eine Adresse zuweisen');
-        $sql->setValue('table', 'rex_shop_customer_address');
-        $sql->setValue('field', 'company_name," ",firstname," ",lastname');
-        $sql->setValue('empty_option', 0);
+        $sql->insert();
+    }
+    $item = $sql->getArray('SELECT id FROM rex_yform_field WHERE table_name = :table AND type_id = :type AND name = :name', ['table' => 'rex_shop_customer_address', 'type' => 'value', 'name' => 'name'])[0];
+    if (!$item) {
+        $sql->setTable('rex_yform_field');
+        $sql->setValue('table_name', 'rex_shop_customer_address');
+        $sql->setValue('prio', 2);
+        $sql->setValue('type_id', 'value');
+        $sql->setValue('type_name', 'list_name');
+        $sql->setValue('db_type', 'none');
+        $sql->setValue('list_hidden', 0);
+        $sql->setValue('search', 0);
+        $sql->setValue('name', 'name');
+        $sql->setValue('label', 'Name');
         $sql->insert();
     }
     $item = $sql->getArray('SELECT id FROM rex_yform_field WHERE table_name = :table AND type_id = :type AND name = :name', ['table' => 'rex_shop_customer_address', 'type' => 'validate', 'name' => 'fiscal_code'])[0];
@@ -83,13 +106,16 @@ try {
         
         UPDATE rex_yform_table SET list_sortfield = "id", list_amount = 100, list_sortorder = "DESC" WHERE table_name = "rex_shop_customer";
         UPDATE rex_yform_field SET field = "id" WHERE `table` = "rex_shop_customer";
-        UPDATE rex_yform_field SET field = "company_name,\" \",firstname,\" \",lastname" WHERE `table` = "rex_shop_customer_address";
         UPDATE rex_yform_field SET no_db = 1 WHERE `table` = "rex_shop_customer" AND type_id = "value" AND `name` = "password";
         
         UPDATE rex_yform_field SET type_name = "choice", db_type = "text", options="", `default`="person", `table_name`="rex_shop_customer_address", choices="{\"###label.private_person###\":\"person\",\"###label.company###\":\"company\"}" WHERE table_name = "rex_shop_customer" AND type_id = "value" AND name = "ctype";
         UPDATE rex_yform_field SET `table_name`="rex_shop_customer_address" WHERE table_name = "rex_shop_customer" AND name = "fiscal_code";
         UPDATE rex_yform_field SET `table_name`="rex_shop_customer_address" WHERE table_name = "rex_shop_customer" AND name = "vat_num";
         
+        UPDATE rex_yform_field SET list_hidden=1 WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "firstname";
+        UPDATE rex_yform_field SET list_hidden=1 WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "lastname";
+        UPDATE rex_yform_field SET list_hidden=1 WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "company_name";
+        UPDATE rex_yform_field SET db_type="int" WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "country";
         UPDATE rex_yform_field SET db_type="varchar(191)" WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "fiscal_code";
         UPDATE rex_yform_field SET db_type="varchar(191)" WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "vat_num";
         UPDATE rex_yform_field SET type_name="empty", message="###error.field.empty###", validate_type=0 WHERE table_name = "rex_shop_customer_address" AND type_id = "validate" AND name = "firsname";

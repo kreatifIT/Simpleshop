@@ -35,7 +35,7 @@ class CustomerAddress extends Model
                 $name[] = trim($this->getValue('company_name'));
             }
         }
-        return implode(' - <br/>', $name);
+        return implode(' - ', $name);
     }
 
     public function isCompany()

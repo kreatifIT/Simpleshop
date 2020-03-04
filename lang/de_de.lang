@@ -28,6 +28,7 @@ label.accounting = Buchhaltung
 label.what_u_want_todo = Was wollen Sie tun?
 label.really_delete_entry = Wollen Sie wirklich den Eintrag löschen?
 label.resend_email = Bestellungs-Email an Kunde senden
+label.show_order_pdf = PDF ansehen
 label.recalculate_sums = Werte neu berechnen
 label.msg_resend_email = Email wurde versendet
 label.msg_recalculate_sums = Werte wurden aktualisiert
