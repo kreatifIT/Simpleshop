@@ -86,6 +86,12 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                         header('Location: ' . html_entity_decode(rex_url::currentBackendPage($_GET)));
                         exit;
 
+                    case 'show-pdf':
+                        rex_response::cleanOutputBuffers();
+                        $PDF = $Order->getInvoicePDF($use_invoicing ? 'invoice' : 'order');
+                        $PDF->Output();
+                        exit;
+
                     case 'generate_creditnote':
                         $CreditNote = \FriendsOfREDAXO\Simpleshop\Order::create();
 
@@ -118,6 +124,22 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                 echo rex_view::info(rex_i18n::msg("label.msg_{$msg}"));
             }
 
+            if (\rex_addon::get('kreatif-mpdf')
+                ->isAvailable()
+            ) {
+                $output[] = '
+                    <a href="' . rex_url::currentBackendPage([
+                        'table_name' => $table,
+                        'data_id'    => $main_id,
+                        'func'       => rex_request('func', 'string'),
+                        'ss-action'  => 'show-pdf',
+                        'ts'         => time(),
+                    ]) . '" class="btn btn-default" target="_blank">
+                    <i class="fa fa-print"></i>&nbsp;
+                    ' . rex_i18n::msg('label.show_order_pdf') . '
+                </a>
+            ';
+            }
             if ($Customer) {
                 $output[] = '
                 <a href="' . rex_url::currentBackendPage([
@@ -192,31 +214,33 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                     'orderBy' => 'id',
                 ]);
 
-                if ($CreditNote) {
-                    $output[] = '
-                        <a href="' . rex_url::currentBackendPage([
-                            'table_name' => $table,
-                            'data_id'    => $CreditNote->getId(),
-                            'func'       => 'edit',
-                            'ts'         => time(),
-                        ]) . '" class="btn btn-primary">
-                            <i class="fa fa-money"></i>&nbsp;
-                            ' . rex_i18n::msg('action.goto_creditnote') . '
-                        </a>
-                    ';
-                } else {
-                    $output[] = '
-                        <a href="' . rex_url::currentBackendPage([
-                            'table_name' => $table,
-                            'data_id'    => $main_id,
-                            'func'       => rex_request('func', 'string'),
-                            'ss-action'  => 'generate_creditnote',
-                            'ts'         => time(),
-                        ]) . '" class="btn btn-default">
-                            <i class="fa fa-money"></i>&nbsp;
-                            ' . rex_i18n::msg('label.generate_creditnote') . '
-                        </a>
-                    ';
+                if ($use_invoicing) {
+                    if ($CreditNote) {
+                        $output[] = '
+                            <a href="' . rex_url::currentBackendPage([
+                                'table_name' => $table,
+                                'data_id'    => $CreditNote->getId(),
+                                'func'       => 'edit',
+                                'ts'         => time(),
+                            ]) . '" class="btn btn-primary">
+                                <i class="fa fa-money"></i>&nbsp;
+                                ' . rex_i18n::msg('action.goto_creditnote') . '
+                            </a>
+                        ';
+                    } else {
+                        $output[] = '
+                            <a href="' . rex_url::currentBackendPage([
+                                'table_name' => $table,
+                                'data_id'    => $main_id,
+                                'func'       => rex_request('func', 'string'),
+                                'ss-action'  => 'generate_creditnote',
+                                'ts'         => time(),
+                            ]) . '" class="btn btn-default">
+                                <i class="fa fa-money"></i>&nbsp;
+                                ' . rex_i18n::msg('label.generate_creditnote') . '
+                            </a>
+                        ';
+                    }
                 }
             } else if ($Order->valueIsset('ref_order_id')) {
                 $output[] = '
