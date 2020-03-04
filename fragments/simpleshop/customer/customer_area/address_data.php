@@ -13,8 +13,9 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$address = $this->getVar('address');
-$Country = $address->valueIsset('country') ? Country::get($address->getValue('country')) : null;
+$address   = $this->getVar('address');
+$countryId = (int)$address->getValue('country');
+$Country   = $countryId > 0 ? Country::get($countryId) : null;
 
 
 echo $address->getName() . '<br>';

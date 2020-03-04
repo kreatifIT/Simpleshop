@@ -13,10 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$title    = $this->getVar('title');
-$address  = $this->getVar('address');
-$Country  = $address->valueIsset('country') ? Country::get($address->getValue('country')) : null;
-
 ?>
 <div class="cell margin-bottom">
     <div class="address">
