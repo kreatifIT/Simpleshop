@@ -20,6 +20,10 @@ var Simpleshop = (function ($) {
         $body = $('body');
         $offcanvasCart = $('.offcanvas-cart');
 
+        $('[data-init-form-toggle]').each(function() {
+            $(this).trigger('change');
+        });
+
         $body.click(function (event) {
             if ($body.hasClass('offcanvas-cart-open') && !$(event.target).closest('.offcanvas-cart').length) {
                 result.closeOffcanvasCart();
@@ -110,16 +114,20 @@ var Simpleshop = (function ($) {
         },
         changeCType: function (_this, selector) {
             var $this = $(_this),
-                $container = $this.parents(selector);
+                value = $this.val(),
+                $container = selector ? $this.parents(selector) : $this.parents('form');
 
-            if ($this.val() === 'person') {
-                $container.find('.company-field').addClass('hide');
-                $container.find('.person-field').removeClass('hide');
-            }
-            else {
-                $container.find('.person-field').addClass('hide');
-                $container.find('.company-field').removeClass('hide');
-            }
+            $container.find('[data-form-toggle]').each(function () {
+                var $field = $(this),
+                    data = $field.data('form-toggle'),
+                    values = data.split(',');
+
+                if (values.indexOf(value) < 0) {
+                    $field.addClass('hide');
+                } else {
+                    $field.removeClass('hide');
+                }
+            });
         },
         toggleVariant: function (_this, selector, event) {
             var $this = $(_this),
