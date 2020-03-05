@@ -27,6 +27,7 @@ $canAddItem = $this->getVar('canAddItem', true);
         <?php if ($canAddItem): ?>
             <a href="<?= rex_getUrl(null, null, [
                 'action'  => 'edit',
+                'ctrl'    => 'addresses.detail',
                 'data-id' => $Address->getId(),
             ]) ?>">###action.edit###</a>
             <br/>

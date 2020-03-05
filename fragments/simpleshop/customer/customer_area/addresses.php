@@ -23,7 +23,7 @@ $canAddItem = $User->hasPermission('fragment.customer-area--addresses--add-new')
     <?php if ($canAddItem && $action == 'edit'): ?>
         <?php
         $address_id = rex_get('data-id', 'int');
-        $back_url   = rex_getUrl();
+        $back_url   = rex_getUrl(null, null, ['ctrl' => 'addresses']);
         $Address    = $address_id ? CustomerAddress::get($address_id) : null;
 
         $this->setVar('Address', $Address);
