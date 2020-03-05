@@ -112,15 +112,15 @@ try {
         UPDATE rex_yform_field SET `table_name`="rex_shop_customer_address" WHERE table_name = "rex_shop_customer" AND name = "fiscal_code";
         UPDATE rex_yform_field SET `table_name`="rex_shop_customer_address" WHERE table_name = "rex_shop_customer" AND name = "vat_num";
         
-        UPDATE rex_yform_field SET list_hidden=1 WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "firstname";
-        UPDATE rex_yform_field SET list_hidden=1 WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "lastname";
-        UPDATE rex_yform_field SET list_hidden=1 WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "company_name";
+        UPDATE rex_yform_field SET list_hidden=1, attributes="{\"data-form-toggle\":\"person\"}" WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "firstname";
+        UPDATE rex_yform_field SET list_hidden=1, attributes="{\"data-form-toggle\":\"person\"}" WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "lastname";
+        UPDATE rex_yform_field SET list_hidden=1, attributes="{\"data-form-toggle\":\"company\"}" WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "company_name";
         UPDATE rex_yform_field SET db_type="int" WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "country";
         UPDATE rex_yform_field SET db_type="varchar(191)" WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "fiscal_code";
-        UPDATE rex_yform_field SET db_type="varchar(191)" WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "vat_num";
+        UPDATE rex_yform_field SET db_type="varchar(191)",, attributes="{\"data-form-toggle\":\"person\"}" WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "vat_num";
         UPDATE rex_yform_field SET type_name="empty", message="###error.field.empty###", validate_type=0 WHERE table_name = "rex_shop_customer_address" AND type_id = "validate" AND name = "firsname";
         UPDATE rex_yform_field SET type_name="empty", message="###error.field.empty###", validate_type=0 WHERE table_name = "rex_shop_customer_address" AND type_id = "validate" AND name = "lastname";
-        UPDATE rex_yform_field SET type_name="customfunction", message="###error.field.empty###", `function`=:customvalidation, params="{\"method\":\"empty-if\",\"dependencies\":[{\"field\":\"ctype\",\"value\":\"company\"}]}", validate_type=0 WHERE table_name = "rex_shop_customer_address" AND type_id = "validate" AND name = "company_name";
+        UPDATE rex_yform_field SET type_name="customfunction", message="###error.field.empty###", `function`=:customvalidation, params="{\"method\":\"empty-if\",\"dependencies\":[{\"field\":\"ctype\",\"value\":\"company\"}]}", validate_type=0, attributes="{\"onchange\":\"Simpleshop.changeCType(this)\",\"data-init-form-toggle\":\"1\"}" WHERE table_name = "rex_shop_customer_address" AND type_id = "validate" AND name = "company_name";
         UPDATE rex_yform_field SET type_name="customfunction", message="###error.field.fiscal_code_not_valid####", `function`=:customvalidation, params="{\"method\":\"fiscal_code\",\"dependencies\":[{\"field\":\"ctype\",\"value\":\"person\"},{\"field\":\"country\",\"value\":93,\"valueFrom\":\"post\"}]}", validate_type=0 WHERE table_name = "rex_shop_customer_address" AND type_id = "validate" AND name = "fiscal_code";
         UPDATE rex_yform_field SET type_name="customfunction", message="###error.field.vat_not_valid####", `function`=:customvalidation, params="{\"method\":\"vat_num\",\"dependencies\":[{\"field\":\"ctype\",\"value\":\"company\"}]}", validate_type=0 WHERE table_name = "rex_shop_customer_address" AND type_id = "validate" AND name = "vat_num";
     ', ['customvalidation' => '\FriendsOfREDAXO\Simpleshop\Customer::customValidateField']);
