@@ -38,13 +38,7 @@ class CheckoutController extends Controller
         $this->verifyParams(['action']);
 
         if (!Customer::isLoggedIn()) {
-            $config = FragmentConfig::getValue('auth');
-
-            if ($config['has_registration']) {
-                $this->fragment_path[] = 'simpleshop/customer/auth/register_login.php';
-            } else {
-                $this->fragment_path[] = 'simpleshop/customer/auth/login.php';
-            }
+            $this->fragment_path[] = 'simpleshop/customer/auth/login.php';
             return $this;
         }
 
