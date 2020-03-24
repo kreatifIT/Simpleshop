@@ -17,34 +17,10 @@ rex_dir::create(rex_path::addonData('simpleshop', 'packing_lists'), true);
 $sql             = rex_sql::factory();
 $migrations_done = $this->getConfig('migrations', []);
 $migrations      = glob($this->getPath('install') . '/db_migrations/*.php');
+$isInstalled     = $this->getConfig('installed');
 
 
-if ($this->getConfig('installed')) {
-    // for backward compatibility skip the initial migration file
-    $migrations_done[] = $this->getPath('install') . '/db_migrations/2019-06-06 09-00-00__init.php';
-}
-
-foreach ($migrations as $migration) {
-    if (in_array($migration, $migrations_done)) {
-        continue;
-    }
-
-    try {
-        $sql->beginTransaction();
-
-        include_once $migration;
-
-        $sql->commit();
-
-        $migrations_done[] = $migration;
-    } catch (ErrorException  $ex) {
-        $sql->rollBack();
-    }
-}
-$this->setConfig('migrations', $migrations_done);
-
-
-if (!$this->getConfig('installed')) {
+if (!$isInstalled) {
     $modules = glob(__DIR__ . '/install/module/*/');
 
     foreach ($modules as $module) {
@@ -87,3 +63,28 @@ if (!$this->getConfig('installed')) {
 
     $this->setConfig('installed', true);
 }
+
+
+if ($isInstalled) {
+    // for backward compatibility skip the initial migration file
+    $migrations_done[] = $this->getPath('install') . '/db_migrations/2019-06-06 09-00-00__init.php';
+}
+
+foreach ($migrations as $migration) {
+    if (in_array($migration, $migrations_done)) {
+        continue;
+    }
+
+    try {
+        $sql->beginTransaction();
+
+        include_once $migration;
+
+        $sql->commit();
+
+        $migrations_done[] = $migration;
+    } catch (ErrorException  $ex) {
+        $sql->rollBack();
+    }
+}
+$this->setConfig('migrations', $migrations_done);
