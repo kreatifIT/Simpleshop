@@ -62,29 +62,33 @@ if (!$isInstalled) {
     include_once __DIR__ . '/install/inc/mediatypes.inc.php';
 
     $this->setConfig('installed', true);
+    $this->setConfig('migration_bypass', 1);
 }
 
-
-if ($isInstalled) {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DO MIGRATIONS
+if ($isInstalled && (int)$this->getConfig('migration_bypass') < 1) {
     // for backward compatibility skip the initial migration file
     $migrations_done[] = $this->getPath('install') . '/db_migrations/2019-06-06 09-00-00__init.php';
 }
 
-foreach ($migrations as $migration) {
-    if (in_array($migration, $migrations_done)) {
-        continue;
+if ($isInstalled) {
+    foreach ($migrations as $migration) {
+        if (in_array($migration, $migrations_done)) {
+            continue;
+        }
+
+        try {
+            $sql->beginTransaction();
+
+            include_once $migration;
+
+            $sql->commit();
+
+            $migrations_done[] = $migration;
+        } catch (ErrorException  $ex) {
+            $sql->rollBack();
+        }
     }
-
-    try {
-        $sql->beginTransaction();
-
-        include_once $migration;
-
-        $sql->commit();
-
-        $migrations_done[] = $migration;
-    } catch (ErrorException  $ex) {
-        $sql->rollBack();
-    }
+    $this->setConfig('migrations', $migrations_done);
 }
-$this->setConfig('migrations', $migrations_done);
