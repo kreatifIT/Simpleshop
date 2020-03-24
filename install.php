@@ -20,7 +20,31 @@ $migrations      = glob($this->getPath('install') . '/db_migrations/*.php');
 $isInstalled     = $this->getConfig('installed');
 
 
-if (!$isInstalled) {
+if ($isInstalled) {
+    $migrations_done[] = $this->getPath('install') . '/db_migrations/2019-06-06 09-00-00__init.php';
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // DO MIGRATIONS
+    foreach ($migrations as $migration) {
+        if (in_array($migration, $migrations_done)) {
+            continue;
+        }
+
+        try {
+            $sql->beginTransaction();
+
+            include_once $migration;
+
+            $sql->commit();
+
+            $migrations_done[] = $migration;
+        } catch (ErrorException  $ex) {
+            $sql->rollBack();
+        }
+    }
+    $this->setConfig('migrations', $migrations_done);
+}
+else {
     $modules = glob(__DIR__ . '/install/module/*/');
 
     foreach ($modules as $module) {
@@ -50,6 +74,9 @@ if (!$isInstalled) {
         }
     }
 
+    // do basic db installation
+    include_once $this->getPath('install') . '/db_migrations/2019-06-06 09-00-00__init.php';
+
 
     // import tables
     $sql_files = glob($this->getPath('install') . '/sql/*.sql');
@@ -61,34 +88,7 @@ if (!$isInstalled) {
     // install media manager types
     include_once __DIR__ . '/install/inc/mediatypes.inc.php';
 
+    rex_delete_cache();
+
     $this->setConfig('installed', true);
-    $this->setConfig('migration_bypass', 1);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DO MIGRATIONS
-if ($isInstalled && (int)$this->getConfig('migration_bypass') < 1) {
-    // for backward compatibility skip the initial migration file
-    $migrations_done[] = $this->getPath('install') . '/db_migrations/2019-06-06 09-00-00__init.php';
-}
-
-if ($isInstalled) {
-    foreach ($migrations as $migration) {
-        if (in_array($migration, $migrations_done)) {
-            continue;
-        }
-
-        try {
-            $sql->beginTransaction();
-
-            include_once $migration;
-
-            $sql->commit();
-
-            $migrations_done[] = $migration;
-        } catch (ErrorException  $ex) {
-            $sql->rollBack();
-        }
-    }
-    $this->setConfig('migrations', $migrations_done);
 }
