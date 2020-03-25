@@ -17,7 +17,7 @@ use Sprog\Wildcard;
 
 class PayPalExpress extends PaymentAbstract
 {
-    const NAME                 = 'simpleshop.paypal_express';
+    const NAME                 = 'label.paypal_express';
     const API_VERSION          = '124.0';
     const SANDBOX_BASE_URL     = 'https://api-3t.sandbox.paypal.com/nvp/';
     const LIVE_BASE_URL        = 'https://api-3t.paypal.com/nvp/';

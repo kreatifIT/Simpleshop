@@ -15,13 +15,13 @@ $Order = $this->getVar('Order');
 $type  = $this->getVar('type');
 
 if ($type == 'invoice' && $Order->getValue('status') == 'CN') {
-    $title = '###simpleshop.credit_note###: ' . $Order->getInvoiceNum();
+    $title = '###label.credit_note###: ' . $Order->getInvoiceNum();
 }
 else if ($type == 'invoice') {
-    $title = '###simpleshop.invoice_num###: ' . $Order->getInvoiceNum();
+    $title = '###label.invoice_num###: ' . $Order->getInvoiceNum();
 }
 else {
-    $title = '###simpleshop.order_num###: ' . $Order->getId();
+    $title = '###label.order_num###: ' . $Order->getId();
 }
 
 ?>
@@ -38,7 +38,7 @@ else {
                     $CNOrder = \FriendsOfREDAXO\Simpleshop\Order::get($refOrderId);
                 }
                 ?>
-                ###simpleshop.credit_note_reference_info### <?= $CNOrder ? $CNOrder->getInvoiceNum() : '-' ?>
+                ###label.credit_note_reference_info### <?= $CNOrder ? $CNOrder->getInvoiceNum() : '-' ?>
             <?php endif; ?>
         </td>
         <td width="30%" valign="bottom" align="right">

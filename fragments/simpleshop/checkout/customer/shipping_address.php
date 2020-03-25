@@ -32,7 +32,7 @@ $back_url          = $this->getVar('back_url');
                 <label class="custom-checkbox">
                     <input type="checkbox" name="shipping_address_is_idem" value="1" <?= $useShAddress ? '' : 'checked="checked"' ?>
                            onchange="Simpleshop.toggleShipping(this, '.shipping-form|.address-wrapper', true)"/>
-                    ###simpleshop.shipping_address_is_idem###
+                    ###label.shipping_address_is_idem###
                     <span class="checkbox"></span>
                 </label>
             </div>

@@ -1,0 +1,169 @@
+simpleshop.error.cart_product_not_available;{{replace}} al momento non disponibile e pertanto è stato rimosso dal carrello
+simpleshop.error.cart_product_not_exists;{{replace}} Prodotto/i non esistono più e quindi è stato cancellato dal carrello
+simpleshop.packing_list_title;###simpleshop.shipping_document### no. {NUM}
+action.abort;Cancella
+action.use_coupon;Applica codice promo
+shop.order_status_CA;annullato
+shop.order_status_CL;completato
+action.logout;Esci
+simpleshop.account_area_account;Account
+label.address;Indirizzo
+action.add_address;Aggiungi indirizzo
+simpleshop.account_area_addresses;Indirizzi
+label.address_additional;Informazione aggiuntiva
+label.all;tutti
+label.province;Provincia
+label.customer_type;Sono una...
+label.applied;applicato
+action.login;Accedi
+error.login_failed;Accesso non riuscito
+action.add_to_wishlist;aggiungi ai preferiti
+label.bank_transfer ;Bonifico bancario
+action.edit;modificare
+label.description;Descrizione
+label.order_date;Data dell'ordine
+label.order_num;No. ordine
+label.order;Order
+label.order_placed;Ordine completo
+simpleshop.email.order_complete;Ordine completo
+simpleshop.account_area_orders;Ordini
+label.credit_note_reference_info;Riferendosi alla fattura n
+error.field.empty;Si prega di compilare il campo '{{fieldname}}'
+error.insert_company_name;Inserire ragione sociale
+error.insert_lastname;Inserire cognome
+error.insert_firstname;Inserire nome
+error.insert_email;Inserire indirizzo e-mail
+error.insert_location;Inserire luogo
+error.insert_postal;Inserire codice postale
+error.insert_street;Inserire nome strada
+error.email_not_valid;Inserire un indirizzo e-mail valido
+error.field.email_not_valid;Inserire un indirizzo e-mail valido
+error.field.vat_not_valid;Si prega di inserire una P. IVA valida
+error.field.fiscal_code_not_valid;Si prega di inserire un codice fiscale valido
+error.field.checkbox_not_set;Si prega di verificare la casella '{{fieldname}}'
+label.banktransfer_order_complete_text;"Ti preghiamo di trasferire il totale di {{total}} al conto corrente sottostante avente causale: ""Ordine {{order_id}}"".  Appena la somma sarà trasferita, l'ordine sarà gestito.
+
+Südtiroler Volksbank
+IBAN: IT06 D058 5611 6010 5057 1362 397
+SWIFT-BIC: BPAAIT2B050"
+error.field.no_option_selected;Prego selezionare un'opzione - '{{fieldname}}'
+label.shipping_document;Lieferschein
+label.insert_coupon;Entra codice promozionale
+error.password_policy;La password deve contenere almeno 8 caratteri di cui almeno 1 lettera e 1 numero
+label.date;Data
+label.add_to_cart_success;L'articolo è stato aggiunto al tuo carrello con successo
+label.payment_cancelled;Il processo di pagamento è stato interrotto
+label.details;Dettagli
+simpleshop.order_complete_default_shipping_text;La merce le sarà spedita il prima possibile
+error.email_already_exists;Questo indirizzo e-mail è già stato registrato
+simpleshop.error.coupon_not_exists;Il codice di questo buono acquisto non esiste
+simpleshop.error.coupon_not_valid_anymore;Il codice di questo buono acquisto non è più valido
+label.email;E-mail
+label.units;Einheiten
+label.single_price;Prezzo unitario
+label.single_price_no_vat;Prezzo unitario (IVA escl.)
+simpleshop.error.order_has_no_product;Non ci sono articoli nel carrello
+simpleshop.error.shipping_no_price;Non ci sono prezzi di spedizione per l'ordine attuale. Ti pregiamo di contattarci direttamente.
+simpleshop.omest.orderslist_sent_subject;Es wurden {COUNT} Bestellungen an OMEST gesendet
+simpleshop.omest_shipping_ex;Corriere Espresso 
+simpleshop.omest_shipping;Spedizione express
+shop.order_status_FA;fallito
+label.company;Dita
+label.company_name;Ragione sociale
+label.total;Totale
+label.total_sum;Totale
+label.coupon;Buono acquisto
+label.redeem_coupon;Riscatta buono sconto
+simpleshop.error.coupon_not_yet_valid;Il codice di questo buono acquisto non è ancora attivo
+simpleshop.error.coupon_consumed;Il codice di questo buono acquisto è già stato usato
+label.credit_note;Nota da credito
+simpleshop.email.registration_text;Congratulazioni! Ti sei registrato con successo da ###company.name###. Quindi puoi accedere con le seguenti credenziali:
+privacy.accept_tos;Accetto le {{tos-link}}CGV{{tos-link}}.
+label.cancellation_terms;Accetto le {{cancellation-terms-link}}condizioni di recesso{{cancellation-terms-link}}.
+simpleshop.email.password_reset_text;La tua password è stata ripristinata. Puoi quindi accedere con le seguenti credenziali.
+simpleshop.your_order_num;Il suo ordine
+simpleshop.email.creditnote_text;Allegato trovi la nota da credito
+shop.order_status_IP;in preparazione
+action.add_to_cart;Aggiungi al carrello
+simpleshop.tax_included_value;{VALUE}% IVA incl.
+action.place_order;Acquista ora
+action.register;Registrati Qui
+label.no_products_in_cart;Non ci sono articoli nel carrello
+label.code;Codice
+label.account_data;Informazioni account
+label.nexi_credit_card ;Carta di credito
+label.country;Paese
+simpleshop.omest.orderslist_sent;"Gentile cliente,
+
+I seguenti ordini sono stati inviati a OMEST e saranno spediti alla prossima occasione:
+
+{ORDERS}"
+label.shipment_payment;Consegna e pagamento
+label.amount;Quantità
+label.tax;IVA
+label.tax_included;IVA incl.
+label.vat_short;Part. IVA
+label.lastname;Cognome
+label.name;Nome
+label.location;Città
+label.password;Password
+label.password_forgotten;Password dimenticata?
+simpleshop.email.user_password_reset;La tua password è stata ripristinata
+label.paypal_express;Paypal
+label.postal;CAP
+label.position_short;Pos.
+label.price;Prezzo
+label.private_person;Privato
+label.product;Prodotto
+label.product_not_available;Articolo non disponibile
+label.promotions;Promozioni
+label.discount;Sconto
+simpleshop.error.discountgroup_not_applyable_anymore;L'offerta promozionale a prezzi ridotti è cambiata
+label.invoice;Fattura
+label.invoice_address;Indirizzo di fatturazione
+label.invoice_num;Fattura n°
+simpleshop.registration_info_text;Registra il tuo account.
+simpleshop.account_area_rma;RMA
+simpleshop.shipping_pickup_point;Ritiro in azienda
+label.shipping_number;Numero della spedizione
+label.login_info_text;Hai già un account? Accedi qui.
+label.registration_sucessfull;La registrazione è avvenuta con successo. Puoi continuare/iniziare con i tuoi acquisti
+label.applied_promotion_text;Queste sono le tue offerte personali:
+simpleshop.error.tos_rma_not_accepted;Devi accettare le condizioni di vendita e di recesso
+simpleshop.order_complete_pickup_text;"Ti contatteremo appena la merce sarà pronta per il ritiro.
+
+Orari di apertura:
+Lunedì - Giovedì dalle 8:00 alle 17:00 
+Venerdì dalle 8:00 alle 14:00 (a richiesta anche più tardi)"
+label.are_required_fields;sono campi obbligatori
+action.save;salvare
+simpleshop.omest_shipping_ec;Standard / Economy
+label.shipping_default;Spedizione Standard
+label.status;Stato
+label.gross_total;Base imponibile
+label.fiscal_code;Codice fiscale
+label.street;Via
+label.overview;Übersicht
+label.keep_password_notice;Se desideri continuare con la password attuale, non compilare il campo
+label.shipping_address;Indirizzo di spedizione
+label.shipping_address_is_idem;L'indirizzo di trasporto è identico all'indirizzo di fatturazione
+label.shipping_method;Metodo di spedizione
+label.shipping_costs;Costi di spedizione
+shop.order_status_SH;spedito
+simpleshop.email.order_complete_text;Grazie, abbiamo ricevuto il suo ordine.
+simpleshop.error.cart_product_not_enough_amount;"Sono rimasti solo {{count}} pezzi di ""{{replace}}"" e ne abbiamo ridotto il numero nel carrello."
+label.firstname;Nome
+shop.order_status_OP;in attesa di pagamento
+action.go_ahead;Avanti
+label.continue_shopping;Continua acquistare
+label.load_more;carica di più
+action.continue_shopping;Continua acquistare
+notif.password_reset_msg;Se hai un account attivo presto riceverai un e-mail con la tua nuova password
+label.payment_method;Metodo di pagamento
+action.proceed_to_checkout;Procedi alla cassa
+action.go_back;Torna
+action.back_to_login;Torna al login
+action.back_to_overview;ritorna all'elenco
+action.reset;Ripristina
+label.subtotal;Subtotale
+simpleshop.error.wsconnector_exception;Connector error

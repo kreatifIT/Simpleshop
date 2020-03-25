@@ -23,12 +23,12 @@ if (count($products) == 0) {
 <table id="invoice-items" width="100%" cellpadding="8">
     <thead>
     <tr>
-        <td width="8%">###simpleshop.position_short###</td>
+        <td width="8%">###label.position_short###</td>
         <td width="14%">###label.code###</td>
         <td width="38%">###label.description###</td>
-        <td width="10%">###simpleshop.amount###</td>
-        <td width="15%">###simpleshop.single_price_no_vat###</td>
-        <td width="15%">###simpleshop.total_sum###</td>
+        <td width="10%">###label.amount###</td>
+        <td width="15%">###label.single_price_no_vat###</td>
+        <td width="15%">###label.total_sum###</td>
     </tr>
     </thead>
     <tbody>

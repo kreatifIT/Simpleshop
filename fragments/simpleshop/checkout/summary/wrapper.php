@@ -29,7 +29,7 @@ $shipping   = $Order->getValue('shipping');
 <div class="summary-wrapper">
 
     <div class="margin-top margin-bottom">
-        <h2>###simpleshop.summary_order###</h2>
+        <h2>###simpleshop.your_order_num###</h2>
     </div>
 
     <?php if (count($warnings)): ?>
@@ -84,8 +84,8 @@ $shipping   = $Order->getValue('shipping');
         <?php if ($promotions): ?>
             <div class="discounts margin-bottom">
 
-                <h3>###simpleshop.promotions###</h3>
-                <p>###simpleshop.applied_promotion_text###</p>
+                <h3>###label.promotions###</h3>
+                <p>###label.applied_promotion_text###</p>
                 <?php
                 foreach ($promotions as $promotion) {
                     $this->setVar('promotion', $promotion);
@@ -130,14 +130,14 @@ $shipping   = $Order->getValue('shipping');
                     <div class="terms-of-service text-right">
                         <div class="custom-checkbox align-right margin-small-bottom">
                             <label>
-                                *&nbsp;###simpleshop.accept_tos###
+                                *&nbsp;###privacy.accept_tos###
                                 <input name="tos_accepted" value="1" type="checkbox"/>
                                 <span class="checkbox"></span>
                             </label>
                         </div>
                         <div class="custom-checkbox align-right margin-small-bottom">
                             <label>
-                                *&nbsp;###simpleshop.cancellation_terms###
+                                *&nbsp;###label.cancellation_terms###
                                 <input name="rma_accepted" value="1" type="checkbox"/>
                                 <span class="checkbox"></span>
                             </label>

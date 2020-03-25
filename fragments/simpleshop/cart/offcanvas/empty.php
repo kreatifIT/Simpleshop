@@ -1,1 +1,1 @@
-<div class="offcanvas-cart-empty margin text-center">###simpleshop.no_products_in_cart###</div>
+<div class="offcanvas-cart-empty margin text-center">###label.no_products_in_cart###</div>

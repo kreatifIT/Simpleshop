@@ -60,7 +60,7 @@ unset($_GET['action']);
 
 $texts = [
     'registration_info_text' => \Wildcard::get('simpleshop.registration_info_text'),
-    'login_info_text'        => \Wildcard::get('simpleshop.login_info_text'),
+    'login_info_text'        => \Wildcard::get('label.login_info_text'),
     'pwd_recovery_info_text' => \Wildcard::get('simpleshop.pwd_recovery_info_text'),
 ];
 
@@ -98,7 +98,7 @@ $texts = [
                     <?php if ($Config['has_password_recovery']): ?>
                         <div class="login-form-passwort-reset">
                             <a class="text-link" href="javascript:;"
-                               onclick="Simpleshop.toggleAuth(this, '.recovery-form', '.login-form')">###action.reset_password###.</a>
+                               onclick="Simpleshop.toggleAuth(this, '.recovery-form', '.login-form')">###label.password_forgotten###.</a>
                         </div>
                     <?php endif; ?>
                 </div>

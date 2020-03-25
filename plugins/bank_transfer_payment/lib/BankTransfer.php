@@ -17,7 +17,7 @@ use Sprog\Wildcard;
 
 class BankTransfer extends PaymentAbstract
 {
-    const NAME = 'simpleshop.bank_transfer';
+    const NAME = 'label.bank_transfer';
 
     public function getName()
     {

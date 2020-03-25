@@ -19,6 +19,8 @@ $migrations_done = $this->getConfig('migrations', []);
 $migrations      = glob($this->getPath('install') . '/db_migrations/*.php');
 $isInstalled     = $this->getConfig('installed');
 
+\Sprog\Sync::ensureAddonWildcards($this);
+
 
 if ($isInstalled) {
     $migrations_done[] = $this->getPath('install') . '/db_migrations/2019-06-06 09-00-00__init.php';

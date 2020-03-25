@@ -440,7 +440,7 @@ class CheckoutController extends Controller
         }
 
         if ($this->Order->getValue('status') && rex_get('ca-info', 'int') == 1) {
-            $warnings[] = ['label' => '###simpleshop.payment_cancelled###'];
+            $warnings[] = ['label' => '###label.payment_cancelled###'];
         }
         Session::setCheckoutData('Order', $this->Order);
 

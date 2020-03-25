@@ -41,7 +41,7 @@ $prod_req_url = $this->getVar('product_request_url', '');
         <?php if ($config['is_disabled']): ?>
             <a class="add-to-cart disabled">
                 <i class="fa fa-exclamation" aria-hidden="true"></i>
-                <span>###simpleshop.product_not_available###</span>
+                <span>###label.product_not_available###</span>
             </a>
         <?php else: ?>
             <a class="add-to-cart <?= $config['css_class']['button'] ?>" href="javascript:;"

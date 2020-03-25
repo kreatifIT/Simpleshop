@@ -75,7 +75,7 @@ if ($is_giftcard) {
         <?php endif; ?>
     </td>
     <td class="cart-item-price-wrapper" <?= $styles['prod-td'] ?>>
-        <span class="label-mobile"><?= $useTaxPrices ? '###simpleshop.single_price###' : '###simpleshop.single_price_no_vat###' ?>:</span>
+        <span class="label-mobile"><?= $useTaxPrices ? '###label.single_price###' : '###label.single_price_no_vat###' ?>:</span>
         <strong>&euro;&nbsp;<?= format_price($price) ?></strong>
         <?php if ($discount): ?>
             <div class="product-discount"><?= $discount->getName() ?></div>

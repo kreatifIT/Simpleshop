@@ -24,7 +24,7 @@ $use_tax_prices = $this->getVar('use_tax_prices', true);
         <th class="img">###label.preview###</th>
     <?php endif; ?>
     <th class="name">###label.product###</th>
-    <th class="price"><?= $use_tax_prices ? '###simpleshop.single_price###' : '###simpleshop.single_price_no_vat###' ?></th>
+    <th class="price"><?= $use_tax_prices ? '###label.single_price###' : '###label.single_price_no_vat###' ?></th>
     <th class="amount">###label.amount###</th>
     <th class="total">###label.total###</th>
 </tr>

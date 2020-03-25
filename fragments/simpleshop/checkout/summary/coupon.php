@@ -21,7 +21,7 @@ $code = $this->getVar('coupon_code');
         <h3>###label.coupon###</h3>
         <input type="text" name="coupon" value="<?= $code ?>"/>
         <button type="submit" class="button coupon-btn" name="action" value="redeem_coupon">
-            ###simpleshop.redeem_coupon###
+            ###label.redeem_coupon###
         </button>
     </form>
 </div>

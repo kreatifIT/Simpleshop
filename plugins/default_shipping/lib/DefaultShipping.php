@@ -18,7 +18,7 @@ use Sprog\Wildcard;
 
 class DefaultShipping extends ShippingAbstract
 {
-    const NAME = 'simpleshop.shipping_default';
+    const NAME = 'label.shipping_default';
 
     protected $tax_percentage = 22;
 

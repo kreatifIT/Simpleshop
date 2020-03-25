@@ -1,0 +1,171 @@
+simpleshop.error.cart_product_not_available;{{replace}} ist zur Zeit nicht verfügbar und wurde deshalb aus der Einkaufstasche entfernt
+simpleshop.error.cart_product_not_exists;{{replace}} Produkt/e existieren nicht mehr und wurde/n deshalb aus der Einkaufstasche entfernt
+simpleshop.packing_list_title;###simpleshop.shipping_document### Nr. {NUM}
+action.abort;Abbrechen
+action.use_coupon;Coupon anwenden
+shop.order_status_CA;abgebrochen
+shop.order_status_CL;abgeschlossen
+action.logout;Abmelden
+simpleshop.account_area_account;Account
+label.address;Adresse
+action.add_address;Adresse hinzufügen
+simpleshop.account_area_addresses;Adressen
+label.address_additional;Adresszusatz
+label.customer_type;Ich bin eine...
+label.all;alle
+label.province;Provinz
+label.applied;angewandt
+action.login;Anmelden
+error.login_failed;Anmeldung ist fehlgeschlagen
+action.add_to_wishlist;auf meine wunschliste
+label.bank_transfer ;Banküberweisung
+action.edit;bearbeiten
+label.description;Beschreibung
+label.order_date;Bestelldatum
+label.order_num;Bestellnummer
+label.order;Bestellung
+label.order_placed;Bestellung abgeschlossen
+simpleshop.email.order_complete;Bestellung erfolgreich
+simpleshop.account_area_orders;Bestellungen
+label.credit_note_reference_info;Bezugnehmend auf Rechnung Nr.
+error.field.empty;Bitte füllen Sie das Feld '{{fieldname}}' aus
+error.insert_company_name;Bitte geben Sie den Firmennamen ein
+error.insert_lastname;Bitte geben Sie den Nachnamen ein
+error.insert_firstname;Bitte geben Sie den Vornamen ein
+error.insert_email;Bitte geben Sie die E-Mail-Adresse ein
+error.insert_location;Bitte geben Sie die Ortschaft ein
+error.insert_postal;Bitte geben Sie die PLZ ein
+error.insert_street;Bitte geben Sie die Straße ein
+error.email_not_valid;Bitte geben Sie eine gültige Email ein
+error.field.email_not_valid;Bitte geben Sie eine gültige Email ein
+error.field.vat_not_valid;Bitte geben Sie eine gültige MwSt.Nr. ein
+error.field.fiscal_code_not_valid;Bitte geben Sie eine gültige Steuernummer ein
+error.field.checkbox_not_set;Bitte setzen Sie das '{{fieldname}}'-Häckchen
+label.banktransfer_order_complete_text;"Bitte überweisen Sie den Betrag von {{total}} auf das unten genannten Konto mit dem Betreff: ""Bestellung {{order_id}}""
+Sobald die Zahlung eingeht, wird der Auftrag schnellstmöglich bearbeitet. 
+
+Südtiroler Volksbank
+IBAN: IT06 D058 5611 6010 5057 1362 397
+SWIFT-BIC: BPAAIT2B050"
+error.field.no_option_selected;Bitte wählen Sie eine Option - '{{fieldname}}'
+label.shipping_document;Bolla di consegna
+label.insert_coupon;Coupon-Code eingeben
+error.password_policy;Das Passwort muss min. 8 Zeichen lang sein und min. 1 einen Bustabe und min. 1 Zahl beinhalten
+label.date;Datum
+label.add_to_cart_success;Der Artikel wurde erfolgreich in die Einkaufstasche gelegt
+label.payment_cancelled;Der Bezahlvorgang wurde abgebrochen
+label.details;Details
+simpleshop.order_complete_default_shipping_text;Die Ware wird ihnen schnellstmöglich zugesendet
+error.email_already_exists;Diese E-Mail-Adresse ist bereits registriert
+simpleshop.error.coupon_not_exists;Dieser Gutschein-Code existiert nicht
+simpleshop.error.coupon_not_valid_anymore;Dieser Gutschein-Code ist nicht mehr gültig
+label.email;E-Mail
+label.units;Einheiten
+label.single_price;Einzelpreis
+label.single_price_no_vat;Einzelpreis (exkl. MwSt.)
+simpleshop.error.order_has_no_product;Es befinden sich keine Artikel in der Einkaufstasche
+simpleshop.error.shipping_no_price;Es ist kein Versandpreis für die gegenwärtige Bestellung verfügbar. Bitte kontaktieren Sie uns direkt.
+simpleshop.omest.orderslist_sent_subject;Es wurden {COUNT} Bestellungen an OMEST gesendet
+simpleshop.omest_shipping_ex;Express
+simpleshop.omest_shipping;Expressversand
+shop.order_status_FA;fehlgeschlagen
+label.company;Firma
+label.company_name;Firmenname
+label.total;Gesamt
+label.total_sum;Gesamtsumme
+label.coupon;Gutschein
+label.redeem_coupon;Gutschein einlösen
+simpleshop.error.coupon_not_yet_valid;Gutschein-Code ist noch nicht gültig
+simpleshop.error.coupon_consumed;Gutschein-Code wurde bereits benutzt
+label.credit_note;Gutschrift
+simpleshop.email.registration_text;Herzlichen Glückwunsch, Sie haben sich erfolgreich bei ###company.name### registriert und können sich nun mit folgenden Daten anmelden:
+privacy.accept_tos;Ich akzeptiere die {{tos-link}}Allgemeinen Geschäftsbedingungen{{tos-link}}.
+label.cancellation_terms;Ich bin mit den {{cancellation-terms-link}}Widerrufsbedingungen{{cancellation-terms-link}} einverstanden.
+simpleshop.email.password_reset_text;Ihr Passwort wurde soeben zurückgesetzt und Sie können sich nun mit den folgenden Zugangsdaten wieder anmelden.
+simpleshop.your_order_num;Ihre Bestellung
+simpleshop.email.creditnote_text;Im Anhang finden Sie die Gutschrift
+shop.order_status_IP;in Bearbeitung
+action.add_to_cart;In die Einkaufstasche
+simpleshop.tax_included_value;inkl. {VALUE}% MwSt.
+action.place_order;Jetzt kaufen
+action.register;Jetzt Registrieren
+label.no_products_in_cart;Keine Produkte in der Einkaufstasche
+label.code;Kodex
+label.account_data;Kontodaten
+label.nexi_credit_card ;Kreditkarte
+label.country;Land
+simpleshop.omest.orderslist_sent;"Liebe Kundin,
+
+folgende Bestellungen wurden an OMEST gesendet und werden bei nächster Gelegenheit versendet:
+
+{ORDERS}"
+label.shipment_payment;Lieferung & Bezahlung
+label.amount;Menge
+label.tax;MwSt.
+label.tax_included;MwSt. inkl.
+label.vat_short;MwSt. Nr.
+label.lastname;Nachname
+label.name;Name
+label.location;Ort
+label.password;Passwort
+label.password_forgotten;Passwort vergessen?
+simpleshop.email.user_password_reset;Passwort zurückgesetzt
+label.paypal_express;Paypal
+label.postal;PLZ
+label.position_short;Pos.
+label.price;Preis
+label.private_person;Privatperson
+label.product;Produkt
+label.product_not_available;Produkt ist nicht verfügbar
+label.promotions;Promotionen
+label.discount;Rabatt
+simpleshop.error.discountgroup_not_applyable_anymore;Rabatt-Promotion hat sich geändert
+label.invoice;Rechnung
+label.invoice_address;Rechnungsadresse
+label.invoice_num;Rechnungsnr.
+simpleshop.registration_info_text;Registrieren Sie ihren Account.
+simpleshop.account_area_rma;RMA
+simpleshop.shipping_pickup_point;Selbstabholung
+label.shipping_number;Sendungsnummer
+label.login_info_text;"Sie haben bereits einen Account? Log-In hier.
+"
+label.registration_sucessfull;Sie haben sich erfolgreich registriert und können weiter-/anfangen einzukaufen
+label.applied_promotion_text;Sie kommen in den Genuss folgender Promotionen:
+simpleshop.error.tos_rma_not_accepted;Sie müssen die Geschäftsbedingungen und die Widerrufsbelehrungen akzeptieren
+simpleshop.order_complete_pickup_text;"Sie werden von uns kontaktiert sobald die Ware in unserem Lager abholbereit ist.
+
+Öffnungszeiten: 
+Montag - Donnerstag 8:00 - 17:00 Uhr
+Freitag 8:00 - 14:00 Uhr (auf Anfrage auch später)"
+label.are_required_fields;sind Pflichtfelder
+action.save;speichern
+simpleshop.omest_shipping_ec;Standard / Economy
+label.shipping_default;Standardversand
+label.status;Status
+label.gross_total;Steuergrundlage
+label.fiscal_code;Steuernummer
+label.street;Straße
+label.overview;Übersicht
+label.keep_password_notice;Um das aktuelle Passwort beizubehalten, das Feld leer lassen
+label.shipping_address;Versandadresse
+label.shipping_address_is_idem;Versandadresse ist identisch mit der Rechnungsadresse
+label.shipping_method;Versandart
+label.shipping_costs;Versandkosten
+shop.order_status_SH;versendet
+simpleshop.email.order_complete_text;Vielen Dank, wir haben erfolgreich ihre Bestellung erhalten.
+simpleshop.error.cart_product_not_enough_amount;"Von ""{{replace}}"" sind nur noch {{count}} Stück verfügbar, deshalb wurde die Anzahl in der Einkaufstasche reduziert"
+label.firstname;Vorname
+shop.order_status_OP;warten auf Zahlung
+action.go_ahead;Weiter
+label.continue_shopping;Weiter einkaufen
+label.load_more;weitere laden
+action.continue_shopping;Weitershoppen
+notif.password_reset_msg;Wenn Sie ein aktives Konto besitzen, wurde Ihnen nun eine E-Mail mit dem neuen Passwort gesendet
+label.payment_method;Zahlungsmethode
+action.proceed_to_checkout;Zur Kasse gehen
+action.go_back;Zurück
+action.back_to_login;Zurück zum Login
+action.back_to_overview;zurück zur Übersicht
+action.reset;Zurücksetzen
+label.subtotal;Zwischensumme
+simpleshop.error.wsconnector_exception;Connector error

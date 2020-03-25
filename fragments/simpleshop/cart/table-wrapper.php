@@ -53,7 +53,7 @@ $hasCoupons  = FragmentConfig::getValue('cart.has_coupons');
                     <div class="coupon-input-container">
                         <input type="text" class="coupon-input" placeholder="###label.insert_coupon###" data-link="<?= rex_getUrl() ?>" value="<?= $coupon_code ?>">
                         <button class="button coupon-submit" type="submit" onclick="Simpleshop.applyCoupon(this, '.cart-coupon|.coupon-input', '[data-cart-container]');">
-                            <span>###label.use_coupon###</span>
+                            <span>###action.use_coupon###</span>
                             <i class="fal fa-chevron-circle-right"></i>
                         </button>
                     </div>
@@ -66,7 +66,7 @@ $hasCoupons  = FragmentConfig::getValue('cart.has_coupons');
                 <div class="checkout-summary-total">
                     <?php if ($discount > 0): ?>
                         <div class="subtotal">
-                            <span class="label">###simpleshop.subtotal###</span>
+                            <span class="label">###label.subtotal###</span>
                             <span class="price">&euro;&nbsp;<?= format_price(array_sum($totals)) ?></span>
                         </div>
 

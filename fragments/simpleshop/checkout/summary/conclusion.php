@@ -25,7 +25,7 @@ $promotions = (array)$Order->getValue('promotions');
 <div class="margin-bottom">
     <div class="checkout-summary-total">
         <div class="subtotal">
-            <span class="label">###simpleshop.subtotal###</span>
+            <span class="label">###label.subtotal###</span>
             <span class="price">&euro;&nbsp;<?= format_price(array_sum($net_prices)) ?></span>
         </div>
 
@@ -42,14 +42,14 @@ $promotions = (array)$Order->getValue('promotions');
 
         <?php if ($shipping): ?>
             <div class="shipping">
-                <span class="label">+ ###simpleshop.shipping_costs###</span>
+                <span class="label">+ ###label.shipping_costs###</span>
                 <span class="price">&euro;&nbsp;<?= format_price($shipping->getPrice($Order)) ?></span>
             </div>
         <?php endif; ?>
 
         <?php if (!$Order->isTaxFree()): ?>
             <div class="gross-price margin-small-top">
-                <span class="label">###simpleshop.brutto_total###</span>
+                <span class="label">###label.gross_total###</span>
                 <span class="price">&euro;&nbsp;<?= format_price(array_sum($net_prices) + ($shipping ? $shipping->getPrice($Order) : 0) - $discount) ?></span>
             </div>
 

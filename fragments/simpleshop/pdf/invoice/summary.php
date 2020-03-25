@@ -19,7 +19,7 @@ $summary        = $Order->getValue($config['show_tax_info'] ? 'net_prices' : 'br
     <?php if ($Order->getValue('status') != 'CN'): ?>
         <tr>
             <td>
-                ###simpleshop.subtotal###
+                ###label.subtotal###
             </td>
             <td align="right">
                 &euro;&nbsp;<?= format_price(array_sum($summary)) ?>
@@ -44,7 +44,7 @@ $summary        = $Order->getValue($config['show_tax_info'] ? 'net_prices' : 'br
         <?php if ($shipping): ?>
             <tr>
                 <td>
-                    + ###simpleshop.shipping_costs###
+                    + ###label.shipping_costs###
                 </td>
                 <td align="right">
                     &euro;&nbsp;<?= format_price($shipping_costs) ?>
@@ -55,7 +55,7 @@ $summary        = $Order->getValue($config['show_tax_info'] ? 'net_prices' : 'br
         <?php if ($config['show_tax_info'] && !$Order->isTaxFree()): ?>
             <tr>
                 <td>
-                    ###simpleshop.brutto_total###
+                    ###label.gross_total###
                 </td>
                 <td align="right">
                     &euro;&nbsp;<?= format_price(array_sum($summary) + $shipping_costs - $discount) ?>

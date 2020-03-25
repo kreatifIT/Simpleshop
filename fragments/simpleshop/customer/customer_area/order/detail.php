@@ -41,7 +41,7 @@ $Config['has_summary_footer'] = false;
         <a href="<?= rex_getUrl(null, null, ['ctrl' => $cur_area]) ?>">&laquo; ###action.back_to_overview###</a>
         <hr>
     </div>
-    <h1 class="heading">###simpleshop.order_num### <?= $order_id ?></h1>
+    <h1 class="heading">###label.order_num### <?= $order_id ?></h1>
 
     <?php
     $fragment = new \rex_fragment();

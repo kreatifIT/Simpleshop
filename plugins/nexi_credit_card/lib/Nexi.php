@@ -19,7 +19,7 @@ use Sprog\Wildcard;
 class Nexi extends PaymentAbstract
 {
     const TEST_ID          = 89027777;
-    const NAME             = 'simpleshop.nexi_credit_card';
+    const NAME             = 'label.nexi_credit_card';
     const SANDBOX_BASE_URL = 'https://ipg-test4.constriv.com';
     const LIVE_BASE_URL    = 'https://ipg.constriv.com';
 
