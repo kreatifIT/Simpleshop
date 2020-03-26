@@ -46,7 +46,7 @@ $back_url          = $this->getVar('back_url');
             <?php endif; ?>
 
             <?php if (count($addresses)): ?>
-                <h5>###simpleshop.use_existing_addredss###</h5>
+                <h5>###label.use_existing_addredss###</h5>
                 <div class="grid-x grid-margin-x shipping-addresses-wrapper margin-bottom" data-shipping-addresses>
                     <?php foreach ($addresses as $address): ?>
                         <div class="cell medium-6 large-4">
@@ -74,12 +74,12 @@ $back_url          = $this->getVar('back_url');
                     <label class="custom-checkbox">
                         <input type="checkbox" name="create_new_shipping_address" value="1" <?= $createNewShipping ? 'checked="checked"' : '' ?>
                                onchange="Simpleshop.toggleShipping(this, '.address-wrapper|.new-address-wrapper')"/>
-                        ###simpleshop.create_new_shipping_address###
+                        ###action.create_new_shipping_address###
                         <span class="checkbox"></span>
                     </label>
                 </div>
             <?php else: ?>
-                <h5>###simpleshop.create_new_shipping_address###</h5>
+                <h5>###action.create_new_shipping_address###</h5>
             <?php endif; ?>
             <div class="new-address-wrapper <?= count($addresses) && $createNewShipping != 1 ? 'hide' : '' ?>">
                 <?php
