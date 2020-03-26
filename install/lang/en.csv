@@ -14,6 +14,8 @@ label.address_additional;Address add-on
 label.all;All
 label.province;Province
 label.customer_type;I'm a...
+label.use_existing_addredss;Use existing address
+action.create_new_shipping_address;Create new shipping address
 label.applied;applied
 action.login;LOG IN
 error.login_failed;Log in failed

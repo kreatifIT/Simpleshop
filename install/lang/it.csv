@@ -14,6 +14,8 @@ label.address_additional;Informazione aggiuntiva
 label.all;tutti
 label.province;Provincia
 label.customer_type;Sono una...
+label.use_existing_addredss;Utilizzare l'indirizzo esistente
+action.create_new_shipping_address;Creare un nuovo indirizzo di consegna
 label.applied;applicato
 action.login;Accedi
 error.login_failed;Accesso non riuscito

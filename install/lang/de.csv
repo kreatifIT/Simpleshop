@@ -13,6 +13,8 @@ simpleshop.account_area_addresses;Adressen
 label.address_additional;Adresszusatz
 label.customer_type;Ich bin eine...
 label.all;alle
+label.use_existing_addredss;Bestehende Adresse verwenden
+action.create_new_shipping_address;Neue Lieferadresse anlegen
 label.province;Provinz
 label.applied;angewandt
 action.login;Anmelden
