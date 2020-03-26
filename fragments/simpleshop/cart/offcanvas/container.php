@@ -26,7 +26,7 @@ else: ?>
     <?php if ($product_added): ?>
         <div class="offcanvas-cart-success">
             <span class="check"><i class="far fa-check"></i></span>
-            <span class="description">###simpleshop.add_to_cart_success###</span>
+            <span class="description">###label.add_to_cart_success###</span>
         </div>
     <?php endif; ?>
 
