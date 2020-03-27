@@ -28,9 +28,8 @@ $contact_suffix    = $this->getVar('contact_suffix', '');
 <?= $contact_separator ?>
     <div class="contact-contact-data">
         ###company.phone###<br/>
-        ###company.fax###<br/>
         <br/>
         ###company.email###<br/>
-        ###company.website###
+        <?= rex_yrewrite::getCurrentDomain()->getUrl()  ?>
     </div>
 <?= $contact_suffix ?>
