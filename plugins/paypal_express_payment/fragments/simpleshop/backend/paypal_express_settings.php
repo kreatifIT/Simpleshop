@@ -55,19 +55,19 @@ $Settings = $this->getVar('Settings');
     <dl class="rex-form-group form-group">
         <dt>SANDBOX Username:</dt>
         <dd>
-            <input type="text" class="form-control" name="sandbox_username" value="<?= from_array($Settings, 'sandbox_username') ?>"/>
+            <input type="text" class="form-control" name="sandbox_username" value="<?= from_array($Settings, 'sandbox_username', 'a.platter_api1.kreatif.it') ?>"/>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
         <dt>SANDBOX Password:</dt>
         <dd>
-            <input type="password" class="form-control" name="sandbox_password" value="<?= from_array($Settings, 'sandbox_password') ?>"/>
+            <input type="password" class="form-control" name="sandbox_password" value="<?= from_array($Settings, 'sandbox_password', 'SJWM9HR9EN99X6CM') ?>"/>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
         <dt>SANDBOX Signature:</dt>
         <dd>
-            <input type="text" class="form-control" name="sandbox_signature" value="<?= from_array($Settings, 'sandbox_signature') ?>"/>
+            <input type="text" class="form-control" name="sandbox_signature" value="<?= from_array($Settings, 'sandbox_signature', 'AFcWxV21C7fd0v3bYYYRCpSSRl31ARXDgWffkSSamt2i3NX2u9LaqCXR') ?>"/>
         </dd>
     </dl>
 
