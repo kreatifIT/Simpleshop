@@ -13,34 +13,38 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Kreatif\Api;
 use Sprog\Wildcard;
+
 
 Utils::setCalcLocale();
 
 $errors   = [];
 $Order    = $this->getVar('Order');
+$api      = $this->getVar('Api');
 $Payment  = $Order->getValue('payment');
 $order_id = $Order->getValue('id');
 
-try
-{
+try {
     $url = $Payment->initPayment($order_id, $Order->getValue('total'), 'Order #' . $order_id);
-    header('Location: ' . $url);
-    exit();
-}
-catch (PaypalException $ex)
-{
-    switch ($ex->getCode())
-    {
+
+    if ($api && $api instanceof Api) {
+        $fragment = new \rex_fragment();
+        $fragment->setVar('payment', $Payment);
+        $api->response['html']        = $fragment->parse('simpleshop/checkout/payment/paypal_express_payment/redirect_info.php');
+        $api->response['redirectUrl'] = $url;
+    } else {
+        header('Location: ' . $url);
+        exit();
+    }
+} catch (PaypalException $ex) {
+    switch ($ex->getCode()) {
         default:
             $errors[] = $ex->getMessage();
             break;
     }
-}
-catch (WSConnectorException $ex)
-{
-    switch ($ex->getCode())
-    {
+} catch (WSConnectorException $ex) {
+    switch ($ex->getCode()) {
         case 1:
             $errors[] = strtr(Wildcard::get('error.ws_not_available'), ['{{service}}' => 'Paypal']);
             break;

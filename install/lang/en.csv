@@ -15,6 +15,7 @@ label.all;All
 label.province;Province
 label.customer_type;I'm a...
 label.use_existing_addredss;Use existing address
+label.redirect_to_plugin_payment_page;You are now directed to the payment interface of {NAME}
 action.create_new_shipping_address;Create new shipping address
 label.applied;applied
 action.login;LOG IN

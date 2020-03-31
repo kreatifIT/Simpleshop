@@ -15,6 +15,7 @@ label.all;tutti
 label.province;Provincia
 label.customer_type;Sono una...
 label.use_existing_addredss;Utilizzare l'indirizzo esistente
+label.redirect_to_plugin_payment_page;Ora sarete indirizzati all'interfaccia di pagamento di {NAME}
 action.create_new_shipping_address;Creare un nuovo indirizzo di consegna
 label.applied;applicato
 action.login;Accedi
