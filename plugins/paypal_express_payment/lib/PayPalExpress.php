@@ -36,12 +36,14 @@ class PayPalExpress extends PaymentAbstract
 
     public function initPayment($order_id, $total_amount, $order_descr, $show_cc = false)
     {
-        $Settings      = \rex::getConfig('simpleshop.PaypalExpress.Settings');
-        $prefix        = from_array($Settings, 'api_type', '');
-        $url           = $prefix == 'sandbox_' ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
-        $api_user      = from_array($Settings, $prefix . 'username', '');
-        $api_pwd       = from_array($Settings, $prefix . 'password', '');
-        $api_signature = from_array($Settings, $prefix . 'signature', '');
+        $Settings        = \rex::getConfig('simpleshop.PaypalExpress.Settings');
+        $shopConfig      = \rex::getConfig('simpleshop.Settings');
+        $prefix          = from_array($Settings, 'api_type', '');
+        $url             = $prefix == 'sandbox_' ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
+        $api_user        = from_array($Settings, $prefix . 'username', '');
+        $api_pwd         = from_array($Settings, $prefix . 'password', '');
+        $api_signature   = from_array($Settings, $prefix . 'signature', '');
+        $checkoutArticle = \rex_article::get($shopConfig['linklist']['checkout']);
 
 
         if ($api_signature == '' || $api_pwd == '' || $api_user == '') {
@@ -56,14 +58,14 @@ class PayPalExpress extends PaymentAbstract
             'PWD'       => $api_pwd,
             'SIGNATURE' => $api_signature,
 
-            'returnUrl' => rex_getUrl(null, null, ['action' => 'pay_process']),
-            'cancelUrl' => rex_getUrl(null, null, ['action' => 'cancelled']),
+            'returnUrl' => $checkoutArticle->getUrl(['action' => 'pay_process', 'ts' => time()]),
+            'cancelUrl' => $checkoutArticle->getUrl(['action' => 'cancelled', 'ts' => time()]),
 
             'PAYMENTREQUEST_0_PAYMENTREQUESTID' => $order_id,
-            'PAYMENTREQUEST_0_AMT'              => (float) number_format($total_amount, 2, '.', ''), // total payment (including tax + shipping)
+            'PAYMENTREQUEST_0_AMT'              => (float)number_format($total_amount, 2, '.', ''), // total payment (including tax + shipping)
             'PAYMENTREQUEST_0_CURRENCYCODE'     => 'EUR',
             'L_PAYMENTREQUEST_0_NAME0'          => $order_descr,
-            'L_PAYMENTREQUEST_0_AMT0'           => (float) number_format($total_amount, 2, '.', ''),
+            'L_PAYMENTREQUEST_0_AMT0'           => (float)number_format($total_amount, 2, '.', ''),
             'NOSHIPPING'                        => 1,
             'ALLOWNOTE'                         => 0,
             'L_PAYMENTTYPE0'                    => 'InstantOnly',
@@ -76,7 +78,9 @@ class PayPalExpress extends PaymentAbstract
             'LANDINGPAGE' => $show_cc ? 'Billing' : 'Login', // shows either credit card form OR Paypal Login page
         ];
 
-        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Paypal.initPaymentData', $data));
+        $data = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Paypal.initPaymentData', $data, [
+            'orderId' => $order_id,
+        ]));
 
         $sdata     = html_entity_decode(urldecode(http_build_query($data)));
         $Connector = new WSConnector($url);
@@ -93,18 +97,18 @@ class PayPalExpress extends PaymentAbstract
         if ($__response['ACK'] != 'Success') {
             Utils::log('Paypal.initPayment.response', $logMsg, 'ERROR', true);
             throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
-        }
-        else {
+        } else {
             Utils::log('Paypal.initPayment.response', $logMsg, 'INFO');
             $this->responses['initPayment'] = $__response;
             $Order                          = Session::getCurrentOrder();
             $Order->setValue('payment', Order::prepareData($this));
+            $Order->save();
         }
         // redirect to paypal
         return ($prefix == 'sandbox_' ? self::SANDBOX_REDIRECT_URL : self::LIVE_REDIRECT_URL) . $__response['TOKEN'];
     }
 
-    public function processPayment($token, $payer_id, $total_amount)
+    public function processPayment($token, $payer_id, $order)
     {
         $Settings      = \rex::getConfig('simpleshop.PaypalExpress.Settings');
         $prefix        = from_array($Settings, 'api_type', '');
@@ -113,6 +117,12 @@ class PayPalExpress extends PaymentAbstract
         $api_pwd       = from_array($Settings, $prefix . 'password', '');
         $api_signature = from_array($Settings, $prefix . 'signature', '');
 
+        if ($order instanceof Order) {
+            $totalAmount = $order->getValue('total');
+        } else {
+            $totalAmount = $order;
+            $order       = Order::create();
+        }
         $data = [
             'METHOD'   => 'DoExpressCheckoutPayment',
             'VERSION'  => self::API_VERSION,
@@ -124,9 +134,13 @@ class PayPalExpress extends PaymentAbstract
             'PWD'       => $api_pwd,
             'SIGNATURE' => $api_signature,
 
-            'PAYMENTREQUEST_0_AMT'          => (float) number_format($total_amount, 2, '.', ''),
+            'PAYMENTREQUEST_0_AMT'          => (float)number_format($totalAmount, 2, '.', ''),
             'PAYMENTREQUEST_0_CURRENCYCODE' => 'EUR',
         ];
+
+        $data = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Paypal.processPaymentData', $data, [
+            'orderId' => $order->getId(),
+        ]));
 
         $sdata     = html_entity_decode(urldecode(http_build_query($data)));
         $Connector = new WSConnector($url);
@@ -146,10 +160,9 @@ class PayPalExpress extends PaymentAbstract
                 Utils::log('Paypal.processPayment.response4', $logMsg, 'WARNING', true);
                 $this->responses['processPayment'] = $__response;
 
-                header('Location: '. $url .'?'. $sdata);
+                header('Location: ' . $url . '?' . $sdata);
                 exit;
-            }
-            else {
+            } else {
                 Utils::log('Paypal.processPayment.response3', $logMsg, 'ERROR', true);
                 throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
             }
@@ -160,8 +173,7 @@ class PayPalExpress extends PaymentAbstract
             ";
             Utils::log('Paypal.processPayment.response2', $logMsg, 'ERROR', true);
             throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
-        }
-        else {
+        } else {
             // log successful payment
             Utils::log('Paypal.processPayment.response1', $logMsg, 'INFO');
             $this->responses['processPayment'] = $__response;
