@@ -182,6 +182,7 @@ class PayPalExpress extends PaymentAbstract
             $Order->setValue('payment', Order::prepareData($this));
             // update status
             $Order->setValue('status', 'IP');
+            $Order->save();
         }
         return $__response;
     }
