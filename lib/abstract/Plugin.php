@@ -33,6 +33,23 @@ abstract class Plugin
         return self::getByClass(self::$plugins[static::$type][$name], $extension);
     }
 
+    public static function getByPackageName($name)
+    {
+        $inst = null;
+        $name = array_pop(explode('/', $name));
+
+        foreach (self::$plugins as $pluginType => $items) {
+            foreach ($items as $pluginName => $class) {
+                if ($pluginName === $name) {
+                    $plugin[$name] = $class;
+                    $inst = self::getByClass($class);
+                    break 2;
+                }
+            }
+        }
+        return $inst;
+    }
+
     public static function getByClass($class, $extension = '')
     {
         if (!array_key_exists($class, self::$classes[static::$type])) {
