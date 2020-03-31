@@ -28,24 +28,26 @@ class CheckoutController extends Controller
     {
         $this->params = array_merge([
             'show_steps_fragment' => true,
+            'needs_login'         => true,
             'Customer'            => Customer::getCurrentUser(),
         ], $this->params);
 
-        $this->products = Session::getCartItems(true);
-        $this->Order    = Session::getCurrentOrder();
+        $this->Order = Session::getCurrentOrder();
 
         $this->setVar('Order', $this->Order);
         $this->verifyParams(['action']);
 
-        if (!Customer::isLoggedIn()) {
+        if ($this->params['needs_login'] && !Customer::isLoggedIn()) {
             $this->fragment_path[] = 'simpleshop/customer/auth/login.php';
             return $this;
         }
 
-        if (count($this->products)) {
 
-            switch ($this->params['action']) {
-                default:
+        switch ($this->params['action']) {
+            default:
+                $this->products = Session::getCartItems(true);
+
+                if (count($this->products)) {
                     $currentStep = $this->getCurrentStep();
                     $doneSteps   = $this->getDoneSteps();
                     $backStep    = $doneSteps[array_search($currentStep, $doneSteps) - 1];
@@ -76,24 +78,24 @@ class CheckoutController extends Controller
                         case 'show-summary':
                             return $this->getSummaryView();
                     }
-                    break;
+                } else {
+                    // no products - redirect to shopping cart
+                    rex_redirect($this->settings['linklist']['cart'], null, ['ts' => time()]);
+                }
+                break;
 
-                case 'cancelled':
-                    return $this->cancelPayment();
+            case 'cancelled':
+                return $this->cancelPayment();
 
-                case 'complete':
-                    return $this->getCompleteView();
+            case 'complete':
+                return $this->getCompleteView();
 
-                case 'pay_process':
-                case 'pay-process':
-                    return $this->doPay();
+            case 'pay_process':
+            case 'pay-process':
+                return $this->doPay();
 
-                case 'init-payment':
-                    return $this->initPayment();
-            }
-        } else {
-            // no products - redirect to shopping cart
-            rex_redirect($this->settings['linklist']['cart'], null, ['ts' => time()]);
+            case 'init-payment':
+                return $this->initPayment();
         }
     }
 
