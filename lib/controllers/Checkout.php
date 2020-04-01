@@ -487,9 +487,7 @@ class CheckoutController extends Controller
 
         $type = \FriendsOfREDAXO\Simpleshop\Utils::getSetting('use_invoicing', false) && $this->Order->getInvoiceNum() ? 'invoice' : 'order';
 
-        if (\rex_addon::get('kreatif-mpdf')
-            ->isAvailable()
-        ) {
+        if (FragmentConfig::$data['checkout']['generate_pdf']) {
             $PDF = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.setInvoicePDF', null, [
                 'type'  => $type,
                 'User'  => $Customer,

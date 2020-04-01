@@ -86,6 +86,7 @@ class FragmentConfig
                 'has_global_refresh_button' => false,
                 'has_edit_link'             => false,
             ],
+            'generate_pdf'         => null,
             'invoice_excl_fields'  => [],
             'shipping_excl_fields' => ['ctype', 'vat_num', 'fiscal_code'],
         ],
