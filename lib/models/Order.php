@@ -509,7 +509,6 @@ class Order extends Model
             return false;
         }
 
-        $content    = '';
         $fragment   = new \rex_fragment();
         $Mpdf       = $_Mpdf ?: new \Kreatif\Mpdf\Mpdf([
             'margin_left'   => 20,
@@ -533,8 +532,9 @@ class Order extends Model
         $fragment->setVar('Customer', $this->getInvoiceAddress());
         $fragment->setVar('Order', $this);
 
+
         // HEADER
-        $content .= $fragment->parse('simpleshop/pdf/invoice/header.php');
+        $content = $fragment->parse('simpleshop/pdf/invoice/header.php');
         // INVOICE DATA
         $content .= $fragment->parse('simpleshop/pdf/invoice/invoice_data.php');
         // ITEMS
@@ -547,6 +547,9 @@ class Order extends Model
         $fragment->setVar('content', $content, false);
         $html = $fragment->parse('simpleshop/pdf/invoice/wrapper.php');
 
+        list($Mpdf, $html) = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoicePDFContent', [$Mpdf, $html], [
+            'order' => $this,
+        ]));
         if ($debug) {
             echo \Wildcard::parse("<div style='background:#666;height:100vh;padding:20px;'><div style='max-width:800px;margin:0px auto;background:#fff;'>{$html}</div></div>");
             exit;
