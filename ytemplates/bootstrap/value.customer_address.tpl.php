@@ -29,10 +29,14 @@ $apiUrl      = rex_url::frontend('index.php?' . http_build_query(['rex-api-call'
                 KUNDE: [ID=<?= $customer->getId() ?>]
                 <?= $customer->getName(null, true) ?>
                 ---> ADRESSE: [ID=<?= $address->getId() ?>]
-                <?= $address->getName() ?>
-                | <?= $address->getValue('street') ?>
-                | <?= $address->getValue('postal') ?>
-                <?= $address->getValue('location') ?>
+                <?php
+                echo implode(' | ', array_unique(array_filter([
+                    $address->getName(),
+                    $address->getValue('street'),
+                    $address->getValue('postal'),
+                    $address->getValue('location'),
+                ])))
+                ?>
             </option>
         <?php endif; ?>
     </select>
