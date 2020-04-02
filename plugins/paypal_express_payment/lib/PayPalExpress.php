@@ -34,6 +34,29 @@ class PayPalExpress extends PaymentAbstract
         return parent::getName();
     }
 
+    public function getOrderByPaymentToken()
+    {
+        $order = null;
+        $token = trim(rex_request('token', 'string'));
+
+        if ($token != '') {
+            $stmt = Order::query();
+            $stmt->where('payment', "%{$token}%", 'LIKE');
+            $collection = $stmt->find();
+
+            foreach ($collection as $item) {
+                $payment = $item->getValue('payment');
+                $reponse = $payment->getValue('responses')['initPayment'];
+
+                if ($reponse['TOKEN'] == $token) {
+                    $order = $item;
+                    break;
+                }
+            }
+        }
+        return $order;
+    }
+
     public function initPayment($order_id, $total_amount, $order_descr, $show_cc = false)
     {
         $Settings        = \rex::getConfig('simpleshop.PaypalExpress.Settings');

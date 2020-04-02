@@ -35,6 +35,11 @@ abstract class PaymentAbstract extends PluginAbstract
         return $this->price;
     }
 
+    public function getOrderByPaymentToken()
+    {
+        return null;
+    }
+
     public function canBePayedNow()
     {
         return method_exists($this, 'initPayment');

@@ -28,6 +28,24 @@ class Order extends Model
         return $_this;
     }
 
+    public static function findByPaymentToken()
+    {
+        $order    = null;
+        $payments = Payment::getAll();
+
+        foreach ($payments as $payment) {
+            $order = $payment->getOrderByPaymentToken();
+
+            if ($order) {
+                break;
+            }
+        }
+        if (!$order){
+            $order = Session::getCurrentOrder();
+        }
+        return $order;
+    }
+
     public function getShippingAddress()
     {
         return $this->getValue('shipping_address') == '' ? $this->getValue('invoice_address') : $this->getValue('shipping_address');

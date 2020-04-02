@@ -545,7 +545,9 @@ class CheckoutController extends Controller
 
     protected function doPay()
     {
-        $payment               = $this->Order->getValue('payment');
+        $order   = Order::findByPaymentToken();
+        $payment = $order->getValue('payment');
+        $this->setVar('Order', $order);
         $this->fragment_path[] = 'simpleshop/checkout/payment/' . $payment->getValue('plugin_name') . '/payment_process.php';
     }
 }
