@@ -111,14 +111,16 @@ class Omest extends ShippingAbstract
         if ($response['response']['status'] <= 0) {
             Utils::log('Omest.calculatePriceFromOLC', $response['response']['message'] . "\n" . print_r($data, true) . "\n" . print_r($DAddress, true), 'Error', true);
             throw new OmestShippingException($response['response']['message'], 2);
-        }
-        else if ($response['response']['shipment']->price == '' || $response['response']['shipment']->price == '-') {
-            Utils::log('Omest.calculatePriceFromOLC', "No price found!\n" . print_r($data, true) . "\n" . print_r($DAddress, true), 'Error', true);
-            throw new OmestShippingException('', 3);
-        }
-        else {
+        } else if ($response['response']['shipment']->priceDetails->price == '' || $response['response']['shipment']->priceDetails->price == '-') {
+            if ($response['response']['shipment']->price == '' || $response['response']['shipment']->price == '-') {
+                Utils::log('Omest.calculatePriceFromOLC', "No price found!\n" . print_r($data, true) . "\n" . print_r($DAddress, true), 'Error', true);
+                throw new OmestShippingException('', 3);
+            } else {
+                return (float)$response['response']['shipment']->price;
+            }
+        } else {
             // return shipping costs
-            return (float) $response['response']['shipment']->price;
+            return (float)$response['response']['shipment']->priceDetails->price;
         }
     }
 
@@ -152,15 +154,7 @@ class Omest extends ShippingAbstract
                 'shippingServiceKey' => $extras['shipping']['service_key'],
                 'shipmentTypeKey'    => 'PARCEL',
                 'parcels'            => [],
-                'pickupAddress'      => [
-                    'pickupOMEST'  => $Settings['omest_pickup'],
-                    'companyName'  => $Settings['pickup_company_name'],
-                    'street'       => $Settings['pickup_street'],
-                    'city'         => $Settings['pickup_city'],
-                    'zipcode'      => $Settings['pickup_zip'],
-                    'countryCode'  => $Settings['pickup_country_code'],
-                    'warehouseKey' => $Settings['warehouse_key'],
-                ],
+                'pickupAddress'      => [],
                 'deliveryAddress'    => [
                     'personName'  => $DAddress->getName(),
                     'companyName' => $DAddress->getValue('company'),
@@ -173,6 +167,22 @@ class Omest extends ShippingAbstract
                     'email'       => $Customer ? $Customer->getValue('email') : $IAddress->getValue('email'),
                 ],
             ];
+
+            if (trim($Settings['warehouse_key']) == '') {
+                $data['pickupAddress'] = [
+                    'pickupOMEST'  => $Settings['omest_pickup'],
+                    'companyName'  => $Settings['pickup_company_name'],
+                    'street'       => $Settings['pickup_street'],
+                    'city'         => $Settings['pickup_city'],
+                    'zipcode'      => $Settings['pickup_zip'],
+                    'countryCode'  => $Settings['pickup_country_code'],
+                    'warehouseKey' => trim($Settings['warehouse_key']),
+                ];
+            } else {
+                $data['pickupAddress'] = [
+                    'warehouseKey' => trim($Settings['warehouse_key']),
+                ];
+            }
 
             foreach ($parcels as $parcel) {
                 $_parcel = [
