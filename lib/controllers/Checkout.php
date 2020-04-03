@@ -540,12 +540,18 @@ class CheckoutController extends Controller
     {
         $status = rex_get('status', 'string', 'completed');
 
+        if (!$this->Order->getId()) {
+            rex_redirect($this->settings['linklist']['cart'], null, ['ts' => time()]);
+        }
         try {
             if ($status == 'completed') {
                 // finally save order - DONE / COMPLETE
                 $this->Order->completeOrder();
                 $this->sendMail($this->params['debug']);
             }
+            \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.getCompleteView', $this, [
+                'status' => $status,
+            ]));
         } catch (OrderException $ex) {
             echo '<div class="row column"><div class="margin callout alert">' . $ex->getMessage() . '</div></div>';
             return;
