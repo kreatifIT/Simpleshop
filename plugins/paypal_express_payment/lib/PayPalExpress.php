@@ -212,7 +212,6 @@ class PayPalExpress extends PaymentAbstract
                 throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
             }
         }
-        $__response['PAYMENTINFO_0_PAYMENTSTATUS'] = 'Pending';
         if ($__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Completed' && $__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Pending') {
             $logMsg = "
                 The Payment with Transaction-ID = {$__response['PAYMENTINFO_0_TRANSACTIONID']} " . "has status = '{$__response['PAYMENTINFO_0_PAYMENTSTATUS']}'
