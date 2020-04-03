@@ -15,6 +15,8 @@ label.all;tutti
 label.province;Provincia
 label.customer_type;Sono una...
 label.use_existing_addredss;Utilizzare l'indirizzo esistente
+error.token_already_used_for_transaction;Il pagamento è già stato effettuato in un'altra transazione
+label.order_placed_but_pending;L'ordine è stato creato con successo ed è ancora in attesa del pagamento.
 label.redirect_to_plugin_payment_page;Ora sarete indirizzati all'interfaccia di pagamento di {NAME}
 action.create_new_shipping_address;Creare un nuovo indirizzo di consegna
 label.applied;applicato

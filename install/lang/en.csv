@@ -16,6 +16,8 @@ label.province;Province
 label.customer_type;I'm a...
 label.use_existing_addredss;Use existing address
 label.redirect_to_plugin_payment_page;You are now directed to the payment interface of {NAME}
+error.token_already_used_for_transaction;The payment has already been made in another transaction
+label.order_placed_but_pending;The order has been successfully created and is still waiting for payment to be completed.
 action.create_new_shipping_address;Create new shipping address
 label.applied;applied
 action.login;LOG IN

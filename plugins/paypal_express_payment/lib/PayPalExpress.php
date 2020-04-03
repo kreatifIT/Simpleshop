@@ -37,20 +37,41 @@ class PayPalExpress extends PaymentAbstract
     public function getOrderByPaymentToken()
     {
         $order = null;
-        $token = trim(rex_request('token', 'string'));
 
-        if ($token != '') {
-            $stmt = Order::query();
-            $stmt->where('payment', "%{$token}%", 'LIKE');
-            $collection = $stmt->find();
+        if (rex_get('listener', 'string') == 'ipn') {
+            $txnId = trim(rex_request('txn_id', 'string'));
 
-            foreach ($collection as $item) {
-                $payment = $item->getValue('payment');
-                $reponse = $payment->getValue('responses')['initPayment'];
+            if ($txnId != '') {
+                $stmt = Order::query();
+                $stmt->where('payment', "%{$txnId}%", 'LIKE');
+                $collection = $stmt->find();
 
-                if ($reponse['TOKEN'] == $token) {
-                    $order = $item;
-                    break;
+                foreach ($collection as $item) {
+                    $payment = $item->getValue('payment');
+                    $reponse = $payment->getValue('responses')['processPayment'];
+
+                    if ($reponse['PAYMENTINFO_0_TRANSACTIONID'] == $txnId) {
+                        $order = $item;
+                        break;
+                    }
+                }
+            }
+        } else {
+            $token = trim(rex_request('token', 'string'));
+
+            if ($token != '') {
+                $stmt = Order::query();
+                $stmt->where('payment', "%{$token}%", 'LIKE');
+                $collection = $stmt->find();
+
+                foreach ($collection as $item) {
+                    $payment = $item->getValue('payment');
+                    $reponse = $payment->getValue('responses')['initPayment'];
+
+                    if ($reponse['TOKEN'] == $token) {
+                        $order = $item;
+                        break;
+                    }
                 }
             }
         }
@@ -81,8 +102,9 @@ class PayPalExpress extends PaymentAbstract
             'PWD'       => $api_pwd,
             'SIGNATURE' => $api_signature,
 
-            'returnUrl' => $checkoutArticle->getUrl(['action' => 'pay_process', 'ts' => time()]),
-            'cancelUrl' => $checkoutArticle->getUrl(['action' => 'cancelled', 'ts' => time()]),
+            'returnUrl'            => $checkoutArticle->getUrl(['action' => 'pay_process', 'ts' => time()]),
+            'cancelUrl'            => $checkoutArticle->getUrl(['action' => 'cancelled', 'ts' => time()]),
+            'ipn_notification_url' => $checkoutArticle->getUrl(['action' => 'pay_process', 'listener' => 'ipn']),
 
             'PAYMENTREQUEST_0_PAYMENTREQUESTID' => $order_id,
             'PAYMENTREQUEST_0_AMT'              => (float)number_format($total_amount, 2, '.', ''), // total payment (including tax + shipping)
@@ -190,24 +212,101 @@ class PayPalExpress extends PaymentAbstract
                 throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
             }
         }
-        if ($__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Completed') {
+        $__response['PAYMENTINFO_0_PAYMENTSTATUS'] = 'Pending';
+        if ($__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Completed' && $__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Pending') {
             $logMsg = "
                 The Payment with Transaction-ID = {$__response['PAYMENTINFO_0_TRANSACTIONID']} " . "has status = '{$__response['PAYMENTINFO_0_PAYMENTSTATUS']}'
-            ";
+            " . $logMsg;
             Utils::log('Paypal.processPayment.response2', $logMsg, 'ERROR', true);
             throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
         } else {
             // log successful payment
             Utils::log('Paypal.processPayment.response1', $logMsg, 'INFO');
             $this->responses['processPayment'] = $__response;
-
-            $Order = Session::getCurrentOrder();
-            $Order->setValue('payment', Order::prepareData($this));
             // update status
-            $Order->setValue('status', 'IP');
-            $Order->save();
+            $order->setValue('payment', Order::prepareData($this));
+
+            if ($__response['PAYMENTINFO_0_PAYMENTSTATUS'] == 'Completed') {
+                $order->setValue('status', 'IP');
+            }
+            $order->save();
         }
-        return $__response;
+        return strtolower($__response['PAYMENTINFO_0_PAYMENTSTATUS']);
+    }
+
+    public function processAsyncIPN($order)
+    {
+        /*
+         * IPN Simulator
+         * https://developer.paypal.com/developer/ipnSimulator/
+         *
+         * um diese Funktion zu testen muss man im Simulator
+         * folgendes eingeben:
+         * IPN handler URL: <ipn_notification_url-welche-oben-angegeben-ist>
+         * Transaction Type: Express Checkout
+         * payment_status: Completed
+         * txn_id: <PAYMENTINFO_0_TRANSACTIONID--aus-der-Bestellungs-Response-von-paypal-entnehmen>
+         */
+        $Settings   = \rex::getConfig('simpleshop.PaypalExpress.Settings');
+        $prefix     = from_array($Settings, 'api_type', '');
+        $status     = rex_post('payment_status', 'string');
+        $useSandbox = $prefix == 'sandbox_';
+        $verified   = false;
+
+        $ipn = new \PaypalIPN();
+        $ipn->usePHPCerts();
+
+        if ($useSandbox) {
+            $ipn->useSandbox();
+        }
+        try {
+            $verified = $ipn->verifyIPN();
+        } catch (\Exception $ex) {
+            $logMsg = "
+                {$ex->getMessage()}
+                Response: " . print_r($_POST, true) . "
+            ";
+            Utils::log('Paypal.processAsyncIPN.response2' . ($_POST["test_ipn"] == 1 ? ' [Sandbox]' : ''), $logMsg, 'ERROR', true);
+        }
+
+        if ($verified) {
+            if ($status == 'Completed') {
+                $logMsg = "
+                    IPN Success
+                    Response: " . print_r($_POST, true) . "
+                ";
+                Utils::log('Paypal.processAsyncIPN.response1' . ($_POST["test_ipn"] == 1 ? ' [Sandbox]' : ''), $logMsg, 'INFO');
+                $this->responses['processAsyncIPN'] = $_POST;
+                // update status
+                $order->setValue('payment', Order::prepareData($this));
+                $order->setValue('status', 'IP');
+                $order->save();
+
+                \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Payment.asyncPayment', $order, [
+                    'payment' => $this,
+                ]));
+
+                CheckoutController::completeAsyncPayment($order);
+            } else {
+                $logMsg = "
+                    IPN Status was '{$status}'
+                    Response: " . print_r($_POST, true) . "
+                ";
+                Utils::log('Paypal.processAsyncIPN.response3' . ($_POST["test_ipn"] == 1 ? ' [Sandbox]' : ''), $logMsg, 'ERROR', true);
+            }
+        }
+
+        // responde to paypal
+        if ($verified) {
+            // Reply with an empty 200 response to indicate to paypal the IPN was received correctly.
+            \rex_response::cleanOutputBuffers();
+            \rex_response::setStatus(\rex_response::HTTP_OK);
+        } else {
+            file_put_contents(\rex_path::base('ipn.log'), (int)$verified, FILE_APPEND);
+            \rex_response::setStatus(\rex_response::HTTP_NOT_FOUND);
+            echo 'error';
+        }
+        exit;
     }
 }
 

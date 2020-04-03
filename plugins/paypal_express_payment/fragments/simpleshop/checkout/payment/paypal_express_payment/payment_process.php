@@ -24,10 +24,15 @@ $Order    = $this->getVar('Order');
 $Payment  = $Order->getValue('payment');
 $token    = rex_get('token', 'string');
 $payer_id = rex_get('PayerID', 'string');
+$listener = rex_get('listener', 'string');
 
 try {
-    $Payment->processPayment($token, $payer_id, $Order);
-    rex_redirect(null, null, ['action' => 'complete', 'ts' => time()]);
+    if ($listener == 'ipn') {
+        $Payment->processAsyncIPN($Order);
+    } else {
+        $status = $Payment->processPayment($token, $payer_id, $Order);
+        rex_redirect(null, null, ['action' => 'complete', 'status' => $status, 'ts' => time()]);
+    }
 } catch (PaypalException $ex) {
     switch ($ex->getCode()) {
         case 11607:

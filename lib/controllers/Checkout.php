@@ -518,23 +518,48 @@ class CheckoutController extends Controller
         }
     }
 
+    public static function completeAsyncPayment($order)
+    {
+        $_this = new self();
+        try {
+            $_this->Order = $order;
+            $_this->Order->completeOrder();
+            $_this->sendMail();
+        } catch (OrderException $ex) {
+            $logMsg = "
+                {$ex->getMessage()}
+                Uri: " . rex_server('REQUEST_URI', 'string') . " 
+                GET: " . print_r($_GET, true) . "
+                POST: " . print_r($_POST, true) . "
+            ";
+            Utils::log('Checkout.completeAsyncPayment', $logMsg, 'ERROR', true);
+        }
+    }
+
     protected function getCompleteView()
     {
-        // finally save order - DONE / COMPLETE
+        $status = rex_get('status', 'string', 'completed');
+
         try {
-            $this->Order->completeOrder();
+            if ($status == 'completed') {
+                // finally save order - DONE / COMPLETE
+                $this->Order->completeOrder();
+                $this->sendMail($this->params['debug']);
+            }
         } catch (OrderException $ex) {
             echo '<div class="row column"><div class="margin callout alert">' . $ex->getMessage() . '</div></div>';
             return;
         }
 
-        $this->sendMail($this->params['debug']);
-
         // CLEAR THE SESSION
         Session::clearCheckout();
         Session::clearCart();
 
-        $this->fragment_path[] = 'simpleshop/checkout/complete.php';
+        if ($status == 'completed') {
+            $this->fragment_path[] = 'simpleshop/checkout/complete.php';
+        } else {
+            $this->fragment_path[] = 'simpleshop/checkout/pending.php';
+        }
     }
 
     protected function initPayment()
@@ -546,8 +571,21 @@ class CheckoutController extends Controller
     protected function doPay()
     {
         $order   = Order::findByPaymentToken();
-        $payment = $order->getValue('payment');
-        $this->setVar('Order', $order);
-        $this->fragment_path[] = 'simpleshop/checkout/payment/' . $payment->getValue('plugin_name') . '/payment_process.php';
+        $payment = $order ? $order->getValue('payment') : null;
+
+        if ($payment) {
+            $this->setVar('Order', $order);
+            $this->fragment_path[] = 'simpleshop/checkout/payment/' . $payment->getValue('plugin_name') . '/payment_process.php';
+        } else {
+            $logMsg = "
+                Invalid Checkout request
+                Uri: " . rex_server('REQUEST_URI', 'string') . " 
+                GET: " . print_r($_GET, true) . "
+                POST: " . print_r($_POST, true) . "
+            ";
+            Utils::log('Checkout.doPay', $logMsg, 'ERROR', true);
+
+            echo '<div class="grid-container margin-top margin-bottom"><div class="cell"><div class="callout alert">Request not valid</div></div></div>';
+        }
     }
 }

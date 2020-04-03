@@ -13,7 +13,9 @@ simpleshop.account_area_addresses;Adressen
 label.address_additional;Adresszusatz
 label.customer_type;Ich bin eine...
 label.all;alle
+error.token_already_used_for_transaction;Die Zahlung wurde bereits in einer anderen Transaktion durchgeführt
 label.redirect_to_plugin_payment_page;Sie werden nun zur Bezahlschnittstelle von {NAME} geleitet
+label.order_placed_but_pending;Die Bestellung wurde erfolgreich erstellt und wartet noch auf den Abschluss der Zahlung.
 label.use_existing_addredss;Bestehende Adresse verwenden
 action.create_new_shipping_address;Neue Lieferadresse anlegen
 label.province;Provinz
