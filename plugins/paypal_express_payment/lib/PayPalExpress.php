@@ -15,6 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 use Sprog\Wildcard;
 
+
 class PayPalExpress extends PaymentAbstract
 {
     const NAME                 = 'label.paypal_express';
@@ -203,7 +204,6 @@ class PayPalExpress extends PaymentAbstract
         if ($__response['ACK'] != 'Success') {
             if ($__response['ERRORCODE0'] == 10486) {
                 Utils::log('Paypal.processPayment.response4', $logMsg, 'WARNING', true);
-                $this->responses['processPayment'] = $__response;
 
                 header('Location: ' . $url . '?' . $sdata);
                 exit;
@@ -212,7 +212,7 @@ class PayPalExpress extends PaymentAbstract
                 throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
             }
         }
-        if ($__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Completed' && $__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Pending') {
+        if ($__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Completed' && $__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Pending' && $__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Completed_Funds_Held') {
             $logMsg = "
                 The Payment with Transaction-ID = {$__response['PAYMENTINFO_0_TRANSACTIONID']} " . "has status = '{$__response['PAYMENTINFO_0_PAYMENTSTATUS']}'
             " . $logMsg;
@@ -221,15 +221,14 @@ class PayPalExpress extends PaymentAbstract
         } else {
             // log successful payment
             Utils::log('Paypal.processPayment.response1', $logMsg, 'INFO');
-            $this->responses['processPayment'] = $__response;
-            // update status
-            $order->setValue('payment', Order::prepareData($this));
-
             if ($__response['PAYMENTINFO_0_PAYMENTSTATUS'] == 'Completed') {
+                // update status
                 $order->setValue('status', 'IP');
             }
-            $order->save();
         }
+        $this->responses['processPayment'] = $__response;
+        $order->setValue('payment', Order::prepareData($this));
+        $order->save();
         return strtolower($__response['PAYMENTINFO_0_PAYMENTSTATUS']);
     }
 

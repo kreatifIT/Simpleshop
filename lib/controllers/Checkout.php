@@ -561,10 +561,16 @@ class CheckoutController extends Controller
         Session::clearCheckout();
         Session::clearCart();
 
-        if ($status == 'completed') {
-            $this->fragment_path[] = 'simpleshop/checkout/complete.php';
-        } else {
-            $this->fragment_path[] = 'simpleshop/checkout/pending.php';
+        switch ($status) {
+            case 'completed':
+                $this->fragment_path[] = 'simpleshop/checkout/complete.php';
+                break;
+
+            default:
+            case 'pending':
+            case 'completed_funds_held':
+                $this->fragment_path[] = 'simpleshop/checkout/pending.php';
+                break;
         }
     }
 
