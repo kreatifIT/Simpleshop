@@ -19,7 +19,7 @@ $url           = $this->getVar('url');
 $primary_color = $this->getVar('primary_color');
 
 ?>
-<p>###simpleshop.email.password_reset_text###</p>
+<p>###label.email__password_reset_text###</p>
 
 <p>
     <?php if (strlen($url)): ?>###label.website###: <a href="<?= $url ?>" style="color:<?= $primary_color ?>"><?= $url ?></a><?php endif; ?><br/>

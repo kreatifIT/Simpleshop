@@ -611,7 +611,7 @@ class Order extends Model
         // ITEMS
         $content .= $fragment->parse('simpleshop/pdf/packing_list/items.php');
 
-        $fragment->setVar('title', strtr(\Wildcard::parse(\Wildcard::get('simpleshop.packing_list_title')), ['{NUM}' => $refId]));
+        $fragment->setVar('title', strtr(\Wildcard::parse(\Wildcard::get('label.packing_list_title')), ['{NUM}' => $refId]));
         $fragment->setVar('content', $content, false);
         $html = $fragment->parse('simpleshop/pdf/invoice/wrapper.php');
 

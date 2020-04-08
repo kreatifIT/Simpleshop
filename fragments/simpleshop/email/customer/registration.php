@@ -21,7 +21,7 @@ $url_label     = $this->getVar('url_label', $url);
 $primary_color = $this->getVar('primary_color');
 
 ?>
-<p>###simpleshop.email.registration_text###</p>
+<p>###label.email__registration_text###</p>
 
 <table style="width:100%;">
     <?php if (strlen($url)): ?>

@@ -41,7 +41,7 @@ $back_url          = $this->getVar('back_url');
 
             <?php if ($useShAddress && !empty($_POST)): ?>
                 <div class="callout alert">
-                    ###simpleshop.error.choose_shipping_address###
+                    ###error.choose_shipping_address###
                 </div>
             <?php endif; ?>
 

@@ -50,7 +50,7 @@ if (count($orders)): ?>
     </table>
 <?php else: ?>
     <p class="margin-bottom">
-        <i>###simpleshop.no_orders###</i>
+        <i>###label.order_history_is_empty###</i>
     </p>
 <?php endif; ?>
 

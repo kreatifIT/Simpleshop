@@ -406,7 +406,7 @@ class CheckoutController extends Controller
                         $warnings[] = ['label' => $ex->getMessage()];
                     }
                 } else {
-                    $warnings[] = ['label' => '###simpleshop.error.tos_rma_not_accepted###'];
+                    $warnings[] = ['label' => '###error.tos_rma_not_accepted###'];
                 }
                 break;
             default:
@@ -462,7 +462,7 @@ class CheckoutController extends Controller
         $Settings = \rex::getConfig('simpleshop.Settings');
         $Customer = $this->Order->getValue('customer_data');
 
-        $Mail->Subject = '###simpleshop.email.order_complete###';
+        $Mail->Subject = '###label.email__order_complete###';
         $Mail->setFragmentPath('simpleshop/email/order/complete.php');
 
         // add vars

@@ -59,9 +59,9 @@ if (rex_get('referer', 'string') == 'return') {
 unset($_GET['action']);
 
 $texts = [
-    'registration_info_text' => \Wildcard::get('simpleshop.registration_info_text'),
+    'registration_info_text' => \Wildcard::get('label.registration_info_text'),
     'login_info_text'        => \Wildcard::get('label.login_info_text'),
-    'pwd_recovery_info_text' => \Wildcard::get('simpleshop.pwd_recovery_info_text'),
+    'pwd_recovery_info_text' => \Wildcard::get('label.pwd_recovery_info_text'),
 ];
 
 ?>

@@ -31,7 +31,7 @@ $canAddItem = $User->hasPermission('fragment.customer-area--addresses--add-new')
         $this->setVar('redirect_url', $back_url);
         $this->setVar('excluded_fields', ['office_id']);
         ?>
-        <h2><?= $address_id ? '###simpleshop.edit_address###' : '###simpleshop.new_address###' ?></h2>
+        <h2><?= $address_id ? '###label.edit_address###' : '###label.new_address###' ?></h2>
         <?php $this->subfragment('simpleshop/customer/customer_area/address_form.php'); ?>
     <?php else: ?>
         <?php
@@ -61,7 +61,7 @@ $canAddItem = $User->hasPermission('fragment.customer-area--addresses--add-new')
             </ul>
         <?php else: ?>
             <p class="margin-bottom">
-                <i>###simpleshop.no_address_available###</i>
+                <i>###label.no_address_available###</i>
             </p>
         <?php endif; ?>
 

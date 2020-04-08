@@ -1,16 +1,23 @@
-simpleshop.error.cart_product_not_available;{{replace}} is currently not available and has been removed from the shopping bag
-simpleshop.error.cart_product_not_exists;{{replace}} The chosen product/s do not exist anymore and, thus, have been removed from your Shopping Bag
-simpleshop.packing_list_title;###simpleshop.shipping_document### no. {NUM}
+error.cart_product_not_available;{{replace}} is currently not available and has been removed from the shopping bag
+error.cart_product_not_exists;{{replace}} The chosen product/s do not exist anymore and, thus, have been removed from your Shopping Bag
+label.packing_list_title;###lable.shipping_document### no. {NUM}
 action.abort;Abort
 action.use_coupon;Apply coupon
 shop.order_status_CA;cancelled
 shop.order_status_CL;closed
 action.logout;Sign Out
+label.edit_address;Edit address
+label.new_address;New address
 simpleshop.account_area_account;Account
 label.address;Address
 action.add_address;Add Address
+label.email__user_registration_subject;You have successfully registered
 simpleshop.account_area_addresses;Addresses
+label.no_address_available;No address available
+error.choose_shipping_address;Please select a shipping address
+label.no_permission;You have no access authorization for this area
 label.address_additional;Address add-on
+label.email__user_password_reset;Password reset
 label.all;All
 label.province;Province
 label.customer_type;I'm a...
@@ -19,6 +26,7 @@ label.redirect_to_plugin_payment_page;You are now directed to the payment interf
 error.token_already_used_for_transaction;The payment has already been made in another transaction
 label.order_placed_but_pending;The order has been successfully created and is still waiting for payment to be completed.
 action.create_new_shipping_address;Create new shipping address
+label.order_history_is_empty;Your order history is currently still empty
 label.applied;applied
 action.login;LOG IN
 error.login_failed;Log in failed
@@ -30,7 +38,7 @@ label.order_date;Order date
 label.order_num;Order no.
 label.order;Order
 label.order_placed;Order completed
-simpleshop.email.order_complete;Order completed
+label.email__order_complete;Order completed
 simpleshop.account_area_orders;Orders
 label.credit_note_reference_info;
 error.field.empty;Please complete the field '{{fieldname}}'
@@ -59,18 +67,19 @@ label.date;Date
 label.add_to_cart_success;The article has been successfully added to your shopping bag
 label.payment_cancelled;The payment process was aborted
 label.details;Details
-simpleshop.order_complete_default_shipping_text;The items will be sent as soon as possible
+label.order_complete_default_shipping_text;The items will be sent as soon as possible
 error.email_already_exists;This email address is already in use
-simpleshop.error.coupon_not_exists;This coupon-code does not exist
-simpleshop.error.coupon_not_valid_anymore;This coupon-code has expired
+error.coupon_not_exists;This coupon-code does not exist
+error.coupon_not_valid_anymore;This coupon-code has expired
 label.email;E-mail
 label.units;
 label.single_price;Single price
+error.shipping_zipcode_not_valid;The postal code is invalid
 label.single_price_no_vat;Single price (VAT excl.)
-simpleshop.error.order_has_no_product;There are no articles in the shopping bag
-simpleshop.error.shipping_no_price;There is no shipping-price for this order. Please contact us directly.
-simpleshop.omest.orderslist_sent_subject;Es wurden {COUNT} Bestellungen an OMEST gesendet
-simpleshop.omest_shipping_ex;Express
+error.order_has_no_product;There are no articles in the shopping bag
+error.shipping_no_price;There is no shipping-price for this order. Please contact us directly.
+label.omest_orderslist_sent_subject;Es wurden {COUNT} Bestellungen an OMEST gesendet
+label.omest_shipping_ex;Express
 simpleshop.omest_shipping;Express shipping
 shop.order_status_FA;failed
 label.company;Company
@@ -79,18 +88,17 @@ label.total;Total
 label.total_sum;Total
 label.coupon;Coupon
 label.redeem_coupon;Redeem your coupon
-simpleshop.error.coupon_not_yet_valid;This coupon-code is not active, yet
-simpleshop.error.coupon_consumed;This coupon-code has already been used
+error.coupon_not_yet_valid;This coupon-code is not active, yet
+error.coupon_consumed;This coupon-code has already been used
 label.credit_note;Credit note
-simpleshop.email.registration_text;Congratulations! You have successfully signed up to ###company.name### and can now access using the following login data:
+label.email__registration_text;Congratulations! You have successfully signed up to ###company.name### and can now access using the following login data:
 privacy.accept_tos;I accept the {{tos-link}}Terms & Conditions {{tos-link}}.
 label.cancellation_terms;I agree with the {{cancellation-terms-link}}cancellation terms{{cancellation-terms-link}}.
-simpleshop.email.password_reset_text;Your password has been reset. You can sign in with the following login data now.
+label.email__password_reset_text;Your password has been reset. You can sign in with the following login data now.
 simpleshop.your_order_num;Your order
-simpleshop.email.creditnote_text;Please find the credit note attached
+label.email__creditnote_text;Please find the credit note attached
 shop.order_status_IP;processing
 action.add_to_cart;Add To Shopping Bag
-simpleshop.tax_included_value;{VALUE}% VAT incl.
 action.place_order;Buy Now
 action.register;REGISTER
 label.no_products_in_cart;There are no articles in the shopping bag
@@ -98,7 +106,7 @@ label.code;Code
 label.account_data;Account data
 label.nexi_credit_card ;Credit Card
 label.country;Country
-simpleshop.omest.orderslist_sent;"Dear customer. The following orders have been placed,
+label.omest_orderslist_sent;"Dear customer. The following orders have been placed,
 
 The following orders have been sent to OMEST and will be shipped at the next opportunity:
 
@@ -113,7 +121,6 @@ label.name;Name
 label.location;City
 label.password;Password
 label.password_forgotten;Forgot your password?
-simpleshop.email.user_password_reset;Your password has been reset
 label.paypal_express;Paypal
 label.postal;ZIP
 label.position_short;Pos.
@@ -123,26 +130,27 @@ label.product;Product
 label.product_not_available;Product not in stock
 label.promotions;Promotions
 label.discount;Discount
-simpleshop.error.discountgroup_not_applyable_anymore;The promotional discount-offer has changed
+error.discountgroup_not_applyable_anymore;The promotional discount-offer has changed
 label.invoice;Invoice
 label.invoice_address;Billing Address
+label.pwd_recovery_info_text;Enter your email address and we will send you a new password.
 label.invoice_num;Invoice nr.
-simpleshop.registration_info_text;Register your personal account.
+label.registration_info_text;Register your personal account.
 simpleshop.account_area_rma;RMA
 simpleshop.shipping_pickup_point;Collection by the Customer
 label.shipping_number;Shipment number
 label.login_info_text;Already have an account? login here.
 label.registration_sucessfull;Your have successfully registered. You may continue/start your shopping tour
 label.applied_promotion_text;These are your promotions:
-simpleshop.error.tos_rma_not_accepted;You are required to accept the terms & conditions and the cancellation terms
-simpleshop.order_complete_pickup_text;"We will inform you as soon as the items are ready to be picked up.
+error.tos_rma_not_accepted;You are required to accept the terms & conditions and the cancellation terms
+label.order_complete_pickup_text;We will inform you as soon as the items are ready to be picked up.
 
 Business hours:
 Monday - Thursday from 8:00 to 17:00
 Friday from 8:00 to 14:00 (later possible by request)"
 label.are_required_fields;are required fields
 action.save;Save
-simpleshop.omest_shipping_ec;Standard / Economy
+label.omest_shipping_ec;Standard / Economy
 label.shipping_default;Standard Shipping
 label.status;Status
 label.gross_total;Tax Basis
@@ -155,8 +163,8 @@ label.shipping_address_is_idem;The shipping address is the same as the billing a
 label.shipping_method;Shipping Method
 label.shipping_costs;Shipping Costs
 shop.order_status_SH;shipped
-simpleshop.email.order_complete_text;Thank you, we have successfully received your order.
-simpleshop.error.cart_product_not_enough_amount;"There is only {{count}} pieces of ""{{replace}}"" left, hence we have reduced the number of articles in your shopping bag."
+label.email__order_complete_text;Thank you, we have successfully received your order.
+error.cart_product_not_enough_amount;"There is only {{count}} pieces of ""{{replace}}"" left, hence we have reduced the number of articles in your shopping bag."
 label.firstname;Firstname
 shop.order_status_OP;waiting for payment
 action.go_ahead;Proceed
@@ -171,4 +179,4 @@ action.back_to_login;Back to Log in
 action.back_to_overview;back to overview
 action.reset;Reset
 label.subtotal;
-simpleshop.error.wsconnector_exception;Connector error
+error.wsconnector_exception;Connector error

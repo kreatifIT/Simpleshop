@@ -14,4 +14,4 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 ?>
-<p class="text-center margin-bottom">###simpleshop.order_complete_default_shipping_text###</p>
+<p class="text-center margin-bottom">###label.order_complete_default_shipping_text###</p>

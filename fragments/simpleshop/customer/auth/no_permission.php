@@ -16,6 +16,6 @@ namespace FriendsOfREDAXO\Simpleshop;
 ?>
 <div class="no-permission">
     <h2 class="margin-large-top margin-large-bottom text-center">
-        ###simpleshop.no_permission###
+        ###label.no_permission###
     </h2>
 </div>

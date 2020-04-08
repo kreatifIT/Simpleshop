@@ -14,4 +14,4 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 ?>
-<p>###shop.email.creditnote_text###</p>
+<p>###label.email__creditnote_text###</p>

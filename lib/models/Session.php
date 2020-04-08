@@ -181,7 +181,7 @@ class Session extends Model
                     case 3:
                         // variant-combination does not exist
                         Session::removeProduct($key);
-                        self::$errors['cart_product_not_exists']['label']   = Wildcard::get('simpleshop.error.cart_product_not_exists');
+                        self::$errors['cart_product_not_exists']['label']   = Wildcard::get('error.cart_product_not_exists');
                         self::$errors['cart_product_not_exists']['replace'] += 1;
                         break;
 
@@ -190,7 +190,7 @@ class Session extends Model
                         Session::removeProduct($key);
                         list ($product_id, $feature_ids) = explode('|', trim($key, '|'));
                         $product        = Product::get($product_id);
-                        $label          = strtr(Wildcard::get('simpleshop.error.cart_product_not_available'), ['{{replace}}' => $product->getName()]);
+                        $label          = strtr(Wildcard::get('error.cart_product_not_available'), ['{{replace}}' => $product->getName()]);
                         self::$errors[] = ['label' => $label];
                         break;
 
@@ -199,7 +199,7 @@ class Session extends Model
                         $product = Product::getProductByKey($key, 0);
                         // update cart
                         Session::setProductData($key, $product->getValue('amount'));
-                        $label          = strtr(Wildcard::get('simpleshop.error.cart_product_not_enough_amount'), [
+                        $label          = strtr(Wildcard::get('error.cart_product_not_enough_amount'), [
                             '{{replace}}' => $product->getName(),
                             '{{count}}'   => $product->getValue('amount'),
                         ]);

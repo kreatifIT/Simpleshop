@@ -207,6 +207,6 @@ class WSConnectorException extends \Exception
 {
     public function getLabelByCode()
     {
-        return \Wildcard::get('simpleshop.error.wsconnector_exception');
+        return \Wildcard::get('error.wsconnector_exception');
     }
 }

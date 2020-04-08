@@ -137,7 +137,7 @@ class Customer extends Model
 
             $Mail          = new Mail();
             $do_send       = true;
-            $Mail->Subject = '###simpleshop.email.user_registration_subject###';
+            $Mail->Subject = '###label.email__user_registration_subject###';
             $Mail->setFragmentPath('simpleshop/email/customer/registration.php');
 
             // add vars
@@ -255,7 +255,7 @@ class Customer extends Model
 
             $Mail          = new Mail();
             $do_send       = true;
-            $Mail->Subject = '###simpleshop.email.user_password_reset###';
+            $Mail->Subject = '###label.email__user_password_reset###';
             $Mail->setFragmentPath('simpleshop/email/customer/password_reset.php');
 
             // add vars

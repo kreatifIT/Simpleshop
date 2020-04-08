@@ -49,7 +49,7 @@ class Omest extends ShippingAbstract
     public function getName()
     {
         if ($this->name == '') {
-            $this->name = "###simpleshop.omest_shipping_" . mb_strtolower($this->getValue('extension')) . "###";
+            $this->name = "###label.omest_shipping_" . mb_strtolower($this->getValue('extension')) . "###";
         }
         return parent::getName();
     }
@@ -178,7 +178,7 @@ class Omest extends ShippingAbstract
 
         $Mail          = new Mail();
         $orders        = [];
-        $Mail->Subject = strtr(Wildcard::get('simpleshop.omest.orderslist_sent_subject'), ['{COUNT}' => count($processed)]);
+        $Mail->Subject = strtr(Wildcard::get('label.omest_orderslist_sent_subject'), ['{COUNT}' => count($processed)]);
         $Mail->addAddress($clientMail);
 
         foreach ($processed as $item) {
@@ -189,7 +189,7 @@ class Omest extends ShippingAbstract
             }
         }
 
-        $Mail->setVar('body', strtr(Wildcard::get('simpleshop.omest.orderslist_sent'), ['{ORDERS}' => '<strong>' . implode('<br/>', $orders) . '</strong>']), false);
+        $Mail->setVar('body', strtr(Wildcard::get('label.omest_orderslist_sent'), ['{ORDERS}' => '<strong>' . implode('<br/>', $orders) . '</strong>']), false);
         $Mail->send();
 
 
@@ -381,19 +381,19 @@ class OmestShippingException extends \Exception
     {
         switch ($this->getCode()) {
             case 1:
-                $errors = '###simpleshop.error.order_has_no_product###';
+                $errors = '###error.order_has_no_product###';
                 break;
             case 2:
                 $msg = $this->getMessage();
 
                 if (preg_match('/zipcode (.*) invalid/', $msg)) {
-                    $errors = '###simpleshop.error.shipping_zipcode_not_valid###';
+                    $errors = '###error.shipping_zipcode_not_valid###';
                 } else {
                     $errors = $this->getMessage();
                 }
                 break;
             case 3:
-                $errors = '###simpleshop.error.shipping_no_price###';
+                $errors = '###error.shipping_no_price###';
                 break;
             case 4:
                 break;

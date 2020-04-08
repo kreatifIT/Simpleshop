@@ -26,7 +26,7 @@ $styles = FragmentConfig::getValue('email_styles');
 
 ?>
 <div class="order-complete-email">
-    <h2>###simpleshop.email.order_complete_text###</h2>
+    <h2>###label.email__order_complete_text###</h2>
 
     <?php
     if ($Payment) {

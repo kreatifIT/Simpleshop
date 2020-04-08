@@ -1,6 +1,6 @@
-simpleshop.error.cart_product_not_available;{{replace}} ist zur Zeit nicht verfügbar und wurde deshalb aus der Einkaufstasche entfernt
-simpleshop.error.cart_product_not_exists;{{replace}} Produkt/e existieren nicht mehr und wurde/n deshalb aus der Einkaufstasche entfernt
-simpleshop.packing_list_title;###simpleshop.shipping_document### Nr. {NUM}
+error.cart_product_not_available;{{replace}} ist zur Zeit nicht verfügbar und wurde deshalb aus der Einkaufstasche entfernt
+error.cart_product_not_exists;{{replace}} Produkt/e existieren nicht mehr und wurde/n deshalb aus der Einkaufstasche entfernt
+label.packing_list_title;###label.shipping_document### Nr. {NUM}
 action.abort;Abbrechen
 action.use_coupon;Coupon anwenden
 shop.order_status_CA;abgebrochen
@@ -8,6 +8,7 @@ shop.order_status_CL;abgeschlossen
 action.logout;Abmelden
 simpleshop.account_area_account;Account
 label.address;Adresse
+error.choose_shipping_address;Bitte eine Versandadresse auswählen
 action.add_address;Adresse hinzufügen
 simpleshop.account_area_addresses;Adressen
 label.address_additional;Adresszusatz
@@ -30,7 +31,7 @@ label.order_date;Bestelldatum
 label.order_num;Bestellnummer
 label.order;Bestellung
 label.order_placed;Bestellung abgeschlossen
-simpleshop.email.order_complete;Bestellung erfolgreich
+label.email__order_complete;Bestellung erfolgreich
 simpleshop.account_area_orders;Bestellungen
 label.credit_note_reference_info;Bezugnehmend auf Rechnung Nr.
 error.field.empty;Bitte füllen Sie das Feld '{{fieldname}}' aus
@@ -60,18 +61,19 @@ label.date;Datum
 label.add_to_cart_success;Der Artikel wurde erfolgreich in die Einkaufstasche gelegt
 label.payment_cancelled;Der Bezahlvorgang wurde abgebrochen
 label.details;Details
-simpleshop.order_complete_default_shipping_text;Die Ware wird ihnen schnellstmöglich zugesendet
+label.order_complete_default_shipping_text;Die Ware wird ihnen schnellstmöglich zugesendet
 error.email_already_exists;Diese E-Mail-Adresse ist bereits registriert
-simpleshop.error.coupon_not_exists;Dieser Gutschein-Code existiert nicht
-simpleshop.error.coupon_not_valid_anymore;Dieser Gutschein-Code ist nicht mehr gültig
+error.coupon_not_exists;Dieser Gutschein-Code existiert nicht
+error.coupon_not_valid_anymore;Dieser Gutschein-Code ist nicht mehr gültig
+label.email__user_registration_subject;Sie haben erfolgreich registriert
 label.email;E-Mail
 label.units;Einheiten
 label.single_price;Einzelpreis
 label.single_price_no_vat;Einzelpreis (exkl. MwSt.)
-simpleshop.error.order_has_no_product;Es befinden sich keine Artikel in der Einkaufstasche
-simpleshop.error.shipping_no_price;Es ist kein Versandpreis für die gegenwärtige Bestellung verfügbar. Bitte kontaktieren Sie uns direkt.
-simpleshop.omest.orderslist_sent_subject;Es wurden {COUNT} Bestellungen an OMEST gesendet
-simpleshop.omest_shipping_ex;Express
+error.order_has_no_product;Es befinden sich keine Artikel in der Einkaufstasche
+error.shipping_no_price;Es ist kein Versandpreis für die gegenwärtige Bestellung verfügbar. Bitte kontaktieren Sie uns direkt.
+label.omest_orderslist_sent_subject;Es wurden {COUNT} Bestellungen an OMEST gesendet
+label.omest_shipping_ex;Express
 simpleshop.omest_shipping;Expressversand
 shop.order_status_FA;fehlgeschlagen
 label.company;Firma
@@ -79,19 +81,22 @@ label.company_name;Firmenname
 label.total;Gesamt
 label.total_sum;Gesamtsumme
 label.coupon;Gutschein
+label.no_address_available;Keine Adresse verfügbar
+label.no_permission;Sie haben für diesen Bereich keine Zutrittsberechtigung
 label.redeem_coupon;Gutschein einlösen
-simpleshop.error.coupon_not_yet_valid;Gutschein-Code ist noch nicht gültig
-simpleshop.error.coupon_consumed;Gutschein-Code wurde bereits benutzt
+label.order_history_is_empty;Ihre Bestellhistorie ist zur Zeit noch leer
+error.coupon_not_yet_valid;Gutschein-Code ist noch nicht gültig
+error.coupon_consumed;Gutschein-Code wurde bereits benutzt
 label.credit_note;Gutschrift
-simpleshop.email.registration_text;Herzlichen Glückwunsch, Sie haben sich erfolgreich bei ###company.name### registriert und können sich nun mit folgenden Daten anmelden:
+label.email__registration_text;Herzlichen Glückwunsch, Sie haben sich erfolgreich bei ###company.name### registriert und können sich nun mit folgenden Daten anmelden:
 privacy.accept_tos;Ich akzeptiere die {{tos-link}}Allgemeinen Geschäftsbedingungen{{tos-link}}.
 label.cancellation_terms;Ich bin mit den {{cancellation-terms-link}}Widerrufsbedingungen{{cancellation-terms-link}} einverstanden.
-simpleshop.email.password_reset_text;Ihr Passwort wurde soeben zurückgesetzt und Sie können sich nun mit den folgenden Zugangsdaten wieder anmelden.
+label.email__user_password_reset;Passwort zurückgesetzt
+label.email__password_reset_text;Ihr Passwort wurde soeben zurückgesetzt und Sie können sich nun mit den folgenden Zugangsdaten wieder anmelden.
 simpleshop.your_order_num;Ihre Bestellung
-simpleshop.email.creditnote_text;Im Anhang finden Sie die Gutschrift
+label.email__creditnote_text;Im Anhang finden Sie die Gutschrift
 shop.order_status_IP;in Bearbeitung
 action.add_to_cart;In die Einkaufstasche
-simpleshop.tax_included_value;inkl. {VALUE}% MwSt.
 action.place_order;Jetzt kaufen
 action.register;Jetzt Registrieren
 label.no_products_in_cart;Keine Produkte in der Einkaufstasche
@@ -99,7 +104,7 @@ label.code;Kodex
 label.account_data;Kontodaten
 label.nexi_credit_card ;Kreditkarte
 label.country;Land
-simpleshop.omest.orderslist_sent;"Liebe Kundin,
+label.omest_orderslist_sent;"Liebe Kundin,
 
 folgende Bestellungen wurden an OMEST gesendet und werden bei nächster Gelegenheit versendet:
 
@@ -114,7 +119,6 @@ label.name;Name
 label.location;Ort
 label.password;Passwort
 label.password_forgotten;Passwort vergessen?
-simpleshop.email.user_password_reset;Passwort zurückgesetzt
 label.paypal_express;Paypal
 label.postal;PLZ
 label.position_short;Pos.
@@ -124,27 +128,30 @@ label.product;Produkt
 label.product_not_available;Produkt ist nicht verfügbar
 label.promotions;Promotionen
 label.discount;Rabatt
-simpleshop.error.discountgroup_not_applyable_anymore;Rabatt-Promotion hat sich geändert
+error.discountgroup_not_applyable_anymore;Rabatt-Promotion hat sich geändert
 label.invoice;Rechnung
 label.invoice_address;Rechnungsadresse
 label.invoice_num;Rechnungsnr.
-simpleshop.registration_info_text;Registrieren Sie ihren Account.
+label.registration_info_text;Registrieren Sie ihren Account.
+label.pwd_recovery_info_text;Geben Sie Ihre Email-Adresse ein, dann senden wir Ihnen ein neues Passwort zu.
 simpleshop.account_area_rma;RMA
 simpleshop.shipping_pickup_point;Selbstabholung
 label.shipping_number;Sendungsnummer
+label.edit_address;Adresse bearbeiten
+label.new_address;Neue Adresse
 label.login_info_text;"Sie haben bereits einen Account? Log-In hier.
 "
 label.registration_sucessfull;Sie haben sich erfolgreich registriert und können weiter-/anfangen einzukaufen
 label.applied_promotion_text;Sie kommen in den Genuss folgender Promotionen:
-simpleshop.error.tos_rma_not_accepted;Sie müssen die Geschäftsbedingungen und die Widerrufsbelehrungen akzeptieren
-simpleshop.order_complete_pickup_text;"Sie werden von uns kontaktiert sobald die Ware in unserem Lager abholbereit ist.
+error.tos_rma_not_accepted;Sie müssen die Geschäftsbedingungen und die Widerrufsbelehrungen akzeptieren
+label.order_complete_pickup_text;Sie werden von uns kontaktiert sobald die Ware in unserem Lager abholbereit ist.
 
 Öffnungszeiten: 
 Montag - Donnerstag 8:00 - 17:00 Uhr
 Freitag 8:00 - 14:00 Uhr (auf Anfrage auch später)"
 label.are_required_fields;sind Pflichtfelder
 action.save;speichern
-simpleshop.omest_shipping_ec;Standard / Economy
+label.omest_shipping_ec;Standard / Economy
 label.shipping_default;Standardversand
 label.status;Status
 label.gross_total;Steuergrundlage
@@ -157,8 +164,9 @@ label.shipping_address_is_idem;Versandadresse ist identisch mit der Rechnungsadr
 label.shipping_method;Versandart
 label.shipping_costs;Versandkosten
 shop.order_status_SH;versendet
-simpleshop.email.order_complete_text;Vielen Dank, wir haben erfolgreich ihre Bestellung erhalten.
-simpleshop.error.cart_product_not_enough_amount;"Von ""{{replace}}"" sind nur noch {{count}} Stück verfügbar, deshalb wurde die Anzahl in der Einkaufstasche reduziert"
+error.shipping_zipcode_not_valid;Die PLZ ist ungültig
+label.email__order_complete_text;Vielen Dank, wir haben erfolgreich ihre Bestellung erhalten.
+error.cart_product_not_enough_amount;"Von ""{{replace}}"" sind nur noch {{count}} Stück verfügbar, deshalb wurde die Anzahl in der Einkaufstasche reduziert"
 label.firstname;Vorname
 shop.order_status_OP;warten auf Zahlung
 action.go_ahead;Weiter
@@ -173,4 +181,4 @@ action.back_to_login;Zurück zum Login
 action.back_to_overview;zurück zur Übersicht
 action.reset;Zurücksetzen
 label.subtotal;Zwischensumme
-simpleshop.error.wsconnector_exception;Connector error
+error.wsconnector_exception;Connector error

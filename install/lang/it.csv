@@ -1,6 +1,6 @@
-simpleshop.error.cart_product_not_available;{{replace}} al momento non disponibile e pertanto è stato rimosso dal carrello
-simpleshop.error.cart_product_not_exists;{{replace}} Prodotto/i non esistono più e quindi è stato cancellato dal carrello
-simpleshop.packing_list_title;###simpleshop.shipping_document### no. {NUM}
+error.cart_product_not_available;{{replace}} al momento non disponibile e pertanto è stato rimosso dal carrello
+error.cart_product_not_exists;{{replace}} Prodotto/i non esistono più e quindi è stato cancellato dal carrello
+label.packing_list_title;###label.shipping_document### no. {NUM}
 action.abort;Cancella
 action.use_coupon;Applica codice promo
 shop.order_status_CA;annullato
@@ -10,7 +10,10 @@ simpleshop.account_area_account;Account
 label.address;Indirizzo
 action.add_address;Aggiungi indirizzo
 simpleshop.account_area_addresses;Indirizzi
+label.no_address_available;Nessun indirizzo disponibile
 label.address_additional;Informazione aggiuntiva
+error.choose_shipping_address;Selezionare un indirizzo di spedizione
+label.no_permission;Non hai nessuna autorizzazione di accesso per quest'area
 label.all;tutti
 label.province;Provincia
 label.customer_type;Sono una...
@@ -20,6 +23,7 @@ label.order_placed_but_pending;L'ordine è stato creato con successo ed è ancor
 label.redirect_to_plugin_payment_page;Ora sarete indirizzati all'interfaccia di pagamento di {NAME}
 action.create_new_shipping_address;Creare un nuovo indirizzo di consegna
 label.applied;applicato
+label.order_history_is_empty;Lo storico dei vostri ordini è ancora vuoto
 action.login;Accedi
 error.login_failed;Accesso non riuscito
 action.add_to_wishlist;aggiungi ai preferiti
@@ -30,7 +34,7 @@ label.order_date;Data dell'ordine
 label.order_num;No. ordine
 label.order;Order
 label.order_placed;Ordine completo
-simpleshop.email.order_complete;Ordine completo
+label.email__order_complete;Ordine completo
 simpleshop.account_area_orders;Ordini
 label.credit_note_reference_info;Riferendosi alla fattura n
 error.field.empty;Si prega di compilare il campo '{{fieldname}}'
@@ -59,18 +63,21 @@ label.date;Data
 label.add_to_cart_success;L'articolo è stato aggiunto al tuo carrello con successo
 label.payment_cancelled;Il processo di pagamento è stato interrotto
 label.details;Dettagli
-simpleshop.order_complete_default_shipping_text;La merce le sarà spedita il prima possibile
+label.order_complete_default_shipping_text;La merce le sarà spedita il prima possibile
 error.email_already_exists;Questo indirizzo e-mail è già stato registrato
-simpleshop.error.coupon_not_exists;Il codice di questo buono acquisto non esiste
-simpleshop.error.coupon_not_valid_anymore;Il codice di questo buono acquisto non è più valido
+error.coupon_not_exists;Il codice di questo buono acquisto non esiste
+error.coupon_not_valid_anymore;Il codice di questo buono acquisto non è più valido
+label.email__user_registration_subject;Ti sei registrato con successo
+label.email__user_password_reset;Reset della password
 label.email;E-mail
 label.units;Einheiten
 label.single_price;Prezzo unitario
+error.shipping_zipcode_not_valid;Il codice postale non è valido
 label.single_price_no_vat;Prezzo unitario (IVA escl.)
-simpleshop.error.order_has_no_product;Non ci sono articoli nel carrello
-simpleshop.error.shipping_no_price;Non ci sono prezzi di spedizione per l'ordine attuale. Ti pregiamo di contattarci direttamente.
-simpleshop.omest.orderslist_sent_subject;Es wurden {COUNT} Bestellungen an OMEST gesendet
-simpleshop.omest_shipping_ex;Corriere Espresso 
+error.order_has_no_product;Non ci sono articoli nel carrello
+error.shipping_no_price;Non ci sono prezzi di spedizione per l'ordine attuale. Ti pregiamo di contattarci direttamente.
+label.omest_orderslist_sent_subject;Es wurden {COUNT} Bestellungen an OMEST gesendet
+label.omest_shipping_ex;Corriere Espresso
 simpleshop.omest_shipping;Spedizione express
 shop.order_status_FA;fallito
 label.company;Dita
@@ -79,18 +86,17 @@ label.total;Totale
 label.total_sum;Totale
 label.coupon;Buono acquisto
 label.redeem_coupon;Riscatta buono sconto
-simpleshop.error.coupon_not_yet_valid;Il codice di questo buono acquisto non è ancora attivo
-simpleshop.error.coupon_consumed;Il codice di questo buono acquisto è già stato usato
+error.coupon_not_yet_valid;Il codice di questo buono acquisto non è ancora attivo
+error.coupon_consumed;Il codice di questo buono acquisto è già stato usato
 label.credit_note;Nota da credito
-simpleshop.email.registration_text;Congratulazioni! Ti sei registrato con successo da ###company.name###. Quindi puoi accedere con le seguenti credenziali:
+label.email__registration_text;Congratulazioni! Ti sei registrato con successo da ###company.name###. Quindi puoi accedere con le seguenti credenziali:
 privacy.accept_tos;Accetto le {{tos-link}}CGV{{tos-link}}.
 label.cancellation_terms;Accetto le {{cancellation-terms-link}}condizioni di recesso{{cancellation-terms-link}}.
-simpleshop.email.password_reset_text;La tua password è stata ripristinata. Puoi quindi accedere con le seguenti credenziali.
+label.email__password_reset_text;La tua password è stata ripristinata. Puoi quindi accedere con le seguenti credenziali.
 simpleshop.your_order_num;Il suo ordine
-simpleshop.email.creditnote_text;Allegato trovi la nota da credito
+label.email__creditnote_text;Allegato trovi la nota da credito
 shop.order_status_IP;in preparazione
 action.add_to_cart;Aggiungi al carrello
-simpleshop.tax_included_value;{VALUE}% IVA incl.
 action.place_order;Acquista ora
 action.register;Registrati Qui
 label.no_products_in_cart;Non ci sono articoli nel carrello
@@ -98,7 +104,7 @@ label.code;Codice
 label.account_data;Informazioni account
 label.nexi_credit_card ;Carta di credito
 label.country;Paese
-simpleshop.omest.orderslist_sent;"Gentile cliente,
+label.omest_orderslist_sent;"Gentile cliente,
 
 I seguenti ordini sono stati inviati a OMEST e saranno spediti alla prossima occasione:
 
@@ -113,7 +119,6 @@ label.name;Nome
 label.location;Città
 label.password;Password
 label.password_forgotten;Password dimenticata?
-simpleshop.email.user_password_reset;La tua password è stata ripristinata
 label.paypal_express;Paypal
 label.postal;CAP
 label.position_short;Pos.
@@ -123,26 +128,29 @@ label.product;Prodotto
 label.product_not_available;Articolo non disponibile
 label.promotions;Promozioni
 label.discount;Sconto
-simpleshop.error.discountgroup_not_applyable_anymore;L'offerta promozionale a prezzi ridotti è cambiata
+error.discountgroup_not_applyable_anymore;L'offerta promozionale a prezzi ridotti è cambiata
 label.invoice;Fattura
 label.invoice_address;Indirizzo di fatturazione
+label.pwd_recovery_info_text;Inserisci il tuo indirizzo e-mail e ti invieremo una nuova password.
 label.invoice_num;Fattura n°
-simpleshop.registration_info_text;Registra il tuo account.
+label.registration_info_text;Registra il tuo account.
 simpleshop.account_area_rma;RMA
+label.edit_address;Modifica indirizzo
+label.new_address;Nuovo indirizzo
 simpleshop.shipping_pickup_point;Ritiro in azienda
 label.shipping_number;Numero della spedizione
 label.login_info_text;Hai già un account? Accedi qui.
 label.registration_sucessfull;La registrazione è avvenuta con successo. Puoi continuare/iniziare con i tuoi acquisti
 label.applied_promotion_text;Queste sono le tue offerte personali:
-simpleshop.error.tos_rma_not_accepted;Devi accettare le condizioni di vendita e di recesso
-simpleshop.order_complete_pickup_text;"Ti contatteremo appena la merce sarà pronta per il ritiro.
+error.tos_rma_not_accepted;Devi accettare le condizioni di vendita e di recesso
+label.order_complete_pickup_text;Ti contatteremo appena la merce sarà pronta per il ritiro.
 
 Orari di apertura:
 Lunedì - Giovedì dalle 8:00 alle 17:00 
 Venerdì dalle 8:00 alle 14:00 (a richiesta anche più tardi)"
 label.are_required_fields;sono campi obbligatori
 action.save;salvare
-simpleshop.omest_shipping_ec;Standard / Economy
+label.omest_shipping_ec;Standard / Economy
 label.shipping_default;Spedizione Standard
 label.status;Stato
 label.gross_total;Base imponibile
@@ -155,8 +163,8 @@ label.shipping_address_is_idem;L'indirizzo di trasporto è identico all'indirizz
 label.shipping_method;Metodo di spedizione
 label.shipping_costs;Costi di spedizione
 shop.order_status_SH;spedito
-simpleshop.email.order_complete_text;Grazie, abbiamo ricevuto il suo ordine.
-simpleshop.error.cart_product_not_enough_amount;"Sono rimasti solo {{count}} pezzi di ""{{replace}}"" e ne abbiamo ridotto il numero nel carrello."
+label.email__order_complete_text;Grazie, abbiamo ricevuto il suo ordine.
+error.cart_product_not_enough_amount;"Sono rimasti solo {{count}} pezzi di ""{{replace}}"" e ne abbiamo ridotto il numero nel carrello."
 label.firstname;Nome
 shop.order_status_OP;in attesa di pagamento
 action.go_ahead;Avanti
@@ -171,4 +179,4 @@ action.back_to_login;Torna al login
 action.back_to_overview;ritorna all'elenco
 action.reset;Ripristina
 label.subtotal;Subtotale
-simpleshop.error.wsconnector_exception;Connector error
+error.wsconnector_exception;Connector error

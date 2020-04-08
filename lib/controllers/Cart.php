@@ -64,7 +64,7 @@ class CartController extends Controller
             }
         } else if ($coupon_code != '') {
             Session::setCheckoutData('coupon_code', null);
-            $errors[] = ['label' => '###simpleshop.error.coupon_not_exists###'];
+            $errors[] = ['label' => '###error.coupon_not_exists###'];
         }
 
         if (count($errors)) {
