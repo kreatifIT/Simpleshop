@@ -52,9 +52,9 @@ error.field.checkbox_not_set;Bitte setzen Sie das '{{fieldname}}'-Häckchen
 label.banktransfer_order_complete_text;"Bitte überweisen Sie den Betrag von {{total}} auf das unten genannten Konto mit dem Betreff: ""Bestellung {{order_id}}""
 Sobald die Zahlung eingeht, wird der Auftrag schnellstmöglich bearbeitet. 
 
-Südtiroler Volksbank
-IBAN: IT06 D058 5611 6010 5057 1362 397
-SWIFT-BIC: BPAAIT2B050"
+Bankname
+IBAN: ITXX XXX XXXX XXXX XXXX XXXX XXX
+SWIFT-BIC: XXXXXXXX"
 error.field.no_option_selected;Bitte wählen Sie eine Option - '{{fieldname}}'
 label.shipping_document;Bolla di consegna
 label.insert_coupon;Coupon-Code eingeben

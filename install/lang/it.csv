@@ -52,9 +52,9 @@ error.field.fiscal_code_not_valid;Si prega di inserire un codice fiscale valido
 error.field.checkbox_not_set;Si prega di verificare la casella '{{fieldname}}'
 label.banktransfer_order_complete_text;"Ti preghiamo di trasferire il totale di {{total}} al conto corrente sottostante avente causale: ""Ordine {{order_id}}"".  Appena la somma sarà trasferita, l'ordine sarà gestito.
 
-Südtiroler Volksbank
-IBAN: IT06 D058 5611 6010 5057 1362 397
-SWIFT-BIC: BPAAIT2B050"
+Bankname
+IBAN: ITXX XXX XXXX XXXX XXXX XXXX XXX
+SWIFT-BIC: XXXXXXXX"
 error.field.no_option_selected;Prego selezionare un'opzione - '{{fieldname}}'
 label.shipping_document;Lieferschein
 label.insert_coupon;Entra codice promozionale

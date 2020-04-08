@@ -58,9 +58,9 @@ error.field.fiscal_code_not_valid;Please enter a valid tax ID
 error.field.checkbox_not_set;Please place a check mark on '{{fieldname}}'
 label.banktransfer_order_complete_text;"Please transfer the total amount of {{total}} to the following bank account with reference: ""Order {{order_id}}"". As soon as the transfer will be completed, your order is going to be processed.
 
-Südtiroler Volksbank
-IBAN: IT06 D058 5611 6010 5057 1362 397
-SWIFT-BIC: BPAAIT2B050"
+Bankname
+IBAN: ITXX XXX XXXX XXXX XXXX XXXX XXX
+SWIFT-BIC: XXXXXXXX"
 error.field.no_option_selected;Please select an option - '{{fieldname}}'
 label.shipping_document;Bill of delivery
 label.insert_coupon;Insert coupon code
