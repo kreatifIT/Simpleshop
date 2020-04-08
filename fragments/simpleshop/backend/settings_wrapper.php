@@ -17,7 +17,7 @@ $_FUNC  = rex_post('func', 'string');
 $title  = $this->getVar('title', 'Simpleshop');
 $key    = $this->getVar('key');
 $path   = $this->getVar('fragment_path');
-$config = \rex::getConfig($key);
+$config = \rex::getConfig($key, []);
 
 echo \rex_view::title($title);
 
