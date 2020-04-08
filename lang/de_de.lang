@@ -1,5 +1,6 @@
 orders_export = Bestellungs-Export
 
+label.advanced_settings = Erweiterte Einstellungen
 label.overview = Übersicht
 label.category = Kategorie
 label.name = Bezeichnung
@@ -67,6 +68,7 @@ error.product_has_attribute = Das Produkt hat keine Eigenschaften zugewiesen. Kl
 error.product_has_no_attribute_but_variants = Das Produkt hat keine Eigenschaften zugewiesen, jedoch existieren aber Varianten mit folgenden Eigenschaften:
 
 settings.order_settings = Bestellungs-Einstellungen
+settings.min_order_value = Mindestbestellwert
 settings.page_mapping = Artikel-Mapping
 settings.order_notification_email = Email für neue Bestellungen
 settings.discount_settings = Rabatt-Einstellungen

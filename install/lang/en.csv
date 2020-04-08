@@ -16,6 +16,8 @@ simpleshop.account_area_addresses;Addresses
 label.no_address_available;No address available
 error.choose_shipping_address;Please select a shipping address
 label.no_permission;You have no access authorization for this area
+label.min_order_info;The total value of an order must be at least {VALUE}
+error.min_order_value;The minimum order value of {VALUE} was not reached
 label.address_additional;Address add-on
 label.email__user_password_reset;Password reset
 label.all;All

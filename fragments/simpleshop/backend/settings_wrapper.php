@@ -13,29 +13,30 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$_FUNC   = rex_post('func', 'string');
-$title   = $this->getVar('title', 'Simpleshop');
-$key     = $this->getVar('key');
-$path    = $this->getVar('fragment_path');
+$_FUNC  = rex_post('func', 'string');
+$title  = $this->getVar('title', 'Simpleshop');
+$key    = $this->getVar('key');
+$path   = $this->getVar('fragment_path');
+$config = \rex::getConfig($key);
 
 echo \rex_view::title($title);
 
-if ($_FUNC == 'save')
-{
+if ($_FUNC == 'save') {
     unset($_POST['func']);
-    \rex::setConfig($key, $_POST);
+    $config = array_merge($config, $_POST);
+    \rex::setConfig($key, $config);
     echo \rex_view::info(\rex_i18n::msg('label.data_saved'));
 }
 
-$this->setVar('Settings', \rex::getConfig($key));
+$this->setVar('Settings', $config);
 ob_start();
 $this->subfragment($path);
 $content = ob_get_clean();
 
 $fragment = new \rex_fragment();
-$fragment->setVar('body', $content, FALSE);
-$fragment->setVar('class', 'edit', FALSE);
-$fragment->setVar('title', \rex_i18n::msg('setup'), FALSE);
+$fragment->setVar('body', $content, false);
+$fragment->setVar('class', 'edit', false);
+$fragment->setVar('title', \rex_i18n::msg('setup'), false);
 $sections = $fragment->parse('core/page/section.php');
 
 $formElements = [
@@ -43,12 +44,12 @@ $formElements = [
     ['field' => '<button class="btn btn-apply rex-form-aligned" type="submit" name="func" value="save"' . \rex::getAccesskey(\rex_i18n::msg('update'), 'apply') . '>' . \rex_i18n::msg('update') . '</button>'],
 ];
 $fragment     = new \rex_fragment();
-$fragment->setVar('elements', $formElements, FALSE);
+$fragment->setVar('elements', $formElements, false);
 $buttons = $fragment->parse('core/form/submit.php');
 
 $fragment = new \rex_fragment();
-$fragment->setVar('class', 'edit', FALSE);
-$fragment->setVar('buttons', $buttons, FALSE);
+$fragment->setVar('class', 'edit', false);
+$fragment->setVar('buttons', $buttons, false);
 $sections .= $fragment->parse('core/page/section.php');
 
 echo '<form action="' . \rex_url::currentBackendPage() . '" method="post">' . $sections . '</form>';

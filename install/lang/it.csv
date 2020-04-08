@@ -127,6 +127,8 @@ label.private_person;Privato
 label.product;Prodotto
 label.product_not_available;Articolo non disponibile
 label.promotions;Promozioni
+label.min_order_info;Il valore totale di un ordine deve essere almeno {VALUE}
+error.min_order_value;Il valore minimo d'ordine di {VALUE} non è stato raggiunto
 label.discount;Sconto
 error.discountgroup_not_applyable_anymore;L'offerta promozionale a prezzi ridotti è cambiata
 label.invoice;Fattura

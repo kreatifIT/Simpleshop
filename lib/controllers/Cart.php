@@ -25,9 +25,10 @@ class CartController extends Controller
             'products'   => null,
         ], $this->params);
 
-        $errors     = [];
-        $discount   = 0;
-        $postAction = rex_request('action', 'string');
+        $errors      = [];
+        $discount    = 0;
+        $postAction  = rex_request('action', 'string');
+        $minOrderVal = self::getMinOrderValue();
 
         try {
             if ($this->params['products'] === null) {
@@ -67,6 +68,9 @@ class CartController extends Controller
             $errors[] = ['label' => '###error.coupon_not_exists###'];
         }
 
+        if ($minOrderVal > array_sum($grossTotals)) {
+            $errors [] = ['label' => str_replace('{VALUE}', '<strong>' . format_price($minOrderVal) . ' &euro;</strong>', \Wildcard::get('label.min_order_info'))];
+        }
         if (count($errors)) {
             $this->errors = array_merge($this->errors, $errors);
         }
@@ -83,6 +87,12 @@ class CartController extends Controller
         } else {
             $this->fragment_path[] = 'simpleshop/cart/empty.php';
         }
+    }
+
+    public static function getMinOrderValue()
+    {
+        $settings = \rex::getConfig('simpleshop.Settings');
+        return (float)strtr($settings['min_order_value'], [',' => '.']);
     }
 
     public function getProducts()

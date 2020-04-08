@@ -382,8 +382,12 @@ class CheckoutController extends Controller
             case 'place_order':
                 $tos_accepted = rex_post('tos_accepted', 'int');
                 $rma_accepted = rex_post('rma_accepted', 'int');
+                $minOrderValue = CartController::getMinOrderValue();
 
-                if ($tos_accepted && $rma_accepted) {
+                if (array_sum($this->Order->getValue('brut_prices')) < $minOrderValue) {
+                    $warnings[] = ['label' => strtr(Wildcard::get('error.min_order_value'), ['{VALUE}' => '<strong>'. format_price($minOrderValue) .' &euro;</strong>'])];
+                }
+                else if ($tos_accepted && $rma_accepted) {
                     try {
                         $Payment = $this->Order->getValue('payment');
 
@@ -448,7 +452,7 @@ class CheckoutController extends Controller
 
         $this->fragment_path[] = 'simpleshop/checkout/summary/wrapper.php';
         $this->setVar('errors', $errors);
-        $this->setVar('warnings', $warnings);
+        $this->setVar('warnings', $warnings, false);
         $this->setVar('coupon_code', $coupon_code);
         $this->setVar('products', $this->Order->getValue('products'));
         $this->setVar('Config', FragmentConfig::getValue('checkout'));
