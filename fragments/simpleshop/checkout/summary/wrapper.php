@@ -130,7 +130,7 @@ $shipping   = $Order->getValue('shipping');
                     <div class="terms-of-service text-right">
                         <div class="custom-checkbox align-right margin-small-bottom">
                             <label>
-                                *&nbsp;###privacy.accept_tos###
+                                *&nbsp;###action.accept_tos###
                                 <input name="tos_accepted" value="1" type="checkbox"/>
                                 <span class="checkbox"></span>
                             </label>

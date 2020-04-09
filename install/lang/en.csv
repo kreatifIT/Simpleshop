@@ -94,7 +94,7 @@ error.coupon_not_yet_valid;This coupon-code is not active, yet
 error.coupon_consumed;This coupon-code has already been used
 label.credit_note;Credit note
 label.email__registration_text;Congratulations! You have successfully signed up to ###company.name### and can now access using the following login data:
-privacy.accept_tos;I accept the {{tos-link}}Terms & Conditions {{tos-link}}.
+action.accept_tos;I accept the {{tos-link}}Terms & Conditions {{tos-link}}.
 label.cancellation_terms;I agree with the {{cancellation-terms-link}}cancellation terms{{cancellation-terms-link}}.
 label.email__password_reset_text;Your password has been reset. You can sign in with the following login data now.
 simpleshop.your_order_num;Your order
