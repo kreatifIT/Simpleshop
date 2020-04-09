@@ -25,7 +25,7 @@ $rows   = $this->getVar('rows');
         <?php foreach ($labels as $label): ?>
             <th>
                 <?= $label['label'] ?>
-                <?php if (strlen($label['notice'])): ?>
+                <?php if (strlen($label['notice']) && $label['notice'] != 0): ?>
                     <br/>
                     <small class="help-block"><?= $label['notice'] ?></small>
                 <?php endif; ?>

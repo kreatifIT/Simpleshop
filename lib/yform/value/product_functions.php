@@ -20,6 +20,7 @@ class rex_yform_value_product_functions extends rex_yform_value_abstract
             $Product = \FriendsOfREDAXO\Simpleshop\Product::get($this->getParam('main_id'));
 
             if ($Product) {
+                $sql    = rex_sql::factory();
                 $action = rex_get('sa', 'string');
 
                 switch ($action) {
@@ -28,12 +29,31 @@ class rex_yform_value_product_functions extends rex_yform_value_abstract
                         break;
                 }
 
-                $output[] = '
-                    <a href="' . $Product->getUrl(['ts' => time()]) . '" class="btn btn-default" target="_blank">
-                        <i class="fa fa-external-link"></i>&nbsp;
-                        ' . rex_i18n::msg('action.goto_product') . '
-                    </a>
-                ';
+                $urlProfile = current($sql->getArray('SELECT id FROM rex_url_generator_profile WHERE namespace = :ns', [
+                    'ns' => \FriendsOfREDAXO\Simpleshop\Product::URL_PARAMKEY
+                ]));
+
+                if ($urlProfile) {
+                    $output[] = '
+                        <a href="' . $Product->getUrl(['ts' => time()]) . '" class="btn btn-default" target="_blank">
+                            <i class="fa fa-external-link"></i>&nbsp;
+                            ' . rex_i18n::msg('action.goto_product') . '
+                        </a>
+                    ';
+                }
+                if (\FriendsOfREDAXO\Simpleshop\FragmentConfig::$data['has_variants']) {
+                    $variantUrl = \rex_url::backendPage('simpleshop/variants', [
+                        'table_name' => \FriendsOfREDAXO\Simpleshop\Variant::TABLE,
+                        'data_id'    => $Product->getId(),
+                        'func'       => 'edit',
+                    ]);
+                    $output[]   = '
+                        <a href="' . $variantUrl . '" class="btn btn-default">
+                            <i class="fa fa-sitemap"></i>&nbsp;
+                            ' . rex_i18n::msg('action.manage_variants') . '
+                        </a>
+                    ';
+                }
             }
 
 

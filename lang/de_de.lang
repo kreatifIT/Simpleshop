@@ -45,7 +45,7 @@ label.save_order_for_order_products = Sie müssen zuerst die Bestellung erstelle
 
 
 action.goto_creditnote = gehe zur Gutschrift
-action.goto_product = gehe zum Produkt
+action.goto_product = Produktdetailseite ansehen
 action.goto_order = Bestellung ansehen
 action.manage_variants = Varianten verwalten
 action.edit_product = Produkt bearbeiten

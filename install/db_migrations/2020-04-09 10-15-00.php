@@ -21,7 +21,7 @@ try {
         ->ensureColumn(new rex_sql_column('price', 'decimal(11,4)', true))
         ->ensureColumn(new rex_sql_column('reduced_price', 'decimal(11,4)', true))
         ->ensureColumn(new rex_sql_column('tax', 'int(11)', true))
-        ->ensureColumn(new rex_sql_column('features', 'int(11)', true))
+        ->ensureColumn(new rex_sql_column('features', 'text', true))
         ->ensureColumn(new rex_sql_column('status', 'int(11)', false))
         ->ensureColumn(new rex_sql_column('length', 'int(11) unsigned', true))
         ->ensureColumn(new rex_sql_column('width', 'int(11) unsigned', true))

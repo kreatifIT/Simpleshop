@@ -26,6 +26,12 @@ namespace FriendsOfREDAXO\Simpleshop;
         copy($this->getPath('assets/backend.js'), $this->getAssetsPath('backend.js'));
     }
 
+    $stmt = FeatureValue::query();
+    $stmt->where('status', 1);
+    $featureVal = $stmt->findOne();
+
+    FragmentConfig::$data['has_variants'] = (bool)$featureVal;
+
     \rex_view::addCssFile($this->getAssetsUrl('css/backend.css' . $mtime));
     \rex_view::addJsFile($this->getAssetsUrl('backend.js' . $mtime));
 });

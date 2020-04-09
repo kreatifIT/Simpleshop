@@ -207,7 +207,7 @@ echo '<form action="" method="post" onsubmit="SimpleshopBackend.saveVariants(thi
 $fragment = new \rex_fragment();
 $fragment->setVar('class', 'edit', false);
 $fragment->setVar('title', $product->getName() . ' [' . $product_id . ']');
-$fragment->setVar('content', $content, false);
+$fragment->setVar('content', \Wildcard::parse($content), false);
 $fragment->setVar('buttons', $buttons, false);
 echo $fragment->parse('core/page/section.php');
 echo '</form>';

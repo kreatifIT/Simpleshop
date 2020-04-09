@@ -55,7 +55,7 @@ class Product extends Model
 
     public function getKey()
     {
-        return rtrim($this->getId() .'|'. $this->getValue('variant_key'), '|');
+        return rtrim($this->getId() . '|' . $this->getValue('variant_key'), '|');
     }
 
     public function getFeatures()
@@ -139,7 +139,7 @@ class Product extends Model
             $feature_values = [];
             // get feature values
             foreach ($feature_val_ids as $feature_id) {
-                $_value = FeatureValue::get($feature_id);
+                $_value = $feature_id ? FeatureValue::get($feature_id) : null;
 
                 if ($_value) {
                     $_id                    = $_value->getValue('feature_id');
@@ -148,9 +148,13 @@ class Product extends Model
                 }
             }
             // get features
-            $_features = Feature::query()
-                ->where('id', $feature_ids)
-                ->find();
+            if ($feature_ids) {
+                $stmt = Feature::query();
+                $stmt->where('id', $feature_ids);
+                $_features = $stmt->find();
+            } else {
+                $_features = [];
+            }
 
             foreach ($_features as $feature) {
                 // assign feature values to the feature
