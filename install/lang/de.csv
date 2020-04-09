@@ -91,7 +91,7 @@ error.coupon_not_yet_valid;Gutschein-Code ist noch nicht gültig
 error.coupon_consumed;Gutschein-Code wurde bereits benutzt
 label.credit_note;Gutschrift
 label.email__registration_text;Herzlichen Glückwunsch, Sie haben sich erfolgreich bei ###company.name### registriert und können sich nun mit folgenden Daten anmelden:
-privacy.accept_tos;Ich akzeptiere die {{tos-link}}Allgemeinen Geschäftsbedingungen{{tos-link}}.
+action.accept_tos;Ich akzeptiere die {{tos-link}}Allgemeinen Geschäftsbedingungen{{tos-link}}.
 label.cancellation_terms;Ich bin mit den {{cancellation-terms-link}}Widerrufsbedingungen{{cancellation-terms-link}} einverstanden.
 label.email__user_password_reset;Passwort zurückgesetzt
 label.email__password_reset_text;Ihr Passwort wurde soeben zurückgesetzt und Sie können sich nun mit den folgenden Zugangsdaten wieder anmelden.

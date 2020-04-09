@@ -90,7 +90,7 @@ error.coupon_not_yet_valid;Il codice di questo buono acquisto non è ancora atti
 error.coupon_consumed;Il codice di questo buono acquisto è già stato usato
 label.credit_note;Nota da credito
 label.email__registration_text;Congratulazioni! Ti sei registrato con successo da ###company.name###. Quindi puoi accedere con le seguenti credenziali:
-privacy.accept_tos;Accetto le {{tos-link}}CGV{{tos-link}}.
+action.accept_tos;Accetto le {{tos-link}}CGV{{tos-link}}.
 label.cancellation_terms;Accetto le {{cancellation-terms-link}}condizioni di recesso{{cancellation-terms-link}}.
 label.email__password_reset_text;La tua password è stata ripristinata. Puoi quindi accedere con le seguenti credenziali.
 simpleshop.your_order_num;Il suo ordine
