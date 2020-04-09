@@ -29,31 +29,30 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
 
     <legend><?= $Addon->i18n('settings.shop_settings'); ?></legend>
     <dl class="rex-form-group form-group">
-        <dt><?= $Addon->i18n('settings.brutto_prices'); ?></dt>
+        <dt><?= $Addon->i18n('settings.brutto_prices_info'); ?></dt>
         <dd>
-            <label class="form-label">
-                <input type="checkbox" name="brutto_prices" value="1" <?= from_array($Settings, 'brutto_prices') == 1 ? 'checked="checked"' : '' ?>/>
-                <span></span><?= $Addon->i18n('settings.brutto_prices_info'); ?>
-            </label>
+            <select name="brutto_prices" class="form-control">
+                <option value="0"><?= $Addon->i18n('no'); ?></option>
+                <option value="1" <?= from_array($Settings, 'brutto_prices') == 1 ? 'selected' : '' ?>><?= $Addon->i18n('yes'); ?></option>
+            </select>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
-        <dt><?= $Addon->i18n('label.packing_list_title'); ?></dt>
+        <dt><?= $Addon->i18n('action.print_packing_list'); ?></dt>
         <dd>
-            <label class="form-label">
-                <input type="checkbox" name="packing_list_printing" value="1" <?= from_array($Settings, 'packing_list_printing') == 1 ? 'checked="checked"' : '' ?>/>
-                <span></span><?= $Addon->i18n('action.print_packing_list'); ?>
-            </label>
+            <select name="packing_list_printing" class="form-control">
+                <option value="0"><?= $Addon->i18n('no'); ?></option>
+                <option value="1" <?= from_array($Settings, 'packing_list_printing') == 1 ? 'selected' : '' ?>><?= $Addon->i18n('yes'); ?></option>
+            </select>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
-        <dt><?= $Addon->i18n('label.accounting'); ?></dt>
+        <dt><?= $Addon->i18n('action.use_invoicing'); ?></dt>
         <dd>
-            <label class="form-label">
-                <input type="checkbox" name="use_invoicing" value="1" <?= from_array($Settings, 'use_invoicing') == 1 ? 'checked="checked"' : '' ?>/>
-                <span></span>
-                <?= $Addon->i18n('action.use_invoicing'); ?>
-            </label>
+            <select name="use_invoicing" class="form-control">
+                <option value="0"><?= $Addon->i18n('no'); ?></option>
+                <option value="1" <?= from_array($Settings, 'use_invoicing') == 1 ? 'selected' : '' ?>><?= $Addon->i18n('yes'); ?></option>
+            </select>
         </dd>
     </dl>
 
@@ -100,13 +99,12 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
 
     <legend><?= $Addon->i18n('settings.shop_functions'); ?></legend>
     <dl class="rex-form-group form-group">
-        <dt><?= $Addon->i18n('settings.category_linking_label'); ?></dt>
+        <dt><?= $Addon->i18n('settings.category_linking_input_label'); ?></dt>
         <dd>
-            <label class="form-label">
-                <input type="checkbox" name="category_linking" value="1" <?= from_array($Settings, 'category_linking') == 1 ? 'checked="checked"' : '' ?>/>
-                <span></span>
-                <?= $Addon->i18n('settings.category_linking_input_label'); ?>
-            </label>
+            <select name="category_linking" class="form-control">
+                <option value="0"><?= $Addon->i18n('no'); ?></option>
+                <option value="1" <?= from_array($Settings, 'category_linking') == 1 ? 'selected' : '' ?>><?= $Addon->i18n('yes'); ?></option>
+            </select>
         </dd>
     </dl>
 
