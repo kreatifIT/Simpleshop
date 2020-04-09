@@ -29,7 +29,7 @@ $is_giftcard = $product->getValue('type') == 'giftcard';
 $extras      = $product->getValue('extras');
 $discount    = $product->getValue('discount');
 
-$Category = $product->valueIsset('category_id') ? Category::get($product->getValue('category_id')) : null;
+$category = $product->valueIsset('category') ? \rex_article::get($product->getValue('category')) : null;
 
 $config = $this->getVar('cart_config', FragmentConfig::getValue('cart'));
 $styles = FragmentConfig::getValue('styles');
@@ -58,9 +58,9 @@ if ($is_giftcard) {
         <h3 class="cart-item-name" <?= $styles['h3'] ?>>
             <?= $product->getName() ?>
         </h3>
-        <?php if ($Category && !$is_giftcard): ?>
+        <?php if ($category && !$is_giftcard): ?>
             <span class="cart-item-description" <?= $styles['p'] ?>>
-                <?= $Category->getName() ?>
+                <?= $category->getName() ?>
             </span>
         <?php elseif ($extras['coupon_code']): ?>
             <br/>

@@ -97,23 +97,27 @@ $image_types = [
 
 
 foreach ($image_types as $key => $data) {
-    $sql->setTable('rex_media_manager_type');
-    $sql->setValue('name', $key);
-    $sql->setValue('description', $data['description']);
-    $sql->insert();
+    $item = current($sql->getArray('SELECT id FROM rex_media_manager_type WHERE name = :name', ['name' => $key]));
 
-    $lid = $sql->getLastId();
-
-    foreach ($data['effects'] as $index => $effect) {
-        $sql->setTable('rex_media_manager_type_effect');
-        $sql->setValue('type_id', $lid);
-        $sql->setValue('effect', $effect['name']);
-        $sql->setValue('priority', $index + 1);
-        $sql->setValue('updatedate', date('Y-m-d H:i:s'));
-        $sql->setValue('createdate', date('Y-m-d H:i:s'));
-        $sql->setValue('updateuser', 'simpleshop-addon');
-        $sql->setValue('createuser', 'simpleshop-addon');
-        $sql->setValue('parameters', $effect['params']);
+    if (!$item) {
+        $sql->setTable('rex_media_manager_type');
+        $sql->setValue('name', $key);
+        $sql->setValue('description', $data['description']);
         $sql->insert();
+
+        $lid = $sql->getLastId();
+
+        foreach ($data['effects'] as $index => $effect) {
+            $sql->setTable('rex_media_manager_type_effect');
+            $sql->setValue('type_id', $lid);
+            $sql->setValue('effect', $effect['name']);
+            $sql->setValue('priority', $index + 1);
+            $sql->setValue('updatedate', date('Y-m-d H:i:s'));
+            $sql->setValue('createdate', date('Y-m-d H:i:s'));
+            $sql->setValue('updateuser', 'simpleshop-addon');
+            $sql->setValue('createuser', 'simpleshop-addon');
+            $sql->setValue('parameters', $effect['params']);
+            $sql->insert();
+        }
     }
 }

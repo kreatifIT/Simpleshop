@@ -341,24 +341,6 @@ class Product extends Model
         return $result;
     }
 
-    public function generatePath($lang_id, $path = '')
-    {
-        $_paths   = [];
-        $catId    = $this->getValue('category_id');
-        $category = $catId ? Category::get($this->getValue('category_id')) : null;
-
-        if ($category) {
-            $parents = $category->getParentTree();
-
-            foreach ($parents as $parent) {
-                $_paths[] = Url::getRewriter()
-                    ->normalize($parent->getValue('name_' . $lang_id));
-            }
-        }
-        $_paths[] = $path;
-        return implode('/', $_paths);
-    }
-
     public static function ext_yform_data_delete(\rex_extension_point $Ep)
     {
         $result = $Ep->getSubject();

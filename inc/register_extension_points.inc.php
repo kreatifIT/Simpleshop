@@ -14,8 +14,6 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-\rex_extension::register('YFORM_DATA_LIST', ['\FriendsOfREDAXO\Simpleshop\Category', 'ext_yform_data_list']);
-\rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Category', 'ext_yform_data_delete']);
 \rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Feature', 'ext_yform_data_delete']);
 \rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\FeatureValue', 'ext_yform_data_delete']);
 \rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_yform_data_delete']);
@@ -91,22 +89,6 @@ namespace FriendsOfREDAXO\Simpleshop;
     }
 
     return $options;
-});
-
-\rex_extension::register('yform/usability.addDragNDropSort.filters', function ($params) {
-    $subject = $params->getSubject();
-    $params  = $params->getParam('list_params');
-
-    if (is_object($params['params']['table']) && $params['params']['table']->getTableName() == Category::TABLE) {
-        $_filter = rex_get('rex_yform_filter', 'array');
-
-        if (isset($_filter['parent_id'])) {
-            $subject[] = 'parent_id=' . (int)$_filter['parent_id'];
-        } else {
-            $subject[] = 'parent_id=0';
-        }
-    }
-    return $subject;
 });
 
 \rex_view::setJsProperty('simpleshop', [

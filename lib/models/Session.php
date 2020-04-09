@@ -344,7 +344,7 @@ class Session extends Model
             $products[] = [
                 'id'       => $product->getId(),
                 'name'     => $product->getName(),
-                'category' => $product->generatePath(\rex_clang::getCurrentId()),
+                'category' => $product->getUrl([], \rex_clang::getCurrentId()),
                 'quantity' => $product->getValue('cart_quantity'),
                 'variant'  => implode(', ', $variantName),
                 'price'    => number_format($Variant->getPrice(true), 2, '.', ','),
