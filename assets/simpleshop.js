@@ -72,13 +72,11 @@ var Simpleshop = (function ($) {
                     $success.fadeOut();
                 }, 3000);
             }
-            window.event.stopPropagation();
         },
 
         closeOffcanvasCart: function () {
             $offcanvasCart.removeClass('expanded');
             $body.removeClass('offcanvas-cart-open');
-            window.event.stopPropagation();
         },
 
         toggleAuth: function (_this, selector, hideSelector) {
@@ -165,6 +163,7 @@ var Simpleshop = (function ($) {
             $.ajax({
                 url: rex.simpleshop.ajax_url,
                 method: 'POST',
+                cache: false,
                 data: {
                     'controller': 'Cart.addProduct',
                     'rex-api-call': 'simpleshop_api',
@@ -189,6 +188,7 @@ var Simpleshop = (function ($) {
             $.ajax({
                 url: rex.simpleshop.ajax_url,
                 method: 'POST',
+                cache: false,
                 data: {
                     'controller': 'Cart.removeProduct',
                     'rex-api-call': 'simpleshop_api',
@@ -242,6 +242,7 @@ var Simpleshop = (function ($) {
                 $.ajax({
                     url: rex.simpleshop.ajax_url,
                     method: 'POST',
+                    cache: false,
                     data: {
                         'controller': 'Cart.addProduct',
                         'rex-api-call': 'simpleshop_api',
