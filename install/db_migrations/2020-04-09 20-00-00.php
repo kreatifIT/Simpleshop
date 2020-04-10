@@ -32,6 +32,27 @@ try {
         $sql->setValue('list_hidden', 1);
         $sql->setValue('search', 0);
         $sql->setValue('name', 'product_functions');
+        $sql->setValue('table', 'rex_shop_product');
+        $sql->setValue('empty_option', 0);
+        $sql->insert();
+    }
+
+    $item = current($sql->getArray('SELECT id FROM rex_yform_field WHERE table_name = :table AND type_id = :type AND type_name = :type_name AND name = :name', [
+        'table'     => 'rex_shop_product',
+        'type'      => 'validate',
+        'type_name' => 'unique',
+        'name'      => 'code',
+    ]));
+    if (!$item) {
+        $sql->setTable('rex_yform_field');
+        $sql->setValue('table_name', 'rex_shop_product');
+        $sql->setValue('prio', 1);
+        $sql->setValue('type_id', 'validate');
+        $sql->setValue('type_name', 'unique');
+        $sql->setValue('list_hidden', 1);
+        $sql->setValue('search', 0);
+        $sql->setValue('name', 'code');
+        $sql->setValue('message', 'Der angegeben Produktcode wird bereits für ein anderes Produkt verwendet');
         $sql->insert();
     }
 }
