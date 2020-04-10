@@ -10,6 +10,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace FriendsOfREDAXO\Simpleshop;
 
 
@@ -24,30 +25,45 @@ class FeatureValue extends Model
 
         foreach ($featureIds as $featureId) {
             if ($onlyNames) {
-                $result[$featureId] = self::get($featureId)->getName();
-            }
-            else {
+                $result[$featureId] = self::get($featureId)
+                    ->getName();
+            } else {
                 $result[$featureId] = self::get($featureId);
             }
         }
         return $result;
     }
 
+    public static function getByFeatureId($featureId)
+    {
+        $stmt = self::query();
+        $stmt->where('feature_id', $featureId);
+        $stmt->where('status', 1);
+        return $stmt->find();
+    }
+
     public static function ext_yform_data_delete($params)
     {
         $result = $params->getSubject();
 
-        if ($result !== false && $params->getParam('table')->getTableName() == self::TABLE) {
+        if ($result !== false && $params->getParam('table')
+                ->getTableName() == self::TABLE
+        ) {
             $links    = [];
-            $name     = 'name_'. \rex_clang::getCurrentId();
+            $name     = 'name_' . \rex_clang::getCurrentId();
             $Addon    = \rex_addon::get('simpleshop');
             $obj_id   = $params->getParam('data_id');
-            $products = Product::query()->resetSelect()->select('id')->select($name)->whereRaw("
+            $products = Product::query()
+                ->resetSelect()
+                ->select('id')
+                ->select($name)
+                ->whereRaw("
                     features = {$obj_id}
                     OR features LIKE '{$obj_id},%'
                     OR features LIKE '%,{$obj_id},%'
                     OR features LIKE '%,{$obj_id}'
-                ")->find();
+                ")
+                ->find();
 
             foreach ($products as $product) {
                 $links[] = $product->getValue($name) . ' -

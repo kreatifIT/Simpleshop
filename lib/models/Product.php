@@ -46,9 +46,9 @@ class Product extends Model
         $vkey = $this->getValue('variant_key');
 
         if ($vkey) {
-            $params = array_merge($params, [
+            $params = array_merge([
                 'vkey' => $vkey,
-            ]);
+            ], $params);
         }
         return parent::getUrl($params, $lang_id);
     }
@@ -58,6 +58,25 @@ class Product extends Model
         return rtrim($this->getId() . '|' . $this->getValue('variant_key'), '|');
     }
 
+    public function getFeatureValue($featureKey)
+    {
+        $result  = null;
+        $feature = Feature::getFeatureByKey($featureKey);
+        $variantKey = trim($this->getValue('variant_key'));
+
+        if ($feature && $feature->isOnline()) {
+            $stmt = FeatureValue::query();
+            $stmt->where('status', 1);
+            $stmt->where('feature_id', $feature->getId());
+
+            if ($variantKey != '') {
+                $stmt->where('id', explode(',', $variantKey));
+            }
+            $result = $stmt->findOne();
+        }
+        return $result;
+    }
+
     public function getFeatures()
     {
         if ($this->__features === null) {
@@ -65,6 +84,61 @@ class Product extends Model
             $this->__features = strlen($feature_val_ids) ? $this->_getFeatures(explode(',', $feature_val_ids)) : [];
         }
         return $this->__features;
+    }
+
+    public function getFeatureValuesByFeatureKeys(array $featureKeys, $filterKeys = [])
+    {
+        $result     = [];
+        $filterIds  = [];
+        $variantKey = trim($this->getValue('variant_key'));
+
+        if ($variantKey != '' && count($filterKeys)) {
+            foreach ($filterKeys as $filterKey) {
+                if ($feature = Feature::getFeatureByKey($filterKey)) {
+                    $stmt = FeatureValue::query();
+                    $stmt->where('status', 1);
+                    $stmt->where('feature_id', $feature->getId());
+                    $stmt->where('id', explode(',', $variantKey));
+                    $collection = $stmt->find();
+                    $filterIds  = array_merge($filterIds, $collection->getIds());
+                }
+            }
+        }
+        foreach ($featureKeys as $featureKey) {
+            if ($feature = Feature::getFeatureByKey($featureKey)) {
+                $stmt = FeatureValue::query();
+                $stmt->alias('m');
+                $stmt->select(['m.*', 'jt1.variant_key']);
+                $stmt->joinRaw('inner', Variant::TABLE, 'jt1', 'jt1.product_id = ' . $this->getId());
+                $stmt->where('m.feature_id', $feature->getId());
+                $stmt->where('m.status', 1);
+                $stmt->where('jt1.type', 'NE', '!=');
+                $stmt->whereRaw('(
+                    jt1.variant_key = m.id    
+                    OR jt1.variant_key LIKE CONCAT(m.id, ",%")    
+                    OR jt1.variant_key LIKE CONCAT("%,", m.id, ",%")    
+                    OR jt1.variant_key LIKE CONCAT("%,", m.id)    
+                )');
+                if (count($filterIds)) {
+                    foreach ($filterIds as $index => $filterId) {
+                        $stmt->whereRaw("(
+                            jt1.variant_key = :filter_{$index}_1
+                            OR jt1.variant_key LIKE :filter_{$index}_2    
+                            OR jt1.variant_key LIKE :filter_{$index}_3    
+                            OR jt1.variant_key LIKE :filter_{$index}_4    
+                        )", [
+                            "filter_{$index}_1" => $filterId,
+                            "filter_{$index}_2" => "%,{$filterId}",
+                            "filter_{$index}_3" => "%,{$filterId},%",
+                            "filter_{$index}_4" => "{$filterId},%",
+                        ]);
+                    }
+                }
+                $stmt->groupBy('m.id');
+                $result[$featureKey] = $stmt->find();
+            }
+        }
+        return $result;
     }
 
     public function hasReducedPrice()
