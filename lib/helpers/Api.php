@@ -38,6 +38,7 @@ class rex_api_simpleshop_api extends rex_api_function
             throw new ApiException($ex->getMessage());
         }
         $this->response['controller'] = strtolower($controller);
+        $this->response = rex_extension::registerPoint(new rex_extension_point('simpleshop.Api.response', $this->response, []));
         return new rex_api_result($this->success, $this->response);
     }
 
