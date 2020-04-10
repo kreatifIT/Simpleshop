@@ -60,17 +60,27 @@ class Product extends Model
 
     public function getFeatureValue($featureKey)
     {
-        $result  = null;
-        $feature = Feature::getFeatureByKey($featureKey);
+        $result     = null;
+        $feature    = Feature::getFeatureByKey($featureKey);
         $variantKey = trim($this->getValue('variant_key'));
 
         if ($feature && $feature->isOnline()) {
             $stmt = FeatureValue::query();
-            $stmt->where('status', 1);
-            $stmt->where('feature_id', $feature->getId());
+            $stmt->alias('m');
+            $stmt->select(['m.*', 'jt1.variant_key']);
+            $stmt->joinRaw('inner', Variant::TABLE, 'jt1', 'jt1.product_id = ' . $this->getId());
+            $stmt->where('jt1.type', 'NE', '!=');
+            $stmt->where('m.status', 1);
+            $stmt->where('m.feature_id', $feature->getId());
+            $stmt->whereRaw('(
+                    jt1.variant_key = m.id    
+                    OR jt1.variant_key LIKE CONCAT(m.id, ",%")    
+                    OR jt1.variant_key LIKE CONCAT("%,", m.id, ",%")    
+                    OR jt1.variant_key LIKE CONCAT("%,", m.id)    
+                )');
 
             if ($variantKey != '') {
-                $stmt->where('id', explode(',', $variantKey));
+                $stmt->where('m.id', explode(',', $variantKey));
             }
             $result = $stmt->findOne();
         }
