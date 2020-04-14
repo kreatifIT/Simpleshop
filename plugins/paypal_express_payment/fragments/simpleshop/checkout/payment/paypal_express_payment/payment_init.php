@@ -26,7 +26,7 @@ $Payment  = $Order->getValue('payment');
 $order_id = $Order->getValue('id');
 
 try {
-    $url = $Payment->initPayment($order_id, $Order->getValue('total'), 'Order #' . $order_id);
+    $url = $Payment->initPayment($order_id, $Order->getValue('total'), 'Order #' . $order_id, true);
 
     if ($api && $api instanceof Api) {
         $fragment = new \rex_fragment();
