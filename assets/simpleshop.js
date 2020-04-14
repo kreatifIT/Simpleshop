@@ -178,6 +178,7 @@ var Simpleshop = (function ($) {
                 result.showOffcanvasCart();
 
                 $(document).trigger('simpleshop:addToCart', [$container, resp]);
+                $(document).trigger('pjax:end', [$container, resp]);
             });
         },
         removeCartItem: function (_this, vkey, layout, selector) {
@@ -201,6 +202,7 @@ var Simpleshop = (function ($) {
                 $loading.remove();
 
                 $(document).trigger('simpleshop:removeCartItem', [$container, resp]);
+                $(document).trigger('pjax:end', [$container, resp]);
             });
         },
         changeCartAmount: function (_this, vkey, _max, selector) {
@@ -255,6 +257,7 @@ var Simpleshop = (function ($) {
                     $loading.remove();
 
                     $(document).trigger('simpleshop:changeCartAmount', [$container, resp]);
+                    $(document).trigger('pjax:end', [$container, resp]);
                 });
             }
         },
