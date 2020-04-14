@@ -10,6 +10,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace FriendsOfREDAXO\Simpleshop;
 
 
@@ -20,7 +21,10 @@ class Variant extends Model
     public static function getByVariantKey($key)
     {
         list ($product_id, $variant_key) = explode('|', $key);
-        return self::query()->where('product_id', $product_id)->where('variant_key', $variant_key)->findOne();
+        return self::query()
+            ->where('product_id', $product_id)
+            ->where('variant_key', $variant_key)
+            ->findOne();
     }
 
     public function applyProductData()
@@ -44,33 +48,29 @@ class Variant extends Model
     {
         $labels  = [];
         $fields  = [];
-        $columns = \rex_yform_manager_table::get(self::TABLE)->getFields();
+        $table   = \rex_yform_manager_table::get(self::TABLE);
+        $columns = $table->getFields();
         $params  = ['this' => \rex_yform::factory()];
 
-        foreach ($columns as $column) {
+        $params['main_table'] = rex_request('table_name', 'string');
+
+        foreach ($columns as $index => $column) {
             $type = $column->getTypeName();
             $name = $column->getName();
 
-            if ($name == 'variant_key' || in_array($type, ['be_manager_relation', 'datestamp'])) {
+            if ($name == 'variant_key' || $type == 'datestamp' || $name == 'product_id') {
                 continue;
             }
-            $notice      = '';
-            $values      = [$type];
-            $class       = 'rex_yform_value_' . trim($type);
-            $field       = new $class();
-            $definitions = $field->getDefinitions();
+            $elements = $column->toArray();
+            $notice   = $column->getElement('notice');
+            $class    = 'rex_yform_value_' . trim($type);
+            $field    = new $class();
 
-            foreach ($definitions['values'] as $key => $_) {
-                $values[] = $column->getElement($key);
-            }
-
-            if (count($values) > 4) {
-                $i          = count($values) - 1;
-                $notice     = $values[$i];
-                $values[$i] = '';
-            }
-            $field->loadParams($params, $values);
-            $fields[] = $field;
+            array_unshift($elements, $type);
+            $field->loadParams($params, $elements);
+            $field->fieldName  = $name;
+            $field->fieldIndex = $index;
+            $fields[]          = $field;
 
             if ($type != 'hidden_input' && $name != 'prio') {
                 $labels[] = [

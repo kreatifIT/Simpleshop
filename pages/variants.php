@@ -87,10 +87,23 @@ if (!$product) {
 }
 
 if ($_FUNC == 'save') {
-    $vIds = [];
-    $data = rex_post('FORM', 'array');
+    $vIds  = [];
+    $data  = [];
+    $_data = rex_post('FORM', 'array');
+
+    // re-map be_table values
+    foreach ($_data as $key => $values) {
+        if (substr($key, 0, 9) == 'be_table|') {
+            list($_field, $_key, $_index) = explode('|', $key);
+            $data[$_key]['be_table'][$_index] = $values;
+        } else {
+            $data[$key] = array_merge((array)$data[$key], $values);
+        }
+    }
 
     foreach ($data as $key => $values) {
+        // reset POST values
+        $_POST['FORM'] = [];
         $Variant = Variant::query()
             ->where('product_id', $product_id)
             ->where('variant_key', $key)
@@ -102,6 +115,9 @@ if ($_FUNC == 'save') {
             $Variant->setValue('product_id', $product_id);
         }
         foreach ($values as $name => $value) {
+            if (is_array($value) && $name == 'be_table') {
+                $_POST['FORM'] = array_merge($_POST['FORM'], $value);
+            }
             $Variant->setValue($name, $value);
         }
         $Variant->save();

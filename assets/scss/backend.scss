@@ -135,9 +135,34 @@ table.table {
                 .form-group {
                     margin-bottom: 0;
                 }
+                .form-control {
+                    padding: 6px 4px;
+                    min-width: 50px;
+                }
+                select.form-control {
+                    padding-right: 18px;
+                }
                 .sort-icon:hover {
                     color: #3bb594;
                     cursor: move;
+                }
+
+                th, td {
+                    padding: 2px 3px 4px 3px;
+                    line-height: 24px;
+                    background: #eee;
+
+                    &.rex-table-action {
+                        padding: 0;
+                    }
+                }
+                td {
+                    padding:0;
+                }
+                .formbe_table {
+                    .btn {
+                        line-height: 24px;
+                    }
                 }
             }
         }
@@ -224,7 +249,7 @@ table.table {
                 text-align: center;
             }
         }
-        
+
         td {
             vertical-align: middle;
 

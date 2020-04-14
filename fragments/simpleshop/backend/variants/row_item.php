@@ -24,10 +24,22 @@ $Variant = $this->getVar('Variant');
 
 foreach ($fields as $field) {
     $field->params['this']->setObjectparams('form_name', $vkey);
-    $field->setId($field->name);
     $field->init();
     $field->setLabel('');
-    $field->setValue($Variant ? $Variant->getValue($field->name) : null);
+
+    if ($field instanceof \rex_yform_value_be_table || ($field instanceof \rex_yform_value_be_manager_relation && $field->elements['type'] == 6)) {
+        $field->setId('be_table|' . $vkey . '|' . $field->fieldIndex);
+        $field->setName(str_replace(',', '-', $vkey . '-' . $field->fieldIndex));
+
+        if ($field instanceof \rex_yform_value_be_manager_relation && $field->elements['type'] == 6) {
+            $field->params['main_id'] = $Variant->getId();
+        } else {
+            $field->setValue($Variant ? $Variant->getRawValue($field->fieldName) : null);
+        }
+    } else {
+        $field->setId($field->name);
+        $field->setValue($Variant ? $Variant->getValue($field->fieldName) : null);
+    }
     $field->enterObject();
 
     if ($field->name == 'type') {
@@ -36,8 +48,7 @@ foreach ($fields as $field) {
 
     if ($field->type == 'hidden_input' || $field->name == 'prio') {
         $hiddens[] = $field->params['form_output'][$field->getId()];
-    }
-    else {
+    } else {
         $columns[] = "<td>{$field->params['form_output'][$field->getId()]}</td>";
     }
 }
