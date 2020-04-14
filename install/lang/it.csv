@@ -9,11 +9,18 @@ action.logout;Esci
 simpleshop.account_area_account;Account
 label.address;Indirizzo
 action.add_address;Aggiungi indirizzo
+action.close;chiudere
 simpleshop.account_area_addresses;Indirizzi
 label.no_address_available;Nessun indirizzo disponibile
 label.address_additional;Informazione aggiuntiva
 error.choose_shipping_address;Selezionare un indirizzo di spedizione
+label.email__registration_optin_text;Lei si è registrato con ###company.name## e deve cliccare sul link sottostante per attivare il suo account:
+label.reg_activation_already_done;Avete già attivato il vostro conto
+label.reg_activation_failed;L'attivazione del conto non è riuscita
+label.reg_activation_successful;L'attivazione ha avuto successo. Ora è possibile effettuare il login con i propri dati di accesso
 label.no_permission;Non hai nessuna autorizzazione di accesso per quest'area
+label.activation_link_sent;Un link di attivazione vi è stato inviato per e-mail. Controlla anche la tua cartella spam
+label.login_success_overlay;Vi siete registrati con successo e ora potete continuare
 label.all;tutti
 label.province;Provincia
 label.customer_type;Sono una...

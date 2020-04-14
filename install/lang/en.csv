@@ -11,8 +11,15 @@ label.new_address;New address
 simpleshop.account_area_account;Account
 label.address;Address
 action.add_address;Add Address
+action.close;close
 label.email__user_registration_subject;You have successfully registered
 simpleshop.account_area_addresses;Addresses
+label.email__registration_optin_text;You have registered with ###company.name## and must click on the link below to activate your account:
+label.reg_activation_already_done;You have already activated your account
+label.login_success_overlay;You have successfully registered and can now continue
+label.reg_activation_failed;Account activation has failed
+label.reg_activation_successful;The activation was successful. You can now log in with your access data
+label.activation_link_sent;An activation link was sent to you by e-mail. Please also check your spam folder
 label.no_address_available;No address available
 error.choose_shipping_address;Please select a shipping address
 label.no_permission;You have no access authorization for this area

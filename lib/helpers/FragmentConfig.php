@@ -20,6 +20,7 @@ class FragmentConfig
         'xml_general_line_description' => 'Product line description',
         'auth'                         => [
             'has_registration'         => true,
+            'registration_doubleOptIn' => false,
             'has_password_recovery'    => true,
             'registration_excl_fields' => [],
             'css_class'                => [

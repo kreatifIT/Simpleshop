@@ -12,6 +12,13 @@ error.choose_shipping_address;Bitte eine Versandadresse auswählen
 action.add_address;Adresse hinzufügen
 simpleshop.account_area_addresses;Adressen
 label.address_additional;Adresszusatz
+action.close;schließen
+label.email__registration_optin_text;Sie haben sich bei ###company.name### registriert und müssen auf den nachfolgenden Link klicken um ihr Konto zu aktivieren:
+label.reg_activation_already_done;Sie haben Ihr Konto bereits aktiviert
+label.login_success_overlay;Sie haben sich erfolgreich angemeldet und können nun fortfahren
+label.reg_activation_failed;Die Aktivierung des Kontos ist fehlgeschlagen
+label.reg_activation_successful;Die Aktivierung war erfolgreich. Sie können sich nun mit Ihren Zugangsdaten anmelden
+label.activation_link_sent;Ihnen wurde ein Aktivierungslink per Mail zugesendet. Bitte kontrollieren Sie auch Ihren Spam-Ordner
 label.customer_type;Ich bin eine...
 label.all;alle
 label.min_order_info;Der Gesamtwert einer Bestellung muss mindestens {VALUE} betragen

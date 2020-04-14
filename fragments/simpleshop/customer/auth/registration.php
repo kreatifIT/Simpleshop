@@ -28,8 +28,20 @@ $excFields = array_merge($excFields, FragmentConfig::getValue('auth.registration
 
 FragmentConfig::$data['yform_fields']['rex_shop_customer']['_excludedFields'] = $excFields;
 
+if (\rex_request::isXmlHttpRequest()) {
+    $pjaxData = 'data-pjax="' . rex_escape(json_encode([
+            'container' => '#' . $sid,
+            'fragment'  => '#' . $sid,
+            'push'      => false,
+            'cache'     => false,
+        ]), 'html_attr') . '"';
+} else {
+    $pjaxData = '';
+}
+
 // Options
 $form->setObjectparams('form_anchor', '-' . $sid);
+$form->setObjectparams('data_attributes', $pjaxData);
 $form->setObjectparams('submit_btn_show', false);
 $form->setObjectparams('real_field_names', true);
 $form->setObjectparams('form_ytemplate', 'custom,foundation,bootstrap');
@@ -93,8 +105,11 @@ if ($action == 'register' && $form->isSend() && !$form->hasWarnings()) {
 
     // register customer
     try {
-        Customer::register($values['email'], $values['password'], $values);
-        Customer::login($values['email'], $values['password']);
+        $customer = Customer::register($values['email'], $values['password'], $values);
+
+        if ($customer && $customer->getId()) {
+            Customer::login($values['email'], $values['password']);
+        }
     } catch (CustomerException $ex) {
         $customerError = true;
         $formOutput    = '<div class="callout alert">' . $ex->getMessage() . '</div>' . $formOutput;
@@ -111,7 +126,9 @@ if ($action == 'register' && $form->isSend() && !$form->hasWarnings()) {
         exit;
     }
     ?>
-    <div class="callout success">###label.registration_sucessfull###</div>
+    <div class="callout success">
+        <?= $customer ? '###label.registration_sucessfull###' : '###label.activation_link_sent###' ?>
+    </div>
 <?php else: ?>
     <?= $formOutput ?>
 <?php endif; ?>

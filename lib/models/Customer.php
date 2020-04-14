@@ -73,10 +73,39 @@ class Customer extends Model
         ]));
     }
 
-    public static function register($email, $password, $attributes = [], $User = null)
+    public static function activate($hash)
     {
-        $result = null;
-        $email  = trim(mb_strtolower($email));
+        $isActivated = 0;
+        $hash        = trim($hash);
+
+        if ($hash != '') {
+            $stmt = self::query();
+            $stmt->where('hash', $hash);
+            $customer = $stmt->findOne();
+
+            if ($customer) {
+
+                if ($customer->getValue('activationdate') == '0000-00-00 00:00:00') {
+                    $sql = \rex_sql::factory();
+                    $sql->setTable(self::TABLE);
+                    $sql->setValue('status', 1);
+                    $sql->setRawValue('activationdate', 'NOW()');
+                    $sql->setWhere('id = :id', ['id' => $customer->getId()]);
+                    $sql->update();
+                    $isActivated = 1;
+                } else {
+                    $isActivated = 2;
+                }
+            }
+        }
+        return $isActivated;
+    }
+
+    public static function register($email, $password, $attributes = [], $User = null, $doubleOptIn = false)
+    {
+        $result      = null;
+        $email       = trim(mb_strtolower($email));
+        $doubelOptIn = FragmentConfig::$data['auth']['registration_doubleOptIn'];
 
         if ($User) {
             $_this = $User;
@@ -99,8 +128,9 @@ class Customer extends Model
         FragmentConfig::$data['yform_fields']['rex_shop_customer']['_excludedFields'] = $exclFields;
 
         $_this->setValue('email', $email);
+        $_this->setValue('hash', sha1($email . time()));
         $_this->setValue('password', $password);
-        $_this->setValue('status', $statusField->getElement('default'));
+        $_this->setValue('status', $doubelOptIn ? 0 : $statusField->getElement('default'));
 
         $success  = $_this->save();
         $messages = $_this->getMessages();
@@ -138,9 +168,15 @@ class Customer extends Model
             $Mail          = new Mail();
             $do_send       = true;
             $Mail->Subject = '###label.email__user_registration_subject###';
-            $Mail->setFragmentPath('simpleshop/email/customer/registration.php');
+
+            if ($doubelOptIn) {
+                $Mail->setFragmentPath('simpleshop/email/customer/registration_activation.php');
+            } else {
+                $Mail->setFragmentPath('simpleshop/email/customer/registration.php');
+            }
 
             // add vars
+            $Mail->setVar('customer', $_this);
             $Mail->setVar('email', $email);
             $Mail->setVar('password', $password);
             $Mail->AddAddress($email);
@@ -154,7 +190,9 @@ class Customer extends Model
             if ($do_send) {
                 $Mail->send();
             }
-            $result = Customer::get($_this->getId());
+            if (!$doubelOptIn) {
+                $result = Customer::get($_this->getId());
+            }
         }
         return $result;
     }

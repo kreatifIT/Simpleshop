@@ -13,21 +13,29 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$email    = $this->getVar('email');
-$addText  = $this->getVar('additional_text', '');
-$password = $this->getVar('password');
-$url      = trim($this->getVar('url'));
+$customer      = $this->getVar('customer');
+$email         = $this->getVar('email');
+$addText       = $this->getVar('additional_text', '');
+$password      = $this->getVar('password');
+$url           = trim($this->getVar('url'));
+$shopSettings  = \rex::getConfig('simpleshop.Settings');
+$accountPage   = $shopSettings['linklist']['dashboard'] ? \rex_article::get($shopSettings['linklist']['dashboard']) : null;
+$activationUrl = $accountPage ? $accountPage->getUrl(['action' => 'activate_customer', 'hash' => $customer->getValue('hash')]) : '';
 
 if ($url == '') {
-    $shopSettings = \rex::getConfig('simpleshop.Settings');
-    $accountPage  = $shopSettings['linklist']['dashboard'] ? \rex_article::get($shopSettings['linklist']['dashboard']) : null;
-    $url          = $accountPage ? $accountPage->getUrl() : '';
+    $url = $accountPage ? $accountPage->getUrl() : '';
 }
 
 $url_label = $this->getVar('url_label', $url);
 
+
 ?>
-<p>###label.email__registration_text###</p>
+<p>###label.email__registration_optin_text###</p>
+
+<a href="<?= $activationUrl ?>"><?= $activationUrl ?></a>
+
+<br/>
+<br/>
 
 <table style="width:100%;">
     <?php if (strlen($url)): ?>
