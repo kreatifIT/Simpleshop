@@ -17,15 +17,28 @@ $image_types = [
         'description' => '50x50',
         'effects'     => [
             [
-                'name'   => 'focuspoint_fit',
+                'name'   => 'resize',
                 'params' => json_encode([
-                    'rex_effect_focuspoint_fit' => [
-                        'rex_effect_focuspoint_fit_width'  => 50,
-                        'rex_effect_focuspoint_fit_height' => 50,
-                        'rex_effect_focuspoint_fit_hpos'   => 50,
-                        'rex_effect_focuspoint_fit_vpos'   => 50,
-                        'rex_effect_focuspoint_fit_fp'     => "Fokuspunkt des Bildes, Fallback allgemeiner Bezugspunkt",
-                        'rex_effect_focuspoint_fit_zoom'   => "Ausschnitt gr\u00f6\u00dftm\u00f6glich w\u00e4hlen (100%)",
+                    'rex_effect_resize' => [
+                        'rex_effect_resize_width'         => 50,
+                        'rex_effect_resize_height'        => 50,
+                        'rex_effect_resize_style'         => 'maximum',
+                        'rex_effect_resize_allow_enlarge' => 'not_enlarge',
+                    ],
+                ]),
+            ],
+            [
+                'name'   => 'workspace',
+                'params' => json_encode([
+                    'rex_effect_workspace' => [
+                        'rex_effect_workspace_width'           => 50,
+                        'rex_effect_workspace_height'          => 50,
+                        'rex_effect_workspace_hpos'            => 'center',
+                        'rex_effect_workspace_vpos'            => 'middle',
+                        'rex_effect_workspace_set_transparent' => 'colored',
+                        'rex_effect_workspace_bg_r'            => 255,
+                        'rex_effect_workspace_bg_g'            => 255,
+                        'rex_effect_workspace_bg_b'            => 255,
                     ],
                 ]),
             ],
