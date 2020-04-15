@@ -67,7 +67,8 @@ class Product extends Model
         if ($feature && $feature->isOnline()) {
             $stmt = FeatureValue::query();
             $stmt->alias('m');
-            $stmt->select(['m.*', 'jt1.variant_key']);
+            $stmt->resetSelect();
+            $stmt->selectRaw('m.*, jt1.id AS variant_id, jt1.variant_key');
             $stmt->joinRaw('inner', Variant::TABLE, 'jt1', 'jt1.product_id = ' . $this->getId());
             $stmt->where('jt1.type', 'NE', '!=');
             $stmt->where('m.status', 1);
@@ -118,7 +119,8 @@ class Product extends Model
             if ($feature = Feature::getFeatureByKey($featureKey)) {
                 $stmt = FeatureValue::query();
                 $stmt->alias('m');
-                $stmt->select(['m.*', 'jt1.variant_key']);
+                $stmt->resetSelect();
+                $stmt->selectRaw('m.*, jt1.id AS variant_id, jt1.variant_key');
                 $stmt->joinRaw('inner', Variant::TABLE, 'jt1', 'jt1.product_id = ' . $this->getId());
                 $stmt->where('m.feature_id', $feature->getId());
                 $stmt->where('m.status', 1);
@@ -400,6 +402,8 @@ class Product extends Model
                 if ((float)$value > 0) {
                     $this->setValue($key, (float)$value);
                 }
+            } else if ($key == 'id') {
+                $this->setValue('variant_id', $value);
             } else if ($key == 'amount') {
                 if ($value != '') {
                     $this->setValue($key, $value);
