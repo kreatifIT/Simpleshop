@@ -61,30 +61,10 @@ class Session extends Model
     {
         if (self::$session === null) {
             $session_id    = session_id();
-            $User          = Customer::getCurrentUser();
             $session       = parent::query()
                 ->where('session_id', $session_id)
                 ->findOne();
             self::$session = $session ?: parent::create();
-
-            if ($User) {
-                $user_session = parent::query()
-                    ->where('customer_id', $User->getId())
-                    ->where('session_id', $session_id, '!=')
-                    ->orderBy('last_cart_update', 'DESC')
-                    ->orderBy('lastupdate', 'DESC')
-                    ->findOne();
-
-                if ($user_session) {
-                    // merge sessions because we found to sessions for the same user
-                    $cart_items = array_merge((array)$user_session->getValue('cart_items'), (array)self::$session->getValue('cart_items'));
-                    unset($cart_items[0]);
-
-                    self::$session = $user_session;
-                    self::$session->setValue('session_id', $session_id);
-                    self::$session->writeSession(['cart_items' => $cart_items]);
-                }
-            }
         }
         return self::$session;
     }
