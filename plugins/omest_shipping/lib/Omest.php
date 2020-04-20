@@ -317,6 +317,10 @@ class Omest extends ShippingAbstract
                 ->getName());
             $Order->setValue('shipping', Order::prepareData($Shipping));
             $Order->save();
+
+            // todo: hier müsste man noch vom erstellet Versand alle Parcel-Keys auslesen
+            // um bei einem update die Parcels nicht mehrfach anzulegen
+            // http://wiki.olc.omest.com/doku.php?id=api:shipmentdata
         }
 
         return $response;
