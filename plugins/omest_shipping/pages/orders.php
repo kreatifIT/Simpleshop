@@ -33,6 +33,10 @@ if ($_FUNC == 'submit' && count($order_ids)) {
         $Shipping = $Order->getValue('shipping');
         $pparcels = $props[$order_id];
 
+        if ($Order->getValue('shipping_key') != '') {
+            continue;
+        }
+
         ksort($pparcels);
 
         // set shipping parcels
@@ -112,7 +116,7 @@ $fragment->setVar('title', $this->i18n('omest_shipping.set_orders_to_send'), fal
 $sections .= $fragment->parse('core/page/section.php');
 
 $formElements = [
-    ['field' => '<button class="btn btn-apply rex-form-aligned" type="submit" name="func" value="submit"' . \rex::getAccesskey(\rex_i18n::msg('action.submit'), 'apply') . '>' . \rex_i18n::msg('action.submit') . '</button>'],
+    ['field' => '<button class="btn btn-apply rex-form-aligned" type="submit" onclick="(function(_this){window.setTimeout(function(){_this.disabled=true;},300);})(this);" name="func" value="submit"' . \rex::getAccesskey(\rex_i18n::msg('action.submit'), 'apply') . '>' . \rex_i18n::msg('action.submit') . '</button>'],
 ];
 $fragment     = new \rex_fragment();
 $fragment->setVar('elements', $formElements, false);
