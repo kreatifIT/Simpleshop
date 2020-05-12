@@ -32,7 +32,7 @@ foreach ($fields as $field) {
         $field->setName(str_replace(',', '-', $vkey . '-' . $field->fieldIndex));
 
         if ($field instanceof \rex_yform_value_be_manager_relation && $field->elements['type'] == 6) {
-            $field->params['main_id'] = $Variant->getId();
+            $field->params['main_id'] = $Variant ? $Variant->getId() : null;
             $field->setValue(null);
         } else {
             $field->setValue($Variant ? $Variant->getRawValue($field->fieldName) : null);
