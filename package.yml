@@ -1,5 +1,5 @@
 package: simpleshop
-version: '4.0.2'
+version: '4.0.1'
 author: FriendsOfREDAXO
 debug_email: dev@kreatif.it
 compile: 0
@@ -10,15 +10,8 @@ page:
     pjax: false
     icon: rex-icon fa-shopping-cart
     subpages:
-        orders_export:
-            title: translate:orders_export
-            perm: shop[orders_export]
         settings:
             title: translate:settings
-            perm: shop[settings]
-        settings_adv:
-            title: translate:label.advanced_settings
-            perm: shop[advanced_settings]
         variants:
             title: translate:label.variants
             hidden: true
@@ -28,6 +21,12 @@ page:
         yform_functions:
             title: yform_functions
             hidden: true
+        orders_export:
+            title: translate:orders_export
+            perm: shop[orders_export]
+        settings_adv:
+            title: translate:label.advanced_settings
+            perm: shop[advanced_settings]
 
 
 
