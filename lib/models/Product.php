@@ -41,11 +41,11 @@ class Product extends Model
         return $stmt;
     }
 
-    public function getUrl($params = [], $lang_id = null)
+    public function getUrl($params = [], $lang_id = null, $withVkey = true)
     {
         $vkey = $this->getValue('variant_key');
 
-        if ($vkey) {
+        if ($withVkey && $vkey) {
             $params = array_merge([
                 'vkey' => $vkey,
             ], $params);
@@ -264,17 +264,21 @@ class Product extends Model
         return $Object;
     }
 
-    public function getVariant($variant_key)
+    public function getVariant($variantKey = null)
     {
         $product_id = $this->getValue('id');
         $stmt       = Variant::query();
         $stmt->where('product_id', $product_id);
-        $stmt->where('variant_key', $variant_key);
         $stmt->where('type', 'NE', '!=');
+        $stmt->orderBy('prio');
+
+        if ($variantKey) {
+            $stmt->where('variant_key', $variantKey);
+        }
         $variant = $stmt->findOne();
 
         if (!$variant) {
-            throw new ProductException("The variant doesn't exist --key:{$product_id}|{$variant_key}", 3);
+            throw new ProductException("The variant doesn't exist --key:{$product_id}|{$variantKey}", 3);
         }
         // apply default values from variant
         $this->applyVariantData($variant->getData());
