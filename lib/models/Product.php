@@ -391,10 +391,15 @@ class Product extends Model
         if ($_features && count($feature_ids)) {
             foreach ($feature_ids as $feature_id) {
                 // get variants
-                $feature = FeatureValue::query()
-                    ->where('id', $feature_id)
-                    ->where('status', 1)
-                    ->findOne();
+                $stmt = FeatureValue::query();
+                $stmt->alias('m');
+                $stmt->select('jt1.prio', 'feature_prio');
+                $stmt->join(Feature::TABLE, 'jt1', 'jt1.id', 'm.feature_id');
+                $stmt->where('m.id', $feature_id);
+                $stmt->where('m.status', 1);
+                $stmt->orderBy('jt1.prio', 'desc');
+                $feature = $stmt->findOne();
+
 
                 if ($throwErrors) {
                     if (!$feature) {
@@ -406,7 +411,12 @@ class Product extends Model
                         throw new ProductException("Amount of product is lower than cart quantity --key:{$key}", 5);
                     }
                 }
-                $features[] = $feature;
+                $__features[$feature->getValue('feature_prio')] = $feature;
+            }
+            ksort($__features);
+            $features = [];
+            foreach ($__features as $_feature) {
+                $features[] = $_feature;
             }
         } else {
             if ($throwErrors) {
