@@ -171,7 +171,9 @@ class Product extends Model
                     }
                 }
             }
-            $result[$feature->getValue('key')] = $_collection;
+            if (count($_collection)) {
+                $result[$feature->getValue('key')] = $_collection;
+            }
         }
         return $result;
     }
