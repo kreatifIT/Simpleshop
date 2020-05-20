@@ -28,6 +28,7 @@ $products = $this->getVar('products', []);
     $quantity    = $product->getValue('cart_quantity');
     $product_url = $product->getUrl();
     $key         = $product->getValue('key');
+    $features    = $product->getValue('features');
 
     ?>
 
@@ -37,6 +38,17 @@ $products = $this->getVar('products', []);
         </a>
         <div class="description">
             <span class="name"><?= $product->getName() ?></span>
+            <?php if (count($features)): ?>
+                <?php foreach ($features as $featureValue): ?>
+                    <?php
+                    $feature = Feature::get($featureValue->getValue('feature_id'));
+                    ?>
+                    <div class="feature">
+                        <span class="label"><?= $feature->getName() ?>:</span>
+                        <?= $featureValue->getName() ?>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
             <div class="price-container">
                 <?php if ($quantity) : ?>
                     <span class="quantity"><?= $quantity ?> x </span>
