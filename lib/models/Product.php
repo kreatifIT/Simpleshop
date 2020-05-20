@@ -41,11 +41,11 @@ class Product extends Model
         return $stmt;
     }
 
-    public function getUrl($params = [], $lang_id = null, $withVkey = true)
+    public function getUrl($params = [], $lang_id = null, $withoutVkey = true)
     {
         $vkey = $this->getValue('variant_key');
 
-        if ($withVkey && $vkey) {
+        if (!$withoutVkey && $vkey) {
             $params = array_merge([
                 'vkey' => $vkey,
             ], $params);
@@ -101,54 +101,77 @@ class Product extends Model
     {
         $result     = [];
         $filterIds  = [];
-        $variantKey = trim($this->getValue('variant_key'));
+        $variantKey = array_filter(explode(',', trim($this->getValue('variant_key'))));
 
-        if ($variantKey != '' && count($filterKeys)) {
+        if (count($variantKey) && count($filterKeys)) {
             foreach ($filterKeys as $filterKey) {
                 if ($feature = Feature::getFeatureByKey($filterKey)) {
                     $stmt = FeatureValue::query();
                     $stmt->where('status', 1);
                     $stmt->where('feature_id', $feature->getId());
-                    $stmt->where('id', explode(',', $variantKey));
+                    $stmt->where('id', $variantKey);
                     $collection = $stmt->find();
                     $filterIds  = array_merge($filterIds, $collection->getIds());
                 }
             }
         }
-        foreach ($featureKeys as $featureKey) {
-            if ($feature = Feature::getFeatureByKey($featureKey)) {
-                $stmt = FeatureValue::query();
-                $stmt->alias('m');
-                $stmt->resetSelect();
-                $stmt->selectRaw('m.*, jt1.id AS variant_id, jt1.variant_key');
-                $stmt->joinRaw('inner', Variant::TABLE, 'jt1', 'jt1.product_id = ' . $this->getId());
-                $stmt->where('m.feature_id', $feature->getId());
-                $stmt->where('m.status', 1);
-                $stmt->where('jt1.type', 'NE', '!=');
-                $stmt->whereRaw('(
+        // get feature by order
+        $stmt = Feature::query();
+        $stmt->where('key', $featureKeys);
+        $stmt->where('status', 1);
+        $features = $stmt->find();
+
+        foreach ($features as $feature) {
+            $stmt = FeatureValue::query();
+            $stmt->alias('m');
+            $stmt->resetSelect();
+            $stmt->selectRaw('m.*, jt1.id AS variant_id, jt1.variant_key');
+            $stmt->joinRaw('inner', Variant::TABLE, 'jt1', 'jt1.product_id = ' . $this->getId());
+            $stmt->where('m.feature_id', $feature->getId());
+            $stmt->where('m.status', 1);
+            $stmt->where('jt1.type', 'NE', '!=');
+            $stmt->groupBy('m.id');
+            $stmt->orderBy('jt1.prio');
+            $stmt->whereRaw('(
                     jt1.variant_key = m.id    
                     OR jt1.variant_key LIKE CONCAT(m.id, ",%")    
                     OR jt1.variant_key LIKE CONCAT("%,", m.id, ",%")    
                     OR jt1.variant_key LIKE CONCAT("%,", m.id)    
                 )');
-                if (count($filterIds)) {
-                    foreach ($filterIds as $index => $filterId) {
-                        $stmt->whereRaw("(
+            if (count($filterIds)) {
+                foreach ($filterIds as $index => $filterId) {
+                    $stmt->whereRaw("(
                             jt1.variant_key = :filter_{$index}_1
                             OR jt1.variant_key LIKE :filter_{$index}_2    
                             OR jt1.variant_key LIKE :filter_{$index}_3    
                             OR jt1.variant_key LIKE :filter_{$index}_4    
                         )", [
-                            "filter_{$index}_1" => $filterId,
-                            "filter_{$index}_2" => "%,{$filterId}",
-                            "filter_{$index}_3" => "%,{$filterId},%",
-                            "filter_{$index}_4" => "{$filterId},%",
-                        ]);
+                        "filter_{$index}_1" => $filterId,
+                        "filter_{$index}_2" => "%,{$filterId}",
+                        "filter_{$index}_3" => "%,{$filterId},%",
+                        "filter_{$index}_4" => "{$filterId},%",
+                    ]);
+                }
+            } else if (count($variantKey)) {
+                // order by variant key
+                $oStmt    = clone $stmt;
+                $orderIds = $oStmt->find();
+                $orderIds = $orderIds->getIds();
+                $orderIds = array_unique(array_merge(array_intersect($orderIds, $variantKey), $orderIds));
+                $stmt->resetOrderBy();
+                $stmt->orderByRaw('FIELD(m.id, ' . implode(',', $orderIds) . ')');
+            }
+            $_collection = $stmt->find();
+
+            if (count($variantKey)) {
+                foreach ($_collection as $_item) {
+                    if (in_array($_item->getId(), $variantKey)) {
+                        $filterIds[] = $_item->getId();
+                        break;
                     }
                 }
-                $stmt->groupBy('m.id');
-                $result[$featureKey] = $stmt->find();
             }
+            $result[$feature->getValue('key')] = $_collection;
         }
         return $result;
     }
