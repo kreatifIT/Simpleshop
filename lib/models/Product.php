@@ -402,6 +402,8 @@ class Product extends Model
                 if ((float)$value > 0) {
                     $this->setValue($key, (float)$value);
                 }
+            } else if ($key == 'prio') {
+                $this->setValue('variant_prio', $value);
             } else if ($key == 'id') {
                 $this->setValue('variant_id', $value);
             } else if ($key == 'amount') {
