@@ -30,6 +30,7 @@ label.order_placed_but_pending;L'ordine è stato creato con successo ed è ancor
 label.redirect_to_plugin_payment_page;Ora sarete indirizzati all'interfaccia di pagamento di {NAME}
 action.create_new_shipping_address;Creare un nuovo indirizzo di consegna
 label.applied;applicato
+label.remarks_infos;Commenti / info
 label.order_history_is_empty;Lo storico dei vostri ordini è ancora vuoto
 action.login;Accedi
 error.login_failed;Accesso non riuscito

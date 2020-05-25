@@ -145,6 +145,12 @@ $shipping   = $Order->getValue('shipping');
                         </div>
                         <span class="required-fields-hint">* ###label.are_required_fields###</span>
                     </div>
+
+                    <div class="margin-top">
+                        <label>###label.remarks_infos###</label>
+                        <textarea rows="3" name="remarks"><?= $Order->getValue('remarks') ?></textarea>
+                    </div>
+
                     <div class="margin-top margin-large-bottom">
                         <a href="<?= $back_url ?>" class="button hollow">###action.go_back###</a>
                         <button type="submit" name="action" value="place_order" class="button margin-bottom float-right">

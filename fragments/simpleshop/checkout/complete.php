@@ -13,10 +13,9 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$Order           = $this->getVar('Order');
-$Payment         = $Order->getValue('payment');
-$Shipping        = $Order->getValue('shipping');
-$additional_info = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.checkout.complete_additional_info', ''));
+$Order    = $this->getVar('Order');
+$Payment  = $Order->getValue('payment');
+$Shipping = $Order->getValue('shipping');
 
 ?>
 <div class="order-complete margin-large-top margin-large-bottom">
@@ -29,10 +28,4 @@ $additional_info = \rex_extension::registerPoint(new \rex_extension_point('simpl
         $this->subfragment('simpleshop/checkout/shipping/' . $Shipping->plugin_name . '/order_complete.php');
     }
     ?>
-
-    <?php if (strlen($additional_info)): ?>
-        <div class="text-center">
-            <p><?= $additional_info ?></p>
-        </div>
-    <?php endif; ?>
 </div>

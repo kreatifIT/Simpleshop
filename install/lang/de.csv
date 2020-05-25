@@ -148,8 +148,8 @@ simpleshop.shipping_pickup_point;Selbstabholung
 label.shipping_number;Sendungsnummer
 label.edit_address;Adresse bearbeiten
 label.new_address;Neue Adresse
-label.login_info_text;"Sie haben bereits einen Account? Log-In hier.
-"
+label.login_info_text;Sie haben bereits einen Account? Log-In hier.
+label.remarks_infos;Bemerkungen / Infos
 label.registration_sucessfull;Sie haben sich erfolgreich registriert und können weiter-/anfangen einzukaufen
 label.applied_promotion_text;Sie kommen in den Genuss folgender Promotionen:
 error.tos_rma_not_accepted;Sie müssen die Geschäftsbedingungen und die Widerrufsbelehrungen akzeptieren

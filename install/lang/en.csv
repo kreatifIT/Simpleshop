@@ -28,6 +28,7 @@ error.min_order_value;The minimum order value of {VALUE} was not reached
 label.address_additional;Address add-on
 label.email__user_password_reset;Password reset
 label.all;All
+label.remarks_infos;Remarks / infos
 label.province;Province
 label.customer_type;I'm a...
 label.use_existing_addredss;Use existing address

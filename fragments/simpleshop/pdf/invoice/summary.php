@@ -2,18 +2,25 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$Order          = $this->getVar('Order');
-$config         = \FriendsOfREDAXO\Simpleshop\FragmentConfig::getValue('checkout');
+$Order  = $this->getVar('Order');
+$config = \FriendsOfREDAXO\Simpleshop\FragmentConfig::getValue('checkout');
 
 $discount       = $Order->getValue('discount');
 $total          = $Order->getValue('total');
 $taxes          = $Order->getValue('taxes');
 $shipping       = $Order->getValue('shipping');
+$remarks        = trim($Order->getValue('remarks'));
 $promotions     = (array)$Order->getValue('promotions');
 $shipping_costs = $shipping && $config['show_tax_info'] ? $shipping->getPrice($Order) : $Order->getValue('shipping_costs');
 $summary        = $Order->getValue($config['show_tax_info'] ? 'net_prices' : 'brut_prices');
 
 ?>
+<?php if ($remarks != ''): ?>
+    <div class="remarks">
+        <strong>###label.remarks_infos###</strong><br>
+        <p><?= nl2br($remarks) ?></p>
+    </div>
+<?php endif; ?>
 <table id="invoice-summary" width="100%">
 
     <?php if ($Order->getValue('status') != 'CN'): ?>

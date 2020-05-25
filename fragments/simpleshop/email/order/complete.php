@@ -13,14 +13,14 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-$Order         = $this->getVar('Order');
-$add_info      = $this->getVar('additional_info');
-$Payment       = $Order->getValue('payment');
-$Shipping      = $Order->getValue('shipping');
+$Order    = $this->getVar('Order');
+$remarks  = trim($Order->getValue('remarks'));
+$Payment  = $Order->getValue('payment');
+$Shipping = $Order->getValue('shipping');
 
-FragmentConfig::$data['cart']['has_remove_button'] = false;
+FragmentConfig::$data['cart']['has_remove_button']              = false;
 FragmentConfig::$data['cart']['button']['has_quantity_control'] = false;
-FragmentConfig::$data['cart']['table-wrapper']['has_go_ahead'] = false;
+FragmentConfig::$data['cart']['table-wrapper']['has_go_ahead']  = false;
 
 $styles = FragmentConfig::getValue('email_styles');
 
@@ -40,10 +40,6 @@ $styles = FragmentConfig::getValue('email_styles');
         }
     }
     ?>
-
-    <?php if (strlen($add_info)): ?>
-        <p><?= $add_info ?></p>
-    <?php endif; ?>
 
     <?php if ($Payment): ?>
         <!-- payment -->
@@ -72,5 +68,12 @@ $styles = FragmentConfig::getValue('email_styles');
         </table>
     <?php endif; ?>
 
+    <?php if (strlen($remarks)): ?>
+        <br/>
+        <div class="remarks">
+            <h3 <?= $styles['h2'] ?>>###label.remarks_infos###</h3>
+            <div style="font-size:13px;line-height:17px;"><?= nl2br($remarks) ?></div>
+        </div>
+    <?php endif; ?>
 
 </div>
