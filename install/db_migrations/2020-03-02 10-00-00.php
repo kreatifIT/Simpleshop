@@ -133,7 +133,7 @@ try {
         if ($address) {
             $sql->setTable('rex_shop_customer');
             $sql->setValue('invoice_address_id', $address['id']);
-            $sql->setWhere('id = :id', ['id' => $item['id']]);
+            $sql->setWhere(['id' => $item['id']]);
             $sql->update();
         }
     }

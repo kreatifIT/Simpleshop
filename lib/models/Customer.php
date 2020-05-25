@@ -90,7 +90,7 @@ class Customer extends Model
                     $sql->setTable(self::TABLE);
                     $sql->setValue('status', 1);
                     $sql->setRawValue('activationdate', 'NOW()');
-                    $sql->setWhere('id = :id', ['id' => $customer->getId()]);
+                    $sql->setWhere(['id' => $customer->getId()]);
                     $sql->update();
                     $isActivated = 1;
                 } else {
@@ -157,12 +157,12 @@ class Customer extends Model
             $sql->setTable(CustomerAddress::TABLE);
             $sql->setValue('customer_id', $_this->getId());
             $sql->setValue('status', 1);
-            $sql->setWhere('id = :id', ['id' => $address->getId()]);
+            $sql->setWhere(['id' => $address->getId()]);
             $sql->update();
 
             $sql->setTable(self::TABLE);
             $sql->setValue('invoice_address_id', $address->getId());
-            $sql->setWhere('id = :id', ['id' => $_this->getId()]);
+            $sql->setWhere(['id' => $_this->getId()]);
             $sql->update();
 
             $Mail          = new Mail();
@@ -215,7 +215,7 @@ class Customer extends Model
 
         $sql->setTable(self::TABLE);
         $sql->setValue('email', $email);
-        $sql->setWhere('email', $email);
+        $sql->setWhere(['email' => $email]);
         $sql->setValue('password_hash', self::getPasswordHash($password));
         $sql->insertOrUpdate();
 
@@ -263,7 +263,7 @@ class Customer extends Model
                 $sql->setTable(self::TABLE);
                 $sql->setValue('lastlogin', date('Y-m-d H:i:s'));
                 $sql->setValue('lang_id', \rex_clang::getCurrentId());
-                $sql->setWhere('id', $user->getId());
+                $sql->setWhere(['id' => $user->getId()]);
                 $sql->update();
 
                 $result = \rex_extension::registerPoint(new \rex_extension_point('Customer.logged_in', $user, [
@@ -288,7 +288,7 @@ class Customer extends Model
             $sql      = \rex_sql::factory();
             $sql->setTable(self::TABLE);
             $sql->setValue('password_hash', self::getPasswordHash($password));
-            $sql->setWhere('id = :id', ['id' => $User->getId()]);
+            $sql->setWhere(['id' => $User->getId()]);
             $sql->update();
 
             $Mail          = new Mail();

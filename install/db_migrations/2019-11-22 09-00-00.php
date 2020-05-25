@@ -29,7 +29,7 @@ try {
     $sql->setValue('empty_option', 0);
 
     if ($fieldId) {
-        $sql->setWhere('id = :id', ['id' => $fieldId]);
+        $sql->setWhere(['id' => $fieldId]);
         $sql->update();
     } else {
         $sql->insert();
