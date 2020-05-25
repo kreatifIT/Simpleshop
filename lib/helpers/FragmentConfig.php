@@ -49,11 +49,12 @@ class FragmentConfig
                 ],
             ],
             'table-wrapper'     => [
-                'has_go_ahead'    => true,
-                'class'           => 'stack',
-                'btn_ahead_class' => 'secondary',
-                'ahead_url'       => '',
-                'back_url'        => '',
+                'show_coupon_info' => true,
+                'has_go_ahead'     => true,
+                'class'            => 'stack',
+                'btn_ahead_class'  => 'secondary',
+                'ahead_url'        => '',
+                'back_url'         => '',
             ],
             'item'              => [
                 'class'                => '',

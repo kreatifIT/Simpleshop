@@ -109,6 +109,7 @@ $shipping   = $Order->getValue('shipping');
                     'has_quantity'         => true,
                 ]),
                 'cart_table_wrapper_config' => array_merge(FragmentConfig::getValue('cart.table-wrapper'), [
+                    'show_coupon_info'  => false,
                     'has_remove_button' => false,
                     'hide_summary'      => true,
                     'has_go_ahead'      => false,

@@ -24,7 +24,7 @@ $Coupon      = Coupon::getByCode($coupon_code);
 $hasCoupons  = FragmentConfig::getValue('cart.has_coupons');
 
 ?>
-<?php if ($Coupon): ?>
+<?php if ($Coupon && $config['show_coupon_info']): ?>
     <div class="callout success">
         <strong><?= $Coupon->getName() ?></strong>
         ###label.applied###

@@ -69,8 +69,14 @@ if ($is_giftcard) {
             </code>
         <?php endif; ?>
         <?php if (count($features)): ?>
-            <?php foreach ($features as $feature): ?>
-                <div class="feature"><?= $feature->getName() ?></div>
+            <?php foreach ($features as $featureValue): ?>
+                <?php
+                $feature = Feature::get($featureValue->getValue('feature_id'));
+                ?>
+                <div class="feature">
+                    <span class="label"><?= $feature->getName() ?>:</span>
+                    <?= $featureValue->getName() ?>
+                </div>
             <?php endforeach; ?>
         <?php endif; ?>
     </td>
