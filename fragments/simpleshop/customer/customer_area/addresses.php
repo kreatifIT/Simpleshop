@@ -31,7 +31,7 @@ $canAddItem = $User->hasPermission('fragment.customer-area--addresses--add-new')
         $this->setVar('redirect_url', $back_url);
         $this->setVar('excluded_fields', ['office_id']);
         ?>
-        <h2><?= $address_id ? '###label.edit_address###' : '###label.new_address###' ?></h2>
+        <h2 class="heading small"><?= $address_id ? '###label.edit_address###' : '###label.new_address###' ?></h2>
         <?php $this->subfragment('simpleshop/customer/customer_area/address_form.php'); ?>
     <?php else: ?>
         <?php
@@ -41,16 +41,14 @@ $canAddItem = $User->hasPermission('fragment.customer-area--addresses--add-new')
             $where[] = "id IN({$User->getValue('addresses')})";
         }
 
-        $stmt = CustomerAddress::query()
-            ->whereRaw('(' . implode(' OR ', $where) . ')')
-            ->where('status', 0, '!=');
+        $stmt = CustomerAddress::query()->whereRaw('(' . implode(' OR ', $where) . ')')->where('status', 0, '!=');
 
         $addresses = $stmt->find();
 
         $this->subfragment('simpleshop/customer/customer_area/title.php');
 
         if (count($addresses)): ?>
-            <ul class="no-bullet">
+            <div class="address-list">
                 <?php foreach ($addresses as $address) {
                     $fragment = new \rex_fragment();
                     $fragment->setVar('Address', $address);
@@ -58,11 +56,9 @@ $canAddItem = $User->hasPermission('fragment.customer-area--addresses--add-new')
                     echo $fragment->parse('simpleshop/customer/customer_area/address_item.php');
                 }
                 ?>
-            </ul>
+            </div>
         <?php else: ?>
-            <p class="margin-bottom">
-                <i>###label.no_address_available###</i>
-            </p>
+            <div class="no-address">###label.no_address_available###</div>
         <?php endif; ?>
 
         <?php if ($canAddItem): ?>

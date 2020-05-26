@@ -16,7 +16,7 @@ $Address    = $this->getVar('Address');
 $canAddItem = $this->getVar('canAddItem', true);
 
 ?>
-<li class="grid-x grid-margin-x margin-small-bottom">
+<div class="address-item grid-x grid-margin-x">
     <div class="cell medium-6">
         <?= $Address->getName() ?><br/>
         <?= $Address->getValue('street') ?>
@@ -25,7 +25,7 @@ $canAddItem = $this->getVar('canAddItem', true);
     </div>
     <div class="cell medium-6">
         <?php if ($canAddItem): ?>
-            <a href="<?= rex_getUrl(null, null, [
+            <a class="link" href="<?= rex_getUrl(null, null, [
                 'action'  => 'edit',
                 'ctrl'    => 'addresses.detail',
                 'data-id' => $Address->getId(),
@@ -33,4 +33,4 @@ $canAddItem = $this->getVar('canAddItem', true);
             <br/>
         <?php endif; ?>
     </div>
-</li>
+</div>
