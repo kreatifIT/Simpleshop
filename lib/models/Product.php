@@ -139,6 +139,8 @@ class Product extends Model
                     OR jt1.variant_key LIKE CONCAT("%,", m.id)    
                 )');
             if (count($filterIds)) {
+                $stmt->resetOrderBy();
+                $stmt->orderBy('m.prio');
                 foreach ($filterIds as $index => $filterId) {
                     $stmt->whereRaw("(
                             jt1.variant_key = :filter_{$index}_1
