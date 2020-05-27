@@ -158,8 +158,10 @@ class Product extends Model
                 $orderIds = $oStmt->find();
                 $orderIds = $orderIds->getIds();
                 $orderIds = array_unique(array_merge(array_intersect($orderIds, $variantKey), $orderIds));
-                $stmt->resetOrderBy();
-                $stmt->orderByRaw('FIELD(m.id, ' . implode(',', $orderIds) . ')');
+                if (count($orderIds)) {
+                    $stmt->resetOrderBy();
+                    $stmt->orderByRaw('FIELD(m.id, ' . implode(',', $orderIds) . ')');
+                }
             }
             $_collection = $stmt->find();
 
