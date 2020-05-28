@@ -24,7 +24,7 @@ class DiscountGroup extends Discount
 
         if (parent::isRegistered(self::TABLE)) {
             $Order      = $Ep->getParam('Order');
-            $promotions = self::getValidPromotions($Ep->getParam('products'), $Order->getValue('customer_data'));
+            $promotions = self::getValidPromotions($Ep->getParam('products'), $Order->getCustomerData());
         }
         return $promotions;
     }

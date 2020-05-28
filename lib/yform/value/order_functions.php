@@ -24,7 +24,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
 
             if (!$CustomerData || $CustomerData->getId() != $Order->getValue('customer_id')) {
                 $Order->save();
-                $CustomerData = $Order->get('customer_data');
+                $CustomerData = $Order->getCustomerData();
             }
 
             $Customer = $Order->getValue('customer_id') ? \FriendsOfREDAXO\Simpleshop\Customer::get($Order->getValue('customer_id')) : $Order->getInvoiceAddress();;

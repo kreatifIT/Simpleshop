@@ -32,8 +32,10 @@ if (file_exists(\rex_path::base('resources/img/logo300dpi.png'))) {
         <td width="50%" valign="top">
             <?php
             if ($invoice_addr) {
+                $customerData = $Order->getCustomerData();
+                $invoice_addr->setValue('email', $customerData->getValue('email'));
                 $this->setVar('address', $invoice_addr);
-                $this->setVar('customer', $Order->getValue('customer_data'));
+                $this->setVar('customer', $customerData);
                 $this->setVar('title', '###label.invoice_address###');
                 $this->subfragment('simpleshop/checkout/summary/address_item.php');
                 echo '<br/><br/>';

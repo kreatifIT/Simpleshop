@@ -208,7 +208,7 @@ class Omest extends ShippingAbstract
         $IAddress = $Order->getInvoiceAddress();
         $DAddress = $Order->getShippingAddress();
         $Country  = Country::get($DAddress->getValue('country'));
-        $Customer = $Order->getValue('customer_data');
+        $Customer = $Order->getCustomerData();
         $Shipping = $Order->getValue('shipping');
         $parcels  = $Shipping->getValue('parcels');
         $products = OrderProduct::query()
