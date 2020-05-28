@@ -39,6 +39,38 @@ try {
     rex_sql_table::get('rex_shop_order')
         ->ensureColumn(new rex_sql_column('remarks', 'text'), 'invoice_num')
         ->alter();
+
+
+    rex_sql_table::get('rex_shop_product_has_feature')
+        ->ensureColumn(new rex_sql_column('price', 'decimal(11,4)', true))
+        ->ensureColumn(new rex_sql_column('reduced_price', 'decimal(11,4)', true))
+        ->ensure();
+
+    $sql->setTable('rex_yform_field');
+    $sql->setValue('table_name', 'rex_shop_product_has_feature');
+    $sql->setValue('name', 'price');
+    $sql->setValue('type_name', 'number');
+    $sql->setValue('db_type', '');
+    $sql->setValue('scale', 4);
+    $sql->setValue('precision', 11);
+    $sql->setWhere([
+        'table_name' =>'rex_shop_product_has_feature',
+        'name' =>'price',
+    ]);
+    $sql->update();
+
+    $sql->setTable('rex_yform_field');
+    $sql->setValue('table_name', 'rex_shop_product_has_feature');
+    $sql->setValue('name', 'reduced_price');
+    $sql->setValue('type_name', 'number');
+    $sql->setValue('db_type', '');
+    $sql->setValue('scale', 4);
+    $sql->setValue('precision', 11);
+    $sql->setWhere([
+        'table_name' =>'rex_shop_product_has_feature',
+        'name' =>'reduced_price',
+    ]);
+    $sql->update();
 }
 finally {
     $sql = rex_sql::factory();
