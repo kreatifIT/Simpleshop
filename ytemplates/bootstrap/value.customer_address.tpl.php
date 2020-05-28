@@ -26,17 +26,7 @@ $apiUrl      = rex_url::frontend('index.php?' . http_build_query(['rex-api-call'
     <select class="form-control address-select" name="<?= $this->getFieldName() ?>" data-placeholder="Adresse auswählen" data-ajax--url="<?= $apiUrl ?>" data-minimum-input-length="0" data-customer-id="<?= $customer ? $customer->getId() : null ?>">
         <?php if ($address): ?>
             <option value="<?= $address->getId() ?>" <?= $addressId == $address->getId() ? 'selected="selected"' : '' ?>>
-                KUNDE: [ID=<?= $customer->getId() ?>]
-                <?= $customer->getName(null, true) ?>
-                ---> ADRESSE: [ID=<?= $address->getId() ?>]
-                <?php
-                echo implode(' | ', array_unique(array_filter([
-                    $address->getName(),
-                    $address->getValue('street'),
-                    $address->getValue('postal'),
-                    $address->getValue('location'),
-                ])))
-                ?>
+                <?= $address->getNameForOrder() ?>
             </option>
         <?php endif; ?>
     </select>

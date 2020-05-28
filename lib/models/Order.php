@@ -203,6 +203,10 @@ class Order extends Model
         if (!$this->valueIsset('createdate')) {
             $this->setValue('createdate', $date_now);
         }
+        if (!$this->valueIsset('shipping_address_id')) {
+            $shippingAddress = $this->getShippingAddress();
+            $this->setValue('shipping_address_id', $shippingAddress->getId());
+        }
 
         if (self::$_finalizeOrder && ($this->getValue('invoice_num') === null || (int)$this->getValue('invoice_num') === 0)) {
             $query = 'SELECT IFNULL(MAX(invoice_num), 0) + 1 as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"';
