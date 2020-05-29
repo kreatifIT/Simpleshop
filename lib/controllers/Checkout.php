@@ -80,6 +80,8 @@ class CheckoutController extends Controller
                     }
                 } else {
                     // no products - redirect to shopping cart
+                    \rex_response::sendCacheControl();
+                    \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
                     rex_redirect($this->settings['linklist']['cart'], null, ['ts' => time()]);
                 }
                 break;
@@ -162,6 +164,7 @@ class CheckoutController extends Controller
                 $data['Payment']->processIPN($data['Order'], $_POST);
                 $data['Order']->setValue('status', 'IP');
                 $data['Order']->setValue('payment', Order::prepareData($data['Payment']));
+                Session::setCheckoutData('Order', $data['Order']);
                 $data['Order']->save();
             } catch (\Exception $ex) {
                 Utils::log('Checkout.processIPN', $ex->getMessage() . "\n" . print_r($data, true), 'ERROR', true);
@@ -181,6 +184,8 @@ class CheckoutController extends Controller
         $this->Order->setValue('status', 'CA');
         $this->Order->save();
 
+        \rex_response::sendCacheControl();
+        \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
         rex_redirect(null, null, ['step' => 'show-summary', 'ca-info' => 1, 'ts' => time()]);
     }
 
@@ -229,6 +234,8 @@ class CheckoutController extends Controller
             if ($goAhead) {
                 $nextStep = CheckoutController::getNextStep();
                 CheckoutController::setDoneStep($nextStep);
+                \rex_response::sendCacheControl();
+                \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
                 rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
             }
         }
@@ -264,6 +271,8 @@ class CheckoutController extends Controller
             Session::setCheckoutData('Order', $Order);
 
             CheckoutController::setDoneStep($nextStep);
+            \rex_response::sendCacheControl();
+            \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
             rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
         }
         return $yform;
@@ -272,6 +281,7 @@ class CheckoutController extends Controller
     protected function getInvoiceAddressView()
     {
         $Address     = $this->Order->getInvoiceAddress();
+        $Address     = $Address ? CustomerAddress::get($Address->getId()) : null;
         $customer_id = $this->params['Customer']->getId();
 
         if (!$Address && $customer_id > 0) {
@@ -318,6 +328,8 @@ class CheckoutController extends Controller
             Session::setCheckoutData('Order', $Order);
 
             CheckoutController::setDoneStep($nextStep);
+            \rex_response::sendCacheControl();
+            \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
             rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
         }
         return $yform;
@@ -338,6 +350,8 @@ class CheckoutController extends Controller
         if (empty($shippings) && empty($payments)) {
             $nextStep = CheckoutController::getNextStep();
             CheckoutController::setDoneStep($nextStep);
+            \rex_response::sendCacheControl();
+            \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
             rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
         } else if (rex_post('action', 'string') == 'set-shipping-payment') {
             try {
@@ -354,6 +368,8 @@ class CheckoutController extends Controller
 
             $nextStep = CheckoutController::getNextStep();
             CheckoutController::setDoneStep($nextStep);
+            \rex_response::sendCacheControl();
+            \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
             rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
         }
 
@@ -380,16 +396,15 @@ class CheckoutController extends Controller
                 break;
 
             case 'place_order':
-                $tos_accepted = rex_post('tos_accepted', 'int');
-                $rma_accepted = rex_post('rma_accepted', 'int');
-                $remarks = trim(rex_post('remarks', 'string'));
+                $tos_accepted  = rex_post('tos_accepted', 'int');
+                $rma_accepted  = rex_post('rma_accepted', 'int');
+                $remarks       = trim(rex_post('remarks', 'string'));
                 $minOrderValue = CartController::getMinOrderValue();
                 $this->Order->setValue('remarks', $remarks);
 
                 if (array_sum($this->Order->getValue('brut_prices')) < $minOrderValue) {
-                    $warnings[] = ['label' => strtr(Wildcard::get('error.min_order_value'), ['{VALUE}' => '<strong>'. format_price($minOrderValue) .' &euro;</strong>'])];
-                }
-                else if ($tos_accepted && $rma_accepted) {
+                    $warnings[] = ['label' => strtr(Wildcard::get('error.min_order_value'), ['{VALUE}' => '<strong>' . format_price($minOrderValue) . ' &euro;</strong>'])];
+                } else if ($tos_accepted && $rma_accepted) {
                     try {
                         $Payment = $this->Order->getValue('payment');
 
@@ -407,6 +422,8 @@ class CheckoutController extends Controller
                         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.beforePlaceOrder', $this->Order, []));
 
                         $this->Order->save(false);
+                        \rex_response::sendCacheControl();
+                        \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
                         rex_redirect(null, null, ['action' => 'init-payment', 'ts' => time()]);
                     } catch (OrderException $ex) {
                         $warnings[] = ['label' => $ex->getMessage()];
@@ -547,6 +564,8 @@ class CheckoutController extends Controller
         $status = rex_get('status', 'string', 'completed');
 
         if (!$this->Order->getId()) {
+            \rex_response::sendCacheControl();
+            \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
             rex_redirect($this->settings['linklist']['cart'], null, ['ts' => time()]);
         }
         try {

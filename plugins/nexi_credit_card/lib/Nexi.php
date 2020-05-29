@@ -126,6 +126,7 @@ class Nexi extends PaymentAbstract
 
             $Order = Session::getCurrentOrder();
             $Order->setValue('payment', Order::prepareData($this));
+            Session::setCheckoutData('Order', $Order);
             $Order->save();
         }
 
@@ -142,6 +143,7 @@ class Nexi extends PaymentAbstract
 
             $Order = Session::getCurrentOrder();
             $Order->setValue('payment', Order::prepareData($this));
+            Session::setCheckoutData('Order', $Order);
             $Order->save();
 
             if ($post_data['result'] == 'APPROVED') {

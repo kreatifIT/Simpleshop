@@ -14,5 +14,6 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
-
+\rex_response::sendCacheControl();
+\rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
 rex_redirect(null, null, ['action' => 'complete', 'ts' => time()]);

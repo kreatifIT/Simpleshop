@@ -26,11 +26,14 @@ $token    = rex_get('token', 'string');
 $payer_id = rex_get('PayerID', 'string');
 $listener = rex_get('listener', 'string');
 
+
 try {
     if ($listener == 'ipn') {
         $Payment->processAsyncIPN($Order);
     } else {
         $status = $Payment->processPayment($token, $payer_id, $Order);
+        \rex_response::sendCacheControl();
+        \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
         rex_redirect(null, null, ['action' => 'complete', 'status' => $status, 'ts' => time()]);
     }
 } catch (PaypalException $ex) {

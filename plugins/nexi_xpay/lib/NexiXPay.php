@@ -86,9 +86,12 @@ class NexiXPay extends PaymentAbstract
 
         $Order = Session::getCurrentOrder();
         $Order->setValue('payment', Order::prepareData($this));
+        Session::setCheckoutData('Order', $Order);
         $Order->save();
 
         Utils::log('NexiXPay.initPayment', 'REDIRECT-URL: ' . $redirect_url, 'INFO');
+        \rex_response::sendCacheControl();
+        \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
         \rex_response::sendRedirect($redirect_url);
         exit;
     }
@@ -120,6 +123,7 @@ class NexiXPay extends PaymentAbstract
         $this->setValue('responses', $responses);
 
         $Order->setValue('payment', Order::prepareData($this));
+        Session::setCheckoutData('Order', $Order);
 
         // Verifico corrispondenza tra MAC calcolato e parametro mac di ritorno
         if ($mac_calculated != $mac_sent) {

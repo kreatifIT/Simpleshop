@@ -25,6 +25,8 @@ $Payment  = $Order->getValue('payment');
 try
 {
     $Payment->processPayment($Order);
+    \rex_response::sendCacheControl();
+    \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
     rex_redirect(null, null, ['action' => 'complete', 'ts' => time()]);
 }
 catch (NexiXPayException $ex)

@@ -47,6 +47,8 @@ class Customer extends Model
 
             if (!$result) {
                 self::logout();
+                \rex_response::sendCacheControl();
+                \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
                 rex_redirect(\rex_article::getCurrentId(), null, ['ts' => time()]);
             }
         }

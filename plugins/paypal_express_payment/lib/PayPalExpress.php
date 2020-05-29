@@ -148,6 +148,7 @@ class PayPalExpress extends PaymentAbstract
             $this->responses['initPayment'] = $__response;
             $Order                          = Session::getCurrentOrder();
             $Order->setValue('payment', Order::prepareData($this));
+            Session::setCheckoutData('Order', $Order);
             $Order->save();
         }
         // redirect to paypal
@@ -202,13 +203,14 @@ class PayPalExpress extends PaymentAbstract
         ";
 
         if ($__response['ACK'] != 'Success') {
-            if ($__response['ERRORCODE0'] == 10486) {
+            if ($__response['L_ERRORCODE0'] == 10486) {
                 Utils::log('Paypal.processPayment.response4', $logMsg, 'WARNING', true);
 
                 header('Location: ' . $url . '?' . $sdata);
                 exit;
             } else {
                 Utils::log('Paypal.processPayment.response3', $logMsg, 'ERROR', true);
+                Session::clearCheckout();
                 throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
             }
         }
@@ -226,8 +228,10 @@ class PayPalExpress extends PaymentAbstract
                 $order->setValue('status', 'IP');
             }
         }
+
         $this->responses['processPayment'] = $__response;
         $order->setValue('payment', Order::prepareData($this));
+        Session::setCheckoutData('Order', $order);
         $order->save();
         return strtolower($__response['PAYMENTINFO_0_PAYMENTSTATUS']);
     }
@@ -278,6 +282,7 @@ class PayPalExpress extends PaymentAbstract
                 // update status
                 $order->setValue('payment', Order::prepareData($this));
                 $order->setValue('status', 'IP');
+                Session::setCheckoutData('Order', $order);
                 $order->save();
 
                 \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Payment.asyncPayment', $order, [
