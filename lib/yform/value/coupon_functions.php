@@ -48,6 +48,7 @@ class rex_yform_value_coupon_functions extends rex_yform_value_abstract
         }
 
         if (strlen($action1)) {
+            \rex_sql::factory()->commit();
             $_GET['ss-action'] = 'msg|' . $_GET['ss-action'];
             header('Location: ' . html_entity_decode(rex_url::currentBackendPage($_GET)));
             exit;

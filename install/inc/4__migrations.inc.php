@@ -32,6 +32,7 @@ if ($isInstalled) {
 
 $migrationsTodo = array_diff($migrations, $migrations_done);
 
+$sql = rex_sql::factory();
 foreach ($migrationsTodo as $migration) {
     try {
         $sql->beginTransaction();

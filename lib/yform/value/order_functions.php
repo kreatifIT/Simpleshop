@@ -15,6 +15,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
     public function enterObject()
     {
         if (rex::isBackend() && $this->getParam('main_id')) {
+            $sql              = rex_sql::factory();
             $Order            = \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id'));
             $CustomerData     = $Order->getCustomerData();
             $table            = $this->getParam('main_table');
@@ -97,6 +98,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
 
                         $CreditNote->calculateCreditNote($Order);
                         $CreditNote->save();
+                        $sql->commit();
 
                         unset($_GET['ss-action']);
                         $_GET['ss-msg'] = $action;
@@ -108,7 +110,9 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                         $order_products = $Order->getProducts(false);
 
                         $Order->recalculateDocument($order_products, $promotions);
+                        $Order->setValue('invoice_num', 4);
                         $Order->save();
+                        $sql->commit();
 
                         unset($_GET['ss-action']);
                         $_GET['ss-msg'] = $action;
