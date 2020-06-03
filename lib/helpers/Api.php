@@ -52,23 +52,16 @@ class rex_api_simpleshop_api extends rex_api_function
         $orderBy = rex_get('orderby', 'string', 'name_' . $lang_id);
         $offset  = $page * $limit;
 
-        $queryParams = [
-            'orderBy' => $orderBy,
-            'order'   => 'asc',
-            'filter'  => [
-                [
-                    ["name_{$lang_id} LIKE :term", "code LIKE :term"],
-                    ['term' => "%{$term}%"],
-                    'OR',
-                ],
-            ],
-        ];
+        $stmt = \FriendsOfREDAXO\Simpleshop\Product::query();
+        $stmt->whereRaw("(
+            name_{$lang_id} LIKE :term
+            OR code LIKE :term
+        )", ['term' => "%{$term}%"]);
+        $stmt->orderBy($orderBy);
 
-        $totalCnt   = \FriendsOfREDAXO\Simpleshop\Product::getCount(false, $queryParams);
-        $collection = \FriendsOfREDAXO\Simpleshop\Product::getAll(false, array_merge($queryParams, [
-            'limit'  => $limit,
-            'offset' => $offset,
-        ]));
+        $totalCnt   = $stmt->count();
+        $stmt->limit($offset, $limit);
+        $collection = $stmt->find();
 
         foreach ($collection as $item) {
             $variants = $item->getFeatureVariants();

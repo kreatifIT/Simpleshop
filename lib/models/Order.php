@@ -87,18 +87,17 @@ class Order extends Model
 
     public function getProducts($raw = true)
     {
-        $products = OrderProduct::getAll(false, [
-            'filter'  => [['order_id', $this->getId()]],
-            'orderBy' => 'id',
-        ])
-            ->toArray();
-
+        $stmt = OrderProduct::query();
+        $stmt->where('order_id',  $this->getId());
+        $stmt->orderBy('id');
+        $products = $stmt->find();
+        $products = $products->toArray();
 
         if (!$raw) {
             if (empty($products)) {
                 $products = $this->getValue('products');
             } else {
-                foreach ($products as $index => &$orderProduct) {
+                foreach ($products as &$orderProduct) {
                     $Product     = clone $orderProduct->getValue('data');
                     $orderPData  = $orderProduct->getData();
                     $productData = $Product->getData();
@@ -240,13 +239,13 @@ class Order extends Model
             }
 
             // reset quanities
-            $order_products = OrderProduct::getAll(false, [
-                'filter'  => [['order_id', $order_id]],
-                'orderBy' => 'id',
-            ]);
+            $stmt = OrderProduct::query();
+            $stmt->where('order_id', $order_id);
+            $stmt->orderBy('id', 'asc');
+            $orderProducts = $stmt->find();
 
             if ($already_exists) {
-                foreach ($order_products as $order_product) {
+                foreach ($orderProducts as $order_product) {
                     if ($order_product->getValue('cart_quantity')) {
                         $_product = $order_product->getValue('data');
                         $quantity = $order_product->getValue('cart_quantity');
