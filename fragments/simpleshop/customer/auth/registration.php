@@ -97,7 +97,7 @@ if ($action == 'register' && $form->isSend() && !$form->hasWarnings()) {
         Customer::login($values['email'], $values['password']);
     } catch (CustomerException $ex) {
         $customerError = true;
-        $formOutput    = '<div class="callout alert">' . $ex->getMessage() . '</div>' . $formOutput;
+        $formOutput    = '<div class="callout alert">' . implode('<br/>', $ex->getLabelByCode()) . '</div>' . $formOutput;
     }
 }
 
