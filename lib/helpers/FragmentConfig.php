@@ -141,7 +141,7 @@ class FragmentConfig
             ],
             'rex_shop_customer'         => [
                 '_fieldDefaults'  => ['css_class' => 'cell medium-6'],
-                '_excludedFields' => ['invoice_address_id', 'lang_id', 'addresses', 'status', 'lastlogin', 'updatedate', 'created'],
+                '_excludedFields' => ['invoice_address_id', 'lang_id', 'addresses', 'status', 'lastlogin', 'updatedate', 'created', 'activationdate'],
             ],
         ],
     ];
