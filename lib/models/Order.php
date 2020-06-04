@@ -493,6 +493,13 @@ class Order extends Model
                 'Order'    => $this,
                 'products' => $products,
             ]));
+
+            // clear all products first
+            $orderId = $this->getId();
+            if ($orderId) {
+                $sql = \rex_sql::factory();
+                $sql->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$orderId}");
+            }
         } catch (\Exception $ex) {
             $promotions = [];
             $errors[]   = ['label' => $ex->getLabelByCode()];
@@ -500,6 +507,7 @@ class Order extends Model
 
         $this->setValue('initial_total', 0);
         $this->setValue('quantity', 0);
+        $this->setValue('products', $products);
         $this->setValue('ip_address', rex_server('REMOTE_ADDR', 'string', 'notset'));
 
         return $this->recalculateDocument($products, $promotions, $errors);

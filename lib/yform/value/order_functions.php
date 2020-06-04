@@ -97,6 +97,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
 
                         $CreditNote->calculateCreditNote($Order);
                         $CreditNote->save();
+                        rex_sql::factory()->commit();
 
                         unset($_GET['ss-action']);
                         $_GET['ss-msg'] = $action;
@@ -109,6 +110,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
 
                         $Order->recalculateDocument($order_products, $promotions);
                         $Order->save();
+                        rex_sql::factory()->commit();
 
                         unset($_GET['ss-action']);
                         $_GET['ss-msg'] = $action;
