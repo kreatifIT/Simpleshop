@@ -380,14 +380,15 @@ class CheckoutController extends Controller
                 break;
 
             case 'place_order':
-                $tos_accepted = rex_post('tos_accepted', 'int');
-                $rma_accepted = rex_post('rma_accepted', 'int');
+                $tos_accepted  = rex_post('tos_accepted', 'int');
+                $rma_accepted  = rex_post('rma_accepted', 'int');
+                $remarks       = trim(rex_post('remarks', 'string'));
                 $minOrderValue = CartController::getMinOrderValue();
+                $this->Order->setValue('remarks', $remarks);
 
                 if (array_sum($this->Order->getValue('brut_prices')) < $minOrderValue) {
-                    $warnings[] = ['label' => strtr(Wildcard::get('error.min_order_value'), ['{VALUE}' => '<strong>'. format_price($minOrderValue) .' &euro;</strong>'])];
-                }
-                else if ($tos_accepted && $rma_accepted) {
+                    $warnings[] = ['label' => strtr(Wildcard::get('error.min_order_value'), ['{VALUE}' => '<strong>' . format_price($minOrderValue) . ' &euro;</strong>'])];
+                } else if ($tos_accepted && $rma_accepted) {
                     try {
                         $Payment = $this->Order->getValue('payment');
 
