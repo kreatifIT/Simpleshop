@@ -421,7 +421,8 @@ class CheckoutController extends Controller
 
                         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.beforePlaceOrder', $this->Order, []));
 
-                        $this->Order->save(false);
+                        $products = Session::getCartItems();
+                        $this->Order->save(false, $products);
                         \rex_response::sendCacheControl();
                         \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
                         rex_redirect(null, null, ['action' => 'init-payment', 'ts' => time()]);
