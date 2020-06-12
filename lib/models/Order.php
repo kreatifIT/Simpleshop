@@ -77,7 +77,7 @@ class Order extends Model
         $Address = $this->getInvoiceAddress();
         $Country = null;
 
-        if ($Address->isCompany()) {
+        if ($Address && $Address->isCompany()) {
             $countrId = $Address->getValue('country');
             $Country  = $countrId ? Country::get($countrId) : null;
         }
@@ -174,14 +174,15 @@ class Order extends Model
     {
         self::$_finalizeOrder = true;
 
-        $result = $this->save(false);
+        $products = Session::getCartItems();
+        $result = $this->save(false, $products);
 
         return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.completeOrder', $result, [
             'Order' => $this,
         ]));
     }
 
-    public function save($simple_save = true)
+    public function save($simple_save = true, $products = null)
     {
         Utils::setCalcLocale();
 
@@ -189,10 +190,9 @@ class Order extends Model
 
         $sql            = \rex_sql::factory();
         $date_now       = date('Y-m-d H:i:s');
-        $products       = $this->getProducts(false);
         $CustomerData   = $this->getCustomerData();
         $customerId     = $this->getValue('customer_id');
-        $already_exists = $this->getValue('invoice_num') != '';
+        $already_exists = !($this->getValue('invoice_num') === null || (int)$this->getValue('invoice_num') === 0);
 
         if (!$CustomerData || ($customerId && $CustomerData->getId() != $customerId)) {
             $CustomerData = $customerId ? Customer::get($customerId) : self::getInvoiceAddress();
@@ -204,7 +204,7 @@ class Order extends Model
             $this->setValue('createdate', $date_now);
         }
 
-        if (self::$_finalizeOrder && ($this->getValue('invoice_num') === null || (int)$this->getValue('invoice_num') === 0)) {
+        if (self::$_finalizeOrder && !$already_exists) {
             $query = 'SELECT IFNULL(MAX(invoice_num), 0) + 1 as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"';
             $sql->setQuery($query);
             $num = $sql->getValue('num');
@@ -216,18 +216,21 @@ class Order extends Model
             $this->setValue('invoice_num', $num);
         }
 
-        $result = parent::save(true);
+        $saveSuccess = parent::save(true);
 
-        if (!$result) {
+        if (!$saveSuccess) {
             throw new OrderException(implode('<br/>', $this->getMessages()));
         }
 
 
-        if ($result && !$simple_save) {
+        if ($saveSuccess && !$simple_save) {
             $order_id   = $this->getId();
             $promotions = $this->getValue('promotions');
 
-            // IMPORTANT! after saving readd the products
+            // IMPORTANT! after saving read the products
+            if ($products === null) {
+                $products = (array)$this->getProducts(false);
+            }
             $this->setValue('products', $products);
 
             if (self::$_finalizeOrder && isset ($promotions['coupon'])) {
@@ -236,13 +239,13 @@ class Order extends Model
             }
 
             // reset quanities
-            $order_products = OrderProduct::getAll(false, [
-                'filter'  => [['order_id', $order_id]],
-                'orderBy' => 'id',
-            ]);
-
             if ($already_exists) {
-                foreach ($order_products as $order_product) {
+                $query = OrderProduct::query();
+                $query->where('order_id', $order_id);
+                $query->orderBy('id');
+                $orderProducts = $query->find();
+
+                foreach ($orderProducts as $order_product) {
                     if ($order_product->getValue('cart_quantity')) {
                         $_product = $order_product->getValue('data');
                         $quantity = $order_product->getValue('cart_quantity');
@@ -263,17 +266,24 @@ class Order extends Model
                 }
             }
 
-            // clear all products first
-            \rex_sql::factory()
-                ->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$order_id}");
-
             // set order products
+            $orderProductIds = [];
             foreach ($products as $product) {
-                $this->saveOrderProduct($product, self::$_finalizeOrder);
+                $orderProductIds[] = $this->saveOrderProduct($product, self::$_finalizeOrder);
             }
+
+            // clear deleted products
+            $where = ["order_id = {$order_id}"];
+
+            if (count($orderProductIds)) {
+                $where[] = 'id NOT IN('. implode(',', $orderProductIds) .')';
+            }
+            $sql->setTable(OrderProduct::TABLE);
+            $sql->setWhere(implode(' AND ', $where));
+            $sql->delete();
         }
         Utils::resetLocale();
-        return $result;
+        return $saveSuccess;
     }
 
     public function saveOrderProduct($product, $trackInventory = false, $OrderProduct = null)
@@ -302,7 +312,7 @@ class Order extends Model
         }
 
         if (!$OrderProduct) {
-            $OrderProduct = OrderProduct::create();
+            $OrderProduct = OrderProduct::getByProductId($this->getId(), $product->getValue('id')) ?: OrderProduct::create();
         }
         $OrderProduct->setValue('data', $product);
         $OrderProduct->setValue('product_id', $product->getValue('id'));
@@ -315,6 +325,7 @@ class Order extends Model
         ]));
 
         $OrderProduct->save(true);
+        return $OrderProduct->getId();
     }
 
     public function recalculateDocument($products = [], $promotions = [], $errors = [])
@@ -493,13 +504,6 @@ class Order extends Model
                 'Order'    => $this,
                 'products' => $products,
             ]));
-
-            // clear all products first
-            $orderId = $this->getId();
-            if ($orderId) {
-                $sql = \rex_sql::factory();
-                $sql->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$orderId}");
-            }
         } catch (\Exception $ex) {
             $promotions = [];
             $errors[]   = ['label' => $ex->getLabelByCode()];
