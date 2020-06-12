@@ -97,7 +97,7 @@ class Product extends Model
         return $this->__features;
     }
 
-    public function getFeatureValuesByFeatureKeys(array $featureKeys, $filterKeys = [])
+    public function getFeatureValuesByFeatureKeys(array $featureKeys, $filterKeys = [], $ignoreType = false)
     {
         $result     = [];
         $filterIds  = [];
@@ -129,7 +129,10 @@ class Product extends Model
             $stmt->joinRaw('inner', Variant::TABLE, 'jt1', 'jt1.product_id = ' . $this->getId());
             $stmt->where('m.feature_id', $feature->getId());
             $stmt->where('m.status', 1);
-            $stmt->where('jt1.type', 'NE', '!=');
+            $stmt->where('m.status', 1);
+            if (!$ignoreType) {
+                $stmt->where('jt1.type', 'NE', '!=');
+            }
             $stmt->groupBy('m.id');
             $stmt->orderBy('jt1.prio');
             $stmt->whereRaw('(
