@@ -16,9 +16,11 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 class Settings
 {
-    public static function getValue($key)
+    public static function getValue($key, $plugin = '')
     {
-        $settings = \rex::getConfig('simpleshop.Settings');
+        $plugin   = $plugin == '' ? '' : '.' . $plugin;
+        $settings = \rex::getConfig('simpleshop.Settings' . $plugin);
+
         return $settings[$key];
     }
 

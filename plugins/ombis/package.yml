@@ -1,0 +1,9 @@
+package: simpleshop/ombis
+version: '1.0'
+author: FriendsOfREDAXO
+
+page:
+    title: Ombis
+    perm: shop[ombis]
+    subpages:
+        settings: { title: translate:settings, hidden: true }
