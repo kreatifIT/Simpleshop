@@ -62,10 +62,11 @@ class rex_yform_value_customer_address extends rex_yform_value_abstract
         $value   = $params['subject'];
         $address = $value ? \FriendsOfREDAXO\Simpleshop\CustomerAddress::get($value) : null;
 
+
         if ($address) {
             $customer = \FriendsOfREDAXO\Simpleshop\Customer::get($address->getValue('customer_id'));
             $value    = implode(' | ', array_unique(array_filter([
-                $address->getName(),
+                $address->getName(null, true),
                 $customer ? $customer->getName(null, true) : '',
             ])));
         }

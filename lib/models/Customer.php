@@ -55,8 +55,16 @@ class Customer extends Model
 
     public function getName($lang_id = null, $companyFallback = false)
     {
-        $address = $this->getAddress();
-        return $address ? $address->getName($lang_id, $companyFallback) : '';
+        $name = trim($this->getValue('firstname') . ' ' . $this->getValue('lastname'));
+
+        if ($name == '') {
+            $name = trim($this->getValue('company_name'));
+        }
+        if ($name == '') {
+            $address = $this->getAddress();
+            $name    = $address ? $address->getName($lang_id, $companyFallback) : '';
+        }
+        return $name;
     }
 
     public function getAddress()
@@ -134,6 +142,8 @@ class Customer extends Model
             $sql->setValue('invoice_address_id', $address->getId());
             $sql->setWhere('id = :id', ['id' => $_this->getId()]);
             $sql->update();
+
+            $_this->setValue('invoice_address_id', $address->getId());
 
             $Mail          = new Mail();
             $do_send       = true;
