@@ -148,6 +148,8 @@ class Omest extends ShippingAbstract
                 throw new OmestShippingException("Order [{$order_id}] has no parcels", 2);
             }
 
+            $country = trim($DAddress->getValue('country'));
+
             $data = [
                 'key'                => $Order->getValue('shipping_key'),
                 'reference1'         => $order_id,
@@ -161,8 +163,7 @@ class Omest extends ShippingAbstract
                     'street'      => $DAddress->getValue('street'),
                     'zipcode'     => $DAddress->getValue('zip'),
                     'city'        => $DAddress->getValue('location'),
-                    'countryCode' => "IT",
-                    //                    'countryCode'  => $DAddress->getValue('country'),
+                    'countryCode' => strlen($country) == 2 ? $country : 'IT',
                     'phone'       => $DAddress->getValue('phone'),
                     'email'       => $Customer ? $Customer->getValue('email') : $IAddress->getValue('email'),
                 ],
