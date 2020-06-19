@@ -51,6 +51,9 @@ try {
             $sql->setValue('firstname', $customer->getValue('firstname'));
             $sql->setValue('lastname', $customer->getValue('lastname'));
             $sql->setValue('company_name', $customer->getValue('company_name'));
+            $sql->setValue('street', $customer->getValue('street'));
+            $sql->setValue('location', $customer->getValue('location'));
+            $sql->setValue('postal', $customer->getValue('postal'));
             $sql->setValue('customer_id', $customer->getId());
             $sql->setValue('lang_id', $customer->getValue('lang_id'));
             $sql->setValue('status', 1);
