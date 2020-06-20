@@ -21,6 +21,9 @@ try {
         ->ensureColumn(new rex_sql_column('ctype', 'varchar(191)', true), 'customer_id')
         ->ensureColumn(new rex_sql_column('fiscal_code', 'varchar(191)', true), 'country')
         ->ensureColumn(new rex_sql_column('vat_num', 'varchar(191)', true), 'fiscal_code')
+        ->ensureColumn(new rex_sql_column('street', 'varchar(191)', true))
+        ->ensureColumn(new rex_sql_column('location', 'varchar(191)', true))
+        ->ensureColumn(new rex_sql_column('postal', 'varchar(191)', true))
         ->ensure();
 
     rex_sql_table::get('rex_shop_customer')

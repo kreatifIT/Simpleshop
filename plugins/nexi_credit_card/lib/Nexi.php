@@ -140,7 +140,6 @@ class Nexi extends PaymentAbstract
             $responses['processIPN'] = $post_data;
             $this->setValue('responses', $responses);
 
-            $Order = Session::getCurrentOrder();
             $Order->setValue('payment', Order::prepareData($this));
             $Order->save();
 
