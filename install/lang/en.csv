@@ -81,6 +81,7 @@ label.order_complete_default_shipping_text;The items will be sent as soon as pos
 error.email_already_exists;This email address is already in use
 error.coupon_not_exists;This coupon-code does not exist
 error.coupon_not_valid_anymore;This coupon-code has expired
+error.coupon_already_used;You have already used this coupon
 label.email;E-mail
 label.units;
 label.single_price;Single price

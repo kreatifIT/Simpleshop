@@ -13,9 +13,10 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
-
 $Addon    = $this->getVar('Addon');
 $Settings = $this->getVar('Settings');
+
+$Settings['coupon_use_options'] = (array)$Settings['coupon_use_options'];
 
 $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('simpleshop.memberarea.input_contents', [
     'account'   => $Addon->i18n('settings.content_account'),
@@ -26,6 +27,29 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
 
 ?>
 <fieldset>
+
+    <legend><?= $Addon->i18n('settings.page_mapping'); ?></legend>
+    <dl class="rex-form-group form-group">
+        <dt>Kunden-Dashboard</dt>
+        <dd>
+            <?= \rex_var_link::getWidget('linklist_dashboard', 'linklist[dashboard]', $Settings['linklist']['dashboard']) ?>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
+        <dt>Warenkorb</dt>
+        <dd>
+            <?= \rex_var_link::getWidget('linklist_cart', 'linklist[cart]', $Settings['linklist']['cart']) ?>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
+        <dt>Checkout</dt>
+        <dd>
+            <?= \rex_var_link::getWidget('linklist_checkout', 'linklist[checkout]', $Settings['linklist']['checkout']) ?>
+        </dd>
+    </dl>
+
+    <br>
+    <br>
 
     <legend><?= $Addon->i18n('settings.shop_settings'); ?></legend>
     <dl class="rex-form-group form-group">
@@ -55,27 +79,20 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
             </select>
         </dd>
     </dl>
-
-    <br>
-    <br>
-
-    <legend><?= $Addon->i18n('settings.page_mapping'); ?></legend>
     <dl class="rex-form-group form-group">
-        <dt>Kunden-Dashboard</dt>
+        <dt>Gutscheine</dt>
         <dd>
-            <?= \rex_var_link::getWidget('linklist_dashboard', 'linklist[dashboard]', $Settings['linklist']['dashboard']) ?>
-        </dd>
-    </dl>
-    <dl class="rex-form-group form-group">
-        <dt>Warenkorb</dt>
-        <dd>
-            <?= \rex_var_link::getWidget('linklist_cart', 'linklist[cart]', $Settings['linklist']['cart']) ?>
-        </dd>
-    </dl>
-    <dl class="rex-form-group form-group">
-        <dt>Checkout</dt>
-        <dd>
-            <?= \rex_var_link::getWidget('linklist_checkout', 'linklist[checkout]', $Settings['linklist']['checkout']) ?>
+            <select name="coupon_use_options[]" class="form-control" multiple>
+                <option value="global" <?= in_array('global', $Settings['coupon_use_options']) ? 'selected' : '' ?>>
+                    Global für jeden User 1x nutzbar
+                </option>
+                <option value="fixedprice" <?= in_array('fixedprice', $Settings['coupon_use_options']) ? 'selected' : '' ?>>
+                    kann genutzt werden bis fixer Rabatt aufgebraucht
+                </option>
+                <option value="single" <?= in_array('single', $Settings['coupon_use_options']) ? 'selected' : '' ?>>
+                    exakt 1x nutzbar
+                </option>
+            </select>
         </dd>
     </dl>
 

@@ -58,7 +58,6 @@ class rex_yform_value_coupon_functions extends rex_yform_value_abstract
     public function enterObject()
     {
         if (rex::isBackend() && $this->getParam('main_id')) {
-            $output = [];
             $table  = $this->getParam('main_table');
             $params = [
                 'data_id'    => $this->getParam('main_id'),
@@ -69,7 +68,7 @@ class rex_yform_value_coupon_functions extends rex_yform_value_abstract
             $this->processFunctions();
 
             // clone coupon
-            $output[] = '
+            $output = '
                 <div class="coupon-functions">
                     <input type="text" class="form-control coupon-clone-count" value="1"/>
                     <div class="inline-text">X</div>
@@ -80,10 +79,10 @@ class rex_yform_value_coupon_functions extends rex_yform_value_abstract
             ';
 
             // output
-            $this->params['form_output'][$this->getId()] .= '
+            $this->params['form_output'][$this->getId()] = '
                 <div class="row nested-panel">
                     <div class="form-group col-xs-12" id="' . $this->getHTMLId() . '">
-                        <div>' . implode('', $output) . '</div>
+                        <div>' . $output . '</div>
                     </div>
                 </div>
             ';

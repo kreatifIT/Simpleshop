@@ -483,7 +483,6 @@ class CheckoutController extends Controller
     {
         $do_send  = true;
         $Mail     = new Mail();
-        $Settings = \rex::getConfig('simpleshop.Settings');
         $Customer = $this->Order->getCustomerData();
 
         $Mail->Subject = '###label.email__order_complete###';
@@ -496,7 +495,11 @@ class CheckoutController extends Controller
 
         // set order notification email
         $Mail->AddAddress($Customer->getValue('email'));
-        $Mail->AddAddress(from_array($Settings, 'order_notification_email'));
+        $orderMails = explode(',', \FriendsOfREDAXO\Simpleshop\Settings::getValue('order_notification_email', 'general'));
+
+        foreach ($orderMails as $orderMail) {
+            $Mail->AddAddress($orderMail);
+        }
 
         if (isset($this->params['addAddress'])) {
             foreach (explode(',', $this->params['addAddress']) as $_add) {

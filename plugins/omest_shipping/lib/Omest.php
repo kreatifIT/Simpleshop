@@ -145,7 +145,8 @@ class Omest extends ShippingAbstract
     public static function sendOrdersToOLC($order_ids)
     {
         $processed  = [];
-        $clientMail = Utils::getSetting('order_notification_email');
+        $orderMails = explode(',',  Settings::getValue('order_notification_email', 'general'));
+        $clientMail = current($orderMails);
         $Settings   = \rex::getConfig('simpleshop.OmestShipping.Settings');
 
 
