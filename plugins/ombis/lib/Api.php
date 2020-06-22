@@ -22,29 +22,31 @@ use Kreatif\WSConnectorException;
 class Api extends WSConnector
 {
 
-    public static function testConnection()
-    {
+    public static function curl($path, $data = [], $method = 'GET', $name = '') {
         $apiUrl  = Settings::getValue('api_base_url', 'Ombis');
         $apiUser = Settings::getValue('api_username', 'Ombis');
         $apiPwd  = Settings::getValue('api_password', 'Ombis');
-        $apiPort = Settings::getValue('api_port', 'Ombis');
 
+        if ($path != '/versioninfo') {
+            $apiUrl .= Settings::getValue('api_company_path', 'Ombis');
+        }
         $conn = new parent($apiUrl);
-        $conn->setAuthType(CURLAUTH_BASIC);
+        $conn->setAuthType(CURLAUTH_DIGEST);
         $conn->setAuth($apiUser, $apiPwd);
-        $conn->setPort($apiPort);
         $conn->setLang('de-De');
         $conn->setGzip(true);
-        $conn->setReturnHeader(true);
-        $conn->setDebug(true);
+        //$conn->setDebug(true);
+        return $conn->request($path, $data, $method, $name);
+    }
 
+    public static function testConnection()
+    {
         try {
-        $response = $conn->request('/versioninfo', [
-            'json' => 1
-        ]);
-        pr($response);
+            $response = self::curl('/versioninfo');
+            $result   = isset($response['response']['JarSize']) && $response['response']['JarSize'] > 0 ? 'OK' : 'FAILED';
         } catch (WSConnectorException $ex) {
-            pr($ex->getMessage(), 'red');
+            $result = $ex->getMessage();
         }
+        return $result;
     }
 }

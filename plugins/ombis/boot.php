@@ -11,7 +11,12 @@
  * file that was distributed with this source code.
  */
 
+
+
+\rex_extension::register('simpleshop.Order.completeOrder', ['\FriendsOfREDAXO\Simpleshop\Ombis\Order', 'ext__createPreVKDokument']);
+
+
 if (rex::isFrontend()) {
-    \FriendsOfREDAXO\Simpleshop\Ombis\Api::testConnection();
+    pr(\FriendsOfREDAXO\Simpleshop\Ombis\Api::testConnection());
     exit;
 }

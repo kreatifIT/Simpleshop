@@ -22,13 +22,13 @@ $Settings = $this->getVar('Settings');
     <dl class="rex-form-group form-group">
         <dt>REST Base Url:</dt>
         <dd>
-            <input type="text" class="form-control" name="api_base_url" value="<?= from_array($Settings, 'api_base_url') ?>" placeholder="https://domain.com/rest/kreatif"/>
+            <input type="text" class="form-control" name="api_base_url" value="<?= from_array($Settings, 'api_base_url') ?>" placeholder="https://domain.com:15443/rest/kreatif"/>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
-        <dt>REST Port:</dt>
+        <dt>REST Company Path:</dt>
         <dd>
-            <input type="text" class="form-control" name="api_port" value="<?= from_array($Settings, 'api_port') ?>" placeholder="15443"/>
+            <input type="text" class="form-control" name="api_company_path" value="<?= from_array($Settings, 'api_company_path') ?>" placeholder="/company"/>
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
