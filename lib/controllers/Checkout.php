@@ -281,7 +281,8 @@ class CheckoutController extends Controller
     protected function getInvoiceAddressView()
     {
         $Address     = $this->Order->getInvoiceAddress();
-        $Address     = $Address ? CustomerAddress::get($Address->getId()) : null;
+        $addressId   = $Address ? $Address->getId() : null;
+        $Address     = $addressId ? CustomerAddress::get($addressId) : null;
         $customer_id = $this->params['Customer']->getId();
 
         if (!$Address && $customer_id > 0) {
@@ -382,8 +383,13 @@ class CheckoutController extends Controller
     protected function getSummaryView()
     {
         $errors     = [];
-        $warnings   = [];
         $postAction = rex_post('action', 'string');
+        $products   = Session::getCartItems();
+        $warnings   = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.orderWarnings', [], [
+            'order'    => $this->Order,
+            'action'   => $postAction,
+            'products' => $products,
+        ]));
 
         switch ($postAction) {
             case 'redeem_coupon':
@@ -404,7 +410,10 @@ class CheckoutController extends Controller
 
                 if (array_sum($this->Order->getValue('brut_prices')) < $minOrderValue) {
                     $warnings[] = ['label' => strtr(Wildcard::get('error.min_order_value'), ['{VALUE}' => '<strong>' . format_price($minOrderValue) . ' &euro;</strong>'])];
-                } else if ($tos_accepted && $rma_accepted) {
+                } else if (!$tos_accepted || !$rma_accepted) {
+                    $warnings[] = ['label' => '###error.tos_rma_not_accepted###'];
+                }
+                if (empty($warnings)) {
                     try {
                         $Payment = $this->Order->getValue('payment');
 
@@ -421,7 +430,6 @@ class CheckoutController extends Controller
 
                         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.beforePlaceOrder', $this->Order, []));
 
-                        $products = Session::getCartItems();
                         $this->Order->save(false, $products);
                         \rex_response::sendCacheControl();
                         \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
@@ -429,8 +437,6 @@ class CheckoutController extends Controller
                     } catch (OrderException $ex) {
                         $warnings[] = ['label' => $ex->getMessage()];
                     }
-                } else {
-                    $warnings[] = ['label' => '###error.tos_rma_not_accepted###'];
                 }
                 break;
             default:

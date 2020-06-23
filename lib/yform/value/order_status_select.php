@@ -16,15 +16,16 @@ class rex_yform_value_order_status_select extends rex_yform_value_select
     {
         $options  = [];
         $_options = $this->getArrayFromString($this->getElement('options'));
+        $Order    = $this->getParam('main_id') ? \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id')) : null;
 
-        if ($this->getParam('main_id')) {
+        if ($Order) {
             if (isset($_options['CN'])) {
-                $Order = \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id'));
 
                 if ($Order->getValue('ref_order_id')) {
                     $options = ['CN' => $_options['CN']];
-                }
-                else if (count(\FriendsOfREDAXO\Simpleshop\Order::query()->where('ref_order_id', $Order->getId())->find())) {
+                } else if (count(\FriendsOfREDAXO\Simpleshop\Order::query()
+                    ->where('ref_order_id', $Order->getId())
+                    ->find())) {
                     $options = ['CA' => $_options['CA']];
                 }
             }
@@ -34,7 +35,6 @@ class rex_yform_value_order_status_select extends rex_yform_value_select
             }
             $this->setElement('options', $options);
         }
-
         return parent::enterObject();
     }
 
