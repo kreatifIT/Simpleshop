@@ -20,7 +20,6 @@ namespace FriendsOfREDAXO\Simpleshop;
 \rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Tax', 'ext_yform_data_delete']);
 \rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Order', 'ext_yform_data_delete']);
 \rex_extension::register('YFORM_DATASET_FORM_SETVALUEFIELD', ['\FriendsOfREDAXO\Simpleshop\Model', 'ext_setValueField']);
-\rex_extension::register('YFORM_DATASET_FORM_SETVALIDATEFIELD', ['\FriendsOfREDAXO\Simpleshop\Model', 'ext_setValidateField']);
 \rex_extension::register('YFORM_MANAGER_REX_INFO', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_tableManagerInfo']);
 \rex_extension::register('kreatif.Model.queryCollection', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_queryCollection']);
 \rex_extension::register('project.layoutBottom', ['\FriendsOfREDAXO\Simpleshop\CartController', 'ext_project_layoutBottom']);

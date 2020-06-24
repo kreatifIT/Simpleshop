@@ -43,6 +43,30 @@ class CustomerAddress extends Model
         return $this->getValue('ctype') == 'company';
     }
 
+    public function toAddressArray($asInvoiceString = false)
+    {
+        $countryId = (int) $this->getValue('country');
+        $Country   = $countryId > 0 ? Country::get($countryId) : null;
+
+        $location = [
+            $this->getValue('postal'),
+            $this->getValue('location')
+        ];
+        if ($this->valueIsset('province')) {
+            $location[] = '- ' . $this->getValue('province');
+        }
+        $output = [
+            'name' => trim($this->getName()),
+            'street' => trim($this->getValue('street')),
+            'street_additional' => $asInvoiceString ? '' : trim($this->getValue('street_additional')),
+            'location' => trim(implode(' ', $location)),
+            'country' => $Country ? trim($Country->getName()) : '',
+            'fiscal_code' => $asInvoiceString && in_array($this->getValue('ctype'), ['company', 'person']) ? trim($this->getValue('fiscal_code')) : '',
+            'vat_num' => $asInvoiceString && $this->getValue('ctype') == 'company' ? trim($this->getValue('vat_num')) : '',
+        ];
+        return array_filter($output);
+    }
+
     public function getForm($yform = null, $excludedFields = [], $customerId = null)
     {
         if (\rex::isBackend()) {

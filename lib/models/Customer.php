@@ -103,6 +103,21 @@ class Customer extends Model
         return $isActivated;
     }
 
+    public function getInvoiceAddress()
+    {
+        $invoiceAddrId = $this->getvalue('invoice_address_id');
+        $Address       = $invoiceAddrId ? CustomerAddress::get($invoiceAddrId) : null;
+
+        if (!$Address) {
+            $stmt = CustomerAddress::query();
+            $stmt->where('status', 1);
+            $stmt->where('customer_id', $this->getId());
+            $stmt->orderBy('id');
+            $Address = $stmt->findOne();
+        }
+        return $Address;
+    }
+
     public static function register($email, $password, $attributes = [], $User = null, $doubleOptIn = false)
     {
         $result      = null;
@@ -125,9 +140,6 @@ class Customer extends Model
         }
 
         $statusField = self::getYformFieldByName('status');
-        $exclFields  = array_diff(FragmentConfig::getValue('yform_fields.rex_shop_customer._excludedFields'), ['created', 'updatedate', 'status']);
-
-        FragmentConfig::$data['yform_fields']['rex_shop_customer']['_excludedFields'] = $exclFields;
 
         $_this->setValue('email', $email);
         $_this->setValue('hash', sha1($email . time()));

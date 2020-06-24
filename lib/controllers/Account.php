@@ -41,7 +41,7 @@ class AccountController extends Controller
 
 
         // CHECK CONTENT IS ENABLED BY SETTINGS
-        if (!in_array($this->params['area'], $Settings['membera_area_contents'])) {
+        if (!in_array($this->params['area'], (array)$Settings['membera_area_contents'])) {
             $this->fragment_path[] = 'simpleshop/customer/auth/no_permission.php';
             return $this;
         }
