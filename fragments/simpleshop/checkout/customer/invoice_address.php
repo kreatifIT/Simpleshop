@@ -11,24 +11,15 @@
  * file that was distributed with this source code.
  */
 
-namespace FriendsOfREDAXO\Simpleshop;
-
-$this->setVar('btn_label', '###action.go_ahead###');
-
 ?>
 <div class="addresses-grid margin-top margin-large-bottom">
     <h2 class="heading large">###label.invoice_address###</h2>
-    <form action="<?= rex_getUrl(null, null, array_merge($_GET, ['ts' => time()])) ?>" method="POST">
-        <?php
-        $this->setVar('only_fields', true);
-        $this->setVar('show_save_btn', false);
-        $this->subfragment('simpleshop/customer/customer_area/address_form.php');
-        ?>
 
-        <div class="clearfix">
-            <div class="margin-top">
-                <button type="submit" class="button float-right">###action.go_ahead###</button>
-            </div>
-        </div>
-    </form>
+    <?php
+    $this->setVar('save_callback', function ($address) {
+        \FriendsOfREDAXO\Simpleshop\CheckoutController::processInvoiceAddress($address);
+    });
+    $this->subfragment('simpleshop/customer/customer_area/invoice_address.php');
+    ?>
+
 </div>

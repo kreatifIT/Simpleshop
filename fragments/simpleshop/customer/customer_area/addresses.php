@@ -16,53 +16,66 @@ namespace FriendsOfREDAXO\Simpleshop;
 $User       = $this->getVar('User');
 $action     = rex_get('action', 'string');
 $canAddItem = $User->hasPermission('fragment.customer-area--addresses--add-new');
+$output     = '';
+
+if ($canAddItem && $action == 'edit') {
+    $fragment = new \rex_fragment();
+    $output   = $fragment->parse('simpleshop/customer/customer_area/address_edit.php');
+} else {
+    $query = CustomerAddress::query();
+    $query->where('status', 0, '!=');
+
+    $where = ["customer_id = {$User->getId()}"];
+    if ($User->valueIsset('addresses')) {
+        $where[] = "id IN({$User->getValue('addresses')})";
+    }
+    if ($User->valueIsset('invoice_address_id')) {
+        $query->where('id', $User->getValue('invoice_address_id'), '!=');
+    }
+    $query->whereRaw('(' . implode(' OR ', $where) . ')');
+    $addresses = $query->find();
+}
 
 ?>
 <div class="customer-area-address">
 
-    <?php if ($canAddItem && $action == 'edit'): ?>
-        <?php
-        $address_id = rex_get('data-id', 'int');
-        $back_url   = rex_getUrl(null, null, ['ctrl' => 'addresses']);
-        $Address    = $address_id ? CustomerAddress::get($address_id) : null;
-
-        $this->setVar('Address', $Address);
-        $this->setVar('back_url', $back_url);
-        $this->setVar('redirect_url', $back_url);
-        $this->setVar('excluded_fields', ['office_id']);
-        ?>
-        <h2 class="heading small"><?= $address_id ? '###label.edit_address###' : '###label.new_address###' ?></h2>
-        <?php $this->subfragment('simpleshop/customer/customer_area/address_form.php'); ?>
+    <?php if ($output): ?>
+        <?= $output ?>
     <?php else: ?>
+        <h2 class="margin-small-bottom">
+            ###label.addresses###
+        </h2>
+
         <?php
-        $where = ["customer_id = {$User->getId()}"];
-
-        if ($User->valueIsset('addresses')) {
-            $where[] = "id IN({$User->getValue('addresses')})";
-        }
-
-        $stmt = CustomerAddress::query()->whereRaw('(' . implode(' OR ', $where) . ')')->where('status', 0, '!=');
-
-        $addresses = $stmt->find();
-
-        $this->subfragment('simpleshop/customer/customer_area/title.php');
-
         if (count($addresses)): ?>
             <div class="address-list">
-                <?php foreach ($addresses as $address) {
-                    $fragment = new \rex_fragment();
-                    $fragment->setVar('Address', $address);
-                    $fragment->setVar('canAddItem', $canAddItem);
-                    echo $fragment->parse('simpleshop/customer/customer_area/address_item.php');
-                }
-                ?>
+                <?php foreach ($addresses as $address): ?>
+                    <?php
+                    $addressData = $address->toAddressArray();
+                    ?>
+                    <div class="address-item grid-x grid-margin-x">
+                        <div class="cell medium-6">
+                            <?= implode('<br/>', $addressData) ?>
+                        </div>
+                        <div class="cell medium-6">
+                            <?php if ($canAddItem): ?>
+                                <a class="link" href="<?= rex_getUrl(null, null, [
+                                    'action'  => 'edit',
+                                    'ctrl'    => 'addresses.detail',
+                                    'data-id' => $address->getId(),
+                                ]) ?>">###action.edit###</a>
+                                <br/>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
             </div>
         <?php else: ?>
             <div class="no-address">###label.no_address_available###</div>
         <?php endif; ?>
 
         <?php if ($canAddItem): ?>
-            <a href="<?= rex_getUrl(null, null, ['action' => 'edit']) ?>" class="button margin-small-top">+&nbsp; ###action.add_address###</a>
+            <a href="<?= rex_getUrl(null, null, ['ctrl' => 'addresses.edit', 'action' => 'edit']) ?>" class="button margin-small-top">+&nbsp; ###action.add_address###</a>
         <?php endif; ?>
     <?php endif; ?>
 </div>

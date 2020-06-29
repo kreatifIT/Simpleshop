@@ -5,12 +5,13 @@ action.abort;Cancella
 action.use_coupon;Applica codice promo
 shop.order_status_CA;annullato
 shop.order_status_CL;completato
+shop.order_status_CN;Nota di credito
 action.logout;Esci
 simpleshop.account_area_account;Account
 label.address;Indirizzo
 action.add_address;Aggiungi indirizzo
 action.close;chiudere
-simpleshop.account_area_addresses;Indirizzi
+label.addresses;Indirizzi
 label.no_address_available;Nessun indirizzo disponibile
 label.address_additional;Informazione aggiuntiva
 error.choose_shipping_address;Selezionare un indirizzo di spedizione
@@ -24,7 +25,6 @@ label.login_success_overlay;Vi siete registrati con successo e ora potete contin
 label.all;tutti
 label.province;Provincia
 label.customer_type;Sono una...
-label.use_existing_addredss;Utilizzare l'indirizzo esistente
 error.token_already_used_for_transaction;Il pagamento è già stato effettuato in un'altra transazione
 label.order_placed_but_pending;L'ordine è stato creato con successo ed è ancora in attesa del pagamento.
 label.redirect_to_plugin_payment_page;Ora sarete indirizzati all'interfaccia di pagamento di {NAME}
@@ -37,10 +37,12 @@ error.login_failed;Accesso non riuscito
 action.add_to_wishlist;aggiungi ai preferiti
 label.bank_transfer ;Bonifico bancario
 action.edit;modificare
+label.auth_data;Dati di accesso
 label.description;Descrizione
 label.order_date;Data dell'ordine
 label.order_num;No. ordine
-label.order;Order
+label.order;Ordine
+label.saved;Salvato
 label.order_placed;Ordine completo
 label.email__order_complete;Ordine completo
 simpleshop.account_area_orders;Ordini
@@ -72,7 +74,7 @@ label.add_to_cart_success;L'articolo è stato aggiunto al tuo carrello con succe
 label.payment_cancelled;Il processo di pagamento è stato interrotto
 label.details;Dettagli
 label.order_complete_default_shipping_text;La merce le sarà spedita il prima possibile
-error.email_already_exists;Questo indirizzo e-mail è già stato registrato
+error.email_already_exists;Questo indirizzo e-mail è già stato registrato ad un altro utente
 error.coupon_not_exists;Il codice di questo buono acquisto non esiste
 error.coupon_not_valid_anymore;Il codice di questo buono acquisto non è più valido
 error.coupon_already_used;Hai già usato questo coupon
@@ -127,6 +129,11 @@ label.lastname;Cognome
 label.name;Nome
 label.location;Città
 label.password;Password
+label.new_password;Nuova password
+label.repeat_email;Ripeti l'email
+label.repeat_password;Ripeti la password
+error.email_not_identical_to_repeat;L'e-mail e la ripetizione devono essere identiche
+error.new_password_not_identical_to_repeat;La password e la ripetizione devono essere identiche
 label.password_forgotten;Password dimenticata?
 label.paypal_express;Paypal
 label.postal;CAP
@@ -145,7 +152,6 @@ label.invoice_address;Indirizzo di fatturazione
 label.pwd_recovery_info_text;Inserisci il tuo indirizzo e-mail e ti invieremo una nuova password.
 label.invoice_num;Fattura n°
 label.registration_info_text;Registra il tuo account.
-simpleshop.account_area_rma;RMA
 label.edit_address;Modifica indirizzo
 label.new_address;Nuovo indirizzo
 simpleshop.shipping_pickup_point;Ritiro in azienda
@@ -155,10 +161,6 @@ label.registration_sucessfull;La registrazione è avvenuta con successo. Puoi co
 label.applied_promotion_text;Queste sono le tue offerte personali:
 error.tos_rma_not_accepted;Devi accettare le condizioni di vendita e di recesso
 label.order_complete_pickup_text;Ti contatteremo appena la merce sarà pronta per il ritiro.
-
-Orari di apertura:
-Lunedì - Giovedì dalle 8:00 alle 17:00 
-Venerdì dalle 8:00 alle 14:00 (a richiesta anche più tardi)"
 label.are_required_fields;sono campi obbligatori
 action.save;salvare
 label.omest_shipping_ec;Standard / Economy
@@ -170,7 +172,6 @@ label.street;Via
 label.overview;Übersicht
 label.keep_password_notice;Se desideri continuare con la password attuale, non compilare il campo
 label.shipping_address;Indirizzo di spedizione
-label.shipping_address_is_idem;L'indirizzo di trasporto è identico all'indirizzo di fatturazione
 label.shipping_method;Metodo di spedizione
 label.shipping_costs;Costi di spedizione
 shop.order_status_SH;spedito

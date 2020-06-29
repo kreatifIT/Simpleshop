@@ -11,9 +11,12 @@
  * file that was distributed with this source code.
  */
 
-$Order         = $this->getVar('Order');
-$invoice_addr  = $Order->getInvoiceAddress();
-$shipping_addr = $Order->getShippingAddress();
+$Order        = $this->getVar('Order');
+$invoiceAddr  = $Order->getInvoiceAddress();
+$shippingAddr = $Order->getShippingAddress();
+
+$invoiceAddrData  = $invoiceAddr ? $invoiceAddr->toAddressArray(true) : [];
+$shippingAddrData = $shippingAddr ? $shippingAddr->toAddressArray(false) : [];
 
 
 if (file_exists(\rex_path::base('resources/img/logo300dpi.png'))) {
@@ -30,23 +33,24 @@ if (file_exists(\rex_path::base('resources/img/logo300dpi.png'))) {
 <table width="100%" id="invoice-header-infos">
     <tr>
         <td width="50%" valign="top">
-            <?php
-            if ($invoice_addr) {
-                $customerData = $Order->getCustomerData();
-                $invoice_addr->setValue('email', $customerData->getValue('email'));
-                $this->setVar('address', $invoice_addr);
-                $this->setVar('customer', $customerData);
-                $this->setVar('title', '###label.invoice_address###');
-                $this->subfragment('simpleshop/checkout/summary/address_item.php');
-                echo '<br/><br/>';
-            }
-            if ($shipping_addr) {
-                $this->setVar('address', $shipping_addr);
-                $this->setVar('customer', null);
-                $this->setVar('title', '###label.shipping_address###');
-                $this->subfragment('simpleshop/checkout/summary/address_item.php');
-            }
-            ?>
+
+            <div class="address">
+                <h4 class="heading small">###label.invoice_address###</h4>
+                <p>
+                    <?= implode('<br/>', $invoiceAddrData) ?>
+                </p>
+            </div>
+
+            <br/>
+            <br/>
+
+            <div class="address">
+                <h4 class="heading small">###label.shipping_address###</h4>
+                <p>
+                    <?= implode('<br/>', $shippingAddrData) ?>
+                </p>
+            </div>
+
         </td>
         <td width="50%" align="right" valign="top">
             <p>

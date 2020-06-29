@@ -20,11 +20,15 @@ $config   = $this->getVar('cart_table_wrapper_config', FragmentConfig::getValue(
 $coupon_code = Session::getCheckoutData('coupon_code');
 $styles      = FragmentConfig::getValue('styles');
 $settings    = \rex::getConfig('simpleshop.Settings');
-$Coupon      = Coupon::getByCode($coupon_code);
 $hasCoupons  = FragmentConfig::getValue('cart.has_coupons');
+$cartArticle = Settings::getArticle('cart');
+
+if ($cartArticle && \rex_article::getCurrentId() == $cartArticle->getId()) {
+    $Coupon = Coupon::getByCode($coupon_code);
+}
 
 ?>
-<?php if ($Coupon && $config['show_coupon_info']): ?>
+<?php if ($Coupon): ?>
     <div class="callout success">
         <strong><?= $Coupon->getName() ?></strong>
         ###label.applied###
@@ -46,15 +50,14 @@ $hasCoupons  = FragmentConfig::getValue('cart.has_coupons');
 </table>
 
 <?php if (!$config['hide_summary']): ?>
-    <div class="cart-sum grid-x grid-margin-x">
+    <div class="cart-sum grid-x grid-margin-x align-bottom">
         <div class="cell large-6">
             <?php if ($hasCoupons): ?>
-                <div class="cart-coupon">
+                <div class="cart-coupon" data-coupon-wrapper>
                     <div class="coupon-input-container">
-                        <input type="text" class="coupon-input" placeholder="###label.insert_coupon###" data-link="<?= rex_getUrl() ?>" value="<?= $coupon_code ?>">
-                        <button class="button coupon-submit" type="submit" onclick="Simpleshop.applyCoupon(this, '.cart-coupon|.coupon-input', '[data-cart-container]');">
+                        <input type="text" class="coupon-input" placeholder="###label.insert_coupon###" data-coupon-input data-link="<?= rex_getUrl() ?>" value="<?= $coupon_code ?>">
+                        <button class="button coupon-submit" type="submit" onclick="Simpleshop.applyCoupon(this, '[data-coupon-wrapper]|[data-coupon-input]', '[data-cart-container]');">
                             <span>###action.use_coupon###</span>
-                            <i class="fal fa-chevron-circle-right"></i>
                         </button>
                     </div>
                 </div>
@@ -62,24 +65,22 @@ $hasCoupons  = FragmentConfig::getValue('cart.has_coupons');
         </div>
 
         <div class="cell large-6">
-            <div class="margin-bottom">
-                <div class="checkout-summary-total">
-                    <?php if ($discount > 0): ?>
-                        <div class="subtotal">
-                            <span class="label">###label.subtotal###</span>
-                            <span class="price">&euro;&nbsp;<?= format_price(array_sum($totals)) ?></span>
-                        </div>
-
-                        <div class="promotions ">
-                            <span class="label">###label.discount###</span>
-                            <span class="price">&euro;&nbsp;-<?= format_price($discount) ?></span>
-                        </div>
-                    <?php endif; ?>
-
-                    <div class="total">
-                        <span class="label">###label.total_sum###</span>
-                        <span class="price">&euro;&nbsp;<?= format_price(array_sum($totals) - $discount) ?></span>
+            <div class="cart-summary-total">
+                <?php if ($discount > 0): ?>
+                    <div class="subtotal">
+                        <span class="label">###label.subtotal###</span>
+                        <span class="price">&euro;&nbsp;<?= format_price(array_sum($totals)) ?></span>
                     </div>
+
+                    <div class="promotions ">
+                        <span class="label">###label.discount###</span>
+                        <span class="price">&euro;&nbsp;-<?= format_price($discount) ?></span>
+                    </div>
+                <?php endif; ?>
+
+                <div class="total">
+                    <span class="label">###label.total_sum###</span>
+                    <span class="price">&euro;&nbsp;<?= format_price(array_sum($totals) - $discount) ?></span>
                 </div>
             </div>
         </div>
@@ -87,7 +88,7 @@ $hasCoupons  = FragmentConfig::getValue('cart.has_coupons');
 <?php endif; ?>
 
 <?php if ($config['has_go_ahead'] || strlen($config['back_url'])): ?>
-    <div class="cart-buttons clearfix">
+    <div class="cart-buttons">
         <?php if (strlen($config['back_url'])): ?>
             <a href="<?= $config['back_url'] ?>" class="cart-button-back button">
                 ###action.continue_shopping###

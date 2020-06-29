@@ -5,12 +5,13 @@ action.abort;Abbrechen
 action.use_coupon;Coupon anwenden
 shop.order_status_CA;abgebrochen
 shop.order_status_CL;abgeschlossen
+shop.order_status_CN;Gutschrift
 action.logout;Abmelden
 simpleshop.account_area_account;Account
 label.address;Adresse
 error.choose_shipping_address;Bitte eine Versandadresse auswählen
 action.add_address;Adresse hinzufügen
-simpleshop.account_area_addresses;Adressen
+label.addresses;Adressen
 label.address_additional;Adresszusatz
 action.close;schließen
 label.email__registration_optin_text;Sie haben sich bei ###company.name### registriert und müssen auf den nachfolgenden Link klicken um ihr Konto zu aktivieren:
@@ -18,6 +19,7 @@ label.reg_activation_already_done;Sie haben Ihr Konto bereits aktiviert
 label.login_success_overlay;Sie haben sich erfolgreich angemeldet und können nun fortfahren
 label.reg_activation_failed;Die Aktivierung des Kontos ist fehlgeschlagen
 label.reg_activation_successful;Die Aktivierung war erfolgreich. Sie können sich nun mit Ihren Zugangsdaten anmelden
+label.auth_data;Zugangsdaten
 label.activation_link_sent;Ihnen wurde ein Aktivierungslink per Mail zugesendet. Bitte kontrollieren Sie auch Ihren Spam-Ordner
 label.customer_type;Ich bin eine...
 label.all;alle
@@ -26,7 +28,6 @@ error.min_order_value;Der Mindestbestellwert von {VALUE} wurde nicht erreicht
 error.token_already_used_for_transaction;Die Zahlung wurde bereits in einer anderen Transaktion durchgeführt
 label.redirect_to_plugin_payment_page;Sie werden nun zur Bezahlschnittstelle von {NAME} geleitet
 label.order_placed_but_pending;Die Bestellung wurde erfolgreich erstellt und wartet noch auf den Abschluss der Zahlung.
-label.use_existing_addredss;Bestehende Adresse verwenden
 action.create_new_shipping_address;Neue Lieferadresse anlegen
 label.province;Provinz
 label.applied;angewandt
@@ -37,6 +38,7 @@ label.bank_transfer ;Banküberweisung
 action.edit;bearbeiten
 label.description;Beschreibung
 label.order_date;Bestelldatum
+label.saved;Gespeichert
 label.order_num;Bestellnummer
 label.order;Bestellung
 label.order_placed;Bestellung abgeschlossen
@@ -71,7 +73,7 @@ label.add_to_cart_success;Der Artikel wurde erfolgreich in die Einkaufstasche ge
 label.payment_cancelled;Der Bezahlvorgang wurde abgebrochen
 label.details;Details
 label.order_complete_default_shipping_text;Die Ware wird ihnen schnellstmöglich zugesendet
-error.email_already_exists;Diese E-Mail-Adresse ist bereits registriert
+error.email_already_exists;Diese E-Mail-Adresse ist bereits von einem anderen Nutzer registriert
 error.coupon_not_exists;Dieser Gutschein-Code existiert nicht
 error.coupon_not_valid_anymore;Dieser Gutschein-Code ist nicht mehr gültig
 error.coupon_already_used;Sie haben diesen Coupon bereits verwendet
@@ -128,6 +130,11 @@ label.lastname;Nachname
 label.name;Name
 label.location;Ort
 label.password;Passwort
+label.new_password;Neues Passwort
+label.repeat_email;Email wiederholen
+label.repeat_password;Passwort wiederholen
+error.email_not_identical_to_repeat;Die Email und die Wiederholung müssen identisch sein
+error.new_password_not_identical_to_repeat;Das Passwort und die Wiederholung müssen identisch sein
 label.password_forgotten;Passwort vergessen?
 label.paypal_express;Paypal
 label.postal;PLZ
@@ -144,7 +151,6 @@ label.invoice_address;Rechnungsadresse
 label.invoice_num;Rechnungsnr.
 label.registration_info_text;Registrieren Sie ihren Account.
 label.pwd_recovery_info_text;Geben Sie Ihre Email-Adresse ein, dann senden wir Ihnen ein neues Passwort zu.
-simpleshop.account_area_rma;RMA
 simpleshop.shipping_pickup_point;Selbstabholung
 label.shipping_number;Sendungsnummer
 label.edit_address;Adresse bearbeiten
@@ -155,10 +161,6 @@ label.registration_sucessfull;Sie haben sich erfolgreich registriert und können
 label.applied_promotion_text;Sie kommen in den Genuss folgender Promotionen:
 error.tos_rma_not_accepted;Sie müssen die Geschäftsbedingungen und die Widerrufsbelehrungen akzeptieren
 label.order_complete_pickup_text;Sie werden von uns kontaktiert sobald die Ware in unserem Lager abholbereit ist.
-
-Öffnungszeiten: 
-Montag - Donnerstag 8:00 - 17:00 Uhr
-Freitag 8:00 - 14:00 Uhr (auf Anfrage auch später)"
 label.are_required_fields;sind Pflichtfelder
 action.save;speichern
 label.omest_shipping_ec;Standard / Economy
@@ -170,7 +172,6 @@ label.street;Straße
 label.overview;Übersicht
 label.keep_password_notice;Um das aktuelle Passwort beizubehalten, das Feld leer lassen
 label.shipping_address;Versandadresse
-label.shipping_address_is_idem;Versandadresse ist identisch mit der Rechnungsadresse
 label.shipping_method;Versandart
 label.shipping_costs;Versandkosten
 shop.order_status_SH;versendet

@@ -30,18 +30,36 @@ abstract class Discount extends Model
         } else if ($this->getValue('discount_value') > 0) {
             $discount = $this->getValue('discount_value');
         } else if ($this->getValue('discount_percent') > 0) {
+            $shippingFaktor = [];
+            if ($Order) {
+                $shipping = $Order->getValue('shipping');
+                if ($shipping) {
+                    $shippingCost = $shipping->getPrice($Order);
+
+                    $shippingFaktor = [
+                        'percent' => $shipping->getTaxPercentage(),
+                        'value'   => $shippingCost,
+                    ];
+
+                    $gross_prices[$shipping->getTaxPercentage()] -= $shippingCost;
+                }
+            }
             $discount = array_sum($gross_prices) / 100 * $this->getValue('discount_percent');
+
+            if (count($shippingFaktor)) {
+                $gross_prices[$shippingFaktor['percent']] += $shippingFaktor['value'];
+            }
         }
 
         if ($discount > 0) {
             $discount = $discount - $this->applyToGrossPrices($discount, $gross_prices);
         }
         $this->setValue('value', $discount);
-        
+
         return $discount;
     }
 
-    public function applyToCart(&$brut_prices)
+    public function applyToCart(&$brut_prices, $Order = null)
     {
         $discount = 0;
 

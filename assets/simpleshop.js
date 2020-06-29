@@ -20,8 +20,14 @@ var Simpleshop = (function ($) {
         $body = $('body');
         $offcanvasCart = $('.offcanvas-cart');
 
-        $('[data-init-form-toggle]').each(function() {
+        $('[data-init-form-toggle]').each(function () {
             $(this).trigger('change');
+        });
+
+        $(document).on('pjax:end', function() {
+            $('[data-init-form-toggle]').each(function () {
+                $(this).trigger('change');
+            });
         });
 
         $body.click(function (event) {
@@ -49,8 +55,7 @@ var Simpleshop = (function ($) {
 
         if (position === 'relative') {
             $container.append($loading.addClass('show relative'));
-        }
-        else {
+        } else {
             var css = $container.offset();
             css.height = $container.outerHeight();
             css.width = $container.outerWidth();
@@ -61,7 +66,7 @@ var Simpleshop = (function ($) {
 
     var result = {
         addLoading: addLoading,
-        showOffcanvasCart: function () {
+        showOffcanvasCart: function (e) {
             $offcanvasCart.addClass('expanded');
             $body.addClass('offcanvas-cart-open');
 
@@ -74,41 +79,37 @@ var Simpleshop = (function ($) {
             }
         },
 
-        closeOffcanvasCart: function () {
+        closeOffcanvasCart: function (e) {
             $offcanvasCart.removeClass('expanded');
             $body.removeClass('offcanvas-cart-open');
         },
 
-        toggleAuth: function (_this, selector, hideSelector) {
+        toggleShipping: function (_this) {
             var $this = $(_this),
-                $wrapper = $this.parents('[data-auth-wrapper]');
-
-            $this.parents(hideSelector).addClass('hide');
-            $wrapper.find(selector).removeClass('hide');
-        },
-        toggleShipping: function (_this, selector, inverted) {
-            var $this = $(_this),
-                chunks = selector.split('|'),
-                $container = $this.parents(chunks[0]),
-                $address = $container.find(chunks[1]);
+                showNew = $this.is(':checked'),
+                $container = $this.parents('[data-address-toggle-container]'),
+                $toggles = $container.find('[data-address-toggle]');
 
             $container.find('[data-shipping-addresses] input').prop('checked', false);
 
-            if (inverted) {
-                if ($this.is(':checked')) {
-                    $address.addClass('hide');
+            $toggles.each(function() {
+                var $this = $(this),
+                    toggle = $this.data('address-toggle');
+
+                if (showNew) {
+                    if (toggle == 'new-address') {
+                        $this.removeClass('hide');
+                    } else {
+                        $this.addClass('hide');
+                    }
+                } else {
+                    if (toggle == 'new-address') {
+                        $this.addClass('hide');
+                    } else {
+                        $this.removeClass('hide');
+                    }
                 }
-                else {
-                    $address.removeClass('hide');
-                }
-            } else {
-                if ($this.is(':checked')) {
-                    $address.removeClass('hide');
-                }
-                else {
-                    $address.addClass('hide');
-                }
-            }
+            });
         },
         changeCType: function (_this, selector) {
             var $this = $(_this),
@@ -134,8 +135,7 @@ var Simpleshop = (function ($) {
 
             if (!$container.length) {
                 alert('Variant container class not found [' + selector + ']');
-            }
-            else if (typeof KreatifPjax == 'undefined') {
+            } else if (typeof KreatifPjax == 'undefined') {
                 alert('KreatifPjax is not defined - Gruntfile?');
                 return false;
             }
@@ -169,13 +169,15 @@ var Simpleshop = (function ($) {
                     'rex-api-call': 'simpleshop_api',
                     'lang': lang_id,
                     'product_key': vkey,
-                    'quantity': parseInt(amount),
+                    'exact_qty': parseInt(amount),
                     'layout': layout
                 }
             }).done(function (resp) {
                 $container.html(resp.message.cart_html);
                 $loading.remove();
                 result.showOffcanvasCart();
+
+                $('#header-cart').html(resp.message.cartButton);
 
                 $(document).trigger('simpleshop:addToCart', [$container, resp]);
                 $(document).trigger('pjax:end', [$container, resp]);
@@ -201,6 +203,8 @@ var Simpleshop = (function ($) {
                 $container.html(resp.message.cart_html);
                 $loading.remove();
 
+                $('#header-cart').html(resp.message.cartButton);
+
                 $(document).trigger('simpleshop:removeCartItem', [$container, resp]);
                 $(document).trigger('pjax:end', [$container, resp]);
             });
@@ -216,8 +220,7 @@ var Simpleshop = (function ($) {
 
             if (sign == 'minus') {
                 $input.val(parseInt($input.val()) - 1);
-            }
-            else if (sign == 'plus') {
+            } else if (sign == 'plus') {
                 $input.val(parseInt($input.val()) + 1);
             }
 
@@ -225,8 +228,7 @@ var Simpleshop = (function ($) {
 
             if (num < 1) {
                 num = 1;
-            }
-            else if (num > max) {
+            } else if (num > max) {
                 num = max;
             }
             $input.val(num);
@@ -234,8 +236,7 @@ var Simpleshop = (function ($) {
             if (vkey) {
                 if (!$row.length) {
                     alert('Cart row not found [default = data-cart-item]');
-                }
-                else if (!$container.length) {
+                } else if (!$container.length) {
                     alert('Cart container not found [default = data-cart-container');
                 }
 
@@ -256,6 +257,8 @@ var Simpleshop = (function ($) {
                     $container.html(resp.message.cart_html);
                     $loading.remove();
 
+                    $('#header-cart').html(resp.message.cartButton);
+
                     $(document).trigger('simpleshop:changeCartAmount', [$container, resp]);
                     $(document).trigger('pjax:end', [$container, resp]);
                 });
@@ -273,12 +276,10 @@ var Simpleshop = (function ($) {
             if (typeof KreatifPjax == 'undefined') {
                 alert('KreatifPjax is not defined - Gruntfile?');
                 return false;
-            }
-            else if ($container.length == 0) {
+            } else if ($container.length == 0) {
                 alert('Load-More container "' + container + '" is not set!');
                 return false;
-            }
-            else if (url == '' || typeof url == 'undefined') {
+            } else if (url == '' || typeof url == 'undefined') {
                 alert('PJax url is not defined!');
                 return false;
             }
@@ -303,12 +304,10 @@ var Simpleshop = (function ($) {
             if (typeof KreatifPjax == 'undefined') {
                 alert('KreatifPjax is not defined - Gruntfile?');
                 return false;
-            }
-            else if ($fragment.length == 0) {
+            } else if ($fragment.length == 0) {
                 alert('Element container "' + fragment + '" is not set!');
                 return false;
-            }
-            else if ($container.length == 0) {
+            } else if ($container.length == 0) {
                 alert('Load-More container "' + container + '" is not set!');
                 return false;
             }

@@ -75,15 +75,16 @@ class Coupon extends Discount
         return $this->apply('to-order', $Order, $brut_prices);
     }
 
-    public function applyToCart(&$brut_prices)
+    public function applyToCart(&$brut_prices, $order = null)
     {
-        return $this->apply('to-cart', null, $brut_prices);
+        return $this->apply('to-cart', $order, $brut_prices);
     }
 
     protected function apply($method, $Order, &$brut_prices)
     {
         $start   = strtotime($this->getValue('start_time') . ' 00:00:00');
-        $end     = $this->getValue('end_time') != '' ? strtotime($this->getValue('end_time') . ' 23:59:59') : null;
+        $endDate = $this->getValue('end_date');
+        $end     = $endDate != '' && $endDate != '0000-00-00' ? strtotime($endDate . ' 23:59:59') : null;
         $value   = $this->getValue('discount_value');
         $percent = $this->getValue('discount_percent');
         $orders  = array_filter((array)$this->getValue('orders'));
@@ -123,7 +124,7 @@ class Coupon extends Discount
         if ($method == 'to-order') {
             $discount = parent::applyToOrder($Order, $brut_prices, 'coupon');
         } else if ($method == 'to-cart') {
-            $discount = parent::applyToCart($brut_prices);
+            $discount = parent::applyToCart($brut_prices, $Order);
         }
 
         if (isset ($_value)) {

@@ -85,6 +85,39 @@ class Order extends Model
         return $Country && !$Country->getValue('b2b_has_tax');
     }
 
+    public function getSubtotal($includeTax = true)
+    {
+        if ($includeTax) {
+            $subtotal = $this->getGrossTotal();
+        } else {
+            $subtotal = $this->getNettoTotal();
+        }
+        return $subtotal;
+    }
+
+    public function getGrossTotal()
+    {
+        return array_sum($this->getValue('brut_prices'));
+    }
+
+    public function getNettoTotal()
+    {
+        return array_sum($this->getValue('net_prices'));
+    }
+
+    public function getDiscount($includeTax = true)
+    {
+        $discount = $this->getValue('discount');
+
+        if (!$includeTax) {
+            $grossTotal = $this->getGrossTotal();
+            $nettoTotal = $this->getNettoTotal();
+            $_percent   = $discount / $grossTotal;
+            $discount   = $nettoTotal * $_percent;
+        }
+        return $discount;
+    }
+
     public function getProducts($raw = true)
     {
         $stmt = OrderProduct::query();
@@ -277,7 +310,7 @@ class Order extends Model
             // clear deleted products
             $where = ["order_id = {$this->getId()}"];
             if (count($orderProductIds)) {
-                $where[] = 'id NOT IN('. implode(',', $orderProductIds) .')';
+                $where[] = 'id NOT IN(' . implode(',', $orderProductIds) . ')';
             }
             $sql->setTable(OrderProduct::TABLE);
             $sql->setWhere(implode(' AND ', $where));
@@ -371,7 +404,7 @@ class Order extends Model
         if ($this->getValue('shipping')) {
             try {
                 $shipping = $this->getValue('shipping');
-                $this->setValue('shipping_costs', (float)$shipping->getNetPrice($this, $products));
+                $this->setValue('shipping_costs', (float)$shipping->getGrossPrice($this, $products));
             } catch (\Exception $ex) {
                 $msg = trim($ex->getLabelByCode());
 
@@ -448,6 +481,15 @@ class Order extends Model
         $errors       = [];
         $_promotions  = [];
         $gross_prices = $this->getValue('brut_prices');
+        $initialGross = array_sum($gross_prices);
+
+        // set shipping costs
+        if ($this->getValue('shipping_costs') > 0) {
+            $shipping   = $this->getValue('shipping');
+            $taxPercent = $shipping->getTaxPercentage();
+
+            $gross_prices[$taxPercent] += $shipping->getPrice($this);
+        }
 
         foreach ($promotions as $name => $promotion) {
             try {
@@ -468,23 +510,11 @@ class Order extends Model
             $taxes[$tax] += (float)($gross_price / ($tax + 100) * $tax);
         }
 
-        // set shipping costs
-        if ($this->getValue('shipping_costs') > 0 && !$this->isTaxFree()) {
-            $tax = $this->getValue('shipping')
-                ->getTaxPercentage();
-
-
-            if ($tax > 0) {
-                $this->setValue('net_shipping_costs', (float)$this->getValue('shipping_costs') / (100 + $tax) * 100);
-                $taxes[$tax] += $this->getValue('shipping')
-                    ->getTax();
-            }
-        }
         ksort($taxes);
 
         $this->setValue('taxes', $taxes);
         $this->setValue('discount', $discount);
-        $this->setValue('total', $this->getValue('shipping_costs') + array_sum($gross_prices));
+        $this->setValue('total', array_sum($gross_prices));
 
         return [$errors, $_promotions];
     }
@@ -563,6 +593,7 @@ class Order extends Model
         $fragment->setVar('Customer', $this->getInvoiceAddress());
         $fragment->setVar('Order', $this);
 
+        FragmentConfig::$data['checkout']['show_tax_info'] = !$this->isTaxFree();
 
         // HEADER
         $content = $fragment->parse('simpleshop/pdf/invoice/header.php');

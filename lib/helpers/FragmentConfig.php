@@ -128,22 +128,6 @@ class FragmentConfig
             'callout'         => 'style="Margin-bottom:16px;border-collapse:collapse;border-spacing:0;margin-bottom:16px;padding:0;text-align:left;vertical-align:top;width:100%;"',
             'callout_inner'   => 'style="Margin:0;background:#f3f3f3;border:1px solid #cacaca;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:10px;text-align:left;width:100%;"',
         ],
-
-
-        // FIELD DEFINITIONS
-        'yform_fields' => [
-            'rex_shop_customer_address' => [
-                '_fieldDefaults'  => ['css_class' => 'cell medium-6'],
-                '_excludedFields' => ['status', 'customer_id'],
-                'country'         => [
-                    'just_names' => true,
-                ],
-            ],
-            'rex_shop_customer'         => [
-                '_fieldDefaults'  => ['css_class' => 'cell medium-6'],
-                '_excludedFields' => ['invoice_address_id', 'lang_id', 'addresses', 'status', 'lastlogin', 'updatedate', 'created', 'activationdate'],
-            ],
-        ],
     ];
 
     public static function getValue($selector, $default = null)

@@ -37,6 +37,8 @@ if ($method == 'detail') {
 
 ?>
 <div class="customer-area-orders">
-    <?php $this->subfragment('simpleshop/customer/customer_area/title.php') ?>
+    <h2 class="margin-small-bottom">
+        ###simpleshop.account_area_orders###
+    </h2>
     <?php $this->subfragment('simpleshop/customer/customer_area/order/' . $content) ?>
 </div>

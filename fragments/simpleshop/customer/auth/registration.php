@@ -15,119 +15,209 @@ namespace FriendsOfREDAXO\Simpleshop;
 use Kreatif\Form;
 
 
-$sid        = 'form-auth-' . \rex_article::getCurrentId();
-$action     = trim(rex_post('action', 'string'));
-$form       = Form::factory();
-$formFields = CustomerAddress::getAllYformFields();
-$formFields = array_merge($formFields, Customer::getAllYformFields());
+$sid    = \rex_article::getCurrentId();
+$formId = 'shop-registration' . $sid;
 
-$Config    = FragmentConfig::getValue('yform_fields.rex_shop_customer');
-$excFields = FragmentConfig::getValue('yform_fields.rex_shop_customer._excludedFields');
-$excFields = array_merge($excFields, FragmentConfig::getValue('yform_fields.rex_shop_customer_address._excludedFields'));
-$excFields = array_merge($excFields, FragmentConfig::getValue('auth.registration_excl_fields'));
-
-FragmentConfig::$data['yform_fields']['rex_shop_customer']['_excludedFields'] = $excFields;
-
-if (\rex_request::isXmlHttpRequest()) {
-    $pjaxData = 'data-pjax="' . rex_escape(json_encode([
-            'container' => '#' . $sid,
-            'fragment'  => '#' . $sid,
-            'push'      => false,
-            'cache'     => false,
-        ]), 'html_attr') . '"';
-} else {
-    $pjaxData = '';
-}
 
 // Options
-$form->setObjectparams('form_anchor', '-' . $sid);
-$form->setObjectparams('data_attributes', $pjaxData);
-$form->setObjectparams('submit_btn_show', false);
-$form->setObjectparams('real_field_names', true);
-$form->setObjectparams('form_ytemplate', 'custom,foundation,bootstrap');
-$form->setObjectparams('error_class', 'form-warning');
-$form->setObjectparams('form_showformafterupdate', true);
+$form = Form::factory($formId, false);
+$form->setObjectparams('data_pjax', false);
 $form->setObjectparams('fields_class', 'grid-x grid-margin-x');
-
-
-foreach ($formFields as $field) {
-    // exclude types
-    if (in_array($field->getElement('name'), $excFields)) {
-        continue;
-    }
-
-    $fieldType = $field->getElement('type_id');
-
-    if ($fieldType == 'validate') {
-        // set validate field
-        $form->setValidateField($field->getElement('type_name'), $field->toArray());
-    } else if ($fieldType == 'value') {
-        // set value field
-        $params              = array_merge($field->toArray(), (array)$Config[$field->getElement('name')], [
-            'notice' => null,
-        ]);
-        $params['css_class'] .= ' cell medium-6';
-
-        if ($field->getElement('type_name') == 'be_manager_relation') {
-            $params['just_names'] = true;
-            $params['field']      = strtr($params['field'], ['_1' => '_' . \rex_clang::getCurrentId()]);
-        }
-        $form->setValueField($field->getElement('type_name'), $params);
-    }
+{
+    $field = CustomerAddress::getYformFieldByName('ctype');
+    $form->setValueField('choice', [
+        'name'       => $field->getName(),
+        'label'      => $field->getLabel(),
+        'choices'    => $field->getElement('choices'),
+        'css_class'  => 'cell medium-6',
+        'required'   => true,
+        'attributes' => '{"onchange":"Simpleshop.changeCType(this)","data-init-form-toggle":"1"}',
+    ]);
+    $form->setValidateField('empty', [
+        'name'    => $field->getName(),
+        'message' => str_replace('{{fieldname}}', $field->getLabel(), \Wildcard::get('error.field.empty')),
+    ]);
 }
-
-
-// validate empty password
-$form->setValidateField('empty', [
-    'type_id'   => 'validate',
-    'type_name' => 'empty',
-    'name'      => 'password',
-    'message'   => '###error.password_policy###',
-]);
-
-
-// Submit
-$form->setValueField('html', ['', '<div class="margin-small-top cell">']);
-$form->setValueField('submit', [
-    'name'        => 'submit',
-    'no_db'       => 'no_db',
-    'labels'      => strtoupper(\Wildcard::get('action.register')),
-    'css_classes' => 'button expanded ' . $Config['css_class']['buttons'],
-]);
+{
+    $field = CustomerAddress::getYformFieldByName('company_name');
+    $form->setValueField('text', [
+        'name'       => $field->getName(),
+        'label'      => $field->getLabel(),
+        'css_class'  => 'cell medium-6',
+        'required'   => true,
+        'attributes' => '{"data-form-toggle":"company"}',
+    ]);
+    $form->setValidateField('customfunction', [
+        'name'     => $field->getName(),
+        'function' => '\FriendsOfREDAXO\Simpleshop\Customer::customValidateField',
+        'params'   => '{"method":"empty-if","dependencies":[{"field":"ctype","value":"company"}]}',
+        'message'  => str_replace('{{fieldname}}', $field->getLabel(), \Wildcard::get('error.field.empty')),
+    ]);
+}
+{
+    $field = CustomerAddress::getYformFieldByName('firstname');
+    $form->setValueField('text', [
+        'name'       => $field->getName(),
+        'label'      => $field->getLabel(),
+        'css_class'  => 'cell medium-6',
+        'required'   => true,
+        'attributes' => '{"data-form-toggle":"person"}',
+    ]);
+    $form->setValidateField('customfunction', [
+        'name'     => $field->getName(),
+        'function' => '\FriendsOfREDAXO\Simpleshop\Customer::customValidateField',
+        'params'   => '{"method":"empty-if","dependencies":[{"field":"ctype","value":"person"}]}',
+        'message'  => str_replace('{{fieldname}}', $field->getLabel(), \Wildcard::get('error.field.empty')),
+    ]);
+}
+{
+    $field = CustomerAddress::getYformFieldByName('lastname');
+    $form->setValueField('text', [
+        'name'       => $field->getName(),
+        'label'      => $field->getLabel(),
+        'css_class'  => 'cell medium-6',
+        'required'   => true,
+        'attributes' => '{"data-form-toggle":"person"}',
+    ]);
+    $form->setValidateField('customfunction', [
+        'name'     => $field->getName(),
+        'function' => '\FriendsOfREDAXO\Simpleshop\Customer::customValidateField',
+        'params'   => '{"method":"empty-if","dependencies":[{"field":"ctype","value":"person"}]}',
+        'message'  => str_replace('{{fieldname}}', $field->getLabel(), \Wildcard::get('error.field.empty')),
+    ]);
+}
+{
+    $form->setValueField('html', ['', '<div class="show-for-medium cell medium-6" data-form-toggle="person"></div>']);
+}
+{
+    $field = Customer::getYformFieldByName('email');
+    $form->setValueField('email', [
+        'name'      => $field->getName(),
+        'label'     => $field->getLabel(),
+        'css_class' => 'cell medium-6',
+        'required'  => true,
+    ]);
+    $form->setValidateField('empty', [
+        'name'    => $field->getName(),
+        'message' => str_replace('{{fieldname}}', $field->getLabel(), \Wildcard::get('error.field.empty')),
+    ]);
+    $form->setValidateField('email', [
+        'name'    => $field->getName(),
+        'message' => '###error.email_not_valid###',
+    ]);
+    $form->setValidateField('unique', [
+        'name'    => $field->getName(),
+        'table'   => Customer::TABLE,
+        'message' => '###error.email_already_exists###',
+    ]);
+    $form->setValidateField('compare', [
+        'name'    => $field->getName(),
+        'name2'   => 'email2',
+        'message' => '###error.email_not_identical_to_repeat###',
+    ]);
+}
+{
+    $form->setValueField('email', [
+        'name'      => 'email2',
+        'label'     => '###label.repeat_email###',
+        'css_class' => 'cell medium-6',
+        'required'  => true,
+    ]);
+}
+{
+    $field = Customer::getYformFieldByName('password');
+    $form->setValueField('text', [
+        'type'      => 'password',
+        'name'      => $field->getName(),
+        'label'     => $field->getLabel(),
+        'css_class' => 'cell medium-6',
+        'required'  => true,
+    ]);
+    $form->setValidateField('empty', [
+        'name'    => $field->getName(),
+        'message' => str_replace('{{fieldname}}', $field->getLabel(), \Wildcard::get('error.field.empty')),
+    ]);
+    $form->setValidateField('password_policy', [
+        'name'    => $field->getName(),
+        'message' => '###error.password_policy###',
+        'rules'   => '{"length":{"min":8},"letter":{"min":1},"digit":{"min":1}}',
+    ]);
+    $form->setValidateField('compare', [
+        'name'    => $field->getName(),
+        'name2'   => 'password2',
+        'message' => '###error.new_password_not_identical_to_repeat###',
+    ]);
+}
+{
+    $form->setValueField('text', [
+        'type'      => 'password',
+        'name'      => 'password2',
+        'label'     => '###label.repeat_password###',
+        'css_class' => 'cell medium-6',
+        'required'  => true,
+    ]);
+}
+$form->setValueField('html', ['', '<div class="cell">']);
+{
+    $form->setValueField('submit', [
+        'name'        => 'submit',
+        'no_db'       => 'no_db',
+        'labels'      => ucfirst(\Wildcard::get('action.register')),
+        'css_classes' => 'button expanded margin-small-bottom',
+    ]);
+}
 $form->setValueField('html', ['', '</div>']);
-$form->setValueField('html', ['', '<input type="hidden" name="action" value="register">']);
 
-$customerError = false;
-$formOutput    = $form->getForm();
+$formOutput = $form->getForm();
 
-if ($action == 'register' && $form->isSend() && !$form->hasWarnings()) {
-    $values = $form->getFormEmailValues();
+
+if ($form->isSend() && !$form->hasWarnings()) {
+    $customer = null;
+    $values   = $form->getFormEmailValues();
 
     // register customer
     try {
         $customer = Customer::register($values['email'], $values['password'], $values);
-
-        if ($customer && $customer->getId()) {
-            Customer::login($values['email'], $values['password']);
-        }
     } catch (CustomerException $ex) {
-        $customerError = true;
-        $formOutput    = '<div class="callout alert">' . $ex->getMessage() . '</div>' . $formOutput;
+        $formOutput = $form->regenerateForm(explode('||', $ex->getMessage()));
+    } catch (\Exception $ex) {
+        $formOutput = $form->regenerateForm([$ex->getMessage()]);
+    }
+    if ($customer && $customer->getId()) {
+        Customer::login($values['email'], $values['password']);
+
+        $redirectUrl = '';
+        $referer     = rex_session('login_referer', 'string');
+        rex_unset_session('login_referer');
+
+        if ($referer == 'account') {
+            $article     = Settings::getArticle('dashboard');
+            $redirectUrl = $article ? $article->getUrl() : '';
+        }
+        if ($redirectUrl == '' && strlen($referer)) {
+            $redirectUrl = $referer;
+        }
+        if ($redirectUrl == '') {
+            unset($_GET['action']);
+            $redirectUrl = rex_getUrl(null, null, $_GET);
+        }
+        if (\rex_request::isXmlHttpRequest()) {
+            \rex_response::cleanOutputBuffers();
+            \rex_response::sendJson(['redirectUrl' => $redirectUrl]);
+        } else {
+            \rex_response::sendCacheControl();
+            \rex_response::sendRedirect($redirectUrl);
+        }
+        exit;
     }
 }
 
 ?>
-<?php if ($form->isSend() && !$form->hasWarnings() && !$customerError):
-    $referer = rex_session('login_referer', 'string');
-    rex_unset_session('login_referer');
-
-    if (strlen($referer)) {
-        header('Location: ' . $referer);
-        exit;
-    }
-    ?>
-    <div class="callout success">
-        <?= $customer ? '###label.registration_sucessfull###' : '###label.activation_link_sent###' ?>
+<?php if ($form->isSend() && !$form->hasWarnings()): ?>
+    <div id="<?= $formId ?>">
+        <div class="callout success">
+            ###label.activation_link_sent###
+        </div>
     </div>
 <?php else: ?>
     <?= $formOutput ?>

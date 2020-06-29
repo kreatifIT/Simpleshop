@@ -35,13 +35,13 @@ class AccountController extends Controller
 
         // CHECK CUSTOMER IS LOGGED
         if (!Customer::isLoggedIn()) {
-            $this->fragment_path[] = 'simpleshop/customer/auth/login.php';
+            $this->fragment_path[] = 'simpleshop/customer/auth/wrapper.php';
             return $this;
         }
 
 
         // CHECK CONTENT IS ENABLED BY SETTINGS
-        if (!in_array($this->params['area'], $Settings['membera_area_contents'])) {
+        if (!in_array($this->params['area'], (array)$Settings['membera_area_contents'])) {
             $this->fragment_path[] = 'simpleshop/customer/auth/no_permission.php';
             return $this;
         }
