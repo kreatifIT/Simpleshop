@@ -45,8 +45,7 @@ class CartController extends Controller
 
         switch ($postAction) {
             case 'redeem_coupon':
-                $coupon_code = trim(rex_get('coupon_code', 'string'));
-
+                $coupon_code = trim(rex_request('coupon_code', 'string'));
                 Session::setCheckoutData('coupon_code', $coupon_code);
                 break;
         }

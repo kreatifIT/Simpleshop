@@ -33,11 +33,11 @@ $shipping   = $Order->getValue('shipping');
     </div>
 
     <?php if (count($warnings)): ?>
-        <div class="callout alert margin-bottom">
-            <?php foreach ($warnings as $warning): ?>
-                - <?= isset($warning['replace']) ? strtr($warning['label'], ['{{replace}}' => $warning['replace']]) : $warning['label'] ?><br/>
-            <?php endforeach; ?>
-        </div>
+        <?php foreach ($warnings as $warning): ?>
+            <div class="callout alert margin-bottom">
+                <p><?= isset($warning['replace']) ? strtr($warning['label'], ['{{replace}}' => $warning['replace']]) : $warning['label'] ?></p>
+            </div>
+        <?php endforeach; ?>
     <?php endif; ?>
 
     <?php if (count($errors)): ?>
@@ -100,7 +100,7 @@ $shipping   = $Order->getValue('shipping');
             <?php
             $Controller = CartController::execute([
                 'products'                  => $products,
-                'use_tax_prices'            => false,
+                'use_tax_prices'            => !$Order->isTaxFree(),
                 'cart_config'               => array_merge(FragmentConfig::getValue('cart'), [
                     'has_remove_button' => false,
                 ]),
@@ -109,7 +109,6 @@ $shipping   = $Order->getValue('shipping');
                     'has_quantity'         => true,
                 ]),
                 'cart_table_wrapper_config' => array_merge(FragmentConfig::getValue('cart.table-wrapper'), [
-                    'show_coupon_info'  => false,
                     'has_remove_button' => false,
                     'hide_summary'      => true,
                     'has_go_ahead'      => false,
@@ -151,9 +150,9 @@ $shipping   = $Order->getValue('shipping');
                         <textarea rows="3" name="remarks"><?= $Order->getValue('remarks') ?></textarea>
                     </div>
 
-                    <div class="margin-top margin-large-bottom">
+                    <div class="checkout-buttons">
                         <a href="<?= $back_url ?>" class="button hollow">###action.go_back###</a>
-                        <button type="submit" name="action" value="place_order" class="button margin-bottom float-right">
+                        <button type="submit" name="action" value="place_order" class="button">
                             ###action.place_order###
                         </button>
                     </div>

@@ -16,12 +16,14 @@ namespace FriendsOfREDAXO\Simpleshop;
 $code = $this->getVar('coupon_code');
 
 ?>
-<div class="coupon margin-bottom">
+<div class="checkout-coupon">
     <form action="<?= rex_getUrl(null, null, array_merge($_GET, ['ts' => time()])) ?>" method="post">
-        <h3>###label.coupon###</h3>
-        <input type="text" name="coupon" value="<?= $code ?>"/>
-        <button type="submit" class="button coupon-btn" name="action" value="redeem_coupon">
-            ###label.redeem_coupon###
-        </button>
+        <h3 class="heading small">###label.coupon###</h3>
+        <div class="coupon-input-container">
+            <input class="coupon-input" type="text" name="coupon_code" value="<?= $code ?>"/>
+            <button type="submit" class="button coupon-submit" name="action" value="redeem_coupon">
+                ###label.redeem_coupon###
+            </button>
+        </div>
     </form>
 </div>

@@ -27,7 +27,7 @@ if (count($products) == 0) {
         <td width="14%">###label.code###</td>
         <td width="38%">###label.description###</td>
         <td width="10%">###label.amount###</td>
-        <td width="15%">###label.single_price_no_vat###</td>
+        <td width="15%">###label.single_price###</td>
         <td width="15%">###label.total_sum###</td>
     </tr>
     </thead>
@@ -57,8 +57,8 @@ if (count($products) == 0) {
                 <?php endif; ?>
             </td>
             <td align="center"><?= $quantity ?></td>
-            <td align="right">&euro; <?= format_price($product->getPrice(!$config['show_tax_info'])) ?></td>
-            <td align="right">&euro; <?= format_price($product->getPrice(!$config['show_tax_info']) * $quantity) ?></td>
+            <td align="right">&euro; <?= format_price($product->getPrice($config['show_tax_info'])) ?></td>
+            <td align="right">&euro; <?= format_price($product->getPrice($config['show_tax_info']) * $quantity) ?></td>
         </tr>
     <?php endforeach; ?>
 

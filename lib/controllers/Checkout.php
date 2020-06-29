@@ -338,8 +338,8 @@ class CheckoutController extends Controller
         switch ($postAction) {
             case 'redeem_coupon':
                 try {
-                    $code   = rex_post('coupon', 'string');
-                    $coupon = Coupon::redeem($code);
+                    $coupon_code = rex_post('coupon_code', 'string');
+                    Session::setCheckoutData('coupon_code', $coupon_code);
                 } catch (CouponException $ex) {
                     $warnings[] = ['label' => $ex->getLabelByCode()];
                 }
@@ -537,8 +537,8 @@ class CheckoutController extends Controller
         }
 
         // CLEAR THE SESSION
-//        Session::clearCheckout();
-//        Session::clearCart();
+        Session::clearCheckout();
+        Session::clearCart();
 
         switch ($status) {
             case 'completed':

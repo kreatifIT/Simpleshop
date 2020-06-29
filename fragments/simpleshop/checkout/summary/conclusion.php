@@ -14,56 +14,62 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $Order      = $this->getVar('Order');
-$net_prices = $Order->getValue('net_prices');
-$discount   = $Order->getValue('discount');
 $total      = $Order->getValue('total');
 $taxes      = $Order->getValue('taxes');
 $shipping   = $Order->getValue('shipping');
 $promotions = (array)$Order->getValue('promotions');
+$isTaxFree  = $Order->isTaxFree();
 
 ?>
-<div class="margin-bottom">
-    <div class="checkout-summary-total">
-        <div class="subtotal">
-            <span class="label">###label.subtotal###</span>
-            <span class="price">&euro;&nbsp;<?= format_price(array_sum($net_prices)) ?></span>
+<div class="checkout-summary-total">
+    <div class="subtotal">
+        <span class="label">###label.subtotal###</span>
+        <span class="price">&euro;&nbsp;<?= format_price($Order->getSubtotal(!$isTaxFree)) ?></span>
+    </div>
+
+    <?php foreach ($promotions as $promotion):
+        if (!is_object($promotion) || $promotion->getValue('value') == 0) {
+            continue;
+        }
+        ?>
+        <div class="promotions ">
+            <span class="label"><?= $promotion->getName() ?></span>
+            <span class="price">&euro;&nbsp;-<?= format_price($promotion->getValue('value')) ?></span>
+        </div>
+    <?php endforeach; ?>
+
+    <?php if ($shipping): ?>
+        <div class="shipping">
+            <span class="label">+ ###label.shipping_costs###</span>
+            <span class="price">&euro;&nbsp;<?= format_price($shipping->getPrice($Order)) ?></span>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!$isTaxFree): ?>
+        <?php
+        $nettoTotal = $Order->getNettoTotal();
+
+        if ($shipping) {
+            $nettoTotal += $shipping->getNetPrice($Order);
+        }
+        $nettoTotal -= $Order->getDiscount(false);
+
+        ?>
+        <div class="gross-price">
+            <span class="label">###label.gross_total###</span>
+            <span class="price">&euro;&nbsp;<?= format_price($nettoTotal) ?></span>
         </div>
 
-        <?php foreach ($promotions as $promotion):
-            if (!is_object($promotion) || $promotion->getValue('value') == 0) {
-                continue;
-            }
-            ?>
-            <div class="promotions ">
-                <span class="label"><?= $promotion->getName() ?></span>
-                <span class="price">&euro;&nbsp;-<?= format_price($promotion->getValue('value')) ?></span>
+        <?php foreach ($taxes as $percent => $tax): ?>
+            <div class="taxes">
+                <span class="label">+ <?= $percent ?>% ###label.tax###</span>
+                <span class="price">&euro;&nbsp;<?= format_price($tax) ?></span>
             </div>
         <?php endforeach; ?>
+    <?php endif; ?>
 
-        <?php if ($shipping): ?>
-            <div class="shipping">
-                <span class="label">+ ###label.shipping_costs###</span>
-                <span class="price">&euro;&nbsp;<?= format_price($shipping->getPrice($Order)) ?></span>
-            </div>
-        <?php endif; ?>
-
-        <?php if (!$Order->isTaxFree()): ?>
-            <div class="gross-price margin-small-top">
-                <span class="label">###label.gross_total###</span>
-                <span class="price">&euro;&nbsp;<?= format_price(array_sum($net_prices) + ($shipping ? $shipping->getPrice($Order) : 0) - $discount) ?></span>
-            </div>
-
-            <?php foreach ($taxes as $percent => $tax): ?>
-                <div class="taxes">
-                    <span class="label">+ <?= $percent ?>% ###label.tax###</span>
-                    <span class="price">&euro;&nbsp;<?= format_price($tax) ?></span>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-
-        <div class="total">
-            <span class="label">###label.total_sum###</span>
-            <span class="price">&euro;&nbsp;<?= format_price($total) ?></span>
-        </div>
+    <div class="total">
+        <span class="label">###label.total_sum###</span>
+        <span class="price">&euro;&nbsp;<?= format_price($total) ?></span>
     </div>
 </div>

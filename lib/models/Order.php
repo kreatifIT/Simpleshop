@@ -85,6 +85,39 @@ class Order extends Model
         return $Country && !$Country->getValue('b2b_has_tax');
     }
 
+    public function getSubtotal($includeTax = true)
+    {
+        if ($includeTax) {
+            $subtotal = $this->getGrossTotal();
+        } else {
+            $subtotal = $this->getNettoTotal();
+        }
+        return $subtotal;
+    }
+
+    public function getGrossTotal()
+    {
+        return array_sum($this->getValue('brut_prices'));
+    }
+
+    public function getNettoTotal()
+    {
+        return array_sum($this->getValue('net_prices'));
+    }
+
+    public function getDiscount($includeTax = true)
+    {
+        $discount = $this->getValue('discount');
+
+        if (!$includeTax) {
+            $grossTotal = $this->getGrossTotal();
+            $nettoTotal = $this->getNettoTotal();
+            $_percent   = $discount / $grossTotal;
+            $discount   = $nettoTotal * $_percent;
+        }
+        return $discount;
+    }
+
     public function getProducts($raw = true)
     {
         $stmt = OrderProduct::query();
@@ -277,7 +310,7 @@ class Order extends Model
             // clear deleted products
             $where = ["order_id = {$this->getId()}"];
             if (count($orderProductIds)) {
-                $where[] = 'id NOT IN('. implode(',', $orderProductIds) .')';
+                $where[] = 'id NOT IN(' . implode(',', $orderProductIds) . ')';
             }
             $sql->setTable(OrderProduct::TABLE);
             $sql->setWhere(implode(' AND ', $where));
@@ -371,7 +404,7 @@ class Order extends Model
         if ($this->getValue('shipping')) {
             try {
                 $shipping = $this->getValue('shipping');
-                $this->setValue('shipping_costs', (float)$shipping->getNetPrice($this, $products));
+                $this->setValue('shipping_costs', (float)$shipping->getGrossPrice($this, $products));
             } catch (\Exception $ex) {
                 $msg = trim($ex->getLabelByCode());
 
@@ -563,6 +596,7 @@ class Order extends Model
         $fragment->setVar('Customer', $this->getInvoiceAddress());
         $fragment->setVar('Order', $this);
 
+        FragmentConfig::$data['checkout']['show_tax_info'] = !$this->isTaxFree();
 
         // HEADER
         $content = $fragment->parse('simpleshop/pdf/invoice/header.php');

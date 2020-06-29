@@ -246,7 +246,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                         ';
                     }
                 }
-            } else if ($Order->valueIsset('ref_order_id')) {
+            } else if ($Order->valueIsset('ref_order_id') && $Order->getValue('ref_order_id') > 0) {
                 $output[] = '
                     <a href="' . rex_url::currentBackendPage([
                         'table_name' => $table,

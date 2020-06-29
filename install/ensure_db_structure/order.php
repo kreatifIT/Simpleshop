@@ -216,7 +216,7 @@ $table = \FriendsOfREDAXO\Simpleshop\Order::TABLE;
 ], [
     'type_name'   => 'number',
     'db_type'     => '',
-    'list_hidden' => 1,
+    'list_hidden' => 0,
     'search'      => 1,
     'default'     => 0,
     'scale'       => 2,

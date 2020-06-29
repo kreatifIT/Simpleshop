@@ -5,14 +5,13 @@ namespace FriendsOfREDAXO\Simpleshop;
 $Order  = $this->getVar('Order');
 $config = \FriendsOfREDAXO\Simpleshop\FragmentConfig::getValue('checkout');
 
-$discount       = $Order->getValue('discount');
 $total          = $Order->getValue('total');
 $taxes          = $Order->getValue('taxes');
 $shipping       = $Order->getValue('shipping');
 $remarks        = trim($Order->getValue('remarks'));
 $promotions     = (array)$Order->getValue('promotions');
 $shipping_costs = $shipping && $config['show_tax_info'] ? $shipping->getPrice($Order) : $Order->getValue('shipping_costs');
-$summary        = $Order->getValue($config['show_tax_info'] ? 'net_prices' : 'brut_prices');
+$isTaxFree      = $Order->isTaxFree();
 
 ?>
 <?php if ($remarks != ''): ?>
@@ -29,7 +28,7 @@ $summary        = $Order->getValue($config['show_tax_info'] ? 'net_prices' : 'br
                 ###label.subtotal###
             </td>
             <td align="right">
-                &euro;&nbsp;<?= format_price(array_sum($summary)) ?>
+                &euro;&nbsp;<?= format_price($Order->getSubtotal(!$isTaxFree)) ?>
             </td>
         </tr>
 
@@ -60,12 +59,21 @@ $summary        = $Order->getValue($config['show_tax_info'] ? 'net_prices' : 'br
         <?php endif; ?>
 
         <?php if ($config['show_tax_info'] && !$Order->isTaxFree()): ?>
+            <?php
+            $nettoTotal = $Order->getNettoTotal();
+
+            if ($shipping) {
+                $nettoTotal += $shipping->getNetPrice($Order);
+            }
+            $nettoTotal -= $Order->getDiscount(false);
+
+            ?>
             <tr>
                 <td>
                     ###label.gross_total###
                 </td>
                 <td align="right">
-                    &euro;&nbsp;<?= format_price(array_sum($summary) + $shipping_costs - $discount) ?>
+                    &euro;&nbsp;<?= format_price($nettoTotal) ?>
                 </td>
             </tr>
 

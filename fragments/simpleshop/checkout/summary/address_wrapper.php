@@ -11,28 +11,34 @@
  * file that was distributed with this source code.
  */
 
-$Order         = $this->getVar('Order');
-$invoice_addr  = $Order->getInvoiceAddress();
-$shipping_addr = $Order->getShippingAddress();
+$Order        = $this->getVar('Order');
+$invoiceAddr  = $Order->getInvoiceAddress();
+$shippingAddr = $Order->getShippingAddress();
 
+$invoiceAddrData  = $invoiceAddr ? $invoiceAddr->toAddressArray(true) : [];
+$shippingAddrData = $shippingAddr ? $shippingAddr->toAddressArray(false) : [];
 
 ?>
 <!-- Adressen -->
 <div class="address-panels">
     <div class="grid-x grid-margin-x medium-up-2">
-        <?php
-        if ($invoice_addr) {
-            $this->setVar('address', $invoice_addr);
-            $this->setVar('customer', $Order->getCustomerData());
-            $this->setVar('title', '###label.invoice_address###');
-            $this->subfragment('simpleshop/checkout/summary/address_item.php');
-        }
-        if ($shipping_addr) {
-            $this->setVar('address', $shipping_addr);
-            $this->setVar('customer', null);
-            $this->setVar('title', '###label.shipping_address###');
-            $this->subfragment('simpleshop/checkout/summary/address_item.php');
-        }
-        ?>
+        <div class="cell margin-bottom">
+            <div class="address">
+                <h4 class="heading small">###label.invoice_address###</h4>
+                <p>
+                    <?= implode('<br/>', $invoiceAddrData) ?>
+                </p>
+            </div>
+        </div>
+
+        <div class="cell margin-bottom">
+            <div class="address">
+                <h4 class="heading small">###label.shipping_address###</h4>
+                <p>
+                    <?= implode('<br/>', $shippingAddrData) ?>
+                </p>
+            </div>
+        </div>
+
     </div>
 </div>
