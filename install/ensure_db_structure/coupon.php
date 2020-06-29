@@ -67,7 +67,7 @@ $prio += 30;
     'label'        => 'translate:label.start_date',
     'widget'       => 'input:text',
     'format'       => 'DD.MM.YYYY',
-    'attributes'   => '{"data-yform-tools-datepicker":"YYYY-MM-DD"}',
+    'attributes'   => '{"data-yform-tools-datepicker":"DD.MM.YYYY","autocomplete":"off"}',
     'prio'         => $prio++,
 ], [
     'db_type' => 'date',
@@ -83,7 +83,7 @@ $prio += 30;
     'label'        => 'translate:label.end_date',
     'widget'       => 'input:text',
     'format'       => 'DD.MM.YYYY',
-    'attributes'   => '{"data-yform-tools-datepicker":"YYYY-MM-DD"}',
+    'attributes'   => '{"data-yform-tools-datepicker":"DD.MM.YYYY","autocomplete":"off"}',
     'notice'       => 'translate:label.coupon_end_date',
     'prio'         => $prio++,
 ], [

@@ -481,6 +481,15 @@ class Order extends Model
         $errors       = [];
         $_promotions  = [];
         $gross_prices = $this->getValue('brut_prices');
+        $initialGross = array_sum($gross_prices);
+
+        // set shipping costs
+        if ($this->getValue('shipping_costs') > 0) {
+            $shipping   = $this->getValue('shipping');
+            $taxPercent = $shipping->getTaxPercentage();
+
+            $gross_prices[$taxPercent] += $shipping->getPrice($this);
+        }
 
         foreach ($promotions as $name => $promotion) {
             try {
@@ -501,23 +510,11 @@ class Order extends Model
             $taxes[$tax] += (float)($gross_price / ($tax + 100) * $tax);
         }
 
-        // set shipping costs
-        if ($this->getValue('shipping_costs') > 0 && !$this->isTaxFree()) {
-            $tax = $this->getValue('shipping')
-                ->getTaxPercentage();
-
-
-            if ($tax > 0) {
-                $this->setValue('net_shipping_costs', (float)$this->getValue('shipping_costs') / (100 + $tax) * 100);
-                $taxes[$tax] += $this->getValue('shipping')
-                    ->getTax();
-            }
-        }
         ksort($taxes);
 
         $this->setValue('taxes', $taxes);
         $this->setValue('discount', $discount);
-        $this->setValue('total', $this->getValue('shipping_costs') + array_sum($gross_prices));
+        $this->setValue('total', array_sum($gross_prices));
 
         return [$errors, $_promotions];
     }
