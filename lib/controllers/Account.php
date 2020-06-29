@@ -35,7 +35,7 @@ class AccountController extends Controller
 
         // CHECK CUSTOMER IS LOGGED
         if (!Customer::isLoggedIn()) {
-            $this->fragment_path[] = 'simpleshop/customer/auth/login.php';
+            $this->fragment_path[] = 'simpleshop/customer/auth/wrapper.php';
             return $this;
         }
 

@@ -10,7 +10,7 @@ simpleshop.account_area_account;Account
 label.address;Indirizzo
 action.add_address;Aggiungi indirizzo
 action.close;chiudere
-simpleshop.account_area_addresses;Indirizzi
+label.addresses;Indirizzi
 label.no_address_available;Nessun indirizzo disponibile
 label.address_additional;Informazione aggiuntiva
 error.choose_shipping_address;Selezionare un indirizzo di spedizione
@@ -128,7 +128,9 @@ label.name;Nome
 label.location;Città
 label.password;Password
 label.new_password;Nuova password
+label.repeat_email;Ripeti l'email
 label.repeat_password;Ripeti la password
+error.email_not_identical_to_repeat;L'e-mail e la ripetizione devono essere identiche
 error.new_password_not_identical_to_repeat;La password e la ripetizione devono essere identiche
 label.password_forgotten;Password dimenticata?
 label.paypal_express;Paypal
@@ -148,7 +150,6 @@ label.invoice_address;Indirizzo di fatturazione
 label.pwd_recovery_info_text;Inserisci il tuo indirizzo e-mail e ti invieremo una nuova password.
 label.invoice_num;Fattura n°
 label.registration_info_text;Registra il tuo account.
-simpleshop.account_area_rma;RMA
 label.edit_address;Modifica indirizzo
 label.new_address;Nuovo indirizzo
 simpleshop.shipping_pickup_point;Ritiro in azienda

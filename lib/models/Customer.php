@@ -158,22 +158,23 @@ class Customer extends Model
             'password' => $password,
         ]));
 
+
         if ($success) {
             // create customer address
             $address = CustomerAddress::create();
+            $address->setValue('customer_id', $_this->getId());
 
             foreach ($attributes as $attr => $value) {
                 $address->setValue($attr, trim($value));
             }
             $address->save();
+            $messages = $address->getMessages();
+
+            if (count($messages)) {
+                throw new CustomerException(implode('||', $messages), 98);
+            }
 
             $sql = \rex_sql::factory();
-            $sql->setTable(CustomerAddress::TABLE);
-            $sql->setValue('customer_id', $_this->getId());
-            $sql->setValue('status', 1);
-            $sql->setWhere(['id' => $address->getId()]);
-            $sql->update();
-
             $sql->setTable(self::TABLE);
             $sql->setValue('invoice_address_id', $address->getId());
             $sql->setWhere(['id' => $_this->getId()]);
@@ -361,6 +362,7 @@ class CustomerException extends \Exception
             case 3:
                 $errors = ['###error.email_not_valid###'];
                 break;
+            case 98:
             case 99:
                 $errors = explode('||', $this->getMessage());
                 break;

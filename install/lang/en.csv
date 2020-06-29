@@ -13,7 +13,7 @@ label.address;Address
 action.add_address;Add Address
 action.close;close
 label.email__user_registration_subject;You have successfully registered
-simpleshop.account_area_addresses;Addresses
+label.addresses;Addresses
 label.email__registration_optin_text;You have registered with ###company.name## and must click on the link below to activate your account:
 label.reg_activation_already_done;You have already activated your account
 label.login_success_overlay;You have successfully registered and can now continue
@@ -131,7 +131,9 @@ label.name;Name
 label.location;City
 label.password;Password
 label.new_password;New password
+label.repeat_email;Repeat email
 label.repeat_password;Repeat password
+error.email_not_identical_to_repeat;The email and the repetition must be identical
 error.new_password_not_identical_to_repeat;The password and the repetition must be identical
 label.password_forgotten;Forgot your password?
 label.paypal_express;Paypal
@@ -149,7 +151,6 @@ label.invoice_address;Billing Address
 label.pwd_recovery_info_text;Enter your email address and we will send you a new password.
 label.invoice_num;Invoice nr.
 label.registration_info_text;Register your personal account.
-simpleshop.account_area_rma;RMA
 simpleshop.shipping_pickup_point;Collection by the Customer
 label.shipping_number;Shipment number
 label.login_info_text;Already have an account? login here.

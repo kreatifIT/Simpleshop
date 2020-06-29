@@ -38,7 +38,7 @@ class CheckoutController extends Controller
         $this->verifyParams(['action']);
 
         if ($this->params['needs_login'] && !Customer::isLoggedIn()) {
-            $this->fragment_path[] = 'simpleshop/customer/auth/login.php';
+            $this->fragment_path[] = 'simpleshop/customer/auth/wrapper.php';
             return $this;
         }
 
@@ -191,11 +191,13 @@ class CheckoutController extends Controller
 
     protected function getShippingAddressView()
     {
-        $errors       = [];
-        $address = $this->Order->getValue('shipping_address');
-        $Order        = Session::getCurrentOrder();
-        $customer_id  = $this->params['Customer']->getId();
-        $postAction   = rex_post('action', 'string');
+        $errors      = [];
+        $customer    = Customer::getCurrentUser();
+        $address     = $this->Order->getValue('shipping_address');
+        $address     = $address && $customer->getId() == $address->getValue('customer_id') ? $address : null;
+        $Order       = Session::getCurrentOrder();
+        $customer_id = $this->params['Customer']->getId();
+        $postAction  = rex_post('action', 'string');
 
         $stmt = CustomerAddress::query();
         $stmt->where('status', 1);
@@ -243,8 +245,9 @@ class CheckoutController extends Controller
 
     protected function getInvoiceAddressView()
     {
+        $customer    = Customer::getCurrentUser();
         $Address     = $this->Order->getInvoiceAddress();
-        $Address     = $Address ? CustomerAddress::get($Address->getId()) : null;
+        $Address     = $Address && $customer->getId() == $Address->getValue('customer_id') ? CustomerAddress::get($Address->getId()) : null;
         $customer_id = $this->params['Customer']->getId();
 
         if (!$Address && $customer_id > 0) {
@@ -268,7 +271,7 @@ class CheckoutController extends Controller
         Session::setCheckoutData('Order', $Order);
 
         $customer = Customer::getCurrentUser();
-        $customer->setValue('invoice_address_id', $address->getValue('customer_id'));
+        $customer->setValue('invoice_address_id', $address->getId());
         $customer->save();
 
         self::setDoneStep($nextStep);
@@ -525,8 +528,8 @@ class CheckoutController extends Controller
         }
 
         // CLEAR THE SESSION
-        Session::clearCheckout();
-        Session::clearCart();
+//        Session::clearCheckout();
+//        Session::clearCart();
 
         switch ($status) {
             case 'completed':

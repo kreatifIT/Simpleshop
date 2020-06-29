@@ -27,7 +27,7 @@ class rex_yform_value_customer_address extends rex_yform_value_abstract
 
         if ($this->params['send'] == 1 && $this->getValue() != '') {
             if ($this->params['main_table'] == \FriendsOfREDAXO\Simpleshop\Order::TABLE) {
-                $currentAddressId = $order ? $order->getValue($this->getName()) : 0;
+                $currentAddressId = $order ? $order->getValue($this->getName(null, true)) : 0;
 
                 if ($this->getValue() != $currentAddressId) {
                     // customer daten nur aktualisieren wenn sich kundenadresse geändert hat (manuell im Backend geändert worden)!
@@ -67,16 +67,16 @@ class rex_yform_value_customer_address extends rex_yform_value_abstract
 
     public static function getListValue($params)
     {
-        $value   = $params['subject'];
-        $address = $value ? \FriendsOfREDAXO\Simpleshop\CustomerAddress::get($value) : null;
+        $orderId = $params['list']->getValue('id');
+        $order   = \FriendsOfREDAXO\Simpleshop\Order::get($orderId);
 
-        if ($address) {
-            $customer = \FriendsOfREDAXO\Simpleshop\Customer::get($address->getValue('customer_id'));
-            $value    = implode(' | ', array_unique(array_filter([
-                $address->getName(),
-                $customer ? $customer->getName(null, true) : '',
-            ])));
-        }
+        $invoiceAddr  = $order->getInvoiceAddress();
+        $shippingAddr = $order->getShippingAddress();
+
+        $value = implode(' | ', array_unique(array_filter([
+            $invoiceAddr->getName(null, true),
+            $shippingAddr->getName(null, true),
+        ])));
         return $value;
     }
 

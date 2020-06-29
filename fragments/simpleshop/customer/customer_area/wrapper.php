@@ -21,27 +21,31 @@ $User     = Customer::getCurrentUser();
 \emailobfuscator::whitelistEmail($User->getValue('email'));
 
 ?>
-<div class="grid-x grid-margin-x">
-    <?php if (count($Settings['membera_area_contents']) > 1): ?>
-        <div class="cell large-3 customer-area-sidebar">
-            <ul class="menu vertical">
-                <?php foreach ($Settings['membera_area_contents'] as $area):
-                    if (!$User->hasPermission("fragment.customer-area--sidebar-article--{$area}")) {
-                        continue;
-                    }
+<div class="section-wrapper margin-large-top margin-large-bottom">
+    <div class="grid-container">
+        <div class="grid-x grid-margin-x">
+            <?php if (count($Settings['membera_area_contents']) > 1): ?>
+                <div class="cell large-3 customer-area-sidebar">
+                    <ul class="menu vertical">
+                        <?php foreach ($Settings['membera_area_contents'] as $area):
+                            if (!$User->hasPermission("fragment.customer-area--sidebar-article--{$area}")) {
+                                continue;
+                            }
 
-                    ?>
-                    <li <?= $cur_area == $area ? 'class="active"' : '' ?>>
-                        <a href="<?= rex_getUrl(null, null, ['ctrl' => $area]) ?>"><?= \Wildcard::get('simpleshop.account_area_' . $area) ?></a>
-                    </li>
-                <?php endforeach; ?>
-                <li>
-                    <a href="<?= rex_getUrl(null, null, ['action' => 'logout', 'ts' => time()]) ?>">###action.logout###</a>
-                </li>
-            </ul>
+                            ?>
+                            <li <?= $cur_area == $area ? 'class="active"' : '' ?>>
+                                <a href="<?= rex_getUrl(null, null, ['ctrl' => $area]) ?>"><?= \Wildcard::get('simpleshop.account_area_' . $area) ?></a>
+                            </li>
+                        <?php endforeach; ?>
+                        <li>
+                            <a href="<?= rex_getUrl(null, null, ['action' => 'logout', 'ts' => time()]) ?>">###action.logout###</a>
+                        </li>
+                    </ul>
+                </div>
+            <?php endif; ?>
+            <div class="cell container <?= count($Settings['membera_area_contents']) > 1 ? 'large-9' : '' ?>">
+                <?= $this->subfragment('simpleshop/customer/customer_area/' . $template); ?>
+            </div>
         </div>
-    <?php endif; ?>
-    <div class="cell container <?= count($Settings['membera_area_contents']) > 1 ? 'large-9' : '' ?>">
-        <?= $this->subfragment('simpleshop/customer/customer_area/' . $template); ?>
     </div>
 </div>

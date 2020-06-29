@@ -94,12 +94,12 @@ class CustomerAddress extends Model
     {
         $customer = Customer::get($this->getValue('customer_id'));
         $addressInfo = array_unique(array_filter([
-            $this->getName(),
+            $this->getName(null, true),
             $this->getValue('street'),
             $this->getValue('postal'),
             $this->getValue('location'),
         ]));
-        return "KUNDE: {$customer->getName(null, true)} [{$customer->getValue('email')}] ---> ADRESSE: ". implode(' | ', $addressInfo);
+        return "KUNDE: {$customer->getName(null, true)} ---> ADRESSE: ". implode(' | ', $addressInfo);
     }
 
     public static function be__searchAddress()
@@ -110,8 +110,7 @@ class CustomerAddress extends Model
         $stmt = self::query();
         $stmt->alias('m');
         $stmt->resetSelect();
-        $stmt->select(['m.id', 'm.firstname', 'm.lastname', 'm.street', 'm.postal', 'm.location', 'm.customer_id']);
-//        $stmt->selectRaw('CONCAT("KUNDE: [ID=", jt1.id, "] ", " --> ADRESSE: [ID=", m.id, "] ", IF(m.company_name != "", m.company_name, TRIM(CONCAT(m.firstname, " ",m.lastname))), " | ", m.street, " | ", m.postal, " ", m.location) AS text, m.id');
+        $stmt->select(['m.id', 'm.firstname', 'm.lastname', 'm.company_name', 'm.street', 'm.postal', 'm.location', 'm.customer_id']);
         $stmt->join(Customer::TABLE, 'jt1', 'jt1.id', 'm.customer_id');
         $stmt->orderBy('jt1.id');
         $stmt->orderBy('m.id');
@@ -121,15 +120,26 @@ class CustomerAddress extends Model
             $stmt->where('m.customer_id', $customerId);
         } else {
             $term = trim($term);
-            $stmt->whereRaw('(
-                m.company_name LIKE :term
-                OR m.firstname LIKE :term
-                OR m.lastname LIKE :term
-                OR m.street LIKE :term
-                OR m.location LIKE :term
-                OR m.id = :id
-                OR m.customer_id = :id
-            )', ['term' => "%{$term}%", 'id' => $term]);
+            $orWhere = [
+                'm.company_name LIKE :term',
+                'm.firstname LIKE :term',
+                'm.lastname LIKE :term',
+                'm.street LIKE :term',
+                'm.location LIKE :term',
+                'm.location LIKE :term',
+                'm.id = :id',
+                'm.customer_id = :id',
+            ];
+            if (Customer::getYformFieldByName('company_name')) {
+                $orWhere[] = 'jt1.company_name LIKE :term';
+            }
+            if (Customer::getYformFieldByName('firstname')) {
+                $orWhere[] = 'jt1.firstname LIKE :term';
+            }
+            if (Customer::getYformFieldByName('lastname')) {
+                $orWhere[] = 'jt1.lastname LIKE :term';
+            }
+            $stmt->whereRaw('('. implode(' OR ', $orWhere) .')', ['term' => "%{$term}%", 'id' => $term]);
         }
         $collection = $stmt->find();
 

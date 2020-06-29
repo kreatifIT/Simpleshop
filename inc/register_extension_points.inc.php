@@ -38,8 +38,7 @@ namespace FriendsOfREDAXO\Simpleshop;
             $login->checkLogin();
 
             \rex_response::sendCacheControl();
-            \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
-            \rex_response::sendRedirect(rex_getUrl(null, null, ['ts' => time()]));
+            \rex_response::sendRedirect(rex_getUrl(null));
         }
 
         $beUser = \rex::getUser();
