@@ -327,8 +327,13 @@ class CheckoutController extends Controller
     protected function getSummaryView()
     {
         $errors     = [];
-        $warnings   = [];
         $postAction = rex_post('action', 'string');
+        $products   = Session::getCartItems();
+        $warnings   = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.orderWarnings', [], [
+            'order'    => $this->Order,
+            'action'   => $postAction,
+            'products' => $products,
+        ]));
 
         switch ($postAction) {
             case 'redeem_coupon':
@@ -349,7 +354,10 @@ class CheckoutController extends Controller
 
                 if (array_sum($this->Order->getValue('brut_prices')) < $minOrderValue) {
                     $warnings[] = ['label' => strtr(Wildcard::get('error.min_order_value'), ['{VALUE}' => '<strong>' . format_price($minOrderValue) . ' &euro;</strong>'])];
-                } else if ($tos_accepted && $rma_accepted) {
+                } else if (!$tos_accepted || !$rma_accepted) {
+                    $warnings[] = ['label' => '###error.tos_rma_not_accepted###'];
+                }
+                if (empty($warnings)) {
                     try {
                         $Payment = $this->Order->getValue('payment');
 
@@ -366,15 +374,13 @@ class CheckoutController extends Controller
 
                         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.beforePlaceOrder', $this->Order, []));
 
-                        $this->Order->save(false);
+                        $this->Order->save(false, $products);
                         \rex_response::sendCacheControl();
                         \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
                         rex_redirect(null, null, ['action' => 'init-payment', 'ts' => time()]);
                     } catch (OrderException $ex) {
                         $warnings[] = ['label' => $ex->getMessage()];
                     }
-                } else {
-                    $warnings[] = ['label' => '###error.tos_rma_not_accepted###'];
                 }
                 break;
             default:
@@ -427,7 +433,6 @@ class CheckoutController extends Controller
     {
         $do_send  = true;
         $Mail     = new Mail();
-        $Settings = \rex::getConfig('simpleshop.Settings');
         $Customer = $this->Order->getCustomerData();
 
         $Mail->Subject = '###label.email__order_complete###';
@@ -440,7 +445,11 @@ class CheckoutController extends Controller
 
         // set order notification email
         $Mail->AddAddress($Customer->getValue('email'));
-        $Mail->AddAddress(from_array($Settings, 'order_notification_email'));
+        $orderMails = explode(',', \FriendsOfREDAXO\Simpleshop\Settings::getValue('order_notification_email', 'general'));
+
+        foreach ($orderMails as $orderMail) {
+            $Mail->AddAddress($orderMail);
+        }
 
         if (isset($this->params['addAddress'])) {
             foreach (explode(',', $this->params['addAddress']) as $_add) {

@@ -10,16 +10,25 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace FriendsOfREDAXO\Simpleshop;
 
 
 class OrderProduct extends Model
 {
     const TABLE = 'rex_shop_order_products';
-    
+
     protected $object_data = [
         'data',
     ];
+
+    public static function getByProductId($orderId, $productId)
+    {
+        $query = OrderProduct::query();
+        $query->where('order_id', $orderId);
+        $query->where('product_id', $productId);
+        return $query->findOne();
+    }
 
     public function save($prepare = false)
     {

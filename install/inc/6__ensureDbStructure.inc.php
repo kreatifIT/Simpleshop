@@ -5,23 +5,22 @@
  *
  * @author Kreatif GmbH
  * @author a.platter@kreatif.it
- * Date: 24.02.20
+ * Date: 22.06.20
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
 
+$includeFiles = glob($this->getPath('install') . '/ensure_db_structure/*.php');
+
 $sql = rex_sql::factory();
 $sql->setQuery('SET FOREIGN_KEY_CHECKS = 0');
 
 try {
-    $table = \FriendsOfREDAXO\Simpleshop\Order::TABLE;
-    \Kreatif\Yform::ensureValueField($table, 'shipping_address_id', [], [
-        'label' => '###label.address###',
-    ]);
-    $yTable = rex_yform_manager_table::get($table);
-    rex_yform_manager_table_api::generateTableAndFields($yTable);
+    foreach ($includeFiles as $file) {
+        include_once $file;
+    }
 }
 finally {
     $sql = rex_sql::factory();

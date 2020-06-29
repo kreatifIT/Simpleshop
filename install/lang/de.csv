@@ -5,6 +5,7 @@ action.abort;Abbrechen
 action.use_coupon;Coupon anwenden
 shop.order_status_CA;abgebrochen
 shop.order_status_CL;abgeschlossen
+shop.order_status_CN;Gutschrift
 action.logout;Abmelden
 simpleshop.account_area_account;Account
 label.address;Adresse
@@ -75,6 +76,7 @@ label.order_complete_default_shipping_text;Die Ware wird ihnen schnellstmöglich
 error.email_already_exists;Diese E-Mail-Adresse ist bereits von einem anderen Nutzer registriert
 error.coupon_not_exists;Dieser Gutschein-Code existiert nicht
 error.coupon_not_valid_anymore;Dieser Gutschein-Code ist nicht mehr gültig
+error.coupon_already_used;Sie haben diesen Coupon bereits verwendet
 label.email__user_registration_subject;Sie haben erfolgreich registriert
 label.email;E-Mail
 label.units;Einheiten

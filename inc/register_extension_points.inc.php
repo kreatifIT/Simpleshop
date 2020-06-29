@@ -91,6 +91,10 @@ namespace FriendsOfREDAXO\Simpleshop;
     return $options;
 });
 
+\rex_extension::register('simpleshop.Settings.saved', function (\rex_extension_point $Ep) {
+    Coupon::ext__processSettings($Ep);
+});
+
 \rex_view::setJsProperty('simpleshop', [
     'ajax_url' => \rex_url::frontendController(),
 ]);

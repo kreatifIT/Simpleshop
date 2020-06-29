@@ -15,6 +15,6 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 $fragment = new \rex_fragment();
 $fragment->setVar('Addon', $this);
-$fragment->setVar('key', 'simpleshop.Settings');
+$fragment->setVar('key', 'simpleshop.Settings.general');
 $fragment->setVar('fragment_path', 'simpleshop/backend/settings.php');
 echo $fragment->parse('simpleshop/backend/settings_wrapper.php');

@@ -75,7 +75,7 @@ if ($canAddItem && $action == 'edit') {
         <?php endif; ?>
 
         <?php if ($canAddItem): ?>
-            <a href="<?= rex_getUrl(null, null, ['ctrl' => 'addresses.edit', 'action' => 'edit']) ?>" class="button margin-small-top">+&nbsp; ###simpleshop.add_address###</a>
+            <a href="<?= rex_getUrl(null, null, ['ctrl' => 'addresses.edit', 'action' => 'edit']) ?>" class="button margin-small-top">+&nbsp; ###action.add_address###</a>
         <?php endif; ?>
     <?php endif; ?>
 </div>

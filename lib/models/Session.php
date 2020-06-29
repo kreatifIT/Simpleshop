@@ -33,28 +33,34 @@ class Session extends Model
 
     public static function getCheckoutData($key = null, $default = null)
     {
-        if ($key) {
-            return array_key_exists($key, $_SESSION['checkout']) && $_SESSION['checkout'][$key] !== null ? $_SESSION['checkout'][$key] : $default;
-        } else {
+        $checkout = rex_session('checkout', 'array');
 
-            return $_SESSION['checkout'];
+        if ($key) {
+            return array_key_exists($key, $checkout) && $checkout[$key] !== null ? $checkout[$key] : $default;
+        } else {
+            return $checkout;
         }
     }
 
     public static function setCheckoutData($key, $value)
     {
-        return $_SESSION['checkout'][$key] = $value;
+        $checkout       = self::getCheckoutData();
+        $checkout[$key] = $value;
+        rex_set_session('checkout', $checkout);
     }
 
     public static function getCurrentOrder()
     {
-        if (!isset ($_SESSION['checkout']['Order'])) {
-            $_SESSION['checkout']['Order'] = Order::create();
-        } else if (!$_SESSION['checkout']['Order']->exists() && $_SESSION['checkout']['Order']->getValue('id')) {
+        $order = self::getCheckoutData('Order');
+
+        if (!$order) {
+            $order = Order::create();
+        } else if (!$order->exists() && $order->getValue('id')) {
             // to prevent duplicate key errors on resaving orders
-            $_SESSION['checkout']['Order'] = Order::get($_SESSION['checkout']['Order']->getValue('id'));
+            $order = Order::get($order->getValue('id'));
         }
-        return $_SESSION['checkout']['Order'];
+        self::setCheckoutData('Order', $order);
+        return $order;
     }
 
     public static function getSession()
@@ -299,7 +305,7 @@ class Session extends Model
 
     public static function clearCheckout()
     {
-        $_SESSION['checkout'] = [];
+        rex_set_session('checkout', []);
     }
 
     public static function getGAProducts()

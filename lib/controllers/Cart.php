@@ -91,8 +91,8 @@ class CartController extends Controller
 
     public static function getMinOrderValue()
     {
-        $settings = \rex::getConfig('simpleshop.Settings');
-        return (float)strtr($settings['min_order_value'], [',' => '.']);
+        $value = Settings::getValue('min_order_value', 'general');
+        return (float)strtr($value, [',' => '.']);
     }
 
     public function getProducts()

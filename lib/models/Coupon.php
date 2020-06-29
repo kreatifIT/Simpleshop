@@ -14,6 +14,7 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
+use Kreatif\Yform;
 use Sprog\Wildcard;
 
 
@@ -86,9 +87,23 @@ class Coupon extends Discount
         $value   = $this->getValue('discount_value');
         $percent = $this->getValue('discount_percent');
         $orders  = array_filter((array)$this->getValue('orders'));
+        $user    = Customer::getCurrentUser();
 
         // calculate residual balance
-        if ($this->getValue('is_multi_use') != 1 && $value && count($orders)) {
+        if ($this->getValue('is_multi_use') == 1) {
+            if ($user) {
+                foreach ($orders as $orderId => $orderDiscount) {
+                    $order        = Order::get($orderId);
+                    $customerData = $order->getCustomerData();
+
+                    if ($customerData->getId() == $user->getId()) {
+                        throw new CouponException('Coupon already used', 5);
+                    }
+                }
+            }
+        } else if ($this->getValue('is_multi_use') == 2 && count($orders)) {
+            throw new CouponException('Coupon consumed', 2);
+        } else if ($value && count($orders)) {
             $_value = $value;
             foreach ($orders as $order_id => $order_discount) {
                 $value -= (float)$order_discount;
@@ -97,7 +112,7 @@ class Coupon extends Discount
         }
 
         // do some checks
-        if ($this->getValue('is_multi_use') != 1 && count($orders) && ($value <= 0 || $percent)) {
+        if ($this->getValue('is_multi_use') == 0 && count($orders) && ($value <= 0 || $percent)) {
             throw new CouponException('Coupon consumed', 2);
         } else if ($start > time()) {
             throw new CouponException('Coupon not yet valid', 3);
@@ -129,7 +144,7 @@ class Coupon extends Discount
         $orders[$Order->getValue('id')] = $total < $value ? $total : $value;
 
         $this->setValue('given_away', 1);
-        $this->setValue('orders', json_encode($orders));
+        $this->setValue('orders', json_encode(array_filter($orders)));
         $this->save();
     }
 
@@ -155,6 +170,40 @@ class Coupon extends Discount
         $code = $this->getValue("prefix");
         return $code != "" ? $code . "-" . $this->getValue("code") : $this->getValue("code");
     }
+
+    public static function ext__processSettings(\rex_extension_point $ep)
+    {
+        $sql     = \rex_sql::factory();
+        $options = (array)Settings::getValue('coupon_use_options');
+        $yTable  = \rex_yform_manager_table::get(Coupon::TABLE);
+
+        $sql->setTable('rex_yform_table');
+        $sql->setValue('hidden', (int)!(count($options) > 0));
+        $sql->setWhere(['table_name' => Coupon::TABLE]);
+        $sql->update();
+
+        if (count($options) > 0) {
+            if (in_array('global', $options)) {
+                $choices['translate:coupon.use_global'] = 1;
+            }
+            if (in_array('fixedprice', $options)) {
+                $choices['translate:coupon.use_fixedprice'] = 0;
+            }
+            if (in_array('single', $options)) {
+                $choices['translate:coupon.use_single'] = 2;
+            }
+            Yform::ensureValueField(Coupon::TABLE, 'is_multi_use', [], [
+                'type_name' => 'choice',
+                'db_type'   => 'int',
+                'default'   => 0,
+                'no_db'     => 0,
+                'multiple'  => 0,
+                'expanded'  => 0,
+                'choices'   => json_encode($choices),
+            ]);
+        }
+        \rex_yform_manager_table_api::generateTableAndFields($yTable);
+    }
 }
 
 class CouponException extends \Exception
@@ -173,6 +222,9 @@ class CouponException extends \Exception
                 break;
             case 4:
                 $errors = '###error.coupon_not_valid_anymore###';
+                break;
+            case 5:
+                $errors = '###error.coupon_already_used###';
                 break;
             default:
                 $errors = $this->getMessage();

@@ -33,11 +33,11 @@ $shipping   = $Order->getValue('shipping');
     </div>
 
     <?php if (count($warnings)): ?>
-        <?php foreach ($warnings as $warning): ?>
-            <div class="callout alert margin-bottom">
-                <p><?= isset($warning['replace']) ? strtr($warning['label'], ['{{replace}}' => $warning['replace']]) : $warning['label'] ?></p>
-            </div>
-        <?php endforeach; ?>
+        <div class="callout alert margin-bottom">
+            <?php foreach ($warnings as $warning): ?>
+                - <?= isset($warning['replace']) ? strtr($warning['label'], ['{{replace}}' => $warning['replace']]) : $warning['label'] ?><br/>
+            <?php endforeach; ?>
+        </div>
     <?php endif; ?>
 
     <?php if (count($errors)): ?>

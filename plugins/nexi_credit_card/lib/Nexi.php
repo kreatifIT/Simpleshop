@@ -80,7 +80,7 @@ class Nexi extends PaymentAbstract
             'udf2'         => $order_descr,
         ];
 
-        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Nexi.initPaymentData', $data));
+        $data = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Nexi.initPaymentData', $data));
 
         $sdata     = htmlspecialchars_decode(http_build_query($data));
         $Connector = new WSConnector($url);
@@ -141,7 +141,6 @@ class Nexi extends PaymentAbstract
             $responses['processIPN'] = $post_data;
             $this->setValue('responses', $responses);
 
-            $Order = Session::getCurrentOrder();
             $Order->setValue('payment', Order::prepareData($this));
             Session::setCheckoutData('Order', $Order);
             $Order->save();
