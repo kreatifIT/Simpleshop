@@ -157,6 +157,7 @@ $form->setObjectparams('fields_class', 'grid-x grid-margin-x');
         'required'  => true,
     ]);
 }
+$form->setValueField('html', ['', '<div class="cell">']);
 {
     $form->setValueField('submit', [
         'name'        => 'submit',
@@ -165,6 +166,7 @@ $form->setObjectparams('fields_class', 'grid-x grid-margin-x');
         'css_classes' => 'button expanded margin-small-bottom',
     ]);
 }
+$form->setValueField('html', ['', '</div>']);
 
 $formOutput = $form->getForm();
 
