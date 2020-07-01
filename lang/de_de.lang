@@ -13,6 +13,8 @@ label.variants = Varianten
 label.ref_order_label = Gutschrift-Rechnungs-Referenz
 label.order_no = Bestellnr.
 label.coupon_code_notice = Code wird beim Speichern automatisch erstellt
+label.coupon = Coupon Code
+label.target = Ziel
 label.customer = Kunde
 label.order_sum = Bestellsumme
 label.orders = Bestellungen
@@ -24,6 +26,7 @@ label.orders_export_info_text = Wählen Sie hier die Bestellungen aus die sie ex
 label.orders_export = %d Bestellungen exportieren
 label.filter = Filter
 label.all = Alle
+label.discount = Rabatt
 label.coupon_end_date = wenn das Datum leer bleibt, ist der Code unbeschränkt gültig
 label.activated = aktiviert
 label.initial_total = Ausgangssumme
@@ -53,6 +56,10 @@ label.msg_generate_creditnote = Gutschrift wurder erstellt
 label.clone_coupon = diesen Coupon klonen
 label.msg_clone = Es wurden {NUM} Coupons generiert
 label.no_product_available = Kein Produkt verfügbar
+label.cart_value = Warenkorbwert
+label.order_quantities = Bestellmenge
+label.at_least_price = Warenkorbwert von mindestens
+label.at_least_amount = Mindestanzahl an Produkt im Warenkorb
 label.link_product_rex_categories = Kategorien verlinken
 label.sort_products_for_cat_title = Produkte sortieren in der Kategorie: "{CATNAME}"
 label.save_order_for_order_products = Sie müssen zuerst die Bestellung erstellen, erst dann können Sie Produkte hinzufügen. Klicken Sie einfach am Ende der Seite auf "Übernehmen"
@@ -104,11 +111,19 @@ settings.category_linking_input_label = Schnell-Verlinkung im Backend aktivieren
 
 coupon.use_settings = Nutzungs-Einstellungen
 coupon.use_info = Bestellhistorie
-coupon.fixed_discount = Rabatt als Fix-Betrag
-coupon.percent_discount = [- ODER -] Rabatt als Prozentwert
+coupon.fixed_discount = Rabatt als fixer Betrag
+coupon.free_shipping = Gratisversand
+coupon.generate_code = Coupon zusenden
+coupon.code_generate_notice = der ausgewählte Code wird geklont und dem Kunden nach Abschluss der Bestellung via Email zugesendet
+coupon.percent_discount = Rabatt in Prozent
 coupon.use_global = Kann mehrfach/global genutzt werden (1 code = N-Bestellungen)
 coupon.use_fixedprice = Ist solange gültig wie der Fixrabatt nicht ausgeschöpft ist
 coupon.use_single = Kann exakt 1 mal verwendet werden
 
 yform_values.coupon_functions_description = Funktionen für Coupon-Codes
 yform_values.order_functions_description = Funktionen für Bestelldokumente
+
+
+tablename.discount_group = Rabattaktionen
+tablename.coupon = Gutscheine
+tablename.order = Bestellungen

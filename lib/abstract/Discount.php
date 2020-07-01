@@ -13,6 +13,9 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Kreatif\Model;
+
+
 abstract class Discount extends Model
 {
     public function applyToOrder($Order, &$gross_prices, $name = '')
@@ -24,12 +27,7 @@ abstract class Discount extends Model
 
         if ($name == 'manual_discount') {
             $discount = $this->getValue('discount_value');
-        } else if ($this->getValue('free_shipping')) {
-            $Order->setValue('shipping_costs', 0);
-            $discount = 0;
-        } else if ($this->getValue('discount_value') > 0) {
-            $discount = $this->getValue('discount_value');
-        } else if ($this->getValue('discount_percent') > 0) {
+        } else if ($this->getValue('action') == 'percent_discount') {
             $shippingFaktor = [];
             if ($Order) {
                 $shipping = $Order->getValue('shipping');
@@ -49,6 +47,11 @@ abstract class Discount extends Model
             if (count($shippingFaktor)) {
                 $gross_prices[$shippingFaktor['percent']] += $shippingFaktor['value'];
             }
+        } else if ($this->getValue('action') == 'fixed_discount') {
+            $discount = $this->getValue('discount_value');
+        } else if ($this->getValue('action') == 'free_shipping') {
+            $Order->setValue('shipping_costs', 0);
+        } else if ($this->getValue('action') == 'coupon_code') {
         }
 
         if ($discount > 0) {

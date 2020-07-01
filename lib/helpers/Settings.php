@@ -53,9 +53,12 @@ class Settings
             \Kreatif\Mpdf\Mpdf::addCSSPath($addon->getPath('assets/scss/pdf_styles.scss'));
         }
 
-        $couponIsHidden = \rex_yform_manager_table::get(Coupon::TABLE)->isHidden();
-        FragmentConfig::$data['cart']['has_coupons'] = !$couponIsHidden;
-        FragmentConfig::$data['checkout']['has_coupons'] = !$couponIsHidden;
+        $tableIsHidden = \rex_yform_manager_table::get(Coupon::TABLE)->isHidden();
+        FragmentConfig::$data['cart']['has_coupons'] = !$tableIsHidden;
+        FragmentConfig::$data['checkout']['has_coupons'] = !$tableIsHidden;
+
+        $tableIsHidden = \rex_yform_manager_table::get(DiscountGroup::TABLE)->isHidden();
+        FragmentConfig::$data['cart']['use_discount_groups'] = !$tableIsHidden;
     }
 
     public static function getValue($key, $plugin = '')

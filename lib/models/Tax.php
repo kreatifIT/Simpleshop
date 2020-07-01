@@ -13,6 +13,9 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
+use Kreatif\Model;
+
+
 class Tax extends Model
 {
     const TABLE = 'rex_shop_tax';

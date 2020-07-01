@@ -13,6 +13,9 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Kreatif\Model\Country;
+
+
 $Settings = $this->getVar('Settings');
 $key = $this->getVar('key');
 $countries = Country::query()

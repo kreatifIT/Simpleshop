@@ -14,6 +14,9 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
+use Kreatif\Model;
+
+
 class Feature extends Model
 {
     const TABLE = 'rex_shop_feature';

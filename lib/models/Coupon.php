@@ -40,6 +40,30 @@ class Coupon extends Discount
         return $_this;
     }
 
+    public static function cloneCode($codeId, $amount = 1)
+    {
+        $result = [];
+        $Coupon = self::get($codeId);
+        $data   = $Coupon->getData();
+
+        // cloning codes
+        for ($i = 0; $i < $amount; $i++) {
+            $clone = self::create();
+
+            foreach ($data as $name => $value) {
+                $clone->setValue($name, $value);
+            }
+            $clone->setValue('given_away', 0);
+            $clone->setValue('orders', null);
+            $clone->setValue('code', \rex_yform_value_coupon_code::getRandomCode());
+            $clone->setValue('createdate', date('Y-m-d H:i:s'));
+            $clone->save();
+            $clone->getData();
+            $result[] = $clone;
+        }
+        return $result;
+    }
+
     public static function createGiftcard($Order, $Product)
     {
         $order_id = $Order->getID();
@@ -204,6 +228,68 @@ class Coupon extends Discount
             ]);
         }
         \rex_yform_manager_table_api::generateTableAndFields($yTable);
+    }
+
+    public static function ext_completeOrder(\rex_extension_point $ep)
+    {
+        if ($ep->getSubject()) {
+            $newCoupons = [];
+            $order      = $ep->getParam('Order');
+            $extras     = $order->getValue('extras', false, []);
+            $promotions = $order->getValue('promotions');
+
+            foreach ($promotions as $promotion) {
+                if ($promotion->getValue('action') == 'coupon_code' && $promotion->valueIsset('coupon_code')) {
+                    $coupon       = current(self::cloneCode($promotion->valueIsset('coupon_code')));
+                    $newCoupons[] = $coupon;
+                }
+            }
+
+            if ($newCoupons) {
+                $extras['generated_coupons'] = $newCoupons;
+            } else {
+                unset($extras['generated_coupons']);
+            }
+            $order->setValue('extras', $extras, false);
+            $order->save();
+        }
+    }
+
+    public static function ext_beforeSendOrder(\rex_extension_point $ep)
+    {
+        $mail   = $ep->getParam('Mail');
+        $order  = $ep->getParam('Order');
+        $extras = $order->getValue('extras');
+
+        if (class_exists('Kreatif\Mpdf\Mpdf') && isset($extras['generated_coupons'])) {
+            foreach (array_filter($extras['generated_coupons']) as $coupon) {
+                $debug    = 0;
+                $fragment = new \rex_fragment();
+                $Mpdf     = new \Kreatif\Mpdf\Mpdf([
+                    'margin_left'   => 20,
+                    'margin_right'  => 15,
+                    'margin_top'    => 10,
+                    'margin_bottom' => 34,
+                    'margin_header' => 0,
+                    'margin_footer' => 0,
+                ]);
+
+                $Mpdf->SetProtection(['print']);
+                $Mpdf->SetDisplayMode('fullpage');
+
+                $fragment->setVar('debug', $debug);
+                $fragment->setVar('coupon', $coupon);
+                $html = $fragment->parse('simpleshop/pdf/coupon/default.php');
+
+                if ($debug) {
+                    \rex_response::cleanOutputBuffers();
+                    echo \Wildcard::parse("<div style='background:#666;height:100vh;padding:20px;'><div style='max-width:800px;margin:0px auto;background:#fff;'>{$html}</div></div>");
+                    exit;
+                }
+                $Mpdf->WriteHTML($html);
+                $mail->addStringAttachment($Mpdf->Output('', 'S'), \rex::getServerName() . ' - ' . $coupon->getName() . '.pdf', 'base64', 'application/pdf');
+            }
+        }
     }
 }
 

@@ -147,7 +147,7 @@ class PayPalExpress extends PaymentAbstract
             Utils::log('Paypal.initPayment.response', $logMsg, 'INFO');
             $this->responses['initPayment'] = $__response;
             $Order                          = Session::getCurrentOrder();
-            $Order->setValue('payment', Order::prepareData($this));
+            $Order->setValue('payment', $this);
             Session::setCheckoutData('Order', $Order);
             $Order->save();
         }
@@ -230,7 +230,7 @@ class PayPalExpress extends PaymentAbstract
         }
 
         $this->responses['processPayment'] = $__response;
-        $order->setValue('payment', Order::prepareData($this));
+        $order->setValue('payment', $this);
         Session::setCheckoutData('Order', $order);
         $order->save();
         return strtolower($__response['PAYMENTINFO_0_PAYMENTSTATUS']);
@@ -280,7 +280,7 @@ class PayPalExpress extends PaymentAbstract
                 Utils::log('Paypal.processAsyncIPN.response1' . ($_POST["test_ipn"] == 1 ? ' [Sandbox]' : ''), $logMsg, 'INFO');
                 $this->responses['processAsyncIPN'] = $_POST;
                 // update status
-                $order->setValue('payment', Order::prepareData($this));
+                $order->setValue('payment', $this);
                 $order->setValue('status', 'IP');
                 Session::setCheckoutData('Order', $order);
                 $order->save();

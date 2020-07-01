@@ -14,6 +14,7 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 use Kreatif\Form;
+use Kreatif\Model\Country;
 
 
 $address       = $this->getVar('Address');

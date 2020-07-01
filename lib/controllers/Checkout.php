@@ -141,12 +141,9 @@ class CheckoutController extends Controller
 
     public static function setDoneStep($step)
     {
-        $doneSteps = Session::getCheckoutData('steps_done', []);
-
-        if (!in_array($step, $doneSteps)) {
-            $doneSteps[] = $step;
-        }
-        Session::setCheckoutData('steps_done', $doneSteps);
+        $doneSteps   = Session::getCheckoutData('steps_done', []);
+        $doneSteps[] = $step;
+        Session::setCheckoutData('steps_done', array_unique($doneSteps));
     }
 
     public static function processIPN()
@@ -163,7 +160,7 @@ class CheckoutController extends Controller
             try {
                 $data['Payment']->processIPN($data['Order'], $_POST);
                 $data['Order']->setValue('status', 'IP');
-                $data['Order']->setValue('payment', Order::prepareData($data['Payment']));
+                $data['Order']->setValue('payment', $data['Payment']);
                 Session::setCheckoutData('Order', $data['Order']);
                 $data['Order']->save();
             } catch (\Exception $ex) {
@@ -276,8 +273,7 @@ class CheckoutController extends Controller
 
         self::setDoneStep($nextStep);
         \rex_response::sendCacheControl();
-        \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
-        rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
+        rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
     }
 
     protected function getShippingPaymentView()
@@ -297,15 +293,15 @@ class CheckoutController extends Controller
             CheckoutController::setDoneStep($nextStep);
             \rex_response::sendCacheControl();
             \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
-            rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
+            rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
         } else if (rex_post('action', 'string') == 'set-shipping-payment') {
             try {
-                $this->Order->setValue('shipping', Order::prepareData(Shipping::get(rex_post('shipment', 'string'))));
+                $this->Order->setValue('shipping', Shipping::get(rex_post('shipment', 'string')));
             } catch (RuntimeException $ex) {
             }
 
             try {
-                $this->Order->setValue('payment', Order::prepareData(Payment::get(rex_post('payment', 'string'))));
+                $this->Order->setValue('payment', Payment::get(rex_post('payment', 'string')));
             } catch (RuntimeException $ex) {
             }
 
@@ -315,7 +311,7 @@ class CheckoutController extends Controller
             CheckoutController::setDoneStep($nextStep);
             \rex_response::sendCacheControl();
             \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
-            rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep, 'ts' => time()]));
+            rex_redirect(null, null, array_merge($_GET, ['step' => $nextStep]));
         }
 
         $this->setVar('currentStep', $this->getCurrentStep());

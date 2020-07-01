@@ -229,7 +229,7 @@ $table = \FriendsOfREDAXO\Simpleshop\Order::TABLE;
     'label' => 'translate:label.customer_data',
     'prio'  => $prio++,
 ], [
-    'type_name'   => 'model_data',
+    'type_name'   => 'data_output',
     'db_type'     => 'text',
     'list_hidden' => 1,
     'search'      => 0,
@@ -239,7 +239,7 @@ $table = \FriendsOfREDAXO\Simpleshop\Order::TABLE;
     'label' => '###label.invoice_address###',
     'prio'  => $prio++,
 ], [
-    'type_name'   => 'model_data',
+    'type_name'   => 'data_output',
     'db_type'     => 'text',
     'list_hidden' => 1,
     'search'      => 0,
@@ -249,7 +249,7 @@ $table = \FriendsOfREDAXO\Simpleshop\Order::TABLE;
     'label' => '###label.shipping_address###',
     'prio'  => $prio++,
 ], [
-    'type_name'   => 'model_data',
+    'type_name'   => 'data_output',
     'db_type'     => 'text',
     'list_hidden' => 1,
     'search'      => 0,
@@ -259,7 +259,7 @@ $table = \FriendsOfREDAXO\Simpleshop\Order::TABLE;
     'label' => '###label.promotions###',
     'prio'  => $prio++,
 ], [
-    'type_name'   => 'model_data',
+    'type_name'   => 'data_output',
     'db_type'     => 'text',
     'list_hidden' => 1,
     'search'      => 0,
@@ -269,7 +269,7 @@ $table = \FriendsOfREDAXO\Simpleshop\Order::TABLE;
     'label' => '###label.payment_method###',
     'prio'  => $prio++,
 ], [
-    'type_name'   => 'model_data',
+    'type_name'   => 'data_output',
     'db_type'     => 'text',
     'list_hidden' => 1,
     'search'      => 0,
@@ -279,7 +279,7 @@ $table = \FriendsOfREDAXO\Simpleshop\Order::TABLE;
     'label' => '###label.shipping_method###',
     'prio'  => $prio++,
 ], [
-    'type_name'   => 'model_data',
+    'type_name'   => 'data_output',
     'db_type'     => 'text',
     'list_hidden' => 1,
     'search'      => 0,
@@ -300,7 +300,7 @@ $table = \FriendsOfREDAXO\Simpleshop\Order::TABLE;
     'label' => 'Extras',
     'prio'  => $prio++,
 ], [
-    'type_name'   => 'model_data',
+    'type_name'   => 'data_output',
     'db_type'     => 'text',
     'list_hidden' => 1,
     'search'      => 0,
@@ -376,6 +376,14 @@ $table = \FriendsOfREDAXO\Simpleshop\Order::TABLE;
     'only_empty'  => 0,
     'show_value'  => 1,
 ]);
+
+$sql->setTable('rex_yform_table');
+$sql->setValue('name', 'translate:tablename.order');
+$sql->setValue('list_sortfield', 'id');
+$sql->setValue('list_sortorder', 'DESC');
+$sql->setValue('list_amount', 100);
+$sql->setWhere(['table_name' => $table]);
+$sql->update();
 
 $yTable = rex_yform_manager_table::get($table);
 rex_yform_manager_table_api::generateTableAndFields($yTable);

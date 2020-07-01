@@ -33,6 +33,16 @@ $table = \FriendsOfREDAXO\Simpleshop\Coupon::TABLE;
     'prio'        => $prio++,
 ]);
 
+\Kreatif\Yform::ensureValueField($table, 'name_1', [
+    'label'       => 'translate:label.designation',
+    'list_hidden' => 0,
+    'search'      => 1,
+], [
+    'type_name' => 'text',
+    'db_type'   => 'varchar(191)',
+    'prio'      => $prio++,
+]);
+
 $prio += 30;
 
 \Kreatif\Yform::ensureValueField($table, 'tab_end', [], [
@@ -49,7 +59,7 @@ $prio += 30;
     'list_hidden' => 0,
     'search'      => 0,
     'label'       => 'translate:coupon.use_settings',
-    'choices'     => '{"translate:coupon.use_global":1,"translate:coupon.use_fixedprice":0,"translate:coupon.use_single":2}',
+    'choices'     => '', // these will be set in the simpleshop advanced settings
     'prio'        => $prio++,
 ], [
     'db_type'  => 'int',
@@ -92,6 +102,25 @@ $prio += 30;
     'no_db'   => 0,
 ]);
 
+\Kreatif\Yform::ensureValueField($table, 'action', [
+    'type_name'   => 'choice',
+    'list_hidden' => 0,
+    'search'      => 1,
+    'label'       => 'translate:action',
+    'placeholder' => '- ###action.select.please### -',
+    'prio'        => $prio++,
+], [
+    'db_type'    => 'text',
+    'expanded'   => 0,
+    'multiple'   => 0,
+    'attributes' => '{"data-yform-edit-toggle-switch":"action"}',
+    'choices'    => json_encode([
+        'translate:coupon.percent_discount' => 'percent_discount',
+        'translate:coupon.fixed_discount'   => 'fixed_discount',
+        'translate:coupon.free_shipping'    => 'free_shipping',
+    ]),
+]);
+
 \Kreatif\Yform::ensureValueField($table, 'discount_value', [
     'type_name'   => 'number',
     'list_hidden' => 1,
@@ -102,8 +131,9 @@ $prio += 30;
     'label'       => 'translate:coupon.fixed_discount',
     'prio'        => $prio++,
 ], [
-    'db_type' => '',
-    'no_db'   => 0,
+    'db_type'    => '',
+    'no_db'      => 0,
+    'attributes' => '{"data-yform-edit-toggle":"action:fixed_discount"}',
 ]);
 
 \Kreatif\Yform::ensureValueField($table, 'discount_percent', [
@@ -116,8 +146,9 @@ $prio += 30;
     'label'       => 'translate:coupon.percent_discount',
     'prio'        => $prio++,
 ], [
-    'db_type' => '',
-    'no_db'   => 0,
+    'db_type'    => '',
+    'no_db'      => 0,
+    'attributes' => '{"data-yform-edit-toggle":"action:percent_discount"}',
 ]);
 
 \Kreatif\Yform::ensureValueField($table, 'prefix', [
@@ -183,6 +214,14 @@ $prio += 30;
     'only_empty' => 0,
     'no_db'      => 0,
 ]);
+
+$sql->setTable('rex_yform_table');
+$sql->setValue('name', 'translate:tablename.coupon');
+$sql->setValue('list_sortfield', 'id');
+$sql->setValue('list_sortorder', 'DESC');
+$sql->setValue('list_amount', 100);
+$sql->setWhere(['table_name' => $table]);
+$sql->update();
 
 $yTable = rex_yform_manager_table::get($table);
 rex_yform_manager_table_api::generateTableAndFields($yTable);

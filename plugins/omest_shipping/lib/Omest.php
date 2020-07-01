@@ -13,6 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Kreatif\Model\Country;
 use Sprog\Wildcard;
 
 
@@ -316,7 +317,7 @@ class Omest extends ShippingAbstract
             $Shipping->setValue('shipping_sent', date('Y-m-d H:i:s'));
             $Shipping->setValue('shipping_sent_by', \rex::getUser()
                 ->getName());
-            $Order->setValue('shipping', Order::prepareData($Shipping));
+            $Order->setValue('shipping', $Shipping);
             $Order->save();
 
             // todo: hier müsste man noch vom erstellet Versand alle Parcel-Keys auslesen
@@ -372,7 +373,7 @@ class Omest extends ShippingAbstract
     //                throw new OrderException("Could not create Omest-Shipping for Order {$Order->getId()}", 70);
     //            } else {
     //                $Shipping->setValue('shipping_key', $response['response']['shipment']->key);
-    //                $Order->setValue('shipping', Order::prepareData($Shipping));
+    //                $Order->setValue('shipping', $Shipping);
     //                $Order->save();
     //            }
     //        }

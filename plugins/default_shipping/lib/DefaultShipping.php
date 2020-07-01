@@ -13,6 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Kreatif\Model\Country;
 use Sprog\Wildcard;
 
 

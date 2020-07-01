@@ -14,6 +14,7 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
+use Kreatif\Model;
 use Url\Url;
 
 

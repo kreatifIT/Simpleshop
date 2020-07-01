@@ -34,10 +34,11 @@ class FragmentConfig
             ],
         ],
         'cart'                         => [
-            'has_remove_button' => true,
-            'has_image'         => true,
-            'has_coupons'       => true,
-            'button'            => [
+            'has_remove_button'   => true,
+            'has_image'           => true,
+            'has_coupons'         => false,
+            'use_discount_groups' => false,
+            'button'              => [
                 'has_quantity_control'   => true,
                 'has_quantity'           => true,
                 'is_disabled'            => false,
@@ -48,7 +49,7 @@ class FragmentConfig
                     'button' => 'button',
                 ],
             ],
-            'table-wrapper'     => [
+            'table-wrapper'       => [
                 'show_coupon_info' => true,
                 'has_go_ahead'     => true,
                 'class'            => 'stack',
@@ -56,7 +57,7 @@ class FragmentConfig
                 'ahead_url'        => '',
                 'back_url'         => '',
             ],
-            'item'              => [
+            'item'                => [
                 'class'                => '',
                 'email_tpl_styles'     => [],
                 'has_image'            => true,
@@ -64,7 +65,7 @@ class FragmentConfig
                 'has_refresh_button'   => true,
                 'has_quantity_control' => true,
             ],
-            'summary'           => [
+            'summary'             => [
                 'css_class' => [
                     'table' => '',
                 ],

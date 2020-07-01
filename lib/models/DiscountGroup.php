@@ -21,62 +21,53 @@ class DiscountGroup extends Discount
     public static function ext_applyDiscounts(\rex_extension_point $Ep)
     {
         $promotions = $Ep->getSubject();
+        $useThis    = FragmentConfig::getValue('cart.use_discount_groups');
 
-        if (parent::isRegistered(self::TABLE)) {
+        if ($useThis) {
             $Order      = $Ep->getParam('Order');
-            $promotions = self::getValidPromotions($Ep->getParam('products'), $Order->getCustomerData());
+            $promotions = self::getValidPromotions($Ep->getParam('products'), $Order);
         }
         return $promotions;
     }
 
-    public static function getValidPromotions($products, $Customer = null)
+    public static function getValidPromotions($products, Order $order)
     {
         $promotions = [];
-        $Settings   = \rex::getConfig('simpleshop.Settings');
-        $apply_all  = from_array($Settings, 'discounts_are_accumulable', 0);
-        $discounts  = self::query()->where('status', 1)->orderBy('prio')->find();
-        $address    = $Customer ? $Customer->getAddress() : null;
-        $Cctype     = $address ? $address->getValue('ctype') : 'person';
+        $customer   = $order->getCustomerData();
+        $applyAll   = Settings::getValue('discounts_are_accumulable', 'general');
+        $Cctype     = $customer ? $customer->getCtype() : 'person';
+
+        $query = self::query();
+        $query->where('status', 1);
+        $query->whereRaw('(
+            (target = "order_quantities" AND amount > 0)
+            OR (target = "cart_value" AND price > 0)
+        )');
+        $query->whereRaw('(
+            ctype IS NULL 
+            OR ctype = "" 
+            OR ctype = "all" 
+            OR ctype = :type
+        )', ['type' => $Cctype]);
+        $query->orderBy('target', 'desc');
+        $query->orderBy('price', 'desc');
+        $query->orderBy('amount', 'desc');
+        $discounts = $query->find('status', 1);
 
         foreach ($discounts as $discount) {
-            $dfound = false;
-            $price  = $discount->getValue('price');
-            $amount = $discount->getValue('amount');
-            $Dctype = $discount->getValue('ctype', false, 'all');
+            $target = $discount->getValue('target');
 
-            if ($Cctype == '' || $Dctype == 'all' || $Cctype == $Dctype) {
-                if ($amount) {
-                    foreach ($products as $product) {
-                        if ($product->getValue('discount') == '' && $product->getValue('cart_quantity') >= $amount) {
-                            $dfound = true;
-
-                            if ($discount->getValue('free_shipping')) {
-                                $promotions['discount_' . $discount->getValue('id')] = $discount;
-                            }
-                            else {
-                                $product->setValue('discount', $discount);
-                            }
-                        }
-                    }
-                    if ($dfound && !$apply_all) {
-                        break; // discount found - stop here
-                    }
+            if ($target == 'order_quantities') {
+                if ($order->getValue('quantity') >= $discount->getValue('amount')) {
+                    $promotions['discount_' . $discount->getValue('id')] = $discount;
                 }
-                elseif ($price) {
-                    $cartTotal = 0;
-
-                    foreach ($products as $product) {
-                        $cartTotal += $product->getPrice() * $product->getValue('cart_quantity');
-                    }
-                    if ($cartTotal >= $price) {
-                        $promotions['discount_' . $discount->getValue('id')] = $discount;
-
-                        if (!$apply_all) {
-                            break; // discount found - stop here
-                        }
-                    }
-
+            } else if ($target == 'cart_value') {
+                if ($order->getSubtotal() >= $discount->getValue('price')) {
+                    $promotions['discount_' . $discount->getValue('id')] = $discount;
                 }
+            }
+            if (count($promotions) && !$applyAll) {
+                break; // discount found - stop here
             }
         }
         return $promotions;

@@ -9,6 +9,7 @@ var SimpleshopBackend = (function ($) {
         initVariantSelect();
         initAddressSelect();
         initProductRexCategoryLink();
+        initYformEditToggles();
     });
 
     function addLoading($container) {
@@ -20,6 +21,32 @@ var SimpleshopBackend = (function ($) {
         $('body').append($loading.addClass('show').css(css));
 
         return $loading;
+    }
+
+    function initYformEditToggles() {
+        var $toggles = $('[data-yform-edit-toggle-switch]');
+
+        if ($toggles.length) {
+            $toggles.each(function () {
+                var $this = $(this),
+                    toggle = $(this).data('yform-edit-toggle-switch');
+                $this.on('change', function () {
+                    var option = $(this).val();
+                    $('[data-yform-edit-toggle^="' + toggle + ':"]').each(function () {
+                        var $this = $(this),
+                            $formEl = $this.parents('.form-group');
+
+                        console.debug($this.data('yform-edit-toggle') +' == '+ (toggle + ':' + option));
+
+                        if ($this.data('yform-edit-toggle') == toggle + ':' + option) {
+                            $formEl.removeClass('hide');
+                        } else {
+                            $formEl.addClass('hide');
+                        }
+                    });
+                });
+            }).trigger('change');
+        }
     }
 
     function initProductRexCategoryLink() {
@@ -66,11 +93,11 @@ var SimpleshopBackend = (function ($) {
         $('select.address-select').select2({
             width: 'style',
             ajax: {
-                data: function(params) {
+                data: function (params) {
                     params.customer_id = $(this).data('customer-id');
                     return params;
                 },
-                processResults: function(data) {
+                processResults: function (data) {
                     return data.message;
                 }
             }

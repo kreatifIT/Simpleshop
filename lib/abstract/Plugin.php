@@ -96,7 +96,7 @@ abstract class PluginAbstract
         $value = null;
 
         if (property_exists($this, $key)) {
-            $value = Model::unprepare($this->$key);
+            $value = $this->$key;
         }
         return $value;
     }

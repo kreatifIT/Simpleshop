@@ -14,6 +14,7 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
+use Kreatif\Model;
 use Sprog\Wildcard;
 
 
@@ -101,6 +102,11 @@ class Customer extends Model
             }
         }
         return $isActivated;
+    }
+
+    public function getCtype() {
+        $address = $this->getInvoiceAddress();
+        return $address->getValue('ctype');
     }
 
     public function getInvoiceAddress()

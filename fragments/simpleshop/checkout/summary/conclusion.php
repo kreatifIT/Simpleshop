@@ -14,7 +14,6 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 $Order      = $this->getVar('Order');
-$total      = $Order->getValue('total');
 $taxes      = $Order->getValue('taxes');
 $shipping   = $Order->getValue('shipping');
 $promotions = (array)$Order->getValue('promotions');
@@ -41,23 +40,14 @@ $isTaxFree  = $Order->isTaxFree();
     <?php if ($shipping): ?>
         <div class="shipping">
             <span class="label">+ ###label.shipping_costs###</span>
-            <span class="price">&euro;&nbsp;<?= format_price($shipping->getPrice($Order)) ?></span>
+            <span class="price">&euro;&nbsp;<?= format_price($Order->getShippingCosts()) ?></span>
         </div>
     <?php endif; ?>
 
     <?php if (!$isTaxFree): ?>
-        <?php
-        $nettoTotal = $Order->getNettoTotal();
-
-        if ($shipping) {
-            $nettoTotal += $shipping->getNetPrice($Order);
-        }
-        $nettoTotal -= $Order->getDiscount(false);
-
-        ?>
         <div class="gross-price">
             <span class="label">###label.gross_total###</span>
-            <span class="price">&euro;&nbsp;<?= format_price($nettoTotal) ?></span>
+            <span class="price">&euro;&nbsp;<?= format_price($Order->getNettoTotal(true)) ?></span>
         </div>
 
         <?php foreach ($taxes as $percent => $tax): ?>
@@ -70,6 +60,6 @@ $isTaxFree  = $Order->isTaxFree();
 
     <div class="total">
         <span class="label">###label.total_sum###</span>
-        <span class="price">&euro;&nbsp;<?= format_price($total) ?></span>
+        <span class="price">&euro;&nbsp;<?= format_price($Order->getTotal()) ?></span>
     </div>
 </div>

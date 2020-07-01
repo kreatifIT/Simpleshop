@@ -31,21 +31,13 @@ class rex_yform_value_customer_address extends rex_yform_value_abstract
 
                 if ($this->getValue() != $currentAddressId) {
                     // customer daten nur aktualisieren wenn sich kundenadresse geändert hat (manuell im Backend geändert worden)!
-                    $address = \FriendsOfREDAXO\Simpleshop\CustomerAddress::get($this->getValue());
-                    $model   = \FriendsOfREDAXO\Simpleshop\Order::create();
-                    $model->setValue('address', $address);
-
+                    $address    = \FriendsOfREDAXO\Simpleshop\CustomerAddress::get($this->getValue());
                     $customerId = $address->getValue('customer_id');
                     $customer   = $customerId ? \FriendsOfREDAXO\Simpleshop\Customer::get($customerId) : null;
 
-                    if ($customer) {
-                        $model->setValue('customer', $customer);
-                    }
-                    $prepared = \FriendsOfREDAXO\Simpleshop\Model::prepare($model);
-
-                    $this->params['value_pool']['sql']['customer_data']    = $prepared['customer'] ? $prepared['customer'] : $customer;
+                    $this->params['value_pool']['sql']['customer_data']    = $customer;
                     $this->params['value_pool']['sql']['customer_id']      = $customerId;
-                    $this->params['value_pool']['sql']['shipping_address'] = $prepared['address'];
+                    $this->params['value_pool']['sql']['shipping_address'] = $address;
                 } else if ($order) {
                     $this->params['value_pool']['sql']['customer_id']      = $order->getValue('customer_id');
                     $this->params['value_pool']['sql']['customer_data']    = $order->getRawValue('customer_data');

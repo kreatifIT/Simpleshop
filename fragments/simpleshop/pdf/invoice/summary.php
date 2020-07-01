@@ -5,13 +5,11 @@ namespace FriendsOfREDAXO\Simpleshop;
 $Order  = $this->getVar('Order');
 $config = \FriendsOfREDAXO\Simpleshop\FragmentConfig::getValue('checkout');
 
-$total          = $Order->getValue('total');
-$taxes          = $Order->getValue('taxes');
-$shipping       = $Order->getValue('shipping');
-$remarks        = trim($Order->getValue('remarks'));
-$promotions     = (array)$Order->getValue('promotions');
-$shipping_costs = $shipping && $config['show_tax_info'] ? $shipping->getPrice($Order) : $Order->getValue('shipping_costs');
-$isTaxFree      = $Order->isTaxFree();
+$taxes      = $Order->getValue('taxes');
+$shipping   = $Order->getValue('shipping');
+$remarks    = trim($Order->getValue('remarks'));
+$promotions = (array)$Order->getValue('promotions');
+$isTaxFree  = $Order->isTaxFree();
 
 ?>
 <?php if ($remarks != ''): ?>
@@ -53,27 +51,18 @@ $isTaxFree      = $Order->isTaxFree();
                     + ###label.shipping_costs###
                 </td>
                 <td align="right">
-                    &euro;&nbsp;<?= format_price($shipping_costs) ?>
+                    &euro;&nbsp;<?= format_price($Order->getShippingCosts()) ?>
                 </td>
             </tr>
         <?php endif; ?>
 
         <?php if ($config['show_tax_info'] && !$Order->isTaxFree()): ?>
-            <?php
-            $nettoTotal = $Order->getNettoTotal();
-
-            if ($shipping) {
-                $nettoTotal += $shipping->getNetPrice($Order);
-            }
-            $nettoTotal -= $Order->getDiscount(false);
-
-            ?>
             <tr>
                 <td>
                     ###label.gross_total###
                 </td>
                 <td align="right">
-                    &euro;&nbsp;<?= format_price($nettoTotal) ?>
+                    &euro;&nbsp;<?= format_price($Order->getNettoTotal(true)) ?>
                 </td>
             </tr>
 
@@ -95,7 +84,7 @@ $isTaxFree      = $Order->isTaxFree();
     <tr>
         <td id="invoice-summary-total-label" <?= $Order->getValue('status') == 'CN' ? 'style="padding-top:30mm;"' : '' ?>>###label.total_sum###</td>
         <td id="invoice-summary-total-value" align="right" valign="bottom">
-            &euro;&nbsp;<?= format_price($total) ?>
+            &euro;&nbsp;<?= format_price($Order->getTotal()) ?>
         </td>
     </tr>
 </table>

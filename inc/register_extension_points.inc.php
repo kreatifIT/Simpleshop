@@ -19,11 +19,14 @@ namespace FriendsOfREDAXO\Simpleshop;
 \rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_yform_data_delete']);
 \rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Tax', 'ext_yform_data_delete']);
 \rex_extension::register('YFORM_DATA_DELETE', ['\FriendsOfREDAXO\Simpleshop\Order', 'ext_yform_data_delete']);
-\rex_extension::register('YFORM_DATASET_FORM_SETVALUEFIELD', ['\FriendsOfREDAXO\Simpleshop\Model', 'ext_setValueField']);
 \rex_extension::register('YFORM_MANAGER_REX_INFO', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_tableManagerInfo']);
 \rex_extension::register('kreatif.Model.queryCollection', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_queryCollection']);
 \rex_extension::register('project.layoutBottom', ['\FriendsOfREDAXO\Simpleshop\CartController', 'ext_project_layoutBottom']);
 \rex_extension::register('kreatif.setUrlObject', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_setUrlObject']);
+\rex_extension::register('simpleshop.Order.completeOrder', ['\FriendsOfREDAXO\Simpleshop\Coupon', 'ext_completeOrder']);
+\rex_extension::register('simpleshop.Checkout.orderComplete', ['\FriendsOfREDAXO\Simpleshop\Coupon', 'ext_beforeSendOrder']);
+\rex_extension::register('simpleshop.Order.applyDiscounts', ['\FriendsOfREDAXO\Simpleshop\DiscountGroup', 'ext_applyDiscounts']);
+\rex_extension::register('kreatif.Model.unprepareNEObject', ['\FriendsOfREDAXO\Simpleshop\Std', 'ext_unprepareNEObject']);
 
 
 \rex_extension::register('PACKAGES_INCLUDED', function (\rex_extension_point $Ep) {
@@ -66,8 +69,6 @@ namespace FriendsOfREDAXO\Simpleshop;
     }
     return $Ep->getSubject();
 });
-
-\rex_extension::register('simpleshop.Order.applyDiscounts', ['\FriendsOfREDAXO\Simpleshop\DiscountGroup', 'ext_applyDiscounts']);
 
 \rex_extension::register('yform/usability.getStatusColumnParams.options', function (\rex_extension_point $Ep) {
     $options = $Ep->getSubject();

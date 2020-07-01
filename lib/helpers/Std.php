@@ -34,5 +34,9 @@ class Std extends PluginAbstract
     {
         return get_object_vars($this);
     }
+
+    public static function ext_unprepareNEObject(\rex_extension_point $ep) {
+        $ep->setSubject(self::create());
+    }
 }
 

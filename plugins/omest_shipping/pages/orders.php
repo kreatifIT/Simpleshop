@@ -46,10 +46,9 @@ if ($_FUNC == 'submit' && count($order_ids)) {
             }
         }
         $Shipping->setParcels($parcels);
-        Model::prepareData($Shipping);
 
         // update props
-        $Order->setValue('shipping', Order::prepareData($Shipping));
+        $Order->setValue('shipping', $Shipping);
         $Order->save();
 
         $_order_ids[] = $order_id;

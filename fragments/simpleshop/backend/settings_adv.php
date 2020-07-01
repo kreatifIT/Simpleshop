@@ -83,13 +83,13 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
         <dd>
             <select name="coupon_use_options[]" class="form-control" multiple>
                 <option value="global" <?= in_array('global', $Settings['coupon_use_options']) ? 'selected' : '' ?>>
-                    Global für jeden User 1x nutzbar
+                    <?= $Addon->i18n('coupon.use_global') ?>
                 </option>
                 <option value="fixedprice" <?= in_array('fixedprice', $Settings['coupon_use_options']) ? 'selected' : '' ?>>
-                    kann genutzt werden bis fixer Rabatt aufgebraucht
+                    <?= $Addon->i18n('coupon.use_fixedprice') ?>
                 </option>
                 <option value="single" <?= in_array('single', $Settings['coupon_use_options']) ? 'selected' : '' ?>>
-                    exakt 1x nutzbar
+                    <?= $Addon->i18n('coupon.use_single') ?>
                 </option>
             </select>
         </dd>

@@ -14,6 +14,7 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 use Kreatif\Form;
+use Kreatif\Model\Country;
 
 
 $backUrl       = trim($this->getVar('back_url', ''));

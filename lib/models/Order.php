@@ -13,6 +13,9 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Kreatif\Model;
+
+
 class Order extends Model
 {
     const TABLE = 'rex_shop_order';
@@ -79,7 +82,7 @@ class Order extends Model
 
         if ($Address && $Address->isCompany()) {
             $countrId = $Address->getValue('country');
-            $Country  = $countrId ? Country::get($countrId) : null;
+            $Country  = $countrId ? Model\Country::get($countrId) : null;
         }
 
         return $Country && !$Country->getValue('b2b_has_tax');
@@ -97,12 +100,29 @@ class Order extends Model
 
     public function getGrossTotal()
     {
-        return array_sum($this->getValue('brut_prices'));
+        return array_sum((array)$this->getValue('brut_prices'));
     }
 
-    public function getNettoTotal()
+    public function getNettoTotal($applyShippingAndDiscounts = false)
     {
-        return array_sum($this->getValue('net_prices'));
+        $total = array_sum((array)$this->getValue('net_prices'));
+
+        if ($applyShippingAndDiscounts) {
+            if ($this->getValue('shipping_costs') > 0) {
+                $shipping = $this->getValue('shipping');
+
+                if ($shipping) {
+                    $total += $shipping->getNetPrice($this);
+                }
+            }
+            $total -= $this->getDiscount(false);
+        }
+        return $total;
+    }
+
+    public function getTotal()
+    {
+        return $this->getValue('total');
     }
 
     public function getDiscount($includeTax = true)
@@ -110,12 +130,17 @@ class Order extends Model
         $discount = $this->getValue('discount');
 
         if (!$includeTax) {
-            $grossTotal = $this->getGrossTotal();
-            $nettoTotal = $this->getNettoTotal();
+            $grossTotal = array_sum($this->getValue('brut_prices'));
+            $nettoTotal = array_sum($this->getValue('net_prices'));
             $_percent   = $discount / $grossTotal;
             $discount   = $nettoTotal * $_percent;
         }
         return $discount;
+    }
+
+    public function getShippingCosts()
+    {
+        return $this->getValue('shipping_costs');
     }
 
     public function getProducts($raw = true)
@@ -252,7 +277,9 @@ class Order extends Model
             $this->setValue('invoice_num', $num);
         }
 
-        $saveSuccess = parent::save(true);
+        $products    = $products ?: $this->getValue('products');
+        $saveSuccess = parent::save();
+        $this->setValue('products', $products);
 
         if (!$saveSuccess) {
             throw new OrderException(implode('<br/>', $this->getMessages()));
@@ -322,12 +349,8 @@ class Order extends Model
 
     public function saveOrderProduct($product, $trackInventory = false, $OrderProduct = null)
     {
-        $prod_data = Model::prepare($product);
-        $quantity  = $product->getValue('cart_quantity');
+        $quantity = $product->getValue('cart_quantity');
 
-        foreach ($prod_data as $name => $value) {
-            $product->setValue($name, $value);
-        }
         if ($trackInventory) {
             if ($product->getValue('inventory') == 'F') {
                 // update inventory
@@ -358,7 +381,7 @@ class Order extends Model
             'Order' => $this,
         ]));
 
-        $OrderProduct->save(true);
+        $OrderProduct->save();
         return $OrderProduct->getId();
     }
 
@@ -476,15 +499,23 @@ class Order extends Model
 
     private function calculatePrices($promotions)
     {
-        $discount     = 0;
-        $taxes        = [];
-        $errors       = [];
-        $_promotions  = [];
-        $gross_prices = $this->getValue('brut_prices');
-        $initialGross = array_sum($gross_prices);
+        $discount        = 0;
+        $taxes           = [];
+        $errors          = [];
+        $_promotions     = [];
+        $hasFreeShipping = false;
+        $gross_prices    = $this->getValue('brut_prices');
+
+
+        foreach ($promotions as $promotion) {
+            if ($promotion->getValue('action') == 'free_shipping') {
+                $hasFreeShipping = true;
+                break;
+            }
+        }
 
         // set shipping costs
-        if ($this->getValue('shipping_costs') > 0) {
+        if (!$hasFreeShipping && $this->getValue('shipping_costs') > 0) {
             $shipping   = $this->getValue('shipping');
             $taxPercent = $shipping->getTaxPercentage();
 
@@ -529,6 +560,8 @@ class Order extends Model
                 $products = Session::getCartItems();
             }
         }
+
+        $this->recalculateDocument($products);
 
         try {
             $promotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.applyDiscounts', [], [

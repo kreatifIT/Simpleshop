@@ -14,6 +14,9 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 
+use Kreatif\Model;
+
+
 class CustomerAddress extends Model
 {
     const TABLE = 'rex_shop_customer_address';
@@ -46,7 +49,7 @@ class CustomerAddress extends Model
     public function toAddressArray($asInvoiceString = false)
     {
         $countryId = (int) $this->getValue('country');
-        $Country   = $countryId > 0 ? Country::get($countryId) : null;
+        $Country   = $countryId > 0 ? Model\Country::get($countryId) : null;
 
         $location = [
             $this->getValue('postal'),

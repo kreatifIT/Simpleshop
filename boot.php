@@ -17,7 +17,6 @@ namespace FriendsOfREDAXO\Simpleshop;
 \rex_yform::addTemplatePath(\rex_path::addon('simpleshop', 'ytemplates'));
 
 \rex_yform_manager_dataset::setModelClass(Coupon::TABLE, Coupon::class);
-\rex_yform_manager_dataset::setModelClass(Country::TABLE, Country::class);
 \rex_yform_manager_dataset::setModelClass(Customer::TABLE, Customer::class);
 \rex_yform_manager_dataset::setModelClass(CustomerAddress::TABLE, CustomerAddress::class);
 \rex_yform_manager_dataset::setModelClass(DiscountGroup::TABLE, DiscountGroup::class);
@@ -46,3 +45,5 @@ if (\rex::isBackend()) {
         include_once $include_file;
     }
 }
+
+Settings::init();

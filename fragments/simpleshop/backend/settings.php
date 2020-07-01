@@ -37,7 +37,7 @@ $Settings = $this->getVar('Settings');
     <br/>
     <br/>
 
-    <?php if (DiscountGroup::isRegistered(DiscountGroup::TABLE)): ?>
+    <?php if (FragmentConfig::getValue('cart.use_discount_groups')): ?>
         <legend><?= $Addon->i18n('settings.discount_settings'); ?></legend>
         <dl class="rex-form-group form-group">
             <dt><?= $Addon->i18n('settings.discount_application'); ?></dt>
