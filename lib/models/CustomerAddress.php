@@ -46,26 +46,38 @@ class CustomerAddress extends Model
         return $this->getValue('ctype') == 'company';
     }
 
+    public function isTaxFree()
+    {
+        if ($this->isCompany()) {
+            $countryId = $this->getValue('country');
+            $Country   = $countryId ? Model\Country::get($countryId) : null;
+            $result    = $Country && !$Country->getValue('b2b_has_tax');
+        } else {
+            $result = false;
+        }
+        return $result;
+    }
+
     public function toAddressArray($asInvoiceString = false)
     {
-        $countryId = (int) $this->getValue('country');
+        $countryId = (int)$this->getValue('country');
         $Country   = $countryId > 0 ? Model\Country::get($countryId) : null;
 
         $location = [
             $this->getValue('postal'),
-            $this->getValue('location')
+            $this->getValue('location'),
         ];
         if ($this->valueIsset('province')) {
             $location[] = '- ' . $this->getValue('province');
         }
         $output = [
-            'name' => trim($this->getName()),
-            'street' => trim($this->getValue('street')),
+            'name'              => trim($this->getName()),
+            'street'            => trim($this->getValue('street')),
             'street_additional' => $asInvoiceString ? '' : trim($this->getValue('street_additional')),
-            'location' => trim(implode(' ', $location)),
-            'country' => $Country ? trim($Country->getName()) : '',
-            'fiscal_code' => $asInvoiceString && in_array($this->getValue('ctype'), ['company', 'person']) ? trim($this->getValue('fiscal_code')) : '',
-            'vat_num' => $asInvoiceString && $this->getValue('ctype') == 'company' ? trim($this->getValue('vat_num')) : '',
+            'location'          => trim(implode(' ', $location)),
+            'country'           => $Country ? trim($Country->getName()) : '',
+            'fiscal_code'       => $asInvoiceString && in_array($this->getValue('ctype'), ['company', 'person']) ? trim($this->getValue('fiscal_code')) : '',
+            'vat_num'           => $asInvoiceString && $this->getValue('ctype') == 'company' ? trim($this->getValue('vat_num')) : '',
         ];
         return array_filter($output);
     }
@@ -95,14 +107,14 @@ class CustomerAddress extends Model
 
     public function getNameForOrder()
     {
-        $customer = Customer::get($this->getValue('customer_id'));
+        $customer    = Customer::get($this->getValue('customer_id'));
         $addressInfo = array_unique(array_filter([
             $this->getName(null, true),
             $this->getValue('street'),
             $this->getValue('postal'),
             $this->getValue('location'),
         ]));
-        return "KUNDE: {$customer->getName(null, true)} ---> ADRESSE: ". implode(' | ', $addressInfo);
+        return "KUNDE: {$customer->getName(null, true)} ---> ADRESSE: " . implode(' | ', $addressInfo);
     }
 
     public static function be__searchAddress()
@@ -122,7 +134,7 @@ class CustomerAddress extends Model
         if ($term == '' && $customerId > 0) {
             $stmt->where('m.customer_id', $customerId);
         } else {
-            $term = trim($term);
+            $term    = trim($term);
             $orWhere = [
                 'm.company_name LIKE :term',
                 'm.firstname LIKE :term',
@@ -142,14 +154,14 @@ class CustomerAddress extends Model
             if (Customer::getYformFieldByName('lastname')) {
                 $orWhere[] = 'jt1.lastname LIKE :term';
             }
-            $stmt->whereRaw('('. implode(' OR ', $orWhere) .')', ['term' => "%{$term}%", 'id' => $term]);
+            $stmt->whereRaw('(' . implode(' OR ', $orWhere) . ')', ['term' => "%{$term}%", 'id' => $term]);
         }
         $collection = $stmt->find();
 
         $result = [];
         foreach ($collection as $item) {
             $result[] = [
-                'id' => $item->getId(),
+                'id'   => $item->getId(),
                 'text' => $item->getNameForOrder(),
             ];
         }

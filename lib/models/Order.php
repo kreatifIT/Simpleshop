@@ -78,14 +78,7 @@ class Order extends Model
     public function isTaxFree()
     {
         $Address = $this->getInvoiceAddress();
-        $Country = null;
-
-        if ($Address && $Address->isCompany()) {
-            $countrId = $Address->getValue('country');
-            $Country  = $countrId ? Model\Country::get($countrId) : null;
-        }
-
-        return $Country && !$Country->getValue('b2b_has_tax');
+        return $Address ? $Address->isTaxFree() : false;
     }
 
     public function getSubtotal($includeTax = true)

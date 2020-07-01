@@ -31,13 +31,19 @@ class DefaultShipping extends ShippingAbstract
         return parent::getName();
     }
 
-    protected function calculatePrice($Order)
+    protected function calculatePrice(Order $Order, $products = null)
     {
+        $total     = 0;
         $Address   = $Order->getShippingAddress();
         $countryId = $Address ? $Address->getValue('country') : null;
+        $isTaxFree = $Address ? $Address->isTaxFree() : false;
         $Country   = $countryId ? Country::get($countryId) : null;
-        $total     = $Order->getValue('initial_total');
         $Settings  = \rex::getConfig('simpleshop.DefaultShipping.Settings');
+        $products  = $products ?: $Order->getProducts();
+
+        foreach ($products as $product) {
+            $total += $product->getPrice(!$isTaxFree);
+        }
 
         if ($Country && isset($Settings['costs'][$Country->getId()])) {
             $cost = 0;
@@ -60,21 +66,21 @@ class DefaultShipping extends ShippingAbstract
         }
     }
 
-    public function getPrice($Order, $products = null)
+    public function getPrice(Order $Order, $products = null)
     {
-        $this->calculatePrice($Order);
+        $this->calculatePrice($Order, $products);
         return parent::getPrice($Order, $products);
     }
 
-    public function getNetPrice($Order, $products = null)
+    public function getNetPrice(Order $Order, $products = null)
     {
-        $this->calculatePrice($Order);
+        $this->calculatePrice($Order, $products);
         return parent::getNetPrice($Order, $products);
     }
 
-    public function getGrossPrice($Order, $products = null)
+    public function getGrossPrice(Order $Order, $products = null)
     {
-        $this->calculatePrice($Order);
+        $this->calculatePrice($Order, $products);
         return parent::getGrossPrice($Order, $products);
     }
 }

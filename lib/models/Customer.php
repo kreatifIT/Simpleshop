@@ -104,7 +104,8 @@ class Customer extends Model
         return $isActivated;
     }
 
-    public function getCtype() {
+    public function getCtype()
+    {
         $address = $this->getInvoiceAddress();
         return $address->getValue('ctype');
     }
@@ -122,6 +123,29 @@ class Customer extends Model
             $Address = $stmt->findOne();
         }
         return $Address;
+    }
+
+    public function getShippingAddresses()
+    {
+        $query = CustomerAddress::query();
+        $query->where('status', 0, '!=');
+
+        $where = ["customer_id = {$this->getId()}"];
+        if ($this->valueIsset('addresses')) {
+            $where[] = "id IN({$this->getValue('addresses')})";
+        }
+        if ($this->valueIsset('invoice_address_id')) {
+            $query->where('id', $this->getValue('invoice_address_id'), '!=');
+        }
+        $query->whereRaw('(' . implode(' OR ', $where) . ')');
+        $query->orderBy('id', 'asc');
+        return $query->find();
+    }
+
+    public function getShippingAddress()
+    {
+        $addresses = $this->getShippingAddresses();
+        return current($addresses->toArray());
     }
 
     public static function register($email, $password, $attributes = [], $User = null, $doubleOptIn = false)

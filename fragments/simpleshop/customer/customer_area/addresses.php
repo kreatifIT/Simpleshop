@@ -22,18 +22,7 @@ if ($canAddItem && $action == 'edit') {
     $fragment = new \rex_fragment();
     $output   = $fragment->parse('simpleshop/customer/customer_area/address_edit.php');
 } else {
-    $query = CustomerAddress::query();
-    $query->where('status', 0, '!=');
-
-    $where = ["customer_id = {$User->getId()}"];
-    if ($User->valueIsset('addresses')) {
-        $where[] = "id IN({$User->getValue('addresses')})";
-    }
-    if ($User->valueIsset('invoice_address_id')) {
-        $query->where('id', $User->getValue('invoice_address_id'), '!=');
-    }
-    $query->whereRaw('(' . implode(' OR ', $where) . ')');
-    $addresses = $query->find();
+    $addresses = $User->getShippingAddresses();
 }
 
 ?>

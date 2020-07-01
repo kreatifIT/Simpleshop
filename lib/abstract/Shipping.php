@@ -16,6 +16,22 @@ namespace FriendsOfREDAXO\Simpleshop;
 class Shipping extends Plugin
 {
     protected static $type = 'shipping';
+
+    public static function getAll($fronted = false)
+    {
+        $shippings = parent::getAll();
+
+        if ($fronted) {
+            $_shippings = [];
+            foreach ($shippings as $shipping) {
+                if ($shipping->usedForFrontend()) {
+                    $_shippings[] = $shipping;
+                }
+            }
+            $shippings = $_shippings;
+        }
+        return $shippings;
+    }
 }
 
 
@@ -56,7 +72,7 @@ abstract class ShippingAbstract extends PluginAbstract
         $this->setValue('parcels', $_parcels);
     }
 
-    public function getPrice($order, $products = null)
+    public function getPrice(Order $order, $products = null)
     {
         if ($order->isTaxFree()) {
             $price = $this->price - $this->getTax();
@@ -66,12 +82,12 @@ abstract class ShippingAbstract extends PluginAbstract
         return $price;
     }
 
-    public function getNetPrice($order, $products = null)
+    public function getNetPrice(Order $order, $products = null)
     {
         return $this->price - $this->getTax();
     }
 
-    public function getGrossPrice($order, $products = null)
+    public function getGrossPrice(Order $order, $products = null)
     {
         return $this->price;
     }
