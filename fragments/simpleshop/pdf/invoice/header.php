@@ -15,6 +15,8 @@ $Order         = $this->getVar('Order');
 $invoice_addr  = $Order->getInvoiceAddress();
 $shipping_addr = $Order->getShippingAddress();
 
+$payment = $Order->getValue('payment');
+
 
 if (file_exists(\rex_path::base('resources/img/logo300dpi.png'))) {
     $logo = \rex_path::base('resources/img/logo300dpi.png');
@@ -52,6 +54,15 @@ if (file_exists(\rex_path::base('resources/img/logo300dpi.png'))) {
             <p>
                 <?= $this->subfragment('simpleshop/general/company-data.php') ?>
             </p>
+
+            <?php if ($payment): ?>
+                <br><br><br>
+
+                <p>
+                    <b>###label.payment_method###</b><br/>
+                    <?= $payment->getName() ?>
+                </p>
+            <?php endif; ?>
         </td>
     </tr>
 </table>

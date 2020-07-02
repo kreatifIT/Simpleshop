@@ -500,6 +500,8 @@ class Order extends Model
             }
         }
 
+        $this->recalculateDocument($products);
+
         try {
             $promotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.applyDiscounts', [], [
                 'Order'    => $this,
