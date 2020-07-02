@@ -136,30 +136,18 @@ class Order extends Model
         return $this->getValue('shipping_costs');
     }
 
-    public function getProducts($raw = true)
+    public function getOrderProducts()
     {
-        $stmt = OrderProduct::query();
-        $stmt->where('order_id', $this->getId());
-        $stmt->orderBy('id');
-        $products = $stmt->find();
-        $products = $products->toArray();
+        $products = (array)$this->getValue('products');
 
-        if (!$raw) {
-            if (empty($products)) {
-                $products = $this->getValue('products');
-            } else {
-                foreach ($products as &$orderProduct) {
-                    $Product     = clone $orderProduct->getValue('data');
-                    $orderPData  = $orderProduct->getData();
-                    $productData = $Product->getData();
+        if (!$products) {
+            $stmt = OrderProduct::query();
+            $stmt->where('order_id', $this->getId());
+            $stmt->orderBy('id');
+            $_products = $stmt->find();
 
-                    foreach ($orderPData as $key => $value) {
-                        if (!array_key_exists($key, $productData)) {
-                            $Product->setValue($key, $value);
-                        }
-                    }
-                    $orderProduct = $Product;
-                }
+            foreach ($_products as $orderProduct) {
+                $products[] = $orderProduct->getProduct();
             }
         }
         return $products;
@@ -284,7 +272,7 @@ class Order extends Model
 
             // IMPORTANT! after saving read the products
             if ($products === null) {
-                $products = (array)$this->getProducts(false);
+                $products = (array)$this->getOrderProducts();
             }
             $this->setValue('products', $products);
 

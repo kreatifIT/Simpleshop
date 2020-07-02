@@ -14,3 +14,6 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 Shipping::register(DefaultShipping::class, 'default_shipping');
+
+\rex_extension::register('simpleshop.Order.applyDiscounts', ['\FriendsOfREDAXO\Simpleshop\DefaultShipping', 'ext_applyDiscounts']);
+\rex_extension::register('simpleshop.Order.getUpsellingPromotion', ['\FriendsOfREDAXO\Simpleshop\DefaultShipping', 'ext_getUpsellingPromotion']);

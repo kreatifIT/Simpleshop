@@ -110,6 +110,12 @@ class Customer extends Model
         return $address->getValue('ctype');
     }
 
+    public function isB2B()
+    {
+        $address = $this->getInvoiceAddress();
+        return $address->isCompany();
+    }
+
     public function getInvoiceAddress()
     {
         $invoiceAddrId = $this->getvalue('invoice_address_id');

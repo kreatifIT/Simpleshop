@@ -21,7 +21,6 @@ $products   = $this->getVar('products', []);
 $errors     = $this->getVar('errors', []);
 $back_url   = $this->getVar('back_url');
 $warnings   = $this->getVar('warnings', []);
-$promotions = $Order->getValue('promotions');
 $payment    = $Order->getValue('payment');
 $shipping   = $Order->getValue('shipping');
 
@@ -80,20 +79,6 @@ $shipping   = $Order->getValue('shipping');
             $this->subfragment('simpleshop/checkout/summary/coupon.php');
         }
         ?>
-
-        <?php if ($promotions): ?>
-            <div class="discounts margin-bottom">
-
-                <h3>###label.promotions###</h3>
-                <p>###label.applied_promotion_text###</p>
-                <?php
-                foreach ($promotions as $promotion) {
-                    $this->setVar('promotion', $promotion);
-                    $this->subfragment('simpleshop/checkout/summary/discount_item.php');
-                }
-                ?>
-            </div>
-        <?php endif; ?>
 
         <!-- Warenkorb -->
         <div class="checkout-summary-items margin-bottom">

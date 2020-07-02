@@ -14,6 +14,7 @@
 $Order        = $this->getVar('Order');
 $invoiceAddr  = $Order->getInvoiceAddress();
 $shippingAddr = $Order->getShippingAddress();
+$payment      = $Order->getValue('payment');
 
 $invoiceAddrData  = $invoiceAddr ? $invoiceAddr->toAddressArray(true) : [];
 $shippingAddrData = $shippingAddr ? $shippingAddr->toAddressArray(false) : [];
@@ -35,7 +36,7 @@ if (file_exists(\rex_path::base('resources/img/logo300dpi.png'))) {
         <td width="50%" valign="top">
 
             <div class="address">
-                <h4 class="heading small">###label.invoice_address###</h4>
+                <strong>###label.invoice_address###</strong>
                 <p>
                     <?= implode('<br/>', $invoiceAddrData) ?>
                 </p>
@@ -45,7 +46,7 @@ if (file_exists(\rex_path::base('resources/img/logo300dpi.png'))) {
             <br/>
 
             <div class="address">
-                <h4 class="heading small">###label.shipping_address###</h4>
+                <strong>###label.shipping_address###</strong>
                 <p>
                     <?= implode('<br/>', $shippingAddrData) ?>
                 </p>
@@ -56,6 +57,16 @@ if (file_exists(\rex_path::base('resources/img/logo300dpi.png'))) {
             <p>
                 <?= $this->subfragment('simpleshop/general/company-data.php') ?>
             </p>
+
+            <br><br>
+
+            <?php if ($payment): ?>
+            <p>
+                <strong>###label.payment_method###</strong>
+                <br>
+                <?= $payment->getName() ?>
+            </p>
+            <?php endif; ?>
         </td>
     </tr>
 </table>

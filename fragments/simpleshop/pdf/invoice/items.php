@@ -12,7 +12,7 @@
  */
 
 $Order    = $this->getVar('Order');
-$products = (array)$Order->getProducts(false);
+$products = (array)$Order->getOrderProducts();
 $config   = \FriendsOfREDAXO\Simpleshop\FragmentConfig::getValue('checkout');
 
 if (count($products) == 0) {

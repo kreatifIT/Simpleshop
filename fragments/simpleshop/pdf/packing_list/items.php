@@ -13,7 +13,7 @@
 
 $type     = $this->getVar('type');
 $Order    = $this->getVar('Order');
-$products = (array)$Order->getProducts(false);
+$products = (array)$Order->getOrderProducts();
 
 if (count($products) == 0) {
     return;

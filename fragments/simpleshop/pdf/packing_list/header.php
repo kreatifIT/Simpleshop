@@ -11,9 +11,11 @@
  * file that was distributed with this source code.
  */
 
-$Order         = $this->getVar('Order');
-$shipping_addr = $Order->getShippingAddress();
-$barCodeImg    = $Order->getBarCodeImg();
+$Order        = $this->getVar('Order');
+$shippingAddr = $Order->getShippingAddress();
+$barCodeImg   = $Order->getBarCodeImg();
+
+$shippingAddrData = $shippingAddr ? $shippingAddr->toAddressArray() : [];
 
 if (file_exists(\rex_path::base('resources/img/logo300dpi.png'))) {
     $logo = \rex_path::base('resources/img/logo300dpi.png');
@@ -52,12 +54,13 @@ if (file_exists(\rex_path::base('resources/img/logo300dpi.png'))) {
         </td>
         <td valign="top" class="address">
             <div id="address-label">###label.address###<br/><br/></div>
-            <?php
-            $this->setVar('address', $shipping_addr);
-            $this->setVar('customer', null);
-            $this->setVar('title', '');
-            $this->subfragment('simpleshop/checkout/summary/address_item.php');
-            ?>
+            <div class="cell margin-bottom">
+                <div class="address">
+                    <p>
+                        <?= implode('<br/>', $shippingAddrData) ?>
+                    </p>
+                </div>
+            </div>
         </td>
         <td width="20%" valign="top" align="center">
             <div id="page-label">###label.pages###<br/><br/></div>

@@ -41,4 +41,25 @@ class OrderProduct extends Model
         }
         return $result;
     }
+
+    public function getProduct()
+    {
+        $data    = $this->getData();
+        $product = $this->getValue('data');
+
+        $product->setValue('order_product_id', $data['id']);
+        unset($data['id']);
+        unset($data['code']);
+        unset($data['data']);
+        unset($data['createdate']);
+        unset($data['updatedate']);
+        unset($data['createuser']);
+        unset($data['updateuser']);
+        unset($data['product_id']);
+
+        foreach ($data as $key => $value) {
+            $product->setValue($key, $value);
+        }
+        return $product;
+    }
 }

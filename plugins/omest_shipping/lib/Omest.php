@@ -261,16 +261,14 @@ class Omest extends ShippingAbstract
         }
 
         if ($Settings['submit_order_products'] == 1) {
-            $products = $Order->getProducts();
+            $products = $Order->getOrderProducts();
 
-            foreach ($products as $order_product) {
-                $Product = $order_product->getValue('data');
-
+            foreach ($products as $product) {
                 $data['content'][] = [
-                    'quantity'    => $Product->getValue('cart_quantity'),
-                    'code'        => $Product->getValue('code'),
-                    'description' => $Product->getName(),
-                    'amount'      => number_format($Product->getPrice(), 2, '.', ''),
+                    'quantity'    => $product->getValue('cart_quantity'),
+                    'code'        => $product->getValue('code'),
+                    'description' => $product->getName(),
+                    'amount'      => number_format($product->getPrice(), 2, '.', ''),
                 ];
             }
         } else {

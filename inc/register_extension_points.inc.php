@@ -26,6 +26,8 @@ namespace FriendsOfREDAXO\Simpleshop;
 \rex_extension::register('simpleshop.Order.completeOrder', ['\FriendsOfREDAXO\Simpleshop\Coupon', 'ext_completeOrder']);
 \rex_extension::register('simpleshop.Checkout.orderComplete', ['\FriendsOfREDAXO\Simpleshop\Coupon', 'ext_beforeSendOrder']);
 \rex_extension::register('simpleshop.Order.applyDiscounts', ['\FriendsOfREDAXO\Simpleshop\DiscountGroup', 'ext_applyDiscounts']);
+\rex_extension::register('simpleshop.Order.getUpsellingPromotion', ['\FriendsOfREDAXO\Simpleshop\DiscountGroup', 'ext_getUpsellingPromotion']);
+\rex_extension::register('simpleshop.Order.applyDiscounts', ['\FriendsOfREDAXO\Simpleshop\Coupon', 'ext_applyDiscounts']);
 \rex_extension::register('kreatif.Model.unprepareNEObject', ['\FriendsOfREDAXO\Simpleshop\Std', 'ext_unprepareNEObject']);
 
 
@@ -94,6 +96,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 \rex_extension::register('simpleshop.Settings.saved', function (\rex_extension_point $Ep) {
     Coupon::ext__processSettings($Ep);
+    DiscountGroup::ext__processSettings($Ep);
 });
 
 \rex_view::setJsProperty('simpleshop', [

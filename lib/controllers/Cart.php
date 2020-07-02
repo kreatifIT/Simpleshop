@@ -21,9 +21,16 @@ class CartController extends Controller
     public function _execute()
     {
         $this->params = array_merge([
-            'check_cart' => true,
-            'products'   => null,
+            'check_cart'      => true,
+            'apply_discounts' => true,
+            'apply_coupon'    => true,
+            'products'        => null,
         ], $this->params);
+
+        if (\rex_request::isXmlHttpRequest()) {
+            $this->params = array_merge($this->params, rex_request('api-params', 'array', []));
+        }
+
 
         $errors      = [];
         $discount    = 0;
@@ -50,38 +57,108 @@ class CartController extends Controller
                 break;
         }
 
-        $grossTotals  = Session::getGrossTotals();
-        $coupon_code  = Session::getCheckoutData('coupon_code');
-        $grossTotals2 = $grossTotals;
-        $Coupon       = $coupon_code != '' ? Coupon::getByCode($coupon_code) : null;
-
-        if ($Coupon) {
-            try {
-                $discount = $Coupon->applyToCart($grossTotals2);
-            } catch (CouponException $ex) {
-                Session::setCheckoutData('coupon_code', null);
-                $errors[] = ['label' => $ex->getLabelByCode()];
-            }
-        } else if ($coupon_code != '') {
-            Session::setCheckoutData('coupon_code', null);
-            $errors[] = ['label' => '###error.coupon_not_exists###'];
-        }
-
-        if ($minOrderVal > array_sum($grossTotals)) {
-            $errors [] = ['label' => str_replace('{VALUE}', '<strong>' . format_price($minOrderVal) . ' &euro;</strong>', \Wildcard::get('label.min_order_info'))];
-        }
-        if (count($errors)) {
-            $this->errors = array_merge($this->errors, $errors);
-        }
-
-        foreach ($this->params as $key => $value) {
-            $this->setVar($key, $value);
-        }
-
         if (count($this->products)) {
+            $promotions  = [];
+            $order       = Session::getCurrentOrder();
+            $customer    = Customer::getCurrentUser();
+            $shipping    = $order->getValue('shipping');
+            $grossTotals = Session::getGrossTotals();
+            $coupon_code = Session::getCheckoutData('coupon_code');
+            $Coupon      = $coupon_code != '' ? Coupon::getByCode($coupon_code) : null;
+
+            if (!$shipping) {
+                $shipping = current(Shipping::getAll());
+            }
+            if (!$order->getValue('customer_data')) {
+                if (!$customer) {
+                    $customer = Customer::create();
+                }
+                // prepare customer_data for discount validation
+                $order->setValue('customer_data', $customer);
+            }
+
+            if ($minOrderVal > array_sum($grossTotals)) {
+                $errors [] = ['label' => str_replace('{VALUE}', '<strong>' . format_price($minOrderVal) . ' &euro;</strong>', \Wildcard::get('label.min_order_info'))];
+            }
+
+            if ($shipping) {
+                $address = $order->getShippingAddress();
+                $order->setValue('products', $this->products);
+
+                if (!$address) {
+                    $address = $customer ? $customer->getShippingAddress() : CustomerAddress::create();
+                }
+                if (isset($this->params['country-id'])) {
+                    Session::setCheckoutData('cart_country_id', $this->params['country-id']);
+                }
+                else {
+                    $this->params['country-id'] = Session::getCheckoutData('cart_country_id', $address ? $address->getValue('country') : null);
+                }
+                $shipping->setValue('country_id', $this->params['country-id']);
+                $order->setValue('shipping', $shipping);
+
+                if (!$order->getValue('shipping_address')) {
+                    $order->setValue('shipping_address', $address);
+                }
+            }
+
+            if ($this->params['apply_coupon']) {
+                if ($Coupon) {
+                    try {
+                        $Coupon->applyToOrder($order, $order->getValue('brut_prices'));
+                    }
+                    catch (CouponException $ex) {
+                        Session::setCheckoutData('coupon_code', null);
+                        $errors[] = ['label' => $ex->getLabelByCode()];
+                    }
+                }
+                else if ($coupon_code != '') {
+                    Session::setCheckoutData('coupon_code', null);
+                    $errors[] = ['label' => '###error.coupon_not_exists###'];
+                }
+            }
+
+            if ($this->params['apply_discounts']) {
+                try {
+                    $_errors    = $order->recalculateDocument($this->products);
+                    $errors     = array_merge($errors, $_errors);
+                    $promotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.applyDiscounts', [], [
+                        'Order'      => $order,
+                        'products'   => $this->products,
+                        'country_id' => $this->params['country-id'],
+                    ]));
+                    $_errors    = $order->recalculateDocument($this->products, $promotions);
+                    $errors     = array_merge($errors, $_errors);
+                    $discount   = $order->getValue('discount');
+                }
+                catch (OrderException $ex) {
+                    $errors[] = ['label' => $ex->getMessage()];
+                }
+                catch (\Exception $ex) {
+                    $errors[] = ['label' => $ex->getLabelByCode()];
+                }
+
+                $upsellingPromotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.getUpsellingPromotion', [], [
+                    'Order'      => $order,
+                    'country_id' => $this->params['country-id'],
+                ]));
+            }
+
+            foreach ($this->params as $key => $value) {
+                $this->setVar($key, $value);
+            }
+
+            if (count($errors)) {
+                $this->errors = array_merge($this->errors, $errors);
+            }
+
             $this->setVar('products', $this->products);
             $this->setVar('totals', $grossTotals);
             $this->setVar('discount', $discount);
+            $this->setVar('shipping', $shipping);
+            $this->setVar('shipping_costs', $order->getShippingCosts());
+            $this->setVar('promotions', $promotions);
+            $this->setVar('upselling_promotions', $upsellingPromotions, false);
             $this->fragment_path[] = 'simpleshop/cart/table-wrapper.php';
         } else {
             $this->fragment_path[] = 'simpleshop/cart/empty.php';
@@ -91,7 +168,8 @@ class CartController extends Controller
     public static function getMinOrderValue()
     {
         $value = Settings::getValue('min_order_value', 'general');
-        return (float)strtr($value, [',' => '.']);
+
+        return (float) strtr($value, [',' => '.']);
     }
 
     public function getProducts()
@@ -105,6 +183,7 @@ class CartController extends Controller
         $fragment = new \rex_fragment();
 
         $subject .= $fragment->parse('simpleshop/cart/offcanvas/wrapper.php');
+
         return $subject;
     }
 }

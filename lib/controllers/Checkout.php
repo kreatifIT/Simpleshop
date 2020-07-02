@@ -325,6 +325,8 @@ class CheckoutController extends Controller
             'products' => $products,
         ]));
 
+        Session::setCheckoutData('cart_country_id', null);
+
         switch ($postAction) {
             case 'redeem_coupon':
                 try {
@@ -393,7 +395,8 @@ class CheckoutController extends Controller
         }
 
         try {
-            $warnings = array_merge($warnings, $this->Order->calculateDocument($this));
+            $_errors  = $this->Order->calculateDocument($this);
+            $warnings = array_merge($warnings, $_errors);
         } catch (OrderException $ex) {
             $errors[] = $ex->getMessage();
         }

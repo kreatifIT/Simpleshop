@@ -12,8 +12,11 @@
  */
 namespace FriendsOfREDAXO\Simpleshop;
 
-$Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute([
-    'check_cart' => rex_server('HTTP_X_PJAX', 'string', false),
+$Controller = CartController::execute([
+    'check_cart'      => rex_server('HTTP_X_PJAX', 'string', false),
+    'apply_coupon'    => false,
+    'apply_discounts' => false,
+    'apply_shipping'  => false,
 ]);
 
 $tpl = count($Controller->getProducts()) ? 'simpleshop/cart/offcanvas/container.php' : null;
@@ -23,8 +26,8 @@ $tpl = count($Controller->getProducts()) ? 'simpleshop/cart/offcanvas/container.
     <div class="offcanvas-cart-inner">
 
         <button class="offcanvas-cart-continue-shopping" type="button" onclick="Simpleshop.closeOffcanvasCart();">
-            <i class="far fa-chevron-left"></i>
-            ###label.continue_shopping###
+            ###label.cart###
+            <span class="icon-close"></span>
         </button>
 
         <div data-cart-container>

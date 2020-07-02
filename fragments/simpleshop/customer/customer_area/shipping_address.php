@@ -21,6 +21,7 @@ $backUrl       = trim($this->getVar('back_url', ''));
 $address       = $this->getVar('Address');
 $applyBtnLabel = $this->getVar('apply_btn_label', '###action.save###');
 $saveCallback  = $this->getVar('save_callback', null);
+$isRemoveable  = $this->getVar('is_removeable', false);
 
 
 $showSuccess = false;
@@ -149,7 +150,10 @@ if (!$isCompany) {
 $form->setValueField('html', ['', '<div class="checkout-buttons cell small-12">']);
 {
     if ($backUrl != '') {
-        $form->setValueField('html', ['', '<a href="'. $backUrl .'" class="button hollow">###action.go_back###</a>']);
+        $form->setValueField('html', ['', '<a href="' . $backUrl . '" class="button hollow">###action.go_back###</a>']);
+    }
+    if ($isRemoveable != '' && $address && $address->getId() > 0) {
+        $form->setValueField('html', ['', '<a href="' . rex_getUrl(null, null, ['ctrl' => 'addresses', 'action' => 'remove', 'data-id' => $address->getId()]) . '" class="button hollow">###action.remove###</a>']);
     }
     $form->setValueField('html', ['', '<button type="submit" class="button">' . $applyBtnLabel . '</button>']);
 }

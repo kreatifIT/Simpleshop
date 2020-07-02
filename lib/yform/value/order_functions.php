@@ -107,7 +107,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
 
                     case 'recalculate_sums':
                         $promotions     = $Order->getValue('promotions', false, []);
-                        $order_products = $Order->getProducts(false);
+                        $order_products = $Order->getOrderProducts();
 
                         $Order->recalculateDocument($order_products, $promotions);
                         $Order->setValue('invoice_num', 4);

@@ -1,7 +1,10 @@
 error.cart_product_not_available;{{replace}} ist zur Zeit nicht verfügbar und wurde deshalb aus der Einkaufstasche entfernt
 error.cart_product_not_exists;{{replace}} Produkt/e existieren nicht mehr und wurde/n deshalb aus der Einkaufstasche entfernt
 label.packing_list_title;###label.shipping_document### Nr. {NUM}
+label.entry_removed;Der Eintrag wurde entfernt
+label.pages;Seiten
 action.abort;Abbrechen
+action.remove;Entfernen
 action.use_coupon;Coupon anwenden
 shop.order_status_CA;abgebrochen
 shop.order_status_CL;abgeschlossen
@@ -14,6 +17,7 @@ action.add_address;Adresse hinzufügen
 label.addresses;Adressen
 label.address_additional;Adresszusatz
 action.close;schließen
+label.free_shipping;Gratisversand
 label.email__registration_optin_text;Sie haben sich bei ###company.name### registriert und müssen auf den nachfolgenden Link klicken um ihr Konto zu aktivieren:
 label.reg_activation_already_done;Sie haben Ihr Konto bereits aktiviert
 label.login_success_overlay;Sie haben sich erfolgreich angemeldet und können nun fortfahren
@@ -173,6 +177,7 @@ label.overview;Übersicht
 label.keep_password_notice;Um das aktuelle Passwort beizubehalten, das Feld leer lassen
 label.shipping_address;Versandadresse
 label.shipping_method;Versandart
+label.shipping_country;Versandland
 label.shipping_costs;Versandkosten
 shop.order_status_SH;versendet
 error.shipping_zipcode_not_valid;Die PLZ ist ungültig
@@ -191,5 +196,7 @@ action.go_back;Zurück
 action.back_to_login;Zurück zum Login
 action.back_to_overview;zurück zur Übersicht
 action.reset;Zurücksetzen
+action.add_product_price_to_get_promotion;Fügen Sie noch Waren im Wert von {{PRICE}} hinzu um sich die Promotion "{{NAME}}" zu sichern
+action.add_product_amount_to_get_promotion;Fügen Sie noch weitere {{AMOUNT}} Produkte hinzu um sich die Promotion "{{NAME}}" zu sichern
 label.subtotal;Zwischensumme
 error.wsconnector_exception;Connector error

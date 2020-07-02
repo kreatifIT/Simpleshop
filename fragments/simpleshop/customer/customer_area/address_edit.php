@@ -30,6 +30,7 @@ $title      = $Address ? '###label.edit_address###' : '###label.new_address###';
     <?php
     $fragment = new \rex_fragment();
     $fragment->setVar('Address', $Address);
+    $fragment->setVar('is_removeable', true);
     echo $fragment->parse('simpleshop/customer/customer_area/shipping_address.php');
     ?>
 </div>

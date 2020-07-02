@@ -13,7 +13,7 @@
 
 $Addon    = rex_addon::get('simplehop');
 $Order    = $this->getVar('Order');
-$products = $Order->getProducts();
+$products = $Order->getOrderProducts();
 
 ?>
     <table class="table table-condensed table-hover products-list">
@@ -28,20 +28,20 @@ $products = $Order->getProducts();
             <th>&nbsp;</th>
         </tr>
 
-        <?php foreach ($products as $index => $order_product): ?>
+        <?php foreach ($products as $index => $product): ?>
             <?php
-            $Product = $order_product->getValue('data');
+                $orderProductId = $product->getValue('order_product_id');
             ?>
             <tr>
                 <td class="text-center"><?= $index + 1 ?></td>
-                <td><?= $Product->getValue('code') ?></td>
-                <td><?= $Product->getName() ?></td>
-                <td><input type="text" name="quantity" tabindex="1000<?= $index ?>" value="<?= $Product->getValue('cart_quantity') ?>" size="8" class="text-center form-control" onblur="SimpleshopBackend.changeOrderProductQuantity(this, <?= $Order->getId() ?>, '<?= $order_product->getId() ?>', '<?= $Product->getValue('cart_quantity') ?>');"
+                <td><?= $product->getValue('code') ?></td>
+                <td><?= $product->getName() ?></td>
+                <td><input type="text" name="quantity" tabindex="1000<?= $index ?>" value="<?= $product->getValue('cart_quantity') ?>" size="8" class="text-center form-control" onblur="SimpleshopBackend.changeOrderProductQuantity(this, <?= $Order->getId() ?>, '<?= $orderProductId ?>', '<?= $product->getValue('cart_quantity') ?>');"
                            onkeydown="SimpleshopBackend.changeOrderProductQuantity(this, <?= $Order->getId() ?>,
-                                   '<?= $order_product->getId() ?>', '<?= $Product->getValue('cart_quantity') ?>');"></td>
-                <td><?= format_price($Product->getPrice(false)) ?> &euro;</td>
+                                   '<?= $orderProductId ?>', '<?= $product->getValue('cart_quantity') ?>');"></td>
+                <td><?= format_price($product->getPrice(false)) ?> &euro;</td>
                 <td>
-                    <a href="javascript:;" onclick="return SimpleshopBackend.removeOrderProduct(this, <?= $Order->getId() ?>, '<?= $order_product->getId() ?>', '<?= $Product->getValue('cart_quantity') ?>', '<?= $Addon->i18n('label.really_delete_entry') ?>');">
+                    <a href="javascript:;" onclick="return SimpleshopBackend.removeOrderProduct(this, <?= $Order->getId() ?>, '<?= $orderProductId ?>', '<?= $product->getValue('cart_quantity') ?>', '<?= $Addon->i18n('label.really_delete_entry') ?>');">
                         <i class="rex-icon rex-icon-delete"></i>
                         <?= $Addon->i18n('action.remove') ?>
                     </a>

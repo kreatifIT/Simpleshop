@@ -35,15 +35,19 @@ class Coupon extends Discount
         if (!$_this) {
             throw new CouponException('Coupon not exists', 1);
         }
-        \rex_extension::register('simpleshop.Order.applyDiscounts', [$_this, 'ext_applyDiscounts']);
-
         return $_this;
     }
 
     public static function cloneCode($codeId, $amount = 1)
     {
+        \rex_yform_manager_dataset::clearInstancePool();
+        
         $result = [];
-        $Coupon = self::get($codeId);
+        $Coupon = $codeId ? self::get($codeId) : null;
+
+        if (!$Coupon) {
+            return false;
+        }
         $data   = $Coupon->getData();
 
         // cloning codes
@@ -53,7 +57,6 @@ class Coupon extends Discount
             foreach ($data as $name => $value) {
                 $clone->setValue($name, $value);
             }
-            $clone->setValue('given_away', 0);
             $clone->setValue('orders', null);
             $clone->setValue('code', \rex_yform_value_coupon_code::getRandomCode());
             $clone->setValue('createdate', date('Y-m-d H:i:s'));
@@ -96,16 +99,6 @@ class Coupon extends Discount
 
     public function applyToOrder($Order, &$brut_prices, $name = '')
     {
-        return $this->apply('to-order', $Order, $brut_prices);
-    }
-
-    public function applyToCart(&$brut_prices, $order = null)
-    {
-        return $this->apply('to-cart', $order, $brut_prices);
-    }
-
-    protected function apply($method, $Order, &$brut_prices)
-    {
         $start   = strtotime($this->getValue('start_time') . ' 00:00:00');
         $endDate = $this->getValue('end_date');
         $end     = $endDate != '' && $endDate != '0000-00-00' ? strtotime($endDate . ' 23:59:59') : null;
@@ -145,11 +138,7 @@ class Coupon extends Discount
             throw new CouponException('Coupon not valid anymore', 4);
         }
 
-        if ($method == 'to-order') {
-            $discount = parent::applyToOrder($Order, $brut_prices, 'coupon');
-        } else if ($method == 'to-cart') {
-            $discount = parent::applyToCart($brut_prices, $Order);
-        }
+        $discount = parent::applyToOrder($Order, $brut_prices, 'coupon');
 
         if (isset ($_value)) {
             $this->setValue('discount_value', $_value);
@@ -183,11 +172,16 @@ class Coupon extends Discount
             ->findOne();
     }
 
-    public function ext_applyDiscounts(\rex_extension_point $Ep)
+    public static function ext_applyDiscounts(\rex_extension_point $Ep)
     {
-        $promotions           = $Ep->getSubject();
-        $promotions['coupon'] = $this;
-        return $promotions;
+        $code = Session::getCheckoutData('coupon_code');
+        $_this = self::getByCode($code);
+
+        if ($_this) {
+            $promotions           = $Ep->getSubject();
+            $promotions['coupon'] = $_this;
+            $Ep->setSubject($promotions);
+        }
     }
 
     public function getCode()
@@ -240,7 +234,7 @@ class Coupon extends Discount
 
             foreach ($promotions as $promotion) {
                 if ($promotion->getValue('action') == 'coupon_code' && $promotion->valueIsset('coupon_code')) {
-                    $coupon       = current(self::cloneCode($promotion->valueIsset('coupon_code')));
+                    $coupon       = current(self::cloneCode($promotion->getValue('coupon_code')));
                     $newCoupons[] = $coupon;
                 }
             }

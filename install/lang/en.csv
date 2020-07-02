@@ -2,6 +2,9 @@ error.cart_product_not_available;{{replace}} is currently not available and has 
 error.cart_product_not_exists;{{replace}} The chosen product/s do not exist anymore and, thus, have been removed from your Shopping Bag
 label.packing_list_title;###lable.shipping_document### no. {NUM}
 action.abort;Abort
+label.pages;Pages
+label.entry_removed;The entry was removed
+#action.remove;Remove
 action.use_coupon;Apply coupon
 shop.order_status_CA;cancelled
 shop.order_status_CL;closed
@@ -15,6 +18,7 @@ action.add_address;Add Address
 action.close;close
 label.email__user_registration_subject;You have successfully registered
 label.addresses;Addresses
+label.free_shipping;Free shipping
 label.email__registration_optin_text;You have registered with ###company.name## and must click on the link below to activate your account:
 label.reg_activation_already_done;You have already activated your account
 label.login_success_overlay;You have successfully registered and can now continue
@@ -173,6 +177,7 @@ label.overview;
 label.keep_password_notice;Skip this field if you wish to proceed with the old password
 label.shipping_address;Shipping Address
 label.shipping_method;Shipping Method
+label.shipping_country;Shipping country
 label.shipping_costs;Shipping Costs
 shop.order_status_SH;shipped
 label.email__order_complete_text;Thank you, we have successfully received your order.
@@ -189,6 +194,8 @@ action.proceed_to_checkout;Proceed to Checkout
 action.go_back;Go Back
 action.back_to_login;Back to Log in
 action.back_to_overview;back to overview
+action.add_product_price_to_get_promotion;Add goods worth {{PRICE}} to secure the promotion "{{NAME}}"
+action.add_product_amount_to_get_promotion;Add {{AMOUNT}} more products to secure the promotion "{{NAME}}"
 action.reset;Reset
 label.subtotal;
 error.wsconnector_exception;Connector error

@@ -18,6 +18,8 @@ class rex_api_simpleshop_api extends rex_api_function
 
     public function execute()
     {
+        ob_start();
+
         $lang_id = rex_request('lang', 'int');
         if ($lang_id) {
             rex_clang::setCurrentId($lang_id);
@@ -39,6 +41,8 @@ class rex_api_simpleshop_api extends rex_api_function
         }
         $this->response['controller'] = strtolower($controller);
         $this->response = rex_extension::registerPoint(new rex_extension_point('simpleshop.Api.response', $this->response, []));
+
+        rex_response::cleanOutputBuffers();
         return new rex_api_result($this->success, $this->response);
     }
 
@@ -168,6 +172,12 @@ class rex_api_simpleshop_api extends rex_api_function
         }
         \FriendsOfREDAXO\Simpleshop\Session::setProductData($product_key, $quantity);
 
+        $this->api__cart_getcartcontent($layout);
+    }
+
+    private function api__cart_refresh()
+    {
+        $layout = rex_post('layout', 'string', 'cart');
         $this->api__cart_getcartcontent($layout);
     }
 

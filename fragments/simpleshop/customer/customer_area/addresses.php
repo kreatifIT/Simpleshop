@@ -17,11 +17,24 @@ $User       = $this->getVar('User');
 $action     = rex_get('action', 'string');
 $canAddItem = $User->hasPermission('fragment.customer-area--addresses--add-new');
 $output     = '';
+$info       = '';
+
 
 if ($canAddItem && $action == 'edit') {
     $fragment = new \rex_fragment();
     $output   = $fragment->parse('simpleshop/customer/customer_area/address_edit.php');
 } else {
+    if ($canAddItem && $action == 'remove') {
+        $dataId  = rex_get('data-id', 'int');
+        $address = $dataId ? CustomerAddress::get($dataId) : null;
+
+        if ($address && $address->getValue('customer_id') == $User->getId()) {
+            $address->setValue('status', 0);
+            $address->save();
+            $info = '###label.entry_removed###';
+        }
+    }
+
     $addresses = $User->getShippingAddresses();
 }
 
@@ -34,6 +47,10 @@ if ($canAddItem && $action == 'edit') {
         <h2 class="margin-small-bottom">
             ###label.addresses###
         </h2>
+
+        <?php if ($info != ''): ?>
+            <div class="callout success"><?= $info ?></div>
+        <?php endif; ?>
 
         <?php
         if (count($addresses)): ?>

@@ -20,17 +20,15 @@ class DiscountGroup extends Discount
 
     public static function ext_applyDiscounts(\rex_extension_point $Ep)
     {
-        $promotions = $Ep->getSubject();
-        $useThis    = FragmentConfig::getValue('cart.use_discount_groups');
-
-        if ($useThis) {
-            $Order      = $Ep->getParam('Order');
-            $promotions = self::getValidPromotions($Ep->getParam('products'), $Order);
+        if (FragmentConfig::getValue('cart.use_discount_groups')) {
+            $Order = $Ep->getParam('Order');
+            list($promotions, $nextPromo) = self::getValidPromotions($Order);
+            $promotions = array_merge($Ep->getSubject(), $promotions);
+            $Ep->setSubject($promotions);
         }
-        return $promotions;
     }
 
-    public static function getValidPromotions($products, Order $order)
+    public static function getValidPromotions(Order $order)
     {
         $promotions = [];
         $customer   = $order->getCustomerData();
@@ -61,8 +59,9 @@ class DiscountGroup extends Discount
                 if ($order->getValue('quantity') >= $discount->getValue('amount')) {
                     $promotions['discount_' . $discount->getValue('id')] = $discount;
                 }
-            } else if ($target == 'cart_value') {
-                if ($order->getSubtotal() >= $discount->getValue('price')) {
+            }
+            else if ($target == 'cart_value') {
+                if ($order->getSubtotal(!$customer->isB2B()) >= $discount->getValue('price')) {
                     $promotions['discount_' . $discount->getValue('id')] = $discount;
                 }
             }
@@ -70,7 +69,72 @@ class DiscountGroup extends Discount
                 break; // discount found - stop here
             }
         }
-        return $promotions;
+        $discounts     = array_reverse($discounts->toArray());
+        $nextPromotion = current(array_slice($discounts, count($promotions), 1));
+
+        return [$promotions, $nextPromotion];
+    }
+
+    public static function ext_getUpsellingPromotion(\rex_extension_point $ep)
+    {
+        if (FragmentConfig::getValue('cart.use_discount_groups')) {
+            $promotions = $ep->getSubject();
+            $order      = $ep->getParam('Order');
+            $customer   = $order->getCustomerData();
+            list($_, $nextPromo) = self::getValidPromotions($order);
+
+            if ($nextPromo) {
+                $target = $nextPromo->getValue('target');
+
+                if ($target == 'order_quantities') {
+                    $amountDiff = $nextPromo->getValue('amount') - $order->getValue('quantity');
+
+                    if (!isset($promotions['order_quantities']) || $amountDiff < $promotions['order_quantities']['diff']) {
+                        $wildcard = \Wildcard::get('action.add_product_amount_to_get_promotion');
+                        $message  = strtr($wildcard, [
+                            '{{AMOUNT}}' => "<strong>{$amountDiff}</strong>",
+                            '{{NAME}}'   => $nextPromo->getName(),
+                        ]);
+
+                        $promotions['order_quantities'] = [
+                            'diff'    => $amountDiff,
+                            'message' => $message,
+                        ];
+                    }
+                }
+                else if ($target == 'cart_value') {
+                    $priceDiff = $nextPromo->getValue('price') - $order->getSubtotal(!$customer->isB2B());
+
+                    if (!isset($promotions['cart_value']) || $priceDiff < $promotions['cart_value']['diff']) {
+                        $wildcard = \Wildcard::get('action.add_product_price_to_get_promotion');
+                        $message  = strtr($wildcard, [
+                            '{{PRICE}}' => "<strong>{$priceDiff} €</strong>",
+                            '{{NAME}}'  => $nextPromo->getName(),
+                        ]);
+
+                        $promotions['cart_value'] = [
+                            'diff'    => $priceDiff,
+                            'message' => $message,
+                        ];
+                    }
+                }
+                $ep->setSubject($promotions);
+            }
+        }
+    }
+
+    public static function ext__processSettings(\rex_extension_point $ep)
+    {
+        $sql    = \rex_sql::factory();
+        $option = Settings::getValue('use_discount_groups');
+        $yTable = \rex_yform_manager_table::get(DiscountGroup::TABLE);
+
+        $sql->setTable('rex_yform_table');
+        $sql->setValue('hidden', (int) !$option);
+        $sql->setWhere(['table_name' => DiscountGroup::TABLE]);
+        $sql->update();
+
+        \rex_yform_manager_table_api::generateTableAndFields($yTable);
     }
 }
 

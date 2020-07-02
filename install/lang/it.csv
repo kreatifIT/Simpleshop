@@ -2,6 +2,9 @@ error.cart_product_not_available;{{replace}} al momento non disponibile e pertan
 error.cart_product_not_exists;{{replace}} Prodotto/i non esistono più e quindi è stato cancellato dal carrello
 label.packing_list_title;###label.shipping_document### no. {NUM}
 action.abort;Cancella
+label.pages;Pagine
+action.remove;Rimuovere
+label.entry_removed;La voce è stata rimossa
 action.use_coupon;Applica codice promo
 shop.order_status_CA;annullato
 shop.order_status_CL;completato
@@ -12,6 +15,7 @@ label.address;Indirizzo
 action.add_address;Aggiungi indirizzo
 action.close;chiudere
 label.addresses;Indirizzi
+label.free_shipping;Spedizione gratuita
 label.no_address_available;Nessun indirizzo disponibile
 label.address_additional;Informazione aggiuntiva
 error.choose_shipping_address;Selezionare un indirizzo di spedizione
@@ -173,6 +177,7 @@ label.overview;Übersicht
 label.keep_password_notice;Se desideri continuare con la password attuale, non compilare il campo
 label.shipping_address;Indirizzo di spedizione
 label.shipping_method;Metodo di spedizione
+label.shipping_country;Paese di spedizione
 label.shipping_costs;Costi di spedizione
 shop.order_status_SH;spedito
 label.email__order_complete_text;Grazie, abbiamo ricevuto il suo ordine.
@@ -188,6 +193,8 @@ label.payment_method;Metodo di pagamento
 action.proceed_to_checkout;Procedi alla cassa
 action.go_back;Torna
 action.back_to_login;Torna al login
+action.add_product_price_to_get_promotion;Aggiungere merce del valore di {{PRICE}} per assicurare la promozione "{{NAME}}"
+action.add_product_amount_to_get_promotion;Aggiungete altri {{AMOUNT}} prodotti per garantire la promozione "{{NAME}}"
 action.back_to_overview;ritorna all'elenco
 action.reset;Ripristina
 label.subtotal;Subtotale
