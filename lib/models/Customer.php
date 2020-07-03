@@ -107,13 +107,13 @@ class Customer extends Model
     public function getCtype()
     {
         $address = $this->getInvoiceAddress();
-        return $address->getValue('ctype');
+        return $address ? $address->getValue('ctype') : 'person';
     }
 
     public function isB2B()
     {
         $address = $this->getInvoiceAddress();
-        return $address->isCompany();
+        return $address ? $address->isCompany() : false;
     }
 
     public function getInvoiceAddress()
@@ -133,25 +133,31 @@ class Customer extends Model
 
     public function getShippingAddresses()
     {
-        $query = CustomerAddress::query();
-        $query->where('status', 0, '!=');
+        if ($this->getId()) {
+            $query = CustomerAddress::query();
+            $query->where('status', 0, '!=');
+            $inAddrId = $this->getValue('invoice_address_id');
 
-        $where = ["customer_id = {$this->getId()}"];
-        if ($this->valueIsset('addresses')) {
-            $where[] = "id IN({$this->getValue('addresses')})";
+            $where = ["customer_id = {$this->getId()}"];
+            if ($this->valueIsset('addresses')) {
+                $where[] = "id IN({$this->getValue('addresses')})";
+            }
+            if ($inAddrId != '') {
+                $query->where('id', $inAddrId, '!=');
+            }
+            $query->whereRaw('(' . implode(' OR ', $where) . ')');
+            $query->orderBy('id', 'asc');
+            $addresses = $query->find();
+        } else {
+            $addresses = [];
         }
-        if ($this->valueIsset('invoice_address_id')) {
-            $query->where('id', $this->getValue('invoice_address_id'), '!=');
-        }
-        $query->whereRaw('(' . implode(' OR ', $where) . ')');
-        $query->orderBy('id', 'asc');
-        return $query->find();
+        return $addresses;
     }
 
     public function getShippingAddress()
     {
         $addresses = $this->getShippingAddresses();
-        return current($addresses->toArray());
+        return count($addresses) ? current($addresses->toArray()) : null;
     }
 
     public static function register($email, $password, $attributes = [], $User = null, $doubleOptIn = false)
