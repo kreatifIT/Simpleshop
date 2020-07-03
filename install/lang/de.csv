@@ -47,6 +47,7 @@ label.order_num;Bestellnummer
 label.order;Bestellung
 label.order_placed;Bestellung abgeschlossen
 label.email__order_complete;Bestellung erfolgreich
+label.email__generated_coupons_message;Folgender Gutschein kann bei der nächsten Bestellung verwendet werden
 simpleshop.account_area_orders;Bestellungen
 label.credit_note_reference_info;Bezugnehmend auf Rechnung Nr.
 error.field.empty;Bitte füllen Sie das Feld '{{fieldname}}' aus

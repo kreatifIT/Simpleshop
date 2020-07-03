@@ -17,6 +17,7 @@ action.close;chiudere
 label.addresses;Indirizzi
 label.free_shipping;Spedizione gratuita
 label.no_address_available;Nessun indirizzo disponibile
+label.email__generated_coupons_message;Il seguente buono può essere utilizzato con il prossimo ordine
 label.address_additional;Informazione aggiuntiva
 error.choose_shipping_address;Selezionare un indirizzo di spedizione
 label.email__registration_optin_text;Lei si è registrato con ###company.name## e deve cliccare sul link sottostante per attivare il suo account:

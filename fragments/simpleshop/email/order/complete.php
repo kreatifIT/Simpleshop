@@ -17,6 +17,7 @@ $Order    = $this->getVar('Order');
 $remarks  = trim($Order->getValue('remarks'));
 $Payment  = $Order->getValue('payment');
 $Shipping = $Order->getValue('shipping');
+$coupons  = $this->getVar('coupons', []);
 
 FragmentConfig::$data['cart']['has_remove_button']              = false;
 FragmentConfig::$data['cart']['button']['has_quantity_control'] = false;
@@ -68,6 +69,8 @@ $styles = FragmentConfig::getValue('email_styles');
         </table>
     <?php endif; ?>
 
+
+
     <?php if (strlen($remarks)): ?>
         <br/>
         <div class="remarks">
@@ -76,4 +79,17 @@ $styles = FragmentConfig::getValue('email_styles');
         </div>
     <?php endif; ?>
 
+
+    <?php if (count($coupons)): ?>
+        <br>
+        <p>
+            ###label.email__generated_coupons_message###
+        </p>
+        <?php foreach ($coupons as $coupon): ?>
+            <div class="coupon" <?= $styles['coupon_wrapper'] ?>>
+                <div class="heading" <?= $styles['coupon_heading'] ?>><?= $coupon->getName() ?></div>
+                <div class="code" <?= $styles['coupon_code'] ?>><?= $coupon->getCode() ?></div>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
 </div>

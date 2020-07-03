@@ -19,6 +19,7 @@ action.close;close
 label.email__user_registration_subject;You have successfully registered
 label.addresses;Addresses
 label.free_shipping;Free shipping
+label.email__generated_coupons_message;The following voucher can be used with the next order
 label.email__registration_optin_text;You have registered with ###company.name## and must click on the link below to activate your account:
 label.reg_activation_already_done;You have already activated your account
 label.login_success_overlay;You have successfully registered and can now continue

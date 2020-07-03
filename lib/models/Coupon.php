@@ -41,14 +41,14 @@ class Coupon extends Discount
     public static function cloneCode($codeId, $amount = 1)
     {
         \rex_yform_manager_dataset::clearInstancePool();
-        
+
         $result = [];
         $Coupon = $codeId ? self::get($codeId) : null;
 
         if (!$Coupon) {
             return false;
         }
-        $data   = $Coupon->getData();
+        $data = $Coupon->getData();
 
         // cloning codes
         for ($i = 0; $i < $amount; $i++) {
@@ -174,7 +174,7 @@ class Coupon extends Discount
 
     public static function ext_applyDiscounts(\rex_extension_point $Ep)
     {
-        $code = Session::getCheckoutData('coupon_code');
+        $code  = Session::getCheckoutData('coupon_code');
         $_this = self::getByCode($code);
 
         if ($_this) {
@@ -256,33 +256,7 @@ class Coupon extends Discount
         $extras = $order->getValue('extras');
 
         if (class_exists('Kreatif\Mpdf\Mpdf') && isset($extras['generated_coupons'])) {
-            foreach (array_filter($extras['generated_coupons']) as $coupon) {
-                $debug    = 0;
-                $fragment = new \rex_fragment();
-                $Mpdf     = new \Kreatif\Mpdf\Mpdf([
-                    'margin_left'   => 20,
-                    'margin_right'  => 15,
-                    'margin_top'    => 10,
-                    'margin_bottom' => 34,
-                    'margin_header' => 0,
-                    'margin_footer' => 0,
-                ]);
-
-                $Mpdf->SetProtection(['print']);
-                $Mpdf->SetDisplayMode('fullpage');
-
-                $fragment->setVar('debug', $debug);
-                $fragment->setVar('coupon', $coupon);
-                $html = $fragment->parse('simpleshop/pdf/coupon/default.php');
-
-                if ($debug) {
-                    \rex_response::cleanOutputBuffers();
-                    echo \Wildcard::parse("<div style='background:#666;height:100vh;padding:20px;'><div style='max-width:800px;margin:0px auto;background:#fff;'>{$html}</div></div>");
-                    exit;
-                }
-                $Mpdf->WriteHTML($html);
-                $mail->addStringAttachment($Mpdf->Output('', 'S'), \rex::getServerName() . ' - ' . $coupon->getName() . '.pdf', 'base64', 'application/pdf');
-            }
+            $mail->setVar('coupons', $extras['generated_coupons']);
         }
     }
 }

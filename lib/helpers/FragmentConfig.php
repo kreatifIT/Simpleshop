@@ -127,7 +127,10 @@ class FragmentConfig
             'p'               => 'style="Margin:0;Margin-bottom:10px;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:0;text-align:left;"',
             'code'            => 'style="font-family:Consolas,"Liberation Mono",Courier,monospace;background:#f9f9f9;border:1px solid #cacaca;padding:5px 8px;margin:0;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;text-align:left;"',
             'callout'         => 'style="Margin-bottom:16px;border-collapse:collapse;border-spacing:0;margin-bottom:16px;padding:0;text-align:left;vertical-align:top;width:100%;"',
-            'callout_inner'   => 'style="Margin:0;background:#f3f3f3;border:1px solid #cacaca;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:10px;text-align:left;width:100%;"',
+            'callout_inner'   => 'style="Margin:0;background:#f3f3f3;border:1px solid #cacaca;color:#0a0a0a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;margin:0;padding:10px;text-align:left;"',
+            'coupon_wrapper'  => 'style="Margin:0 0 20px 0;background:#333333;border:1px solid #cacaca;color:#ffffff;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;padding:10px;text-align:left;"',
+            'coupon_heading'  => 'style="Margin:0;color:#ffffff;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;line-height:1.6;padding:0;text-align:left;"',
+            'coupon_code'     => 'style="Margin:10px 0 0 0;color:#ffffff;font-family:Helvetica,Arial,sans-serif;font-size:24px;font-weight:400;line-height:1.6;padding:0;text-align:left;"',
         ],
     ];
 
