@@ -125,7 +125,7 @@ class DefaultShipping extends ShippingAbstract
         if ($priceDiff > 0 && (!isset($promotions['free_shipping']) || $priceDiff < $promotions['free_shipping']['price_diff'])) {
             $wildcard = \Wildcard::get('action.add_product_price_to_get_promotion');
             $message  = strtr($wildcard, [
-                '{{PRICE}}' => "<strong>{$priceDiff} €</strong>",
+                '{{PRICE}}' => "<strong>". format_price($priceDiff) ." €</strong>",
                 '{{NAME}}'  => '###label.free_shipping###',
             ]);
 

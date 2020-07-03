@@ -108,7 +108,7 @@ class DiscountGroup extends Discount
                     if (!isset($promotions['cart_value']) || $priceDiff < $promotions['cart_value']['diff']) {
                         $wildcard = \Wildcard::get('action.add_product_price_to_get_promotion');
                         $message  = strtr($wildcard, [
-                            '{{PRICE}}' => "<strong>{$priceDiff} €</strong>",
+                            '{{PRICE}}' => "<strong>". format_price($priceDiff) ." €</strong>",
                             '{{NAME}}'  => $nextPromo->getName(),
                         ]);
 
