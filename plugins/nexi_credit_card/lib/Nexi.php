@@ -145,7 +145,7 @@ class Nexi extends PaymentAbstract
             Session::setCheckoutData('Order', $Order);
             $Order->save();
 
-            if ($post_data['result'] == 'APPROVED') {
+            if ($post_data['result'] == 'APPROVED' || $post_data['result'] == 'CAPTURED') {
                 Utils::log('Nexi.processIPN', 'successfull', 'INFO');
 
                 \rex_response::cleanOutputBuffers();
