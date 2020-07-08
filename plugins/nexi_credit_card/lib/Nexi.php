@@ -69,7 +69,7 @@ class Nexi extends PaymentAbstract
         $data = [
             'id'           => $tran_portal_id,
             'password'     => $password,
-            'action'       => 4, // Transaction-type = Authorization
+            'action'       => 1, // Transaction-type = Acquisto (“Purchase”)
             'currencycode' => 978, // ISO-Code for EUR
             'amt'          => (float)number_format($total_amount, 2), // total payment (including tax + shipping)
             'langid'       => $this->getLangCode(),
@@ -145,7 +145,7 @@ class Nexi extends PaymentAbstract
             Session::setCheckoutData('Order', $Order);
             $Order->save();
 
-            if ($post_data['result'] == 'APPROVED') {
+            if ($post_data['result'] == 'APPROVED' || $post_data['result'] == 'CAPTURED') {
                 Utils::log('Nexi.processIPN', 'successfull', 'INFO');
 
                 \rex_response::cleanOutputBuffers();
