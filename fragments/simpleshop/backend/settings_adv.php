@@ -91,6 +91,9 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
         <dt>Gutscheine</dt>
         <dd>
             <select name="coupon_use_options[]" class="form-control" multiple>
+                <option value="global_use_single" <?= in_array('global_use_single', $Settings['coupon_use_options']) ? 'selected' : '' ?>>
+                    <?= $Addon->i18n('coupon.global_use_single') ?>
+                </option>
                 <option value="global" <?= in_array('global', $Settings['coupon_use_options']) ? 'selected' : '' ?>>
                     <?= $Addon->i18n('coupon.use_global') ?>
                 </option>

@@ -36,8 +36,6 @@ var SimpleshopBackend = (function ($) {
                         var $this = $(this),
                             $formEl = $this.parents('.form-group');
 
-                        console.debug($this.data('yform-edit-toggle') +' == '+ (toggle + ':' + option));
-
                         if ($this.data('yform-edit-toggle') == toggle + ':' + option) {
                             $formEl.removeClass('hide');
                         } else {

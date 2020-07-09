@@ -89,6 +89,10 @@ namespace FriendsOfREDAXO\Simpleshop;
         } else {
             unset($options['CN']);
         }
+    } else {
+        foreach ($options as &$option) {
+            $option = \Wildcard::get(str_replace('###', '', $option));
+        }
     }
 
     return $options;
