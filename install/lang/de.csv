@@ -12,6 +12,7 @@ shop.order_status_CN;Gutschrift
 action.logout;Abmelden
 simpleshop.account_area_account;Account
 label.address;Adresse
+label.pages;Seiten
 error.choose_shipping_address;Bitte eine Versandadresse auswählen
 action.add_address;Adresse hinzufügen
 label.addresses;Adressen

@@ -212,8 +212,7 @@ class Order extends Model
     {
         self::$_finalizeOrder = true;
 
-        $products = Session::getCartItems();
-        $result   = $this->save(false, $products);
+        $result = $this->save(false);
 
         return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.completeOrder', $result, [
             'Order' => $this,
