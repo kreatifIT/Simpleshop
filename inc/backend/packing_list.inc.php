@@ -22,9 +22,11 @@ namespace FriendsOfREDAXO\Simpleshop;
         $list->addColumn('packing_list', $this->i18n('action.print_packing_list'), count($list->getColumnNames()));
         $list->setColumnLabel('packing_list', '');
         $list->setColumnParams('packing_list', [
-            'page'    => 'simpleshop/packing_list',
-            'func'    => 'print',
-            'data_id' => '###id###',
+            'page'       => 'yform/manager/data_edit',
+            'table_name' => Order::TABLE,
+            'data_id'    => '###id###',
+            'func'       => 'edit',
+            'ss-action'  => 'generate_packing_list',
         ]);
     }
     return $list;

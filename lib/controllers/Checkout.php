@@ -26,9 +26,11 @@ class CheckoutController extends Controller
 
     protected function _execute()
     {
+        $listener = trim(\rex_get('listener', 'string'));
+
         $this->params = array_merge([
             'show_steps_fragment' => true,
-            'needs_login'         => true,
+            'needs_login'         => $listener != 'ipn',
             'Customer'            => Customer::getCurrentUser(),
         ], $this->params);
 

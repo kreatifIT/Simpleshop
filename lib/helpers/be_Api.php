@@ -22,6 +22,7 @@ class rex_api_simpleshop_be_api extends rex_api_function
 
     public function execute()
     {
+        ob_start();
         $controller = rex_request('controller', 'string', null);
 
         list ($class, $method) = explode('.', $controller);
@@ -80,6 +81,7 @@ class rex_api_simpleshop_be_api extends rex_api_function
         if (count($this->response['errors'])) {
             $this->success = false;
         }
+        rex_response::cleanOutputBuffers();
         return new \rex_api_result($this->success, $this->response);
     }
 
