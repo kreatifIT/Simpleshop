@@ -1,5 +1,5 @@
 package: simpleshop
-version: '4.3.3'
+version: '4.3.4'
 author: FriendsOfREDAXO
 debug_email: dev@kreatif.it
 compile: 0
@@ -14,9 +14,6 @@ page:
             title: translate:settings
         variants:
             title: translate:label.variants
-            hidden: true
-        packing_list:
-            title: packing_list
             hidden: true
         yform_functions:
             title: yform_functions

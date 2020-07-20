@@ -173,8 +173,7 @@ class Order extends Model
     {
         self::$_finalizeOrder = true;
 
-        $products = Session::getCartItems();
-        $result   = $this->save(false, $products);
+        $result = $this->save(false);
 
         return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.completeOrder', $result, [
             'Order' => $this,
@@ -277,7 +276,7 @@ class Order extends Model
             // clear deleted products
             $where = ["order_id = {$this->getId()}"];
             if (count($orderProductIds)) {
-                $where[] = 'id NOT IN('. implode(',', $orderProductIds) .')';
+                $where[] = 'id NOT IN(' . implode(',', $orderProductIds) . ')';
             }
             $sql->setTable(OrderProduct::TABLE);
             $sql->setWhere(implode(' AND ', $where));

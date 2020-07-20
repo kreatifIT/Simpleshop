@@ -8,6 +8,7 @@ shop.order_status_CL;completato
 action.logout;Esci
 simpleshop.account_area_account;Account
 label.address;Indirizzo
+label.pages;Pagine
 action.add_address;Aggiungi indirizzo
 action.close;chiudere
 simpleshop.account_area_addresses;Indirizzi
