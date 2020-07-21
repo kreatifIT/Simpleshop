@@ -39,6 +39,38 @@ class Coupon extends Discount
         return $_this;
     }
 
+    public static function cloneCode($codeId, $amount = 1, $_data = [])
+    {
+        \rex_yform_manager_dataset::clearInstancePool();
+
+        $result = [];
+        $Coupon = $codeId ? self::get($codeId) : null;
+
+        if (!$Coupon) {
+            return false;
+        }
+        $data = $Coupon->getData();
+
+        // cloning codes
+        for ($i = 0; $i < $amount; $i++) {
+            $clone = self::create();
+
+            foreach ($data as $name => $value) {
+                $clone->setValue($name, $value);
+            }
+            foreach ($_data as $_key => $_value) {
+                $clone->setValue($_key, $_value);
+            }
+            $clone->setValue('orders', null);
+            $clone->setValue('code', \rex_yform_value_coupon_code::getRandomCode());
+            $clone->setValue('createdate', date('Y-m-d H:i:s'));
+            $clone->save();
+            $clone->getData();
+            $result[] = $clone;
+        }
+        return $result;
+    }
+
     public static function createGiftcard($Order, $Product)
     {
         $order_id = $Order->getID();

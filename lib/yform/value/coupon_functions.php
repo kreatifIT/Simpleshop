@@ -28,22 +28,7 @@ class rex_yform_value_coupon_functions extends rex_yform_value_abstract
 
             case 'clone':
                 $dataId = rex_get('data_id', 'int');
-                $Coupon = \FriendsOfREDAXO\Simpleshop\Coupon::get($dataId);
-                $data   = $Coupon->getData();
-
-                // cloning codes
-                for ($i = 0; $i < $count; $i++) {
-                    $clone = \FriendsOfREDAXO\Simpleshop\Coupon::create();
-
-                    foreach ($data as $name => $value) {
-                        $clone->setValue($name, $value);
-                    }
-                    $clone->setValue('given_away', 0);
-                    $clone->setValue('orders', null);
-                    $clone->setValue('code', rex_yform_value_coupon_code::getRandomCode());
-                    $clone->setValue('createdate', date('Y-m-d H:i:s'));
-                    $clone->save();
-                }
+                \FriendsOfREDAXO\Simpleshop\Coupon::cloneCode($dataId, $count);
                 break;
         }
 
