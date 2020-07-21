@@ -15,64 +15,19 @@
 $sql = rex_sql::factory();
 $sql->setQuery('SET FOREIGN_KEY_CHECKS = 0');
 
+
 try {
     rex_sql_table::get('rex_shop_customer_address')
         ->ensureColumn(new rex_sql_column('customer_id', 'int(11)'), 'id')
         ->ensureColumn(new rex_sql_column('ctype', 'varchar(191)', true), 'customer_id')
         ->ensureColumn(new rex_sql_column('fiscal_code', 'varchar(191)', true), 'country')
         ->ensureColumn(new rex_sql_column('vat_num', 'varchar(191)', true), 'fiscal_code')
-        ->ensureColumn(new rex_sql_column('street', 'varchar(191)', true))
-        ->ensureColumn(new rex_sql_column('location', 'varchar(191)', true))
-        ->ensureColumn(new rex_sql_column('postal', 'varchar(191)', true))
         ->ensure();
 
     rex_sql_table::get('rex_shop_customer')
         ->ensureColumn(new rex_sql_column('invoice_address_id', 'int(11)'), 'id')
         ->ensure();
 
-    $query     = \FriendsOfREDAXO\Simpleshop\Customer::query();
-    $customers = $query->find();
-
-    // move customer data to customer address
-    foreach ($customers as $customer) {
-        $query = \FriendsOfREDAXO\Simpleshop\CustomerAddress::query();
-        $query->where('customer_id', $customer->getId());
-        $query->orderBy('createdate', 'asc');
-        $_cadress = $query->findOne();
-
-
-        $sql->setTable(\FriendsOfREDAXO\Simpleshop\CustomerAddress::TABLE);
-        $sql->setValue('ctype', $customer->getValue('ctype'));
-        $sql->setValue('fiscal_code', $customer->getValue('fiscal_code'));
-        $sql->setValue('vat_num', $customer->getValue('vat_num'));
-
-        if ($_cadress) {
-            $sql->setWhere(['customer_id' => $customer->getId()]);
-            $sql->update();
-            $addressId = $_cadress->getId();
-        } else {
-            $sql->setValue('firstname', $customer->getValue('firstname'));
-            $sql->setValue('lastname', $customer->getValue('lastname'));
-            $sql->setValue('company_name', $customer->getValue('company_name'));
-            $sql->setValue('street', $customer->getValue('street'));
-            $sql->setValue('location', $customer->getValue('location'));
-            $sql->setValue('postal', $customer->getValue('postal'));
-            $sql->setValue('customer_id', $customer->getId());
-            $sql->setValue('lang_id', $customer->getValue('lang_id'));
-            $sql->setValue('status', 1);
-            $sql->setValue('createdate', date('Y-m-d H:i:s'));
-            $sql->setValue('updatedate', date('Y-m-d H:i:s'));
-            $sql->insert();
-            $addressId = $sql->getLastId();
-        }
-
-        if($customer->getValue('invoice_address_id') == 0 || $customer->getValue('invoice_address_id') == '') {
-            $sql->setTable(\FriendsOfREDAXO\Simpleshop\Customer::TABLE);
-            $sql->setValue('invoice_address_id', $addressId);
-            $sql->setWhere(['id' => $customer->getId()]);
-            $sql->update();
-        }
-    }
 
     $item = $sql->getArray('SELECT id FROM rex_yform_field WHERE table_name = :table AND type_id = :type AND name = :name', ['table' => 'rex_shop_customer', 'type' => 'value', 'name' => 'name'])[0];
     if (!$item) {
@@ -170,13 +125,71 @@ try {
     $sql->setQuery('UPDATE rex_yform_field SET db_type="varchar(191)", attributes="{\"data-form-toggle\":\"person\"}" WHERE table_name = "rex_shop_customer_address" AND type_id = "value" AND name = "vat_num"');
     $sql->setQuery('UPDATE rex_yform_field SET type_name="empty", message="###error.field.empty###", validate_type=0 WHERE table_name = "rex_shop_customer_address" AND type_id = "validate" AND name = "firsname"');
     $sql->setQuery('UPDATE rex_yform_field SET type_name="empty", message="###error.field.empty###", validate_type=0 WHERE table_name = "rex_shop_customer_address" AND type_id = "validate" AND name = "lastname"');
-    $sql->setQuery('UPDATE rex_yform_field SET type_name="customfunction", message="###error.field.empty###", `function`=:customvalidation, params="{\"method\":\"empty-if\",\"dependencies\":[{\"field\":\"ctype\",\"value\":\"company\"}]}", validate_type=0, attributes="{\"onchange\":\"Simpleshop.changeCType(this)\",\"data-init-form-toggle\":\"1\"}" WHERE table_name = "rex_shop_customer_address" AND type_id = "validate" AND name = "company_name"', ['customvalidation' => '\FriendsOfREDAXO\Simpleshop\Customer::customValidateField']);
-    $sql->setQuery('UPDATE rex_yform_field SET type_name="customfunction", message="###error.field.fiscal_code_not_valid####", `function`=:customvalidation, params="{\"method\":\"fiscal_code\",\"dependencies\":[{\"field\":\"ctype\",\"value\":\"person\"},{\"field\":\"country\",\"value\":93,\"valueFrom\":\"post\"}]}", validate_type=0 WHERE table_name = "rex_shop_customer_address" AND type_id = "validate" AND name = "fiscal_code"', ['customvalidation' => '\FriendsOfREDAXO\Simpleshop\Customer::customValidateField']);
-    $sql->setQuery('UPDATE rex_yform_field SET type_name="customfunction", message="###error.field.vat_not_valid####", `function`=:customvalidation, params="{\"method\":\"vat_num\",\"dependencies\":[{\"field\":\"ctype\",\"value\":\"company\"}]}", validate_type=0 WHERE table_name = "rex_shop_customer_address" AND type_id = "validate" AND name = "vat_num"', ['customvalidation' => '\FriendsOfREDAXO\Simpleshop\Customer::customValidateField']);
+    $sql->setQuery('UPDATE rex_yform_field SET type_name="customfunction", message="###error.field.empty###", `function`=:customvalidation, params="{\"method\":\"empty-if\",\"dependencies\":[{\"field\":\"ctype\",\"value\":\"company\"}]}", validate_type=0, attributes="{\"onchange\":\"Simpleshop.changeCType(this)\",\"data-init-form-toggle\":\"1\"}" WHERE table_name = "rex_shop_customer_address" AND type_id = "validate" AND name = "company_name"',
+        ['customvalidation' => '\FriendsOfREDAXO\Simpleshop\Customer::customValidateField']);
+    $sql->setQuery('UPDATE rex_yform_field SET type_name="customfunction", message="###error.field.fiscal_code_not_valid####", `function`=:customvalidation, params="{\"method\":\"fiscal_code\",\"dependencies\":[{\"field\":\"ctype\",\"value\":\"person\"},{\"field\":\"country\",\"value\":93,\"valueFrom\":\"post\"}]}", validate_type=0 WHERE table_name = "rex_shop_customer_address" AND type_id = "validate" AND name = "fiscal_code"',
+        ['customvalidation' => '\FriendsOfREDAXO\Simpleshop\Customer::customValidateField']);
+    $sql->setQuery('UPDATE rex_yform_field SET type_name="customfunction", message="###error.field.vat_not_valid####", `function`=:customvalidation, params="{\"method\":\"vat_num\",\"dependencies\":[{\"field\":\"ctype\",\"value\":\"company\"}]}", validate_type=0 WHERE table_name = "rex_shop_customer_address" AND type_id = "validate" AND name = "vat_num"',
+        ['customvalidation' => '\FriendsOfREDAXO\Simpleshop\Customer::customValidateField']);
+
+    $customerAddressTable = rex_sql_table::get('rex_shop_customer_address');
+    $customerAddressTable->ensure();
 
 
-    $project = rex_addon::get('project');
-    $neededFields = $project->getConfig('needed_yform_fields', []);
+    {
+        $query     = \FriendsOfREDAXO\Simpleshop\Customer::query();
+        $customers = $query->find();
+        // move customer data to customer address
+        foreach ($customers as $customer) {
+            $query = \FriendsOfREDAXO\Simpleshop\CustomerAddress::query();
+            $query->where('customer_id', $customer->getId());
+            $query->orderBy('createdate', 'asc');
+            $_cadress = $query->findOne();
+
+            $sql->setTable(\FriendsOfREDAXO\Simpleshop\CustomerAddress::TABLE);
+
+            if ($customer->getValue('ctype')) {
+                $sql->setValue('ctype', $customer->getValue('ctype'));
+            }
+            if ($customer->getValue('fiscal_code')) {
+                $sql->setValue('fiscal_code', $customer->getValue('fiscal_code'));
+            }
+            if ($customer->getValue('vat_num')) {
+                $sql->setValue('vat_num', $customer->getValue('vat_num'));
+            }
+
+            if ($_cadress) {
+                $sql->setValue('id', $_cadress->getId());
+                $sql->setWhere(['id' => $_cadress->getId()]);
+                $sql->update();
+                $addressId = $_cadress->getId();
+            } else {
+                $sql->setValue('firstname', (string)$customer->getValue('firstname'));
+                $sql->setValue('lastname', (string)$customer->getValue('lastname'));
+                $sql->setValue('company_name', (string)$customer->getValue('company_name'));
+                $sql->setValue('street', $customer->getValue('street'));
+                $sql->setValue('location', $customer->getValue('location'));
+                $sql->setValue('postal', $customer->getValue('postal'));
+                $sql->setValue('customer_id', $customer->getId());
+                $sql->setValue('status', 1);
+                $sql->setValue('createdate', date('Y-m-d H:i:s'));
+                $sql->setValue('updatedate', date('Y-m-d H:i:s'));
+                $sql->insert();
+                $addressId = $sql->getLastId();
+            }
+
+            if ($customer->getValue('invoice_address_id') == 0 || $customer->getValue('invoice_address_id') == '') {
+                $sql->setTable(\FriendsOfREDAXO\Simpleshop\Customer::TABLE);
+                $sql->setValue('invoice_address_id', $addressId);
+                $sql->setWhere(['id' => $customer->getId()]);
+                $sql->update();
+            }
+        }
+    }
+
+
+    $project       = rex_addon::get('project');
+    $neededFields  = $project->getConfig('needed_yform_fields', []);
     $customerTable = rex_sql_table::get('rex_shop_customer');
 
     if (!in_array('rex_shop_customer.company_name', $neededFields)) {
@@ -204,6 +217,5 @@ try {
     $customerTable->ensure();
 }
 finally {
-    $sql = rex_sql::factory();
     $sql->setQuery('SET FOREIGN_KEY_CHECKS = 1');
 }
