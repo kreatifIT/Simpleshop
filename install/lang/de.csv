@@ -8,6 +8,7 @@ shop.order_status_CL;abgeschlossen
 action.logout;Abmelden
 simpleshop.account_area_account;Account
 label.address;Adresse
+label.pages;Seiten
 error.choose_shipping_address;Bitte eine Versandadresse auswählen
 action.add_address;Adresse hinzufügen
 simpleshop.account_area_addresses;Adressen
