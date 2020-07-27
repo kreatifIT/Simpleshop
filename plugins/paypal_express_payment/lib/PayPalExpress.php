@@ -294,13 +294,13 @@ class PayPalExpress extends PaymentAbstract
             }
         }
 
-        // responde to paypal
+        \rex_response::cleanOutputBuffers();
+
+        // respond to paypal
         if ($verified) {
             // Reply with an empty 200 response to indicate to paypal the IPN was received correctly.
-            \rex_response::cleanOutputBuffers();
             \rex_response::setStatus(\rex_response::HTTP_OK);
         } else {
-            file_put_contents(\rex_path::base('ipn.log'), (int)$verified, FILE_APPEND);
             \rex_response::setStatus(\rex_response::HTTP_NOT_FOUND);
             echo 'error';
         }

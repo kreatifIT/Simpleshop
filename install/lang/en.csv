@@ -10,6 +10,7 @@ label.edit_address;Edit address
 label.new_address;New address
 simpleshop.account_area_account;Account
 label.address;Address
+label.pages;Pages
 action.add_address;Add Address
 label.email__user_registration_subject;You have successfully registered
 simpleshop.account_area_addresses;Addresses

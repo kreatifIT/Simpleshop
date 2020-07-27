@@ -8,12 +8,14 @@ shop.order_status_CL;abgeschlossen
 action.logout;Abmelden
 simpleshop.account_area_account;Account
 label.address;Adresse
+label.pages;Seiten
 error.choose_shipping_address;Bitte eine Versandadresse auswählen
 action.add_address;Adresse hinzufügen
 simpleshop.account_area_addresses;Adressen
 label.address_additional;Adresszusatz
 label.customer_type;Ich bin eine...
 label.all;alle
+label.satispay;Satispay
 label.min_order_info;Der Gesamtwert einer Bestellung muss mindestens {VALUE} betragen
 error.min_order_value;Der Mindestbestellwert von {VALUE} wurde nicht erreicht
 error.token_already_used_for_transaction;Die Zahlung wurde bereits in einer anderen Transaktion durchgeführt

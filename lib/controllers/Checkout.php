@@ -26,9 +26,11 @@ class CheckoutController extends Controller
 
     protected function _execute()
     {
+        $listener = trim(\rex_get('listener', 'string'));
+
         $this->params = array_merge([
             'show_steps_fragment' => true,
-            'needs_login'         => true,
+            'needs_login'         => $listener != 'ipn',
             'Customer'            => Customer::getCurrentUser(),
         ], $this->params);
 
@@ -405,7 +407,8 @@ class CheckoutController extends Controller
 
                         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.beforePlaceOrder', $this->Order, []));
 
-                        $this->Order->save(false);
+                        $products = Session::getCartItems();
+                        $this->Order->save(false, $products);
                         rex_redirect(null, null, ['action' => 'init-payment', 'ts' => time()]);
                     } catch (OrderException $ex) {
                         $warnings[] = ['label' => $ex->getMessage()];
@@ -545,7 +548,9 @@ class CheckoutController extends Controller
     {
         $status = rex_get('status', 'string', 'completed');
 
-        if (!$this->Order->getId()) {
+        if (!$this->Order) {
+            \rex_response::sendCacheControl();
+            \rex_response::setStatus(307);
             rex_redirect($this->settings['linklist']['cart'], null, ['ts' => time()]);
         }
         try {
