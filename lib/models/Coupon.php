@@ -74,7 +74,7 @@ class Coupon extends Discount
 
         $_this = self::create();
         $_this->setValue('code', \rex_yform_value_coupon_code::getRandomCode());
-        $_this->setValue('given_away', 1);
+        $_this->setValue('status', 'givenaway');
         $_this->setValue('discount_value', $Product->getPrice());
         $_this->setValue('prefix', 'OR');
         $_this->setValue('orders', $order_id);
@@ -122,7 +122,7 @@ class Coupon extends Discount
             }
         } else if ($this->getValue('is_multi_use') == 2 && count($orders)) {
             throw new CouponException('Coupon consumed', 2);
-        } else if ($value && count($orders)) {
+        } else if ($this->getValue('is_multi_use') != 1 && $value && count($orders)) {
             $_value = $value;
             foreach ($orders as $order_id => $order_discount) {
                 $value -= (float)$order_discount;
@@ -158,8 +158,8 @@ class Coupon extends Discount
         }
         $orders[$Order->getValue('id')] = $total < $value ? $total : $value;
 
-        $this->setValue('given_away', 1);
-        $this->setValue('orders', json_encode(array_filter($orders)));
+        $this->setValue('status', 'givenaway');
+        $this->setValue('orders', json_encode($orders));
         $this->save();
     }
 
