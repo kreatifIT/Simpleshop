@@ -1,5 +1,4 @@
 orders_export = Bestellungs-Export
-
 label.advanced_settings = Erweiterte Einstellungen
 label.overview = Übersicht
 label.category = Kategorie
@@ -40,10 +39,8 @@ label.clone_coupon = diesen Coupon klonen
 label.msg_clone = Es wurden {NUM} Coupons generiert
 label.no_product_available = Kein Produkt verfügbar
 label.link_product_rex_categories = Kategorien verlinken
-label.sort_products_for_cat_title = Produkte sortieren in der Kategorie: "{CATNAME}"
-label.save_order_for_order_products = Sie müssen zuerst die Bestellung erstellen, erst dann können Sie Produkte hinzufügen. Klicken Sie einfach am Ende der Seite auf "Übernehmen"
-
-
+label.sort_products_for_cat_title =" Produkte sortieren in der Kategorie: ""{CATNAME}"""
+label.save_order_for_order_products =" Sie müssen zuerst die Bestellung erstellen, erst dann können Sie Produkte hinzufügen. Klicken Sie einfach am Ende der Seite auf ""Übernehmen"""
 action.goto_creditnote = gehe zur Gutschrift
 action.goto_product = gehe zum Produkt
 action.goto_order = Bestellung ansehen
@@ -58,15 +55,13 @@ action.edit_product_add_feature = Dem Produkt die fehlenden Eigenschaften zuweis
 action.remove_all_variants = Alle Varianten entfernen
 action.remove = entfernen
 action.use_invoicing = Rechnungslegung verwenden
-
-error.cannot_delete_category = Die Kategorie "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind
-error.cannot_delete_tax = Der Steuersatz "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind
-error.cannot_delete_feature = Die Eigenschaft "{{name}}" kann nicht gelöscht werden da folgende Werte noch verlinkt sind
-error.cannot_delete_value = Der Wert "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind
+error.cannot_delete_category =" Die Kategorie ""{{name}}"" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind"
+error.cannot_delete_tax =" Der Steuersatz ""{{name}}"" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind"
+error.cannot_delete_feature =" Die Eigenschaft ""{{name}}"" kann nicht gelöscht werden da folgende Werte noch verlinkt sind"
+error.cannot_delete_value =" Der Wert ""{{name}}"" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind"
 error.no_product_choosen = Kein Produkt ausgewählt
 error.product_has_attribute = Das Produkt hat keine Eigenschaften zugewiesen. Klicken Sie {{link}}hier{{/link}} und weisen sie Eigenschaften zu.
 error.product_has_no_attribute_but_variants = Das Produkt hat keine Eigenschaften zugewiesen, jedoch existieren aber Varianten mit folgenden Eigenschaften:
-
 settings.order_settings = Bestellungs-Einstellungen
 settings.min_order_value = Mindestbestellwert
 settings.page_mapping = Artikel-Mapping
@@ -87,6 +82,5 @@ settings.content_rma = Wiederrufsrecht
 settings.shop_functions = Shop-Funktionen
 settings.category_linking_label = Kategorie-Verlinkungen
 settings.category_linking_input_label = Schnell-Verlinkung im Backend aktivieren
-
 yform_values.coupon_functions_description = Funktionen für Coupon-Codes
 yform_values.order_functions_description = Funktionen für Bestelldokumente
