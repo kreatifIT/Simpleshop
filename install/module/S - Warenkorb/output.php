@@ -11,28 +11,13 @@
  * file that was distributed with this source code.
  */
 
-use FriendsOfREDAXO\Simpleshop;
+$values   = rex_var::toArray('REX_VALUE[1]');
+$settings = rex_var::toArray('REX_VALUE[20]');
 
-
-$values = rex_var::toArray('REX_VALUE[1]');
-
-?>
-<div class="row column margin-top margin-large-bottom">
-    <?php if (strlen($values['title']) || strlen($values['text'])): ?>
-        <div class="row column">
-            <?php if (strlen($values['title'])): ?>
-                <h2 class="heading large separator"><?= $values['title'] ?></h2>
-            <?php endif; ?>
-            <?= $values['text'] ?>
-        </div>
-    <?php endif; ?>
-
-    <div class="row">
-        <div class="column" data-cart-container>
-            <?php
-            $Controller = Simpleshop\CartController::execute();
-            echo $Controller->parse();
-            ?>
-        </div>
-    </div>
-</div>
+$fragment = new rex_fragment();
+$fragment->setVar('values', $values, false);
+$fragment->setVar('settings', $settings);
+$fragment->setVar('module_id', 'REX_MODULE_ID');
+$fragment->setVar('slice_id', 'REX_SLICE_ID');
+$fragment->setVar('fragment_path', 'simpleshop/modules/cart/default.php');
+echo $fragment->parse('kreatif/templates/default/module_wrapper.php');
