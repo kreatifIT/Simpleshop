@@ -43,6 +43,15 @@ $table = \FriendsOfREDAXO\Simpleshop\OrderProduct::TABLE;
     'prio'         => $prio++,
 ]);
 
+\Kreatif\Yform::ensureValueField($table, 'variant_key', [], [
+    'type_name'    => 'text',
+    'list_hidden'  => 0,
+    'search'       => 1,
+    'label'        => 'Variant Key',
+    'db_type'      => 'varchar(191)',
+    'prio'         => $prio++,
+]);
+
 \Kreatif\Yform::ensureValueField($table, 'code', [], [
     'type_name'    => 'text',
     'list_hidden'  => 0,

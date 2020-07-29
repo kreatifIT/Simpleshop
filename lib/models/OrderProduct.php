@@ -25,6 +25,23 @@ class OrderProduct extends Model
         'data',
     ];
 
+    public static function getByProductKey($orderId, $productKey)
+    {
+        list($productId, $variantKey) = explode('|', $productKey);
+        $query = OrderProduct::query();
+        $query->where('order_id', $orderId);
+        $query->where('product_id', $productId);
+        $query->where('variant_key', $variantKey);
+        return $query->findOne();
+    }
+
+    /**
+     * @param $orderId
+     * @param $productId
+     *
+     * @return null|\rex_yform_manager_dataset
+     * @deprecated since 2020-07-29 is not variant save - use getByProductKey instead
+     */
     public static function getByProductId($orderId, $productId)
     {
         $query = OrderProduct::query();
