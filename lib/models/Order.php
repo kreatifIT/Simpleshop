@@ -313,10 +313,11 @@ class Order extends Model
         }
 
         if (!$OrderProduct) {
-            $OrderProduct = OrderProduct::getByProductId($this->getId(), $product->getId()) ?: OrderProduct::create();
+            $OrderProduct = OrderProduct::getByProductKey($this->getId(), $product->getKey()) ?: OrderProduct::create();
         }
         $OrderProduct->setValue('data', $product);
         $OrderProduct->setValue('product_id', $product->getValue('id'));
+        $OrderProduct->setValue('variant_key', $product->getValue('variant_key'));
         $OrderProduct->setValue('code', $product->getValue('code'));
         $OrderProduct->setValue('cart_quantity', $quantity);
         $OrderProduct->setValue('order_id', $this->getId());
