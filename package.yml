@@ -1,5 +1,5 @@
 package: simpleshop
-version: '4.3.4'
+version: '4.3.5'
 author: FriendsOfREDAXO
 debug_email: dev@kreatif.it
 compile: 0
@@ -33,4 +33,4 @@ requires:
         yform: '>=2.3,<4'
         yform/manager: '>=2.3,<4'
         sprog: '^1.0'
-        kreatif: '>=4.10.0'
+        kreatif: '>=4.9.0,<4.11'
