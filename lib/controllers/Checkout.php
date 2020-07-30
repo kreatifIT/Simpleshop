@@ -246,7 +246,8 @@ class CheckoutController extends Controller
     {
         $customer    = Customer::getCurrentUser();
         $Address     = $this->Order->getInvoiceAddress();
-        $Address     = $Address && $customer->getId() == $Address->getValue('customer_id') ? CustomerAddress::get($Address->getId()) : null;
+        $addressId   = $Address && $customer->getId() == $Address->getValue('customer_id') ? $Address->getId() : null;
+        $Address     = $addressId ? CustomerAddress::get($addressId) : null;
         $customer_id = $this->params['Customer']->getId();
 
         if (!$Address && $customer_id > 0) {
