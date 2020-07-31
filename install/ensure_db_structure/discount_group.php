@@ -13,10 +13,10 @@
 
 $prio  = 0;
 $sql   = rex_sql::factory();
+$langs = rex_clang::getAll();
 $table = \FriendsOfREDAXO\Simpleshop\DiscountGroup::TABLE;
 
-\Kreatif\Yform::ensureValueField($table, 'tab_start', [], [
-    'type_name'   => 'tab_start',
+\Kreatif\Yform::ensureValueField($table, 'tab_start', 'tab_start', [], [
     'list_hidden' => 1,
     'search'      => 0,
     'label'       => '',
@@ -24,20 +24,29 @@ $table = \FriendsOfREDAXO\Simpleshop\DiscountGroup::TABLE;
     'prio'        => $prio++,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'name_1', [
-    'label'       => 'translate:label.designation',
-    'list_hidden' => 0,
-    'search'      => 1,
-], [
-    'type_name' => 'text',
-    'db_type'   => 'varchar(191)',
-    'prio'      => $prio++,
-]);
+foreach ($langs as $index => $lang) {
+    \Kreatif\Yform::ensureValueField($table, 'name_' . $lang->getId(), 'text', [
+        'label'       => 'translate:label.designation',
+        'list_hidden' => $index == 0 ? 0 : 1,
+        'search'      => $index == 0 ? 1 : 0,
+        'prio'        => $prio++,
+    ], [
+        'db_type' => 'varchar(191)',
+    ]);
 
-$prio += 30;
+    if (($index + 1) < count($langs)) {
+        \Kreatif\Yform::ensureValueField($table, 'tab_break_' . $lang->getId(), 'tab_break', [
+            'prio' => $prio++,
+        ], [
+            'list_hidden' => 1,
+            'search'      => 0,
+            'label'       => '',
+            'db_type'     => 'none',
+        ]);
+    }
+}
 
-\Kreatif\Yform::ensureValueField($table, 'tab_end', [], [
-    'type_name'   => 'tab_end',
+\Kreatif\Yform::ensureValueField($table, 'tab_end', 'tab_end', [], [
     'list_hidden' => 1,
     'search'      => 0,
     'label'       => '',
@@ -45,8 +54,9 @@ $prio += 30;
     'prio'        => $prio++,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'ctype', [
-    'type_name'   => 'choice',
+$prio += 20;
+
+\Kreatif\Yform::ensureValueField($table, 'ctype', 'choice', [
     'list_hidden' => 0,
     'search'      => 0,
     'label'       => '###label.customer_type###',
@@ -63,8 +73,7 @@ $prio += 30;
     'multiple' => 0,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'target', [
-    'type_name'   => 'choice',
+\Kreatif\Yform::ensureValueField($table, 'target', 'choice', [
     'list_hidden' => 0,
     'search'      => 1,
     'label'       => 'translate:label.target',
@@ -81,12 +90,11 @@ $prio += 30;
     'attributes' => '{"data-yform-edit-toggle-switch":"target"}',
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'price', [
+\Kreatif\Yform::ensureValueField($table, 'price', 'number', [
     'label'       => 'translate:label.at_least_price',
     'list_hidden' => 1,
     'search'      => 0,
 ], [
-    'type_name'  => 'number',
     'db_type'    => '',
     'scale'      => 2,
     'precision'  => 10,
@@ -95,19 +103,17 @@ $prio += 30;
     'attributes' => '{"data-yform-edit-toggle":"target:cart_value"}',
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'amount', [
+\Kreatif\Yform::ensureValueField($table, 'amount', 'integer', [
     'label'       => 'translate:label.at_least_amount',
     'list_hidden' => 1,
     'search'      => 0,
 ], [
-    'type_name'  => 'integer',
     'db_type'    => 'int',
     'prio'       => $prio++,
     'attributes' => '{"data-yform-edit-toggle":"target:order_quantities"}',
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'action', [
-    'type_name'   => 'choice',
+\Kreatif\Yform::ensureValueField($table, 'action', 'choice', [
     'list_hidden' => 0,
     'search'      => 1,
     'label'       => 'translate:action',
@@ -126,24 +132,22 @@ $prio += 30;
     ]),
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'discount_percent', [
+\Kreatif\Yform::ensureValueField($table, 'discount_percent', 'integer', [
     'label'       => 'translate:label.discount',
     'list_hidden' => 1,
     'search'      => 0,
 ], [
-    'type_name'  => 'integer',
     'db_type'    => 'int',
     'unit'       => '%',
     'prio'       => $prio++,
     'attributes' => '{"data-yform-edit-toggle":"action:percent_discount"}',
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'discount_value', [
+\Kreatif\Yform::ensureValueField($table, 'discount_value', 'number', [
     'label'       => 'translate:label.discount',
     'list_hidden' => 1,
     'search'      => 0,
 ], [
-    'type_name'  => 'number',
     'db_type'    => '',
     'scale'      => 2,
     'precision'  => 10,
@@ -152,12 +156,11 @@ $prio += 30;
     'attributes' => '{"data-yform-edit-toggle":"action:fixed_discount"}',
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'discount_value', [
+\Kreatif\Yform::ensureValueField($table, 'discount_value', 'number', [
     'label'       => 'translate:label.discount',
     'list_hidden' => 1,
     'search'      => 0,
 ], [
-    'type_name'  => 'number',
     'db_type'    => '',
     'scale'      => 2,
     'precision'  => 10,
@@ -166,8 +169,7 @@ $prio += 30;
     'attributes' => '{"data-yform-edit-toggle":"action:fixed_discount"}',
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'coupon_code', [
-    'type_name'   => 'choice',
+\Kreatif\Yform::ensureValueField($table, 'coupon_code', 'choice', [
     'list_hidden' => 1,
     'search'      => 0,
     'label'       => 'translate:label.coupon',
@@ -181,14 +183,13 @@ $prio += 30;
     'choices'    => 'SELECT id AS value, CONCAT(name_1, " [", code, "]") AS label FROM rex_shop_coupon ORDER BY id DESC',
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'status', [
-    'type_name'   => 'choice',
+\Kreatif\Yform::ensureValueField($table, 'status', 'choice', [
     'list_hidden' => 1,
     'search'      => 1,
     'label'       => 'translate:label.status',
     'prio'        => $prio++,
 ], [
-    'db_type'  => 'text',
+    'db_type'  => 'int',
     'default'  => 1,
     'expanded' => 0,
     'multiple' => 0,
@@ -198,8 +199,7 @@ $prio += 30;
     ]),
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'createdate', [
-    'type_name'   => 'datestamp',
+\Kreatif\Yform::ensureValueField($table, 'createdate', 'datestamp', [
     'list_hidden' => 0,
     'search'      => 0,
     'show_value'  => 1,
@@ -212,8 +212,7 @@ $prio += 30;
     'no_db'      => 0,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'updatedate', [
-    'type_name'   => 'datestamp',
+\Kreatif\Yform::ensureValueField($table, 'updatedate', 'datestamp', [
     'list_hidden' => 1,
     'search'      => 0,
     'show_value'  => 1,
@@ -226,11 +225,10 @@ $prio += 30;
     'no_db'      => 0,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'createuser', [
+\Kreatif\Yform::ensureValueField($table, 'createuser', 'be_user', [
     'label' => 'translate:created_by',
     'prio'  => $prio++,
 ], [
-    'type_name'   => 'be_user',
     'db_type'     => 'varchar(191)',
     'list_hidden' => 1,
     'search'      => 0,
@@ -238,11 +236,10 @@ $prio += 30;
     'show_value'  => 1,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'updateuser', [
+\Kreatif\Yform::ensureValueField($table, 'updateuser', 'be_user', [
     'label' => 'translate:updated_by',
     'prio'  => $prio++,
 ], [
-    'type_name'   => 'be_user',
     'db_type'     => 'varchar(191)',
     'list_hidden' => 1,
     'search'      => 0,
@@ -251,10 +248,7 @@ $prio += 30;
 ]);
 
 $sql->setTable('rex_yform_table');
-$sql->setValue('name', 'translate:tablename.discount_group');
-$sql->setValue('list_sortfield', 'id');
-$sql->setValue('list_sortorder', 'DESC');
-$sql->setValue('list_amount', 100);
+$sql->setValue('prio', 16);
 $sql->setWhere(['table_name' => $table]);
 $sql->update();
 

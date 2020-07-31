@@ -15,8 +15,7 @@ $prio  = 0;
 $sql   = rex_sql::factory();
 $table = \FriendsOfREDAXO\Simpleshop\OrderProduct::TABLE;
 
-\Kreatif\Yform::ensureValueField($table, 'order_id', [], [
-    'type_name'    => 'be_manager_relation',
+\Kreatif\Yform::ensureValueField($table, 'order_id', 'be_manager_relation', [], [
     'list_hidden'  => 0,
     'search'       => 1,
     'label'        => 'Order',
@@ -29,8 +28,7 @@ $table = \FriendsOfREDAXO\Simpleshop\OrderProduct::TABLE;
     'prio'         => $prio++,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'product_id', [], [
-    'type_name'    => 'be_manager_relation',
+\Kreatif\Yform::ensureValueField($table, 'product_id', 'be_manager_relation', [], [
     'list_hidden'  => 0,
     'search'       => 1,
     'label'        => 'Product',
@@ -43,54 +41,48 @@ $table = \FriendsOfREDAXO\Simpleshop\OrderProduct::TABLE;
     'prio'         => $prio++,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'variant_key', [], [
-    'type_name'    => 'text',
-    'list_hidden'  => 0,
-    'search'       => 1,
-    'label'        => 'Variant Key',
-    'db_type'      => 'varchar(191)',
-    'prio'         => $prio++,
+\Kreatif\Yform::ensureValueField($table, 'variant_key', 'text', [], [
+    'list_hidden' => 0,
+    'search'      => 1,
+    'label'       => 'Variant Key',
+    'db_type'     => 'varchar(191)',
+    'prio'        => $prio++,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'code', [], [
-    'type_name'    => 'text',
-    'list_hidden'  => 0,
-    'search'       => 1,
-    'label'        => 'Product-Code',
-    'db_type'      => 'varchar(191)',
-    'prio'         => $prio++,
+\Kreatif\Yform::ensureValueField($table, 'code', 'text', [], [
+    'list_hidden' => 0,
+    'search'      => 1,
+    'label'       => 'Product-Code',
+    'db_type'     => 'varchar(191)',
+    'prio'        => $prio++,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'cart_quantity', [], [
-    'type_name'    => 'integer',
-    'db_type'      => 'int',
-    'list_hidden'  => 0,
-    'search'       => 0,
-    'label'        => 'Quantity',
-    'prio'         => $prio++,
+\Kreatif\Yform::ensureValueField($table, 'cart_quantity', 'integer', [], [
+    'db_type'     => 'int',
+    'list_hidden' => 0,
+    'search'      => 0,
+    'label'       => 'Quantity',
+    'prio'        => $prio++,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'shipping_key', [], [
-    'type_name'    => 'text',
-    'db_type'      => 'varchar(191)',
-    'list_hidden'  => 1,
-    'search'       => 0,
-    'label'        => 'Shipping-Key',
-    'prio'         => $prio++,
+\Kreatif\Yform::ensureValueField($table, 'shipping_key', 'text', [], [
+    'db_type'     => 'varchar(191)',
+    'list_hidden' => 1,
+    'search'      => 0,
+    'label'       => 'Shipping-Key',
+    'prio'        => $prio++,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'data', [], [
-    'type_name'    => 'data_output',
-    'db_type'      => 'text',
-    'list_hidden'  => 1,
-    'search'       => 0,
-    'label'        => 'Product-Data',
-    'prio'         => $prio++,
+\Kreatif\Yform::ensureValueField($table, 'data', 'data_output', [], [
+    'db_type'     => 'text',
+    'list_hidden' => 1,
+    'search'      => 0,
+    'label'       => 'Product-Data',
+    'prio'        => $prio++,
 ]);
 
 
-\Kreatif\Yform::ensureValueField($table, 'createdate', [
-    'type_name'   => 'datestamp',
+\Kreatif\Yform::ensureValueField($table, 'createdate', 'datestamp', [
     'list_hidden' => 0,
     'search'      => 0,
     'show_value'  => 1,
@@ -103,8 +95,7 @@ $table = \FriendsOfREDAXO\Simpleshop\OrderProduct::TABLE;
     'no_db'      => 0,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'updatedate', [
-    'type_name'   => 'datestamp',
+\Kreatif\Yform::ensureValueField($table, 'updatedate', 'datestamp', [
     'list_hidden' => 1,
     'search'      => 0,
     'show_value'  => 1,
@@ -117,11 +108,10 @@ $table = \FriendsOfREDAXO\Simpleshop\OrderProduct::TABLE;
     'no_db'      => 0,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'createuser', [
+\Kreatif\Yform::ensureValueField($table, 'createuser', 'be_user', [
     'label' => 'translate:created_by',
     'prio'  => $prio++,
 ], [
-    'type_name'   => 'be_user',
     'db_type'     => 'varchar(191)',
     'list_hidden' => 1,
     'search'      => 0,
@@ -129,11 +119,10 @@ $table = \FriendsOfREDAXO\Simpleshop\OrderProduct::TABLE;
     'show_value'  => 1,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'updateuser', [
+\Kreatif\Yform::ensureValueField($table, 'updateuser', 'be_user', [
     'label' => 'translate:updated_by',
     'prio'  => $prio++,
 ], [
-    'type_name'   => 'be_user',
     'db_type'     => 'varchar(191)',
     'list_hidden' => 1,
     'search'      => 0,
@@ -146,6 +135,7 @@ $sql->setValue('name', 'Order-Products');
 $sql->setValue('list_sortfield', 'id');
 $sql->setValue('list_sortorder', 'DESC');
 $sql->setValue('list_amount', 100);
+$sql->setValue('prio', 51);
 $sql->setWhere(['table_name' => $table]);
 $sql->update();
 

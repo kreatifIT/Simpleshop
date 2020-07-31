@@ -14,8 +14,7 @@
 $sql   = rex_sql::factory();
 $table = \Kreatif\Model\Country::TABLE;
 
-\Kreatif\Yform::ensureValueField($table, 'b2b_has_tax', [], [
-    'type_name'   => 'select',
+\Kreatif\Yform::ensureValueField($table, 'b2b_has_tax', 'select', [], [
     'list_hidden' => 0,
     'search'      => 0,
     'label'       => 'translate:label.b2b_tax_required',

@@ -12,6 +12,7 @@ shop.order_status_CN;Gutschrift
 action.logout;Abmelden
 simpleshop.account_area_account;Account
 label.address;Adresse
+label.language;Sprache
 label.pages;Seiten
 error.choose_shipping_address;Bitte eine Versandadresse auswählen
 action.add_address;Adresse hinzufügen
@@ -28,6 +29,7 @@ label.auth_data;Zugangsdaten
 label.activation_link_sent;Ihnen wurde ein Aktivierungslink per Mail zugesendet. Bitte kontrollieren Sie auch Ihren Spam-Ordner
 label.customer_type;Ich bin eine...
 label.all;alle
+label.giftcard;Geschenkkarte
 label.min_order_info;Der Gesamtwert einer Bestellung muss mindestens {VALUE} betragen
 error.min_order_value;Der Mindestbestellwert von {VALUE} wurde nicht erreicht
 error.token_already_used_for_transaction;Die Zahlung wurde bereits in einer anderen Transaktion durchgeführt
@@ -124,6 +126,7 @@ action.place_order;Jetzt kaufen
 action.register;Jetzt Registrieren
 label.no_products_in_cart;Keine Produkte in der Einkaufstasche
 label.code;Kodex
+label.product_code;Produkt-Kodex
 label.account_data;Kontodaten
 label.nexi_credit_card ;Kreditkarte
 label.country;Land

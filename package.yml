@@ -1,5 +1,5 @@
 package: simpleshop
-version: '5.2.7'
+version: '5.2.8'
 author: FriendsOfREDAXO
 debug_email: dev@kreatif.it
 compile: 0
@@ -26,11 +26,8 @@ page:
             perm: shop[advanced_settings]
 
 
-
 requires:
-    redaxo: '>=5.3'
     packages:
-        yform: '>=2.3,<4'
-        yform/manager: '>=2.3,<4'
+        yform: '>=3.3,<4' #needed commit: 4d45fc8b344033f1ce740253923d5369d60be6a6
         sprog: '^1.0'
-        kreatif: '>=4.11.0'
+        kreatif: '>=4.13'

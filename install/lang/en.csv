@@ -7,6 +7,7 @@ label.entry_removed;The entry was removed
 #action.remove;Remove
 action.use_coupon;Apply coupon
 shop.order_status_CA;cancelled
+label.language;Language
 shop.order_status_CL;closed
 shop.order_status_CN;Credit note
 action.logout;Sign Out
@@ -15,6 +16,7 @@ label.new_address;New address
 simpleshop.account_area_account;Account
 label.address;Address
 label.pages;Pages
+label.giftcard;Giftcard
 action.add_address;Add Address
 action.close;close
 label.email__user_registration_subject;You have successfully registered
@@ -125,6 +127,7 @@ action.place_order;Buy Now
 action.register;REGISTER
 label.no_products_in_cart;There are no articles in the shopping bag
 label.code;Code
+label.product_code;Product code
 label.account_data;Account data
 label.nexi_credit_card ;Credit Card
 label.country;Country

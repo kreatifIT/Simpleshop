@@ -260,7 +260,7 @@ class Customer extends Model
         $password   = random_string(self::MIN_PWD_LEN);
         $attributes = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Customer.registerFromBeUser.attributes', array_merge([
             'status'     => 1,
-            'created'    => date('Y-m-d H:i:s'),
+            'createdate' => date('Y-m-d H:i:s'),
             'updatedate' => date('Y-m-d H:i:s'),
         ], $attributes), [
             'email' => $email,

@@ -10,11 +10,13 @@ shop.order_status_CA;annullato
 shop.order_status_CL;completato
 shop.order_status_CN;Nota di credito
 action.logout;Esci
+label.language;Lingua
 simpleshop.account_area_account;Account
 label.address;Indirizzo
 label.pages;Pagine
 action.add_address;Aggiungi indirizzo
 action.close;chiudere
+label.giftcard;Cartolina regalo
 label.addresses;Indirizzi
 label.free_shipping;Spedizione gratuita
 label.no_address_available;Nessun indirizzo disponibile
@@ -122,6 +124,7 @@ action.place_order;Acquista ora
 action.register;Registrati Qui
 label.no_products_in_cart;Non ci sono articoli nel carrello
 label.code;Codice
+label.product_code;Codice prodotto
 label.account_data;Informazioni account
 label.nexi_credit_card ;Carta di credito
 label.country;Paese
