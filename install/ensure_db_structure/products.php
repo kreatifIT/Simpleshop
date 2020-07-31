@@ -13,7 +13,7 @@
 
 $prio  = 0;
 $sql   = rex_sql::factory();
-$langs = rex_clang::getAll();
+$langs = array_values(rex_clang::getAll());
 $table = \FriendsOfREDAXO\Simpleshop\Product::TABLE;
 
 \Kreatif\Yform::ensureValueField($table, 'product_functions', 'product_functions', [
@@ -80,7 +80,7 @@ $prio += 20;
 \Kreatif\Yform::ensureValueField($table, 'type', 'hidden_input', [
     'label'       => 'translate:label.product_type',
     'prio'        => $prio++,
-    'list_hidden' => 0,
+    'list_hidden' => 1,
     'search'      => 0,
     'default'     => 'product',
     'choices'     => json_encode([

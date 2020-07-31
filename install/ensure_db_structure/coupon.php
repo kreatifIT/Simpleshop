@@ -13,7 +13,7 @@
 
 $prio  = 0;
 $sql   = rex_sql::factory();
-$langs = rex_clang::getAll();
+$langs = array_values(rex_clang::getAll());
 $table = \FriendsOfREDAXO\Simpleshop\Coupon::TABLE;
 
 \Kreatif\Yform::ensureValueField($table, 'coupon_functions', 'coupon_functions', [

@@ -13,7 +13,7 @@
 
 $prio  = 0;
 $sql   = rex_sql::factory();
-$langs = rex_clang::getAll();
+$langs = array_values(rex_clang::getAll());
 $table = \FriendsOfREDAXO\Simpleshop\DiscountGroup::TABLE;
 
 \Kreatif\Yform::ensureValueField($table, 'tab_start', 'tab_start', [], [
