@@ -547,9 +547,8 @@ class Product extends Model
                     WHERE product_id = :pid 
                     AND type != 'NE'
                     ORDER BY prio ASC LIMIT 1", ['pid' => $Object->getId()]);
-                $vkey = @$sql->getValue('variant_key');
 
-                if ($vkey != '') {
+                if ($sql->hasNext() && $vkey = $sql->getValue('variant_key')) {
                     $Object = $Object->getVariant($vkey);
                 }
                 $result[] = $Object;
