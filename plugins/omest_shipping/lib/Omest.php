@@ -111,14 +111,16 @@ class Omest extends ShippingAbstract
         if ($response['response']['status'] <= 0) {
             Utils::log('Omest.calculatePriceFromOLC', $response['response']['message'] . "\n" . print_r($data, true) . "\n" . print_r($DAddress, true), 'Error', true);
             throw new OmestShippingException($response['response']['message'], 2);
-        }
-        else if ($response['response']['shipment']->price == '' || $response['response']['shipment']->price == '-') {
+        } else if ($response['response']['shipment']->priceDetails->price == '' || $response['response']['shipment']->priceDetails->price == '-') {
+            if ($response['response']['shipment']->price == '' || $response['response']['shipment']->price == '-') {
             Utils::log('Omest.calculatePriceFromOLC', "No price found!\n" . print_r($data, true) . "\n" . print_r($DAddress, true), 'Error', true);
             throw new OmestShippingException('', 3);
+            } else {
+                return (float)str_replace(',', '.', $response['response']['shipment']->price);
         }
-        else {
+        } else {
             // return shipping costs
-            return (float) $response['response']['shipment']->price;
+            return (float)str_replace(',', '.', $response['response']['shipment']->priceDetails->price);
         }
     }
 
