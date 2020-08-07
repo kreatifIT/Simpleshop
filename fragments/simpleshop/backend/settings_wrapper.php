@@ -30,6 +30,9 @@ if ($_FUNC == 'save') {
     }
     $config = array_merge($config, $_POST);
     \rex::setConfig($key, $config);
+
+    \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Settings.saved'));
+
     echo \rex_view::info(\rex_i18n::msg('label.data_saved'));
 }
 

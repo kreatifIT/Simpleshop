@@ -8,6 +8,7 @@ shop.order_status_CL;abgeschlossen
 action.logout;Abmelden
 simpleshop.account_area_account;Account
 label.address;Adresse
+label.pages;Seiten
 error.choose_shipping_address;Bitte eine Versandadresse auswählen
 action.add_address;Adresse hinzufügen
 simpleshop.account_area_addresses;Adressen
@@ -74,6 +75,7 @@ label.order_complete_default_shipping_text;Die Ware wird ihnen schnellstmöglich
 error.email_already_exists;Diese E-Mail-Adresse ist bereits registriert
 error.coupon_not_exists;Dieser Gutschein-Code existiert nicht
 error.coupon_not_valid_anymore;Dieser Gutschein-Code ist nicht mehr gültig
+error.coupon_already_used;Sie haben diesen Coupon bereits verwendet
 label.email__user_registration_subject;Sie haben erfolgreich registriert
 label.email;E-Mail
 label.units;Einheiten

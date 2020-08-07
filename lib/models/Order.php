@@ -173,8 +173,7 @@ class Order extends Model
     {
         self::$_finalizeOrder = true;
 
-        $products = Session::getCartItems();
-        $result   = $this->save(false, $products);
+        $result = $this->save(false);
 
         return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.completeOrder', $result, [
             'Order' => $this,
@@ -277,7 +276,7 @@ class Order extends Model
             // clear deleted products
             $where = ["order_id = {$this->getId()}"];
             if (count($orderProductIds)) {
-                $where[] = 'id NOT IN('. implode(',', $orderProductIds) .')';
+                $where[] = 'id NOT IN(' . implode(',', $orderProductIds) . ')';
             }
             $sql->setTable(OrderProduct::TABLE);
             $sql->setWhere(implode(' AND ', $where));
@@ -313,10 +312,11 @@ class Order extends Model
         }
 
         if (!$OrderProduct) {
-            $OrderProduct = OrderProduct::getByProductId($this->getId(), $product->getId()) ?: OrderProduct::create();
+            $OrderProduct = OrderProduct::getByProductKey($this->getId(), $product->getKey()) ?: OrderProduct::create();
         }
         $OrderProduct->setValue('data', $product);
         $OrderProduct->setValue('product_id', $product->getValue('id'));
+        $OrderProduct->setValue('variant_key', $product->getValue('variant_key'));
         $OrderProduct->setValue('code', $product->getValue('code'));
         $OrderProduct->setValue('cart_quantity', $quantity);
         $OrderProduct->setValue('order_id', $this->getId());
@@ -499,6 +499,8 @@ class Order extends Model
                 $products = Session::getCartItems();
             }
         }
+
+        $this->recalculateDocument($products);
 
         try {
             $promotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.applyDiscounts', [], [

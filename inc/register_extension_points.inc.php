@@ -29,42 +29,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 \rex_extension::register('PACKAGES_INCLUDED', function (\rex_extension_point $Ep) {
     if ($this->getConfig('installed')) {
-        \rex_login::startSession();
-
-        if (rex_get('action', 'string') == 'logout') {
-            Customer::logout();
-
-            $login = new \rex_backend_login();
-            $login->setLogout(true);
-            $login->checkLogin();
-
-            \rex_response::sendCacheControl();
-            \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
-            \rex_response::sendRedirect(rex_getUrl(null, null, ['ts' => time()]));
-        }
-
-        $beUser = \rex::getUser();
-
-        if ($beUser) {
-            $Customer = Customer::getCurrentUser();
-
-            if (!$Customer) {
-                Customer::login($beUser->getEmail(), 'backend');
-            }
-
-            if (\rex::isBackend()) {
-                \rex_view::setJsProperty('simpleshop', [
-                    'ajax_url' => \rex_url::frontendController(),
-                ]);
-            }
-        }
-
-        $mpdf = \rex_addon::get('kreatif-mpdf');
-
-        if ($mpdf->isAvailable()) {
-            FragmentConfig::$data['checkout']['generate_pdf'] = true;
-            \Kreatif\Mpdf\Mpdf::addCSSPath($this->getPath('assets/scss/pdf_styles.scss'));
-        }
+        Settings::init();
     }
     return $Ep->getSubject();
 });
@@ -91,6 +56,10 @@ namespace FriendsOfREDAXO\Simpleshop;
     }
 
     return $options;
+});
+
+\rex_extension::register('simpleshop.Settings.saved', function (\rex_extension_point $Ep) {
+    Coupon::ext__processSettings($Ep);
 });
 
 \rex_view::setJsProperty('simpleshop', [

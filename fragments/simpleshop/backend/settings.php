@@ -23,7 +23,7 @@ $Settings = $this->getVar('Settings');
     <legend><?= $Addon->i18n('settings.shop_settings'); ?></legend>
     <dl class="rex-form-group form-group">
         <dt><?= $Addon->i18n('settings.order_notification_email'); ?></dt>
-        <dd><input type="email" class="form-control" name="order_notification_email" value="<?= from_array($Settings, 'order_notification_email') ?>"/></dd>
+        <dd><input type="text" class="form-control" name="order_notification_email" value="<?= from_array($Settings, 'order_notification_email') ?>"/></dd>
     </dl>
 
     <br/>

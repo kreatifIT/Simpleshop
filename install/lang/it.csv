@@ -8,6 +8,7 @@ shop.order_status_CL;completato
 action.logout;Esci
 simpleshop.account_area_account;Account
 label.address;Indirizzo
+label.pages;Pagine
 action.add_address;Aggiungi indirizzo
 action.close;chiudere
 simpleshop.account_area_addresses;Indirizzi
@@ -75,6 +76,7 @@ label.order_complete_default_shipping_text;La merce le sarà spedita il prima po
 error.email_already_exists;Questo indirizzo e-mail è già stato registrato
 error.coupon_not_exists;Il codice di questo buono acquisto non esiste
 error.coupon_not_valid_anymore;Il codice di questo buono acquisto non è più valido
+error.coupon_already_used;Hai già usato questo coupon
 label.email__user_registration_subject;Ti sei registrato con successo
 label.email__user_password_reset;Reset della password
 label.email;E-mail

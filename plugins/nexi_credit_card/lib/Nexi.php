@@ -69,7 +69,7 @@ class Nexi extends PaymentAbstract
         $data = [
             'id'           => $tran_portal_id,
             'password'     => $password,
-            'action'       => 4, // Transaction-type = Authorization
+            'action'       => 1, // Transaction-type = Acquisto (“Purchase”)
             'currencycode' => 978, // ISO-Code for EUR
             'amt'          => (float)number_format($total_amount, 2), // total payment (including tax + shipping)
             'langid'       => $this->getLangCode(),
@@ -80,7 +80,7 @@ class Nexi extends PaymentAbstract
             'udf2'         => $order_descr,
         ];
 
-        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Nexi.initPaymentData', $data));
+        $data = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Nexi.initPaymentData', $data));
 
         $sdata     = htmlspecialchars_decode(http_build_query($data));
         $Connector = new WSConnector($url);
@@ -141,12 +141,11 @@ class Nexi extends PaymentAbstract
             $responses['processIPN'] = $post_data;
             $this->setValue('responses', $responses);
 
-            $Order = Session::getCurrentOrder();
             $Order->setValue('payment', Order::prepareData($this));
             Session::setCheckoutData('Order', $Order);
             $Order->save();
 
-            if ($post_data['result'] == 'APPROVED') {
+            if ($post_data['result'] == 'APPROVED' || $post_data['result'] == 'CAPTURED') {
                 Utils::log('Nexi.processIPN', 'successfull', 'INFO');
 
                 \rex_response::cleanOutputBuffers();
