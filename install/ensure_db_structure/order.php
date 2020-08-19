@@ -66,7 +66,7 @@ $table = \FriendsOfREDAXO\Simpleshop\Order::TABLE;
     'label' => '###label.invoice_num###',
     'prio'  => $prio++,
 ], [
-    'db_type'     => 'varchar(191)',
+    'db_type'     => 'int',
     'list_hidden' => 0,
     'search'      => 1,
     'attributes'  => '{"readonly":"readonly"}',

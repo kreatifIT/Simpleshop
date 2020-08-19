@@ -13,6 +13,7 @@ action.logout;Abmelden
 simpleshop.account_area_account;Account
 label.address;Adresse
 label.language;Sprache
+simpleshop.cash;Barbezahlung
 label.pages;Seiten
 error.choose_shipping_address;Bitte eine Versandadresse auswählen
 action.add_address;Adresse hinzufügen

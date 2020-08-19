@@ -65,10 +65,21 @@ class rex_yform_value_customer_address extends rex_yform_value_abstract
         $invoiceAddr  = $order->getInvoiceAddress();
         $shippingAddr = $order->getShippingAddress();
 
-        $value = implode(' | ', array_unique(array_filter([
-            $invoiceAddr->getName(null, true),
-            $shippingAddr->getName(null, true),
-        ])));
+        $value = trim(implode(' | ', array_unique(array_filter([
+            $invoiceAddr ? $invoiceAddr->getName(null, true) : '',
+            $shippingAddr ? $shippingAddr->getName(null, true) : '',
+        ]))));
+
+        if ($value == '') {
+            $customer = $order->getCustomerData();
+
+            if ($customer) {
+                $value = trim(implode(' ', array_unique(array_filter([
+                    $customer->getValue('firstname'),
+                    $customer->getValue('lastname'),
+                ]))));
+            }
+        }
         return $value;
     }
 

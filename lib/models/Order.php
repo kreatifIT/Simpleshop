@@ -242,7 +242,9 @@ class Order extends Model
         }
         if (!$this->valueIsset('shipping_address_id')) {
             $shippingAddress = $this->getShippingAddress();
-            $this->setValue('shipping_address_id', $shippingAddress->getId());
+            if ($shippingAddress) {
+                $this->setValue('shipping_address_id', $shippingAddress->getId());
+            }
         }
 
         if (self::$_finalizeOrder && !$already_exists) {

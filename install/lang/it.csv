@@ -14,6 +14,7 @@ label.language;Lingua
 simpleshop.account_area_account;Account
 label.address;Indirizzo
 label.pages;Pagine
+simpleshop.cash;Pagamento in contanti
 action.add_address;Aggiungi indirizzo
 action.close;chiudere
 label.giftcard;Cartolina regalo

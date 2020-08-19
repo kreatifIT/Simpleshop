@@ -39,7 +39,7 @@ abstract class Controller
         $inst->settings = \rex::getConfig('simpleshop.Settings');
 
         foreach ($inst->params as $key => $value) {
-            $inst->setVar($key, $value);
+            $inst->setVar($key, $value, false);
         }
         $inst->_execute();
         return $inst;

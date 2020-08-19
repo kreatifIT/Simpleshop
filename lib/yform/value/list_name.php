@@ -30,6 +30,10 @@ class rex_yform_value_list_name extends rex_yform_value_abstract
             $addressId = $customer->getValue('invoice_address_id');
             $address   = $addressId ? \FriendsOfREDAXO\Simpleshop\CustomerAddress::get($addressId) : null;
             $result    = $address ? $address->getName() : 'undefined';
+        } else if ($table == \FriendsOfREDAXO\Simpleshop\Order::TABLE) {
+            $order = \FriendsOfREDAXO\Simpleshop\Order::get($params['list']->getValue('id'));
+            $customer = $order->getCustomerData();
+            $result = $customer->getName();
         }
         return $result;
     }

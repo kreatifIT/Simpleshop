@@ -59,7 +59,12 @@ class Customer extends Model
     public function getName($lang_id = null, $companyFallback = false)
     {
         $address = $this->getAddress();
-        return $address ? $address->getName($lang_id, $companyFallback) : '';
+        $label   = trim($address ? $address->getName($lang_id, $companyFallback) : '');
+
+        if ($label == '') {
+            $label = trim($this->getValue('firstname') . ' ' . $this->getValue('lastname'));
+        }
+        return $label;
     }
 
     public function getAddress()
