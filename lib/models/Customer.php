@@ -58,13 +58,55 @@ class Customer extends Model
 
     public function getName($lang_id = null, $companyFallback = false)
     {
-        $address = $this->getAddress();
-        $label   = trim($address ? $address->getName($lang_id, $companyFallback) : '');
+        $addressSetting = Settings::getValue('customer_addresses_setting');
 
-        if ($label == '') {
-            $label = trim($this->getValue('firstname') . ' ' . $this->getValue('lastname'));
+        if ($addressSetting == 'disabled') {
+            $data  = $this->getData();
+            $ctype = trim($data['ctype']);
+
+            if ($ctype == 'person' || $ctype == '') {
+                $name = trim($data['firstname'] . ' ' . $data['lastname']);
+            } else {
+                $name = trim($data['company_name']);
+            }
+        } else {
+            $addressId = $this->getValue('invoice_address_id');
+            $address   = $addressId ? CustomerAddress::get($addressId) : null;
+            $name      = $address ? $address->getName() : '';
         }
-        return $label;
+        return $name;
+    }
+
+    public function getNameForOrder()
+    {
+        $label          = '';
+        $addressInfo    = [];
+        $addressSetting = Settings::getValue('customer_addresses_setting');
+
+        if ($addressSetting == 'disabled') {
+            $addressInfo = array_unique(array_filter([
+                $this->getName(null, true),
+                $this->getValue('email'),
+                $this->getValue('street'),
+                $this->getValue('postal'),
+                $this->getValue('location'),
+            ]));
+        } else {
+            $addressId = $this->getValue('invoice_address_id');
+            $address   = $addressId ? CustomerAddress::get($addressId) : null;
+
+            if ($address) {
+                $addressInfo = array_unique(array_filter([
+                    $address->getName(null, true),
+                    $address->getValue('street'),
+                    $address->getValue('postal'),
+                    $address->getValue('location'),
+                ]));
+            }
+            $label = "KUNDE: {$this->getName(null, true)} ---> ADRESSE: ";
+        }
+
+        return $label . implode(' | ', $addressInfo);
     }
 
     public function getAddress()
@@ -392,6 +434,52 @@ class Customer extends Model
     public static function isLoggedIn()
     {
         return (!empty($_SESSION['customer']['user']) && (int)$_SESSION['customer']['user']['id'] > 0);
+    }
+
+    public static function be__searchCustomer()
+    {
+        $orWhere = [];
+        $select  = ['m.id', 'm.email'];
+        $term    = trim(\rex_api_simpleshop_be_api::$inst->request['term']);
+
+        $stmt = self::query();
+        $stmt->alias('m');
+        $stmt->resetSelect();
+        $stmt->orderBy('m.id');
+
+        if (Customer::getYformFieldByName('company_name')) {
+            $select[]  = 'm.company_name';
+            $orWhere[] = 'm.company_name LIKE :term';
+        }
+        if (Customer::getYformFieldByName('firstname')) {
+            $select[]  = 'm.firstname';
+            $orWhere[] = 'm.firstname LIKE :term';
+        }
+        if (Customer::getYformFieldByName('lastname')) {
+            $select[]  = 'm.lastname';
+            $orWhere[] = 'm.lastname LIKE :term';
+        }
+        if (Customer::getYformFieldByName('street')) {
+            $orWhere[] = 'm.street LIKE :term';
+        }
+        if (Customer::getYformFieldByName('postal')) {
+            $select[] = 'm.postal';
+        }
+        if (Customer::getYformFieldByName('location')) {
+            $select[] = 'm.location';
+        }
+        $stmt->select($select);
+        $stmt->whereRaw('(' . implode(' OR ', $orWhere) . ')', ['term' => "%{$term}%"]);
+        $collection = $stmt->find();
+
+        $result = [];
+        foreach ($collection as $item) {
+            $result[] = [
+                'id'   => $item->getId(),
+                'text' => $item->getNameForOrder(),
+            ];
+        }
+        \rex_api_simpleshop_be_api::$inst->response['results'] = $result;
     }
 }
 

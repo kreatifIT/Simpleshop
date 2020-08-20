@@ -16,31 +16,45 @@ class rex_yform_value_customer_address extends rex_yform_value_abstract
 
     public function enterObject()
     {
-        $order = $this->params['main_id'] ? \FriendsOfREDAXO\Simpleshop\Order::get($this->params['main_id']) : null;
+        $addressSetting = \FriendsOfREDAXO\Simpleshop\Settings::getValue('customer_addresses_setting');
+        $order          = $this->params['main_id'] ? \FriendsOfREDAXO\Simpleshop\Order::get($this->params['main_id']) : null;
 
         if ($this->getValue() == '' && $order) {
-            $address = $order->getShippingAddress();
-            if ($address) {
-                $this->setValue($address->getId());
+            if ($addressSetting == 'disabled') {
+                $this->setValue($order->getValue('customer_id'));
+            } else {
+                $address = $order->getShippingAddress();
+                if ($address) {
+                    $this->setValue($address->getId());
+                }
             }
         }
 
         if ($this->params['send'] == 1 && $this->getValue() != '') {
             if ($this->params['main_table'] == \FriendsOfREDAXO\Simpleshop\Order::TABLE) {
-                $currentAddressId = $order ? $order->getValue($this->getName(null, true)) : 0;
+                $currentDataId = $order ? $order->getValue($this->getName(null, true)) : 0;
 
-                if ($this->getValue() != $currentAddressId) {
+                if ($this->getValue() != $currentDataId) {
+
                     // customer daten nur aktualisieren wenn sich kundenadresse geändert hat (manuell im Backend geändert worden)!
-                    $address    = \FriendsOfREDAXO\Simpleshop\CustomerAddress::get($this->getValue());
-                    $customerId = $address->getValue('customer_id');
-                    $customer   = $customerId ? \FriendsOfREDAXO\Simpleshop\Customer::get($customerId) : null;
+                    if ($addressSetting == 'disabled') {
+                        $customer = \FriendsOfREDAXO\Simpleshop\Customer::get($this->getValue());
 
-                    $this->params['value_pool']['sql']['customer_data']    = $customer;
-                    $this->params['value_pool']['sql']['customer_id']      = $customerId;
-                    $this->params['value_pool']['sql']['shipping_address'] = $address;
+                        $this->params['value_pool']['sql']['customer_id']      = $this->getValue();
+                        $this->params['value_pool']['sql']['shipping_address'] = null;
+                    } else {
+                        $address    = \FriendsOfREDAXO\Simpleshop\CustomerAddress::get($this->getValue());
+                        $customerId = $address->getValue('customer_id');
+                        $customer   = $customerId ? \FriendsOfREDAXO\Simpleshop\Customer::get($customerId) : null;
+
+                        $this->params['value_pool']['sql']['customer_id']      = $customerId;
+                        $this->params['value_pool']['sql']['shipping_address'] = $address;
+                    }
+                    $_object = \FriendsOfREDAXO\Simpleshop\Customer::create();
+                    $_object->setValue('data', $customer);
+                    $this->params['value_pool']['sql_overwrite']['customer_data'] = $_object->getRawValue('data');
                 } else if ($order) {
                     $this->params['value_pool']['sql']['customer_id']      = $order->getValue('customer_id');
-                    $this->params['value_pool']['sql']['customer_data']    = $order->getRawValue('customer_data');
                     $this->params['value_pool']['sql']['shipping_address'] = $order->getRawValue('shipping_address');
                 }
             } else if ((int)$this->getElement('empty_option') == 0) {
@@ -59,28 +73,26 @@ class rex_yform_value_customer_address extends rex_yform_value_abstract
 
     public static function getListValue($params)
     {
-        $orderId = $params['list']->getValue('id');
-        $order   = \FriendsOfREDAXO\Simpleshop\Order::get($orderId);
+        $orderId        = $params['list']->getValue('id');
+        $order          = \FriendsOfREDAXO\Simpleshop\Order::get($orderId);
+        $addressSetting = \FriendsOfREDAXO\Simpleshop\Settings::getValue('customer_addresses_setting');
 
-        $invoiceAddr  = $order->getInvoiceAddress();
-        $shippingAddr = $order->getShippingAddress();
-
-        $value = trim(implode(' | ', array_unique(array_filter([
-            $invoiceAddr ? $invoiceAddr->getName(null, true) : '',
-            $shippingAddr ? $shippingAddr->getName(null, true) : '',
-        ]))));
-
-        if ($value == '') {
-            $customer = $order->getCustomerData();
-
-            if ($customer) {
-                $value = trim(implode(' ', array_unique(array_filter([
-                    $customer->getValue('firstname'),
-                    $customer->getValue('lastname'),
-                ]))));
-            }
+        if ($addressSetting == 'disabled') {
+            $customerId = $order->getValue('customer_id');
+            $customer   = $customerId ? \FriendsOfREDAXO\Simpleshop\Customer::get($customerId) : null;
+            $customer   = $customer ?: $order->getCustomerData();
+            $nameChunks = [
+                $customer->getName(null, true),
+            ];
+        } else {
+            $invoiceAddr  = $order->getInvoiceAddress();
+            $shippingAddr = $order->getShippingAddress();
+            $nameChunks   = [
+                $invoiceAddr->getName(null, true),
+                $shippingAddr->getName(null, true),
+            ];
         }
-        return $value;
+        return implode(' | ', array_unique(array_filter($nameChunks)));
     }
 
     public function getDefinitions($values = [])

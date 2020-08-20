@@ -11,22 +11,31 @@
  * file that was distributed with this source code.
  */
 
-$addressId = $this->getValue();
+$dataId         = $this->getValue();
+$addressSetting = \FriendsOfREDAXO\Simpleshop\Settings::getValue('customer_addresses_setting');
 
-$addresses   = [];
 $class       = $this->getElement('required') ? 'form-is-required ' : '';
 $class_group = trim('form-group ' . $class . $this->getWarningClass());
-$address     = $addressId ? \FriendsOfREDAXO\Simpleshop\CustomerAddress::get($addressId) : null;
-$customer    = $address ? \FriendsOfREDAXO\Simpleshop\Customer::get($address->getValue('customer_id')) : null;
-$apiUrl      = rex_url::frontend('index.php?' . http_build_query(['rex-api-call' => 'simpleshop_be_api', 'controller' => 'CustomerAddress.be__searchAddress',]));
+
+if ($addressSetting == 'disabled') {
+    $label    = 'translate:label.choose_customer';
+    $customer = $dataId ? \FriendsOfREDAXO\Simpleshop\Customer::get($dataId) : null;
+    $object   = $customer;
+    $apiUrl   = rex_url::backend('index.php?' . http_build_query(['rex-api-call' => 'simpleshop_be_api', 'controller' => 'Customer.be__searchCustomer',]));
+} else {
+    $label    = 'translate:label.choose_address';
+    $object   = $dataId ? \FriendsOfREDAXO\Simpleshop\CustomerAddress::get($dataId) : null;
+    $customer = $object ? \FriendsOfREDAXO\Simpleshop\Customer::get($object->getValue('customer_id')) : null;
+    $apiUrl   = rex_url::backend('index.php?' . http_build_query(['rex-api-call' => 'simpleshop_be_api', 'controller' => 'CustomerAddress.be__searchAddress',]));
+}
 
 ?>
 <div class="<?= $class_group ?>">
     <label class="control-label"><?= $this->getLabel() ?></label>
-    <select class="form-control address-select" name="<?= $this->getFieldName() ?>" data-placeholder="Adresse auswählen" data-ajax--url="<?= $apiUrl ?>" data-minimum-input-length="0" data-customer-id="<?= $customer ? $customer->getId() : null ?>">
-        <?php if ($address): ?>
-            <option value="<?= $address->getId() ?>" <?= $addressId == $address->getId() ? 'selected="selected"' : '' ?>>
-                <?= $address->getNameForOrder() ?>
+    <select class="form-control address-select" name="<?= $this->getFieldName() ?>" data-placeholder="<?= rex_i18n::translate($label) ?>" data-ajax--url="<?= $apiUrl ?>" data-minimum-input-length="0" data-customer-id="<?= $customer ? $customer->getId() : null ?>">
+        <?php if ($object): ?>
+            <option value="<?= $object->getId() ?>" <?= $dataId == $object->getId() ? 'selected="selected"' : '' ?>>
+                <?= $object->getNameForOrder() ?>
             </option>
         <?php endif; ?>
     </select>

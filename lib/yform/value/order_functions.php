@@ -17,17 +17,13 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
         if (rex::isBackend() && $this->getParam('main_id')) {
             $sql              = rex_sql::factory();
             $Order            = \FriendsOfREDAXO\Simpleshop\Order::get($this->getParam('main_id'));
-            $CustomerData     = $Order->getCustomerData();
             $table            = $this->getParam('main_table');
             $main_id          = $this->getParam('main_id');
             $use_invoicing    = \FriendsOfREDAXO\Simpleshop\Utils::getSetting('use_invoicing', false);
             $use_packing_list = \FriendsOfREDAXO\Simpleshop\Utils::getSetting('packing_list_printing', false);
 
-            if (!$CustomerData || $CustomerData->getId() != $Order->getValue('customer_id')) {
-                $Order->save();
-                $CustomerData = $Order->getCustomerData();
-            }
-
+            // set customer data
+            $Order->getCustomerData();
             $Customer = $Order->getValue('customer_id') ? \FriendsOfREDAXO\Simpleshop\Customer::get($Order->getValue('customer_id')) : $Order->getInvoiceAddress();;
 
             if (strlen($table) && $this->getParam('send') == 0 && $this->getParam('main_id') > 0) {

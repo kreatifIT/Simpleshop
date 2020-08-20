@@ -35,7 +35,7 @@ label.coupon_end_date = wenn das Datum leer bleibt, ist der Code unbeschränkt g
 label.activated = aktiviert
 label.actived_on = Aktiviert am
 label.initial_total = Ausgangssumme
-label.products = Produkte sortieren
+label.products = Produkte
 label.sort_products = Produkte sortieren
 label.packing_list_title = Lieferschein
 label.shipping_address = Lieferadresse
@@ -79,6 +79,8 @@ label.product_height = Höhe in mm
 label.product_weight = Gewicht in g
 label.features = Eigenschaften
 label.related_products = zugehörige Produkte
+label.choose_address = Adresse auswählen
+label.choose_customer = Kunde auswählen
 
 
 action.goto_creditnote = gehe zur Gutschrift
@@ -129,6 +131,7 @@ settings.content_rma = Wiederrufsrecht
 settings.shop_functions = Shop-Funktionen
 settings.category_linking_label = Kategorie-Verlinkungen
 settings.category_linking_input_label = Schnell-Verlinkung im Backend aktivieren
+settings.customer_addresses_setting = Kunden-Adressen Einstellung
 
 coupon.use_settings = Nutzungs-Einstellungen
 coupon.use_info = Bestellhistorie

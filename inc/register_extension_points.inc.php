@@ -100,6 +100,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 \rex_extension::register('simpleshop.Settings.saved', function (\rex_extension_point $Ep) {
     Coupon::ext__processSettings($Ep);
+    CustomerAddress::ext__processSettings($Ep);
     DiscountGroup::ext__processSettings($Ep);
 });
 

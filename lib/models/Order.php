@@ -61,18 +61,25 @@ class Order extends Model
 
     public function getCustomerData()
     {
-        $CustomerData = $this->getValue('customer_data');
+        $customer     = $this->getValue('customer_data');
+        $customerData = $customer ? $customer->getData() : [];
         $customerId   = $this->getValue('customer_id');
 
-        if (!$CustomerData || ($customerId && $CustomerData->getId() != $customerId)) {
-            $CustomerData = $customerId ? Customer::get($customerId) : self::getInvoiceAddress();
-            $this->setValue('customer_data', $CustomerData);
 
-            if ($this->getId()) {
-                $this->save();
+        if (!$customer || ($customerId && $customerData['id'] != $customerId)) {
+            $customer = $customerId ? Customer::get($customerId) : null;
+            $customer = $customer ?: self::getInvoiceAddress();
+            $this->setValue('customer_data', $customer);
+
+            if ($this->getId() && $customer) {
+                $sql = \rex_sql::factory();
+                $sql->setTable(self::TABLE);
+                $sql->setValue('customer_data', $this->getRawValue('customer_data'));
+                $sql->setWhere(['id' => $this->getId()]);
+                $sql->update();
             }
         }
-        return $CustomerData;
+        return $customer;
     }
 
     public function isTaxFree()
@@ -227,15 +234,11 @@ class Order extends Model
 
         $sql            = \rex_sql::factory();
         $date_now       = date('Y-m-d H:i:s');
-        $CustomerData   = $this->getCustomerData();
-        $customerId     = $this->getValue('customer_id');
         $already_exists = !($this->getValue('invoice_num') === null || (int)$this->getValue('invoice_num') === 0);
 
-        if (!$CustomerData || ($customerId && $CustomerData->getId() != $customerId)) {
-            $CustomerData = $customerId ? Customer::get($customerId) : self::getInvoiceAddress();
+        // set customer data
+        $this->getCustomerData();
 
-            $this->setValue('customer_data', $CustomerData);
-        }
 
         if (!$this->valueIsset('createdate')) {
             $this->setValue('createdate', $date_now);

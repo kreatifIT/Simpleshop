@@ -52,6 +52,15 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
 
     <legend><?= $Addon->i18n('settings.shop_settings'); ?></legend>
     <dl class="rex-form-group form-group">
+        <dt><?= $Addon->i18n('settings.customer_addresses_setting'); ?></dt>
+        <dd>
+            <select name="customer_addresses_setting" class="form-control">
+                <option value="enabled"><?= \rex_i18n::translate('label.use') ?></option>
+                <option value="disabled" <?= from_array($Settings, 'customer_addresses_setting') == 'disabled' ? 'selected' : '' ?>><?= \rex_i18n::translate('label.use_not') ?></option>
+            </select>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
         <dt><?= $Addon->i18n('settings.brutto_prices_info'); ?></dt>
         <dd>
             <select name="brutto_prices" class="form-control">

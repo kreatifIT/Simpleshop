@@ -153,6 +153,10 @@ class Session extends Model
         do {
             try {
                 $products = self::_getCartItems($raw, $throwErrors);
+                $products = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Session.getCartItems', $products, [
+                    'raw'          => $raw,
+                    'throwErrors'  => $throwErrors,
+                ]));
                 $retry    = false;
             } catch (ProductException $ex) {
                 $retry = true;

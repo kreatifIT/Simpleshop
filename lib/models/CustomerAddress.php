@@ -129,7 +129,6 @@ class CustomerAddress extends Model
         $stmt->join(Customer::TABLE, 'jt1', 'jt1.id', 'm.customer_id');
         $stmt->orderBy('jt1.id');
         $stmt->orderBy('m.id');
-        $stmt->orderBy('m.id');
 
         if ($term == '' && $customerId > 0) {
             $stmt->where('m.customer_id', $customerId);
@@ -166,5 +165,28 @@ class CustomerAddress extends Model
             ];
         }
         \rex_api_simpleshop_be_api::$inst->response['results'] = $result;
+    }
+
+    public static function ext__processSettings(\rex_extension_point $ep)
+    {
+        $sql    = \rex_sql::factory();
+        $option = Settings::getValue('customer_addresses_setting');
+        $yTable = \rex_yform_manager_table::get(Coupon::TABLE);
+
+        $sql->setTable('rex_yform_field');
+        if ($option == 'disabled') {
+            $sql->setValue('type_name', 'hidden_input');
+            $sql->setValue('list_hidden', 1);
+        } else {
+            $sql->setValue('type_name', 'be_manager_relation');
+            $sql->setValue('list_hidden', 0);
+        }
+        $sql->setWhere([
+            'table_name' => Customer::TABLE,
+            'name'       => 'addresses',
+        ]);
+        $sql->update();
+
+        \rex_yform_manager_table_api::generateTableAndFields($yTable);
     }
 }
