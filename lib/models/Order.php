@@ -364,7 +364,8 @@ class Order extends Model
         $OrderProduct->setValue('order_id', $this->getId());
 
         $OrderProduct = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.saveOrderProduct', $OrderProduct, [
-            'Order' => $this,
+            'Order'   => $this,
+            'product' => $product,
         ]));
 
         $OrderProduct->save();
