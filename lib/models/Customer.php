@@ -423,11 +423,18 @@ class Customer extends Model
         $_SESSION['customer']['user'] = [];
     }
 
-    public static function getPasswordHash($password, $func = 'sha1')
+    public static function getPasswordHash($password)
     {
         $table  = \rex_yform_manager_table::get(Customer::TABLE);
-        $fields = $table->getFields(['name' => 'password_hash']);
-        $salt   = isset ($fields[0]) ? $fields[0]->getElement('salt') : '';
+        $field = current($table->getFields(['name' => 'password_hash']));
+
+        if ($field) {
+            $salt   = $field->getElement('salt');
+            $func   = $field->getElement('function');
+        } else {
+            $salt = '';
+            $func = 'sha1';
+        }
         return hash($func, $password . $salt);
     }
 

@@ -55,8 +55,8 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
         <dt><?= $Addon->i18n('settings.customer_addresses_setting'); ?></dt>
         <dd>
             <select name="customer_addresses_setting" class="form-control">
-                <option value="enabled"><?= \rex_i18n::translate('label.use') ?></option>
-                <option value="disabled" <?= from_array($Settings, 'customer_addresses_setting') == 'disabled' ? 'selected' : '' ?>><?= \rex_i18n::translate('label.use_not') ?></option>
+                <option value="enabled"><?= \rex_i18n::msg('label.use') ?></option>
+                <option value="disabled" <?= from_array($Settings, 'customer_addresses_setting') == 'disabled' ? 'selected' : '' ?>><?= \rex_i18n::msg('label.use_not') ?></option>
             </select>
         </dd>
     </dl>
