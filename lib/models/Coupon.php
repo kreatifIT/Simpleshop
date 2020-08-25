@@ -215,8 +215,7 @@ class Coupon extends Discount
             if (in_array('single', $options)) {
                 $choices['translate:coupon.use_single'] = 2;
             }
-            Yform::ensureValueField(Coupon::TABLE, 'is_multi_use', [], [
-                'type_name' => 'choice',
+            Yform::ensureValueField(Coupon::TABLE, 'is_multi_use', 'choice', [
                 'db_type'   => 'int',
                 'default'   => 0,
                 'no_db'     => 0,
