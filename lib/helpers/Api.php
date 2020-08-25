@@ -40,7 +40,7 @@ class rex_api_simpleshop_api extends rex_api_function
             throw new ApiException($ex->getMessage());
         }
         $this->response['controller'] = strtolower($controller);
-        $this->response = rex_extension::registerPoint(new rex_extension_point('simpleshop.Api.response', $this->response, []));
+        $this->response               = rex_extension::registerPoint(new rex_extension_point('simpleshop.Api.response', $this->response, []));
 
         rex_response::cleanOutputBuffers();
         return new rex_api_result($this->success, $this->response);
@@ -102,7 +102,13 @@ class rex_api_simpleshop_api extends rex_api_function
     private function api__cart_getcartcontent($layout)
     {
         $ctrlTpl    = $layout == 'offcanvas_cart' ? 'simpleshop/cart/offcanvas/container.php' : null;
-        $Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute();
+        $wrapper    = rex_request('wrapper', 'string', null);
+        $ctrlParams = [];
+
+        if ($wrapper) {
+            $ctrlParams['config']['wrapper'] = $wrapper;
+        }
+        $Controller = \FriendsOfREDAXO\Simpleshop\CartController::execute($ctrlParams);
 
         $Controller->setVar('product_added', true);
 
