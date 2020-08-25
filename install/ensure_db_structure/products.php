@@ -51,7 +51,7 @@ foreach ($langs as $index => $lang) {
         'attributes'  => '{"class":"tinyMCEEditor"}',
         'prio'        => $prio++,
     ], [
-        'db_type' => 'varchar(191)',
+        'db_type' => 'text',
     ]);
 
     if (($index + 1) < count($langs)) {
