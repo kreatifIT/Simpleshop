@@ -29,7 +29,7 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
 
     <legend><?= $Addon->i18n('settings.shop_settings'); ?></legend>
     <dl class="rex-form-group form-group">
-        <dt><?= $Addon->i18n('settings.brutto_prices'); ?></dt>
+        <dt><?= $Addon->i18n('settings.brutto_prices'); ?> (deprecated!)</dt>
         <dd>
             <label class="form-label">
                 <input type="checkbox" name="brutto_prices" value="1" <?= from_array($Settings, 'brutto_prices') == 1 ? 'checked="checked"' : '' ?>/>

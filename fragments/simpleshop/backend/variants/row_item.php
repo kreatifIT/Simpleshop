@@ -23,6 +23,7 @@ $Variant = $this->getVar('Variant');
 
 
 foreach ($fields as $field) {
+    $field->params['main_id'] = $Variant ? $Variant->getId() : null;
     $field->params['this']->setObjectparams('form_name', $vkey);
     $field->setId($field->name);
     $field->init();
