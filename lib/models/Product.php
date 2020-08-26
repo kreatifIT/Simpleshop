@@ -398,6 +398,12 @@ class Product extends Model
             $_this->applyVariantData($variant->getData());
         }
 
+        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Product.getProductByKey', $_this, [
+            'cart_quantity' => $cart_quantity,
+            'extras'        => $extras,
+            'throwErrors'   => $throwErrors,
+        ]));
+
         if ($_features && count($feature_ids)) {
             foreach ($feature_ids as $feature_id) {
                 // get variants
