@@ -160,15 +160,15 @@ $prio += 20;
     'no_db'   => 0,
 ]);
 
-\Kreatif\Yform::ensureValueField($table, 'price', 'number', [
+\Kreatif\Yform::ensureValueField($table, 'price', 'price_input', [
     'list_hidden' => 1,
     'search'      => 0,
     'placeholder' => '€',
-    'label'       => 'translate:label.net_single_price',
+    'label'       => 'translate:label.gross_single_price',
     'prio'        => $prio++,
 ], [
-    'scale'     => 3,
-    'precision' => 10,
+    'scale'     => 6,
+    'precision' => 13,
     'default'   => 0,
     'no_db'     => 0,
 ]);
@@ -177,11 +177,11 @@ $prio += 20;
     'list_hidden' => 1,
     'search'      => 0,
     'placeholder' => '€',
-    'label'       => 'translate:label.reduced_net_single_price',
+    'label'       => 'translate:label.reduced_gross_single_price',
     'prio'        => $prio++,
 ], [
-    'scale'     => 3,
-    'precision' => 10,
+    'scale'     => 6,
+    'precision' => 13,
     'default'   => 0,
     'no_db'     => 0,
 ]);

@@ -61,7 +61,7 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
-        <dt><?= $Addon->i18n('settings.brutto_prices_info'); ?></dt>
+        <dt><?= $Addon->i18n('settings.brutto_prices_info'); ?> (deprecated!)</dt>
         <dd>
             <select name="brutto_prices" class="form-control">
                 <option value="0"><?= $Addon->i18n('no'); ?></option>
