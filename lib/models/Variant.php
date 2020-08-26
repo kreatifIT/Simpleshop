@@ -58,7 +58,7 @@ class Variant extends Model
             $type = $column->getTypeName();
             $name = $column->getName();
 
-            if ($name == 'variant_key' || $type == 'datestamp' || $name == 'product_id') {
+            if ($name == 'variant_key' || $type == 'datestamp' || $name == 'product_id' || $type == 'be_user') {
                 continue;
             }
             $elements = $column->toArray();

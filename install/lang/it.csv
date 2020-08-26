@@ -81,6 +81,8 @@ label.email__user_registration_subject;Ti sei registrato con successo
 label.email__user_password_reset;Reset della password
 label.email;E-mail
 label.units;Einheiten
+label.gross_single_price = Prezzo lordo (tasso incl.)
+label.reduced_gross_single_price = Prezzo ridotto lordo (tasso incl.)
 label.single_price;Prezzo unitario
 error.shipping_zipcode_not_valid;Il codice postale non è valido
 label.single_price_no_vat;Prezzo unitario (IVA escl.)

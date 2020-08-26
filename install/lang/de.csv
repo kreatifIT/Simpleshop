@@ -79,6 +79,8 @@ error.coupon_already_used;Sie haben diesen Coupon bereits verwendet
 label.email__user_registration_subject;Sie haben erfolgreich registriert
 label.email;E-Mail
 label.units;Einheiten
+label.gross_single_price = Bruttopreis (inkl. MwSt)
+label.reduced_gross_single_price = Reduzierter Bruttopreis (inkl. MwSt)
 label.single_price;Einzelpreis
 label.single_price_no_vat;Einzelpreis (exkl. MwSt.)
 error.order_has_no_product;Es befinden sich keine Artikel in der Einkaufstasche
