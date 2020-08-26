@@ -94,6 +94,8 @@ error.coupon_not_valid_anymore;This coupon-code has expired
 error.coupon_already_used;You have already used this coupon
 label.email;E-mail
 label.units;
+label.gross_single_price = Gross price (tax incl.)
+label.reduced_gross_single_price = Reduced gross price (tax incl.)
 label.single_price;Single price
 error.shipping_zipcode_not_valid;The postal code is invalid
 label.single_price_no_vat;Single price (VAT excl.)
