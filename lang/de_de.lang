@@ -71,7 +71,7 @@ label.sort_products_for_cat_title = Produkte sortieren in der Kategorie: "{CATNA
 label.save_order_for_order_products = Sie müssen zuerst die Bestellung erstellen, erst dann können Sie Produkte hinzufügen. Klicken Sie einfach am Ende der Seite auf "Übernehmen"
 label.inventory = Artikelbestand
 label.track_inventory = verfolgen
-label.not_tack_inventory = nicht verfolgen
+label.not_track_inventory = nicht verfolgen
 label.inventory_notice = wenn Inventar nicht verfolgt wird muss man bei Menge 1 (= verfügbar) oder 0 (= nicht verfügbar) eintragen
 label.product_length = Länge in mm
 label.product_width = Breite in mm
