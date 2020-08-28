@@ -53,6 +53,12 @@ $Settings = $this->getVar('Settings');
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
+        <dt>Code für Transportspesen:</dt>
+        <dd>
+            <input type="text" class="form-control" name="order_shipping_code" value="<?= from_array($Settings, 'order_shipping_code') ?>"/>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
         <dt>Synchronisierung:</dt>
         <dd>
             <select name="ombis_order_sync" class="form-control">

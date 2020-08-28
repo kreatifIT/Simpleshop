@@ -15,10 +15,9 @@ namespace FriendsOfREDAXO\Simpleshop\Ombis;
 
 
 use FriendsOfREDAXO\Simpleshop\Settings;
-use Kreatif\Model;
 use Kreatif\WSConnector;
+use FriendsOfREDAXO\Simpleshop\Utils;
 use Kreatif\WSConnectorException;
-use function FriendsOfREDAXO\Simpleshop\Utils;
 
 
 class Api extends WSConnector
@@ -32,7 +31,13 @@ class Api extends WSConnector
 
 
         if ($path != '/versioninfo') {
-            $apiUrl .= Settings::getValue('api_company_path', 'Ombis');
+            $_apiCompanyPath = Settings::getValue('api_company_path', 'Ombis');
+            $_compPathPos    = strpos($path, $_apiCompanyPath);
+            $apiUrl          .= $_apiCompanyPath;
+
+            if ($_compPathPos !== false) {
+                $path = substr($path, $_compPathPos + strlen($_apiCompanyPath));
+            }
 
             if ($method == 'POST' || $method == 'PUT') {
                 $data = json_encode($data);
@@ -51,11 +56,31 @@ class Api extends WSConnector
         $conn->setAuth($apiUser, $apiPwd);
         $conn->setLang('de-De');
         $conn->setGzip(true);
-        $conn->setReturnHeader($method == 'POST' || $method == 'PUT');
+        $conn->setReturnHeader($method != 'GET');
         //$conn->setDebug(true);
 
+        $isWarnig = false;
         $response = $conn->request($path, $data, $method);
-        return ($method == 'POST' || $method == 'PUT') ? $response : $response['response'];
+
+        if ($method == 'POST' || $method == 'PUT') {
+            foreach ($response['raw_resp_header'] as $headerLine) {
+                if (strpos($headerLine, 'location:') !== false) {
+                    $chunks              = explode('/', trim($headerLine));
+                    $response['last_id'] = array_pop($chunks);
+                    break;
+                }
+            }
+            if (trim($response['response']) != '') {
+                $isWarnig = true;
+            }
+        }
+        $logMsg = "
+            URL: {$path}
+            Requst: " . print_r($data, true) . "
+            Response: " . print_r($response['response'], true) . "
+        ";
+        Utils::log('Ombis.request', $logMsg, $isWarnig ? 'WARNING' : 'ERROR', true);
+        return $method == 'POST' || $method == 'PUT' ? $response : $response['response'];
     }
 
     public static function testConnection()

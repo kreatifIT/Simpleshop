@@ -42,10 +42,9 @@ class Address
         if ($country) {
             $countryData = Api::curl('/land', [
                 'filter' => "eq(ISOCode,{$country->getValue('iso2')})",
-            ], 'GET', ['Code']);
-            pr($countryData);
+            ], 'GET', ['ID']);
             if (isset($countryData['Data'][0])) {
-                $ombisCountryId = $countryData['Data'][0]->Fields->Code;
+                $ombisCountryId = $countryData['Data'][0]->Fields->ID;
             }
         }
 
@@ -71,16 +70,21 @@ class Address
         }
 
 
-        $ombisId = trim($address->getValue('ombis_id'));
-        $path    = $ombisId == '' ? '' : "/{$ombisId}";
-        $method  = $ombisId == '' ? 'POST' : 'PUT';
-
-        //pr('write address: ' . $method, 'orange');
-        //pr($data, 'blue');
-        //pr(json_encode($data));
-
+        $ombisId  = trim($address->getValue('ombis_id'));
+        $path     = $ombisId == '' ? '' : "/{$ombisId}";
+        $method   = $ombisId == '' ? 'POST' : 'PUT';
         $response = Api::curl('/adresse' . $path, $data, $method);
-        return $response['Data'];
+
+
+        if (isset($response['last_id'])) {
+            $ombisId = $response['last_id'];
+        }
+        $response = Api::curl("/adresse/{$ombisId}", [], 'GET', ['ID', 'UUID']);
+
+
+        $address->setValue('ombis_id', $response['Fields']->ID);
+        $address->setValue('ombis_uid', $response['Fields']->UUID);
+        return $address;
     }
 
     public static function findByEmail($email, $fields = [])
@@ -103,6 +107,7 @@ class Address
 
     public static function findOrCreateByAddress(CustomerAddress $address, $type = 'invoice')
     {
+        $data      = null;
         $fields    = ['ID', 'Name', 'UUID', 'PLZ', 'Ort', 'Strasse1', 'Strasse2', 'EMail', 'Steuernummer', 'MwStNummer', 'UStIDNummer'];
         $isCompany = $address->getValue('ctype') == 'company';
         $customer  = $address->valueIsset('customer_id') ? Customer::get($address->getValue('customer_id')) : null;
@@ -143,13 +148,13 @@ class Address
             }
         }
 
-        if (!$_address) {
-            self::write($address);
+        if ($_address) {
+            $address->setValue('ombis_id', $_address->Fields->ID);
+            $address->setValue('ombis_uid', $_address->Fields->UUID);
+        } else {
+            $address = self::write($address);
         }
-
-        $address->setValue('ombis_id', $_address->Fields->ID);
-        $address->setValue('ombis_uid', $_address->Fields->UUID);
         $address->save();
-        return $_address;
+        return $address;
     }
 }
