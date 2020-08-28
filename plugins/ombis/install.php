@@ -12,35 +12,94 @@
  */
 
 
-$sql = rex_sql::factory();
-$sql->setQuery('SET FOREIGN_KEY_CHECKS = 0');
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ADDRESS table fields
+$table = \FriendsOfREDAXO\Simpleshop\CustomerAddress::TABLE;
+$field = \FriendsOfREDAXO\Simpleshop\CustomerAddress::getYformFieldByName('customer_id');
+$prio = $field->getElement('prio');
 
-try {
+\Kreatif\Yform::ensureValueField($table, 'ombis_id', [], [
+    'type_name'   => 'integer',
+    'list_hidden' => 1,
+    'search'      => 1,
+    'label'       => 'Ombis-ID',
+    'db_type'     => 'int',
+    'attributes'  => '{"readonly":"readonly"}',
+    'prio'        => $prio++
+]);
 
-//    $item = current($sql->getArray('SELECT id FROM rex_yform_field WHERE table_name = :table AND type_id = :type AND name = :name', [
-//        'table' => 'rex_shop_order',
-//        'type'  => 'value',
-//        'name'  => 'remarks',
-//    ]));
-//    if (!$item) {
-//        $sql->setTable('rex_yform_field');
-//        $sql->setValue('table_name', 'rex_shop_order');
-//        $sql->setValue('prio', 5);
-//        $sql->setValue('type_id', 'value');
-//        $sql->setValue('type_name', 'textarea');
-//        $sql->setValue('db_type', 'text');
-//        $sql->setValue('list_hidden', 1);
-//        $sql->setValue('search', 0);
-//        $sql->setValue('name', 'remarks');
-//        $sql->setValue('label', '###label.remarks_infos###');
-//        $sql->insert();
-//    }
+\Kreatif\Yform::ensureValueField($table, 'ombis_uid', [], [
+    'type_name'   => 'text',
+    'list_hidden' => 1,
+    'search'      => 1,
+    'label'       => 'Ombis-UUID',
+    'db_type'     => 'varchar(191)',
+    'attributes'  => '{"readonly":"readonly"}',
+    'prio'        => $prio++
+]);
 
-    rex_sql_table::get('rex_shop_order')
-        ->ensureColumn(new rex_sql_column('ombis_uid', 'varchard()'), 'invoice_num')
-        ->alter();
-}
-finally {
-    $sql = rex_sql::factory();
-    $sql->setQuery('SET FOREIGN_KEY_CHECKS = 1');
-}
+$yTable = rex_yform_manager_table::get($table);
+rex_yform_manager_table_api::generateTableAndFields($yTable);
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// PRODUCT table fields
+$table = \FriendsOfREDAXO\Simpleshop\Product::TABLE;
+$field = \FriendsOfREDAXO\Simpleshop\Product::getYformFieldByName('code');
+
+\Kreatif\Yform::ensureValueField($table, 'ombis_code', [], [
+    'type_name'   => 'text',
+    'list_hidden' => 1,
+    'search'      => 0,
+    'label'       => 'Ombis-Artikelnummer',
+    'db_type'     => 'varchar(191)',
+    'attributes'  => '{"readonly":"readonly"}',
+    'prio'        => $field->getElement('prio') + 1,
+]);
+
+$yTable = rex_yform_manager_table::get($table);
+rex_yform_manager_table_api::generateTableAndFields($yTable);
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// VARIANT table fields
+$table = \FriendsOfREDAXO\Simpleshop\Variant::TABLE;
+$field = \FriendsOfREDAXO\Simpleshop\Variant::getYformFieldByName('code');
+
+\Kreatif\Yform::ensureValueField($table, 'ombis_code', [], [
+    'type_name'   => 'text',
+    'list_hidden' => 1,
+    'search'      => 0,
+    'label'       => 'Ombis-Artikelnummer',
+    'db_type'     => 'varchar(191)',
+    'attributes'  => '{"readonly":"readonly"}',
+    'prio'        => $field->getElement('prio') + 1,
+]);
+
+$yTable = rex_yform_manager_table::get($table);
+rex_yform_manager_table_api::generateTableAndFields($yTable);
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ORDER table fields
+$table = \FriendsOfREDAXO\Simpleshop\Order::TABLE;
+$field = \FriendsOfREDAXO\Simpleshop\Order::getYformFieldByName('invoice_num');
+
+
+\Kreatif\Yform::ensureValueField($table, 'ombis_id', [], [
+    'type_name'   => 'integer',
+    'list_hidden' => 1,
+    'search'      => 1,
+    'label'       => 'Ombis-ID',
+    'db_type'     => 'int',
+    'attributes'  => '{"readonly":"readonly"}',
+    'prio'        => $field->getElement('prio') + 1,
+]);
+
+
+$yTable = rex_yform_manager_table::get($table);
+rex_yform_manager_table_api::generateTableAndFields($yTable);

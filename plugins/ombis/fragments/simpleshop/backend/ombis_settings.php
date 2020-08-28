@@ -44,4 +44,56 @@ $Settings = $this->getVar('Settings');
         </dd>
     </dl>
 
+
+    <legend>Order-Einstellung</legend>
+    <dl class="rex-form-group form-group">
+        <dt>Dummy Customer ID:</dt>
+        <dd>
+            <input type="text" class="form-control" name="order_dummy_id" value="<?= from_array($Settings, 'order_dummy_id') ?>"/>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
+        <dt>Synchronisierung:</dt>
+        <dd>
+            <select name="ombis_order_sync" class="form-control">
+                <option value="">-</option>
+                    <option value="address_sync" <?= from_array($Settings, 'ombis_order_sync') == 'address_sync' ? 'selected="selected"' : '' ?>>
+                        Adressen prüfen bei Bestellungsabschluss (nur Adressen syncen)
+                    </option>
+            </select>
+        </dd>
+    </dl>
+
+    <legend><?= $Addon->i18n('label.payment_methods'); ?></legend>
+    <?php
+    $payments    = \FriendsOfREDAXO\Simpleshop\Payment::getAll();
+    $apiPayments = \FriendsOfREDAXO\Simpleshop\Ombis\Payment::getAll();
+    $values      = from_array($Settings, 'ombis_payment_config');
+    ?>
+    <?php if (count($apiPayments) && count($payments)): ?>
+        <?php foreach ($payments as $payment): ?>
+            <dl class="rex-form-group form-group">
+                <dt><?= $payment->getName() ?>:</dt>
+                <dd>
+                    <select name="ombis_payment_config[<?= $payment->plugin_name ?>]" class="form-control">
+                        <option value="">-</option>
+                        <?php foreach ($apiPayments as $apiPayment): ?>
+                            <option value="<?= $apiPayment->Fields->Code ?>" <?= $values[$payment->plugin_name] == $apiPayment->Fields->Code ? 'selected="selected"' : '' ?>>
+                                <?= $apiPayment->Fields->Name; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </dd>
+            </dl>
+        <?php endforeach; ?>
+    <?php elseif (count($payments) == 0): ?>
+        <div class="alert alert-danger">
+            No payment methods active (Activate in Addons > Simpleshop)
+        </div>
+    <?php elseif (count($apiPayments) == 0): ?>
+        <div class="alert alert-danger">
+            Ombis has no registered paymentmethods (Zahlungsart) - contact client
+        </div>
+    <?php endif; ?>
+
 </fieldset>
