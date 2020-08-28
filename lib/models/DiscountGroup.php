@@ -22,7 +22,7 @@ class DiscountGroup extends Discount
     {
         $promotions = $Ep->getSubject();
 
-        if (parent::isRegistered(self::TABLE)) {
+        if (!\rex_yform_manager_table::get(DiscountGroup::TABLE)->isHidden()) {
             $Order      = $Ep->getParam('Order');
             $promotions = self::getValidPromotions($Ep->getParam('products'), $Order->getCustomerData());
         }
