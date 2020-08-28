@@ -103,15 +103,16 @@ class Address
 
     public static function findOrCreateByAddress(CustomerAddress $address, $type = 'invoice')
     {
+        $fields    = ['ID', 'Name', 'UUID', 'PLZ', 'Ort', 'Strasse1', 'Strasse2', 'EMail', 'Steuernummer', 'MwStNummer', 'UStIDNummer'];
         $isCompany = $address->getValue('ctype') == 'company';
         $customer  = $address->valueIsset('customer_id') ? Customer::get($address->getValue('customer_id')) : null;
 
         if ($customer) {
-            $data = Address::findByEmail($customer->getValue('email'));
+            $data = Address::findByEmail($customer->getValue('email'), $fields);
         }
         if (!$data) {
             $fiscalInfo = $isCompany ? $address->getValue('vat_num') : $address->getValue('fiscal_code');
-            $data       = Address::findByFiscalInfo($fiscalInfo, ['ID', 'Name', 'UUID', 'PLZ', 'Ort', 'Strasse1', 'Strasse2', 'EMail', 'Steuernummer', 'MwStNummer', 'UStIDNummer']);
+            $data       = Address::findByFiscalInfo($fiscalInfo, $fields);
         }
 
         if ($data) {
