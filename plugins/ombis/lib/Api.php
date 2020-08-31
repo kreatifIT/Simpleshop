@@ -23,7 +23,7 @@ use Kreatif\WSConnectorException;
 class Api extends WSConnector
 {
 
-    public static function curl($path, $data = [], $method = 'GET', $fields = [])
+    public static function curl($path, $data = [], $method = 'GET', $fields = [], $debug = false)
     {
         $apiUrl  = Settings::getValue('api_base_url', 'Ombis');
         $apiUser = Settings::getValue('api_username', 'Ombis');
@@ -57,7 +57,7 @@ class Api extends WSConnector
         $conn->setLang('de-De');
         $conn->setGzip(true);
         $conn->setReturnHeader($method != 'GET');
-        //$conn->setDebug(true);
+        $conn->setDebug($debug);
 
         $isWarnig = false;
         $response = $conn->request($path, $data, $method);
@@ -79,7 +79,7 @@ class Api extends WSConnector
             Requst: " . print_r($data, true) . "
             Response: " . print_r($response['response'], true) . "
         ";
-        Utils::log('Ombis.request', $logMsg, $isWarnig ? 'WARNING' : 'ERROR', true);
+        Utils::log('Ombis.request', $logMsg, $isWarnig ? 'WARNING' : 'INFO', $isWarnig);
         return $method == 'POST' || $method == 'PUT' ? $response : $response['response'];
     }
 

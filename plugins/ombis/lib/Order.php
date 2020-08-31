@@ -120,7 +120,7 @@ class Order
             ];
         }
 
-        $data = [
+        $data = \rex_extension::registerPoint(new \rex_extension_point('Ombis.orderData', [
             'Fields'      => [
                 'CustomerNo'              => $dummyId,
                 'TypeOfPaymentCode'       => $paymentConfig[$payment->getPluginName()],
@@ -128,13 +128,13 @@ class Order
                 'CustomerReferenceDate'   => date('Y-m-d'),
                 'InvoiceAddressUUID'      => $invoiceAddress->getValue('ombis_uid'),
                 'ShippingAddressUUID'     => $shippingAddress->getValue('ombis_uid'),
-                'DocType'                 => 'VkAuftrag',
                 'Notes'                   => (string)$order->getValue('remarks'),
+                'DocType'                 => 'VkAuftrag',
             ],
             'Collections' => [
                 'DocPosition' => $docPositions,
             ],
-        ];
+        ]));
 
         //pr($data, 'blue');
         //pr(json_encode($data));
