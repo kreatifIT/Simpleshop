@@ -89,10 +89,21 @@ class Address
 
     public static function findByEmail($email, $fields = [])
     {
-        $response = (array)Api::curl('/adresse', [
-            'filter' => "and(eq(Gesperrt,0),eq(EMail, {$email}))",
+        $response = (array)Api::curl('/kommunikation', [
+            'filter' => "and(eq(Typ,E1),eq(NummerAdresse,{$email}))",
             'order'  => '-ID',
-        ], 'GET', $fields);
+        ], 'GET', ['Adresse.ID']);
+
+        if (isset($response['Data'])) {
+            $addressIds = [];
+            foreach ($response['Data'] as $item) {
+                $addressIds[] = $item->Fields->{'Adresse.ID'};
+            }
+            $response = (array)Api::curl('/adresse', [
+                'filter' => 'in(ID,'. implode(',', $addressIds) .')',
+                'order'  => '-ID',
+            ], 'GET', $fields);
+        }
         return $response['Data'];
     }
 
