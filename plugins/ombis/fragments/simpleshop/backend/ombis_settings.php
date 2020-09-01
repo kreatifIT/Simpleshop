@@ -59,6 +59,12 @@ $Settings = $this->getVar('Settings');
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
+        <dt>Code für Rabattposition:</dt>
+        <dd>
+            <input type="text" class="form-control" name="order_disount_code" value="<?= from_array($Settings, 'order_disount_code') ?>"/>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
         <dt>Synchronisierung:</dt>
         <dd>
             <select name="ombis_order_sync" class="form-control">

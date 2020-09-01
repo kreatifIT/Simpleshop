@@ -56,6 +56,7 @@ class Order
         $dummyId         = Settings::getValue('order_dummy_id', 'Ombis');
         $paymentConfig   = Settings::getValue('ombis_payment_config', 'Ombis');
         $shippingCode    = Settings::getValue('order_shipping_code', 'Ombis');
+        $discountCode    = Settings::getValue('order_disount_code', 'Ombis');
         $invoiceAddress  = $order->getInvoiceAddress();
         $shippingAddress = $order->getShippingAddress();
         $payment         = $order->getValue('payment');
@@ -109,7 +110,7 @@ class Order
         foreach ($order->getValue('promotions') as $promotion) {
             $docPositions['Data'][] = [
                 'Fields' => [
-                    'ItemCode'           => '00902',
+                    'ItemCode'           => $discountCode,
                     'Price'              => number_format($promotion->getValue('value') * -1, 2, '.', ''),
                     'Quantity'           => '1',
                     'PricePerQuantity'   => '1',
