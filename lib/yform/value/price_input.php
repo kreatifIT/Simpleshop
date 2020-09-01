@@ -27,6 +27,9 @@ class rex_yform_value_price_input extends rex_yform_value_number
                 }
                 $product = \FriendsOfREDAXO\Simpleshop\Product::get($productId);
                 $taxId   = $product->getValue('tax');
+            } else if (rex_get('page', 'string') == 'simpleshop/variants' && $dataId = rex_get('data_id', 'int')) {
+                $product = \FriendsOfREDAXO\Simpleshop\Product::get($dataId);
+                $taxId   = $product->getValue('tax');
             } else {
                 foreach ($this->params['values'] as $_valObject) {
                     if ($_valObject->getName() == 'tax') {
