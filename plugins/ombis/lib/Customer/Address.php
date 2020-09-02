@@ -51,7 +51,8 @@ class Address
 
         $data = [
             'Fields' => [
-                'Name1'        => $address->getName(),
+                'Name1'        => $isCompany ? $address->getName() : $address->getValue('lastname'),
+                'Name2'        => $isCompany ? '' : $address->getValue('firstname'),
                 'Email'        => $customer ? $customer->getValue('email') : $address->getValue('email'),
                 'Sprache'      => $lang ? $lang->getCode() : '',
                 'Steuernummer' => strtoupper($address->getValue('fiscal_code')),
