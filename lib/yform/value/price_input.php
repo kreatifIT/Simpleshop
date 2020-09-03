@@ -17,44 +17,39 @@ class rex_yform_value_price_input extends rex_yform_value_number
     {
         $dbPrice = null;
 
-        if ($this->params['send']) {
-            if ($this->params['main_id']) {
-                if ($this->params['main_table'] == \FriendsOfREDAXO\Simpleshop\Product::TABLE) {
-                    $productId = $this->params['main_id'];
-                } else if ($this->params['main_table'] == \FriendsOfREDAXO\Simpleshop\Variant::TABLE) {
-                    $variant   = \FriendsOfREDAXO\Simpleshop\Variant::get($this->params['main_id']);
-                    $productId = $variant->getValue('product_id');
-                }
-                $product = \FriendsOfREDAXO\Simpleshop\Product::get($productId);
-                $taxId   = $product->getValue('tax');
-            } else if (rex_get('page', 'string') == 'simpleshop/variants' && $dataId = rex_get('data_id', 'int')) {
-                $product = \FriendsOfREDAXO\Simpleshop\Product::get($dataId);
-                $taxId   = $product->getValue('tax');
-            } else {
-                foreach ($this->params['values'] as $_valObject) {
-                    if ($_valObject->getName() == 'tax') {
-                        $taxId = $_valObject->getValue();
-                        break;
+        if (rex::isBackend()) {
+            if ($this->params['send']) {
+                if ($this->params['main_id']) {
+                    if ($this->params['main_table'] == \FriendsOfREDAXO\Simpleshop\Product::TABLE) {
+                        $productId = $this->params['main_id'];
+                    } else if ($this->params['main_table'] == \FriendsOfREDAXO\Simpleshop\Variant::TABLE) {
+                        $variant   = \FriendsOfREDAXO\Simpleshop\Variant::get($this->params['main_id']);
+                        $productId = $variant->getValue('product_id');
                     }
+                    $product = \FriendsOfREDAXO\Simpleshop\Product::get($productId);
+                    $taxId   = $product->getValue('tax');
+                } else if (rex_get('page', 'string') == 'simpleshop/variants' && $dataId = rex_get('data_id', 'int')) {
+                    $product = \FriendsOfREDAXO\Simpleshop\Product::get($dataId);
+                    $taxId   = $product->getValue('tax');
                 }
-            }
-            $tax = $taxId ? \FriendsOfREDAXO\Simpleshop\Tax::get($taxId) : null;
+                $tax = $taxId ? \FriendsOfREDAXO\Simpleshop\Tax::get($taxId) : null;
 
-            if ($tax && $taxPerc = $tax->getValue('tax')) {
-                $dbPrice = str_replace(',', '.', str_replace(',', '.', $this->getValue()) / ($taxPerc + 100) * 100);
+                if ($tax && $taxPerc = $tax->getValue('tax')) {
+                    $dbPrice = str_replace(',', '.', str_replace(',', '.', $this->getValue()) / ($taxPerc + 100) * 100);
+                }
+            } else if ($this->params['main_id']) {
+                if ($this->params['main_table'] == \FriendsOfREDAXO\Simpleshop\Product::TABLE) {
+                    $product = \FriendsOfREDAXO\Simpleshop\Product::get($this->params['main_id']);
+                } else if ($this->params['main_table'] == \FriendsOfREDAXO\Simpleshop\Variant::TABLE) {
+                    $variant = \FriendsOfREDAXO\Simpleshop\Variant::get($this->params['main_id']);
+                    $product = \FriendsOfREDAXO\Simpleshop\Product::get($variant->getValue('product_id'));
+                    $product->setValue($this->getName(), $variant->getValue($this->getName()));
+                }
+                $this->setValue($product->getPrice(true));
             }
-        } else if ($this->params['main_id']) {
-            if ($this->params['main_table'] == \FriendsOfREDAXO\Simpleshop\Product::TABLE) {
-                $product = \FriendsOfREDAXO\Simpleshop\Product::get($this->params['main_id']);
-            } else if ($this->params['main_table'] == \FriendsOfREDAXO\Simpleshop\Variant::TABLE) {
-                $variant = \FriendsOfREDAXO\Simpleshop\Variant::get($this->params['main_id']);
-                $product = \FriendsOfREDAXO\Simpleshop\Product::get($variant->getValue('product_id'));
-                $product->setValue($this->getName(), $variant->getValue($this->getName()));
-            }
-            $this->setValue($product->getPrice(true));
+
+            $this->setValue(number_format((float)str_replace(',', '.', $this->getValue()), 2, '.', ''));
         }
-
-        $this->setValue(number_format((float)str_replace(',', '.', $this->getValue()), 2, '.', ''));
 
         parent::enterObject();
 
