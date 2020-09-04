@@ -63,15 +63,17 @@ class Api extends WSConnector
         $response = $conn->request($path, $data, $method);
 
         if ($method == 'POST' || $method == 'PUT') {
+            $isWarnig = true;
             foreach ($response['raw_resp_header'] as $headerLine) {
                 if (strpos($headerLine, 'location:') !== false) {
+                    $isWarnig            = false;
                     $chunks              = explode('/', trim($headerLine));
                     $response['last_id'] = array_pop($chunks);
                     break;
                 }
             }
-            if (trim($response['response']) != '') {
-                $isWarnig = true;
+            if (trim($response['resonse']) == '') {
+                $isWarnig = false;
             }
         }
         $logMsg = "
