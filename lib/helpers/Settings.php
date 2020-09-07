@@ -50,7 +50,7 @@ class Settings
         if ($mpdf->isAvailable()) {
             $addon = \rex_addon::get('simpleshop');
             FragmentConfig::$data['checkout']['generate_pdf'] = true;
-            \Kreatif\Mpdf\Mpdf::addCSSPath($addon->getPath('assets/scss/pdf_styles.scss'));
+            \Kreatif\Mpdf\Mpdf::addCSSPath($addon->getPath('assets/scss/shop.scss'));
         }
 
         $tableIsHidden = \rex_yform_manager_table::get(Coupon::TABLE)->isHidden();

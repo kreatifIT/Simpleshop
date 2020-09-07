@@ -61,13 +61,6 @@ namespace FriendsOfREDAXO\Simpleshop;
                 ]);
             }
         }
-
-        $mpdf = \rex_addon::get('kreatif-mpdf');
-
-        if ($mpdf->isAvailable()) {
-            FragmentConfig::$data['checkout']['generate_pdf'] = true;
-            \Kreatif\Mpdf\Mpdf::addCSSPath($this->getPath('assets/scss/pdf_styles.scss'));
-        }
     }
     return $Ep->getSubject();
 });
