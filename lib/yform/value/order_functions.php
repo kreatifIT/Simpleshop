@@ -260,6 +260,11 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                 ';
             }
 
+            $output = rex_extension::registerPoint(new rex_extension_point('simpleshop.orderFunctions.output', $output, [
+                'order'  => $Order,
+                'action' => $action,
+            ]));
+
             $this->params['form_output'][$this->getId()] = '
                 <div class="row nested-panel">
                     <div class="form-group col-xs-12" id="' . $this->getHTMLId() . '">
