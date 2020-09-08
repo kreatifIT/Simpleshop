@@ -23,7 +23,7 @@ use Kreatif\WSConnectorException;
 class Order
 {
 
-    public static function createPreVKDokument(\FriendsOfREDAXO\Simpleshop\Order $order)
+    public static function writePreVKDokument(\FriendsOfREDAXO\Simpleshop\Order $order)
     {
         $orderSync = \FriendsOfREDAXO\Simpleshop\Settings::getValue('ombis_order_sync', 'Ombis');
 
@@ -50,7 +50,7 @@ class Order
         return $order;
     }
 
-    public static function write(\FriendsOfREDAXO\Simpleshop\Order $order)
+    private static function write(\FriendsOfREDAXO\Simpleshop\Order $order)
     {
         $docPositions    = ['Data' => []];
         $dummyId         = Settings::getValue('order_dummy_id', 'Ombis');
@@ -152,13 +152,52 @@ class Order
         return $order;
     }
 
+    public static function ext__orderFunctionsOutput(\rex_extension_point $ep)
+    {
+        $output = $ep->getSubject();
+        $order  = $ep->getParam('order');
+        $action = $ep->getParam('action');
+
+        if ($action == 'write-to-ombis') {
+            try {
+                $_ombisId = $order->getValue('ombis_id');
+                $order    = self::writePreVKDokument($order);
+                $ombisId  = $order->getValue('ombis_id');
+
+                if ($ombisId == 0 || $ombisId == '') {
+                    echo \rex_view::error('PreVKDokument konnte nicht übermittelt werden');
+                } else if ($_ombisId == '' || $_ombisId == 0) {
+                    echo \rex_view::info('Neues PreVKDokument erstellt mit ID = ' . $ombisId);
+                } else {
+                    echo \rex_view::info('PreVKDokument mit ID = ' . $ombisId . ' wurde aktualisiert');
+                }
+            } catch (\Exception $ex) {
+                echo \rex_view::error($ex->getMessage());
+            }
+        }
+
+        $output[] = '
+             <a href="' . \rex_url::currentBackendPage([
+                'table_name' => \FriendsOfREDAXO\Simpleshop\Order::TABLE,
+                'data_id'    => $order->getId(),
+                'func'       => rex_request('func', 'string'),
+                'ss-action'  => 'write-to-ombis',
+                'ts'         => time(),
+            ]) . '" class="btn btn-default">
+                    <i class="fa fa-database"></i>&nbsp;
+                    ' . \rex_i18n::msg('label.write_to_ombis') . '
+            </a>
+        ';
+        $ep->setSubject($output);
+    }
+
     public static function ext__createPreVKDokument(\rex_extension_point $ep)
     {
         $saveSuccess = $ep->getSubject();
 
         if ($saveSuccess) {
             $order = $ep->getParam('Order');
-            self::createPreVKDokument($order);
+            self::writePreVKDokument($order);
         }
         $ep->setSubject($saveSuccess);
     }
