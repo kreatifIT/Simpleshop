@@ -25,7 +25,7 @@ class Order
 
     public static function writePreVKDokument(\FriendsOfREDAXO\Simpleshop\Order $order)
     {
-        $orderSync = \FriendsOfREDAXO\Simpleshop\Settings::getValue('ombis_order_sync', 'Ombis');
+        $orderSync = Settings::getValue('ombis_order_sync', 'Ombis');
 
         if ($orderSync == 'address_sync') {
             $invoiceAddress  = $order->getInvoiceAddress();

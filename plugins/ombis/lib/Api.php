@@ -72,7 +72,7 @@ class Api extends WSConnector
                     break;
                 }
             }
-            if (trim($response['resonse']) == '') {
+            if (trim($response['response']) == '') {
                 $isWarnig = false;
             }
         }
