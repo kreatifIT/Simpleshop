@@ -65,20 +65,21 @@ class Api extends WSConnector
         if ($method == 'POST' || $method == 'PUT') {
             $isWarnig = true;
             foreach ($response['raw_resp_header'] as $headerLine) {
-                if (strpos($headerLine, 'location:') !== false) {
+                if (strpos(strtoupper($headerLine), 'LOCATION:') !== false) {
                     $isWarnig            = false;
                     $chunks              = explode('/', trim($headerLine));
                     $response['last_id'] = array_pop($chunks);
                     break;
                 }
             }
-            if (trim($response['response']) == '') {
+            if (isset($response['last_id']) || trim($response['response']) == '') {
                 $isWarnig = false;
             }
         }
         $logMsg = "
             URL: {$path}
-            Requst: " . print_r($data, true) . "
+            Request: " . print_r($data, true) . "
+            Raw Headers: " . print_r($response['raw_resp_header'], true) . "
             Response: " . print_r($response['response'], true) . "
         ";
         Utils::log('Ombis.request', $logMsg, $isWarnig ? 'WARNING' : 'INFO', $isWarnig);
