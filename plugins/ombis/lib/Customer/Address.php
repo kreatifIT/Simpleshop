@@ -101,7 +101,7 @@ class Address
                 $addressIds[] = $item->Fields->{'Adresse.ID'};
             }
             $response = (array)Api::curl('/adresse', [
-                'filter' => 'in(ID,'. implode(',', $addressIds) .')',
+                'filter' => 'in(ID,' . implode(',', $addressIds) . ')',
                 'order'  => '-ID',
             ], 'GET', $fields);
         }
@@ -128,8 +128,10 @@ class Address
             $data = Address::findByEmail($customer->getValue('email'), $fields);
         }
         if (!$data) {
-            $fiscalInfo = $isCompany ? $address->getValue('vat_num') : $address->getValue('fiscal_code');
-            $data       = Address::findByFiscalInfo($fiscalInfo, $fields);
+            $fiscalInfo = trim($isCompany ? $address->getValue('vat_num') : $address->getValue('fiscal_code'));
+            if ($fiscalInfo != '') {
+                $data = Address::findByFiscalInfo($fiscalInfo, $fields);
+            }
         }
 
         if ($data) {
@@ -152,7 +154,16 @@ class Address
                         break;
                     }
                 } else {
-                    if ($item->Fields->PLZ == $address->getValue('postal') && $item->Fields->Ort == $address->getValue('location') && ($item->Fields->Strasse1 == $address->getValue('street') || $item->Fields->Strasse2 == $address->getValue('street'))) {
+                    $_ombisPLZ     = strtoupper(trim($item->Fields->PLZ));
+                    $_ombisOrt     = strtoupper(trim($item->Fields->Ort));
+                    $_ombisStreet1 = strtoupper(trim($item->Fields->Strasse1));
+                    $_ombisStreet2 = strtoupper(trim($item->Fields->Strasse2));
+
+                    $_shopPLZ    = strtoupper(trim($address->getValue('postal')));
+                    $_shopOrt    = strtoupper(trim($address->getValue('location')));
+                    $_shopStreet = strtoupper(trim($address->getValue('street')));
+
+                    if (($_shopPLZ == '' || $_shopPLZ == $_ombisPLZ) && ($_shopOrt == '' || $_shopOrt == $_ombisOrt) && ($_shopStreet == '' || $_shopStreet == $_ombisStreet1 || $_shopStreet == $_ombisStreet2)) {
                         $_address = $item;
                         break;
                     }
