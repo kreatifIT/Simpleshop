@@ -117,24 +117,44 @@ class Address
         return $response['Data'];
     }
 
+    public static function findByAddressInfo($name, $postal, $location, $fields = [])
+    {
+        $response = null;
+        $filter   = array_filter([
+            trim($postal) == '' ? '' : "eq(PLZ,'" . addslashes($postal) . "')",
+            trim($location) == '' ? '' : "eq(Ort,'" . addslashes($location) . "')",
+            trim($name) == '' ? '' : "like(Suchbegriff,'" . addslashes($name) . "')",
+        ]);
+
+        if (count($filter)) {
+            $filterString = count($filter > 1) ? 'and(' . implode(',', $filter) . ')' : current($filter);
+            $_response    = (array)Api::curl('/adresse', [
+                'filter' => $filterString,
+                'order'  => 'ID',
+            ], 'GET', $fields);
+            $response = $_response['Data'];
+        }
+        return $response;
+    }
+
     public static function findOrCreateByAddress(CustomerAddress $address, $type = 'invoice')
     {
-        $data      = null;
-        $fields    = ['ID', 'Name', 'UUID', 'PLZ', 'Ort', 'Strasse1', 'Strasse2', 'EMail', 'Steuernummer', 'MwStNummer', 'UStIDNummer'];
-        $isCompany = $address->getValue('ctype') == 'company';
-        $customer  = $address->valueIsset('customer_id') ? Customer::get($address->getValue('customer_id')) : null;
+        $data       = [];
+        $fields     = ['ID', 'Name', 'UUID', 'PLZ', 'Ort', 'Strasse1', 'Strasse2', 'EMail', 'Steuernummer', 'MwStNummer', 'UStIDNummer'];
+        $isCompany  = $address->getValue('ctype') == 'company';
+        $customer   = $address->valueIsset('customer_id') ? Customer::get($address->getValue('customer_id')) : null;
+        $fiscalInfo = trim($isCompany ? $address->getValue('vat_num') : $address->getValue('fiscal_code'));
 
         if ($customer) {
             $data = Address::findByEmail($customer->getValue('email'), $fields);
         }
-        if (!$data) {
-            $fiscalInfo = trim($isCompany ? $address->getValue('vat_num') : $address->getValue('fiscal_code'));
-            if ($fiscalInfo != '') {
-                $data = Address::findByFiscalInfo($fiscalInfo, $fields);
-            }
+        if ($fiscalInfo == '') {
+            $data = array_merge($data, (array)Address::findByAddressInfo($address->getName(), $address->getValue('postal'), $address->getValue('location'), $fields));
+        } else {
+            $data = array_merge($data, Address::findByFiscalInfo($fiscalInfo, $fields));
         }
 
-        if ($data) {
+        if (count($data)) {
             $_address = null;
             foreach ($data as $item) {
                 if ($type == 'invoice') {
@@ -142,15 +162,16 @@ class Address
                     $fiscal = strtoupper(trim($address->getValue('fiscal_code')));
 
                     if ($vatNum == '' && $fiscal == '') {
-                        $_address = $item;
+                        $__address = $item;
                     } else if ($vatNum != '' && ($vatNum == strtoupper($item->Fields->Steuernummer) || $vatNum == $item->Fields->MwStNummer || $vatNum == strtoupper($item->Fields->UStIDNummer))) {
-                        $_address = $item;
+                        $__address = $item;
                     } else if ($fiscal != '' && ($fiscal == strtoupper($item->Fields->Steuernummer) || $fiscal == $item->Fields->MwStNummer || $fiscal == strtoupper($item->Fields->UStIDNummer))) {
-                        $_address = $item;
+                        $__address = $item;
                     } else if ($item->Fields->Steuernummer == '' && $item->Fields->MwStNummer == '') {
-                        $_address = $item;
+                        $__address = $item;
                     }
-                    if ($_address && $item->Fields->PLZ == $address->getValue('postal') && $item->Fields->Ort == $address->getValue('location') && ($item->Fields->Strasse1 == $address->getValue('street') || $item->Fields->Strasse2 == $address->getValue('street'))) {
+                    if ($__address && $item->Fields->PLZ == $address->getValue('postal') && $item->Fields->Ort == $address->getValue('location') && ($item->Fields->Strasse1 == $address->getValue('street') || $item->Fields->Strasse2 == $address->getValue('street'))) {
+                        $_address = $__address;
                         break;
                     }
                 } else {
