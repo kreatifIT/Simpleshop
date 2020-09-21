@@ -371,13 +371,13 @@ class CheckoutController extends Controller
         $errors     = [];
         $warnings   = [];
         $postAction = rex_post('action', 'string');
-
         switch ($postAction) {
             case 'redeem_coupon':
                 try {
                     $code   = rex_post('coupon', 'string');
                     $coupon = Coupon::redeem($code);
                 } catch (CouponException $ex) {
+                    Session::setCheckoutData('coupon_code', null);
                     $warnings[] = ['label' => $ex->getLabelByCode()];
                 }
                 break;
@@ -385,6 +385,7 @@ class CheckoutController extends Controller
             case 'place_order':
                 $tos_accepted = rex_post('tos_accepted', 'int');
                 $rma_accepted = rex_post('rma_accepted', 'int');
+
 
                 if ($tos_accepted && $rma_accepted) {
                     try {

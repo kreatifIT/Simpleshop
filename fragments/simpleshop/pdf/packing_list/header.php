@@ -71,9 +71,9 @@ if (file_exists(\rex_path::base('resources/img/logo300dpi.png'))) {
         <td width="8%">#</td>
         <td width="14%">###label.code###</td>
         <td width="38%">###label.description###</td>
-        <td width="10%">###simpleshop.amount###</td>
-        <td width="15%">###simpleshop.single_price_no_vat###</td>
-        <td width="15%">###simpleshop.total_sum###</td>
+        <td width="9%">###simpleshop.amount###</td>
+        <td width="17%">###simpleshop.single_price_no_vat###</td>
+        <td width="14%">###simpleshop.total_sum###</td>
     </tr>
     </thead>
 </table>

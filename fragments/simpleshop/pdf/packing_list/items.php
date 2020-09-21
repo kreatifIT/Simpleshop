@@ -37,7 +37,7 @@ if (count($products) == 0) {
             <td width="14%" align="center"><?= $code ?></td>
             <td width="38%" class="product-name">
                 <?= $name ?>
-                <?php if (count($features)): ?>
+                <?php if ($features): ?>
                     <?php foreach ($features as $feature): ?>
                         <div class="feature"><?= $feature->getName() ?></div>
                     <?php endforeach; ?>
@@ -46,9 +46,9 @@ if (count($products) == 0) {
                     <div class="product-discount"><?= $discount->getName() ?></div>
                 <?php endif; ?>
             </td>
-            <td width="10%" align="center"><?= $quantity ?></td>
-            <td width="15%" align="right">&euro; <?= format_price($product->getPrice($type != 'invoice')) ?></td>
-            <td width="15%" align="right">&euro; <?= format_price($product->getPrice($type != 'invoice') * $quantity) ?></td>
+            <td width="9%" align="center"><?= $quantity ?></td>
+            <td width="17%" align="right">&euro; <?= format_price($product->getPrice($type != 'invoice')) ?></td>
+            <td width="14%" align="right">&euro; <?= format_price($product->getPrice($type != 'invoice') * $quantity) ?></td>
         </tr>
     <?php endforeach; ?>
 

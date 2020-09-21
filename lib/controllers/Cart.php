@@ -27,7 +27,7 @@ class CartController extends Controller
 
         $errors     = [];
         $discount   = 0;
-        $postAction = rex_request('action', 'string');
+        $getAction = rex_get('action', 'string');
 
         try {
             if ($this->params['products'] === null) {
@@ -42,10 +42,9 @@ class CartController extends Controller
             $this->products = Session::getCartItems();
         }
 
-        switch ($postAction) {
+        switch ($getAction) {
             case 'redeem_coupon':
-                $coupon_code = trim(rex_get('coupon_code', 'string'));
-
+                $coupon_code = trim(rex_request('coupon_code', 'string'));
                 Session::setCheckoutData('coupon_code', $coupon_code);
                 break;
         }
@@ -54,6 +53,8 @@ class CartController extends Controller
         $coupon_code  = Session::getCheckoutData('coupon_code');
         $grossTotals2 = $grossTotals;
         $Coupon       = $coupon_code != '' ? Coupon::getByCode($coupon_code) : null;
+
+
 
         if ($Coupon) {
             try {
