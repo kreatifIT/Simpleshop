@@ -237,6 +237,9 @@ class Product extends Model
 
             $this->__tax = ($price / ($tax + 100)) * $tax;
             $price       = $price - $this->__tax;
+        } else {
+            // prevent rounding problems
+            $price = round($price, 2);
         }
         return $price;
     }
