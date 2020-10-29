@@ -86,6 +86,7 @@ $back_url          = $this->getVar('back_url');
                 $fragment = new \rex_fragment();
                 $fragment->setVar('only_fields', true);
                 $fragment->setVar('show_save_btn', false);
+                $fragment->setVar('form_id', 'shipping-address');
                 echo $fragment->parse('simpleshop/customer/customer_area/address_form.php');
                 ?>
             </div>

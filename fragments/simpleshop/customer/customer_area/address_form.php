@@ -21,13 +21,13 @@ $back_url         = $this->getVar('back_url', '');
 $show_save_btn    = $this->getVar('show_save_btn', true);
 $real_field_names = $this->getVar('real_field_names', false);
 $only_fields      = $this->getVar('only_fields', false);
+$formId           = $this->getVar('form_id', 'form-data-' . \rex_article::getCurrentId());
 $btn_label        = $this->getVar('btn_label', ucfirst(\Wildcard::get('action.save')));
 $Address          = $this->getVar('Address', CustomerAddress::create());
 $Customer         = $this->getVar('Customer', Customer::getCurrentUser());
 
 
-$id   = 'form-data-' . \rex_article::getCurrentId();
-$sid  = "form-{$id}";
+$sid  = "form-{$formId}";
 $form = $Address->getForm($form, $excludedFields, $Customer->getId());
 
 $form->setObjectparams('debug', false);

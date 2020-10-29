@@ -22,6 +22,7 @@ $this->setVar('btn_label', '###action.go_ahead###');
         <?php
         $this->setVar('only_fields', true);
         $this->setVar('show_save_btn', false);
+        $this->setVar('form_id', 'invoice-address');
         $this->subfragment('simpleshop/customer/customer_area/address_form.php');
         ?>
 
