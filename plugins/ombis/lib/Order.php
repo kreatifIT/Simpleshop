@@ -35,7 +35,7 @@ class Order
                 if (!$invoiceAddress->valueIsset('ombis_uid') && $_address = Address::findOrCreateByAddress($invoiceAddress, 'invoice')) {
                     $order->setValue('invoice_address', $_address);
                 }
-                if ($_address = Address::findOrCreateByAddress($shippingAddress, 'shipping')) {
+                if ($invoiceAddress->getId() != $shippingAddress->getId() && $_address = Address::findOrCreateByAddress($shippingAddress, 'shipping')) {
                     $order->setValue('shipping_address', $_address);
                 }
                 $order = self::write($order);
