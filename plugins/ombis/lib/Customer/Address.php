@@ -132,7 +132,7 @@ class Address
                 'filter' => $filterString,
                 'order'  => 'ID',
             ], 'GET', $fields);
-            $response = $_response['Data'];
+            $response     = $_response['Data'];
         }
         return $response;
     }
@@ -200,5 +200,50 @@ class Address
         }
         $address->save();
         return $address;
+    }
+
+    public static function ext__yformDataUpdated(\rex_extension_point $ep)
+    {
+        $table = $ep->getParam('table');
+
+        if ($table->getTableName() == CustomerAddress::TABLE) {
+            $yform         = $ep->getSubject();
+            $oldData       = $ep->getParam('old_data');
+            $object        = $ep->getParam('data');
+            $fieldsToCheck = \rex_extension::registerPoint(new \rex_extension_point('Ombis.AddressFieldsToCheck', [
+                'ctype',
+                'company_name',
+                'firstname',
+                'lastname',
+                'fiscal_code',
+                'vat_num',
+                'street',
+                'street_additional',
+                'postal',
+                'location',
+                'country',
+            ]));
+
+            foreach ($object->getData() as $name => $value) {
+                if (in_array($name, $fieldsToCheck) && $oldData[$name] !== $value) {
+                    $sql = \rex_sql::factory();
+                    $sql->setTable(CustomerAddress::TABLE);
+                    $sql->setValue('ombis_id', null);
+                    $sql->setValue('ombis_uid', null);
+                    $sql->setWhere(['id' => $object->getId()]);
+                    $sql->update();
+
+                    $object->setValue('ombis_id', null);
+                    $object->setValue('ombis_uid', null);
+
+                    $formData = [];
+                    foreach ($object->getData() as $_name => $_value) {
+                        $formData[] = "{$_name}|{$_value}";
+                    }
+                    $yform->setFormData(implode("\n", $formData));
+                    break;
+                }
+            }
+        }
     }
 }
