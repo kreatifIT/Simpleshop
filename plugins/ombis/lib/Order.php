@@ -121,20 +121,25 @@ class Order
             ];
         }
 
-        $data = \rex_extension::registerPoint(new \rex_extension_point('Ombis.orderData', [
+        $orderData = [
             'Fields'      => [
                 'CustomerNo'              => $dummyId,
                 'TypeOfPaymentCode'       => $paymentConfig[$payment->getPluginName()],
                 'CustomerReferenceNumber' => (string)$order->getValue('id'),
                 'CustomerReferenceDate'   => date('Y-m-d'),
                 'InvoiceAddressUUID'      => $invoiceAddress->getValue('ombis_uid'),
-                'ShippingAddressUUID'     => $shippingAddress->getValue('ombis_uid'),
                 'Notes'                   => (string)$order->getValue('remarks'),
                 'DocType'                 => 'VkAuftrag',
             ],
             'Collections' => [
                 'DocPosition' => $docPositions,
             ],
+        ];
+        if ($invoiceAddress->getId() != $shippingAddress->getId()) {
+            $orderData['Fields']['ShippingAddressUUID'] = $shippingAddress->getValue('ombis_uid');
+        }
+        $data = \rex_extension::registerPoint(new \rex_extension_point('Ombis.orderData', $orderData, [
+            'order' => $order
         ]));
 
         //pr($data, 'blue');
