@@ -127,7 +127,7 @@ class Address
         ]);
 
         if (count($filter)) {
-            $filterString = count($filter > 1) ? 'and(' . implode(',', $filter) . ')' : current($filter);
+            $filterString = count($filter) > 1 ? 'and(' . implode(',', $filter) . ')' : current($filter);
             $_response    = (array)Api::curl('/adresse', [
                 'filter' => $filterString,
                 'order'  => 'ID',
