@@ -205,6 +205,8 @@ class Address
     public static function ext__yformDataUpdated(\rex_extension_point $ep)
     {
         $table = $ep->getParam('table');
+        // todo: do a better check
+        return;
 
         if ($table->getTableName() == CustomerAddress::TABLE) {
             $yform         = $ep->getSubject();
