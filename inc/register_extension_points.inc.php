@@ -29,6 +29,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 \rex_extension::register('simpleshop.Order.getUpsellingPromotion', ['\FriendsOfREDAXO\Simpleshop\DiscountGroup', 'ext_getUpsellingPromotion']);
 \rex_extension::register('simpleshop.Order.applyDiscounts', ['\FriendsOfREDAXO\Simpleshop\Coupon', 'ext_applyDiscounts']);
 \rex_extension::register('kreatif.Model.unprepareNEObject', ['\FriendsOfREDAXO\Simpleshop\Std', 'ext_unprepareNEObject']);
+\rex_extension::register('kreatif.Yform.datestampValidate', [Variant::class, 'ext_yformDatestampValidate']);
 
 
 \rex_extension::register('PACKAGES_INCLUDED', function (\rex_extension_point $Ep) {

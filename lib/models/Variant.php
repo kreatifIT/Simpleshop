@@ -87,4 +87,14 @@ class Variant extends Model
         }
         return [$labels, $fields];
     }
+
+    public static function ext_yformDatestampValidate(\rex_extension_point $ep)
+    {
+        $doCheck   = $ep->getSubject();
+        $tablename = $ep->getParam('tablename');
+
+        if ($doCheck && $tablename == self::TABLE) {
+            $ep->setSubject(false);
+        }
+    }
 }
