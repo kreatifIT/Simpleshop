@@ -20,6 +20,7 @@ label.customer_id = Kunden-ID
 label.customer = Kunde
 label.order_sum = Bestellsumme
 label.orders = Bestellungen
+label.gross_single_price = Brutto-Einzelpreis
 label.net_single_price = Netto-Einzelpreis
 label.reduced_net_single_price = Reduzierter Netto-Einzelpreis (Angebotspreis)
 label.net_prices = Nettopriese
