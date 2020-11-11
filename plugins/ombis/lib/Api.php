@@ -79,6 +79,7 @@ class Api extends WSConnector
         $logMsg = "
             URL: {$path}
             Request: " . print_r($data, true) . "
+            Raw Content: " . $response['raw_resp_content'] . "
             Raw Headers: " . print_r($response['raw_resp_header'], true) . "
             Response: " . print_r($response['response'], true) . "
         ";
