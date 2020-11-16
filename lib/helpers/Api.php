@@ -155,6 +155,9 @@ class rex_api_simpleshop_api extends rex_api_function
         if (!$product_key || ($quantity < 1 && $exact_qty < 1)) {
             throw new ApiException("Invalid request arguments");
         }
+
+        rex_extension::registerPoint(new rex_extension_point('Api.Cart.BeforeChangeAmoutProduct', $product_key,[]));
+
         if ($exact_qty) {
             \FriendsOfREDAXO\Simpleshop\Session::setProductData($product_key, $exact_qty, $extras);
         } else {
@@ -165,6 +168,8 @@ class rex_api_simpleshop_api extends rex_api_function
         $this->response['cart_item_cnt']    = \FriendsOfREDAXO\Simpleshop\Session::getCartItemCount();
 
         $this->api__cart_getcartcontent($layout);
+
+        $this->response = rex_extension::registerPoint(new rex_extension_point('Api.Cart.AddProductResponse', $this->response,[]));
     }
 
     private function api__cart_setproductquantity()
@@ -195,6 +200,8 @@ class rex_api_simpleshop_api extends rex_api_function
         if (!$product_key) {
             throw new ApiException("Invalid request arguments");
         }
+        rex_extension::registerPoint(new rex_extension_point('Api.Cart.BeforeRemoveProduct', $product_key,[]));
+
         \FriendsOfREDAXO\Simpleshop\Session::removeProduct($product_key);
 
         $this->response['cart_items']       = \FriendsOfREDAXO\Simpleshop\Session::getCartItems(true);
@@ -202,6 +209,8 @@ class rex_api_simpleshop_api extends rex_api_function
         $this->response['cart_item_cnt']    = \FriendsOfREDAXO\Simpleshop\Session::getCartItemCount();
 
         $this->api__cart_getcartcontent($layout);
+
+        $this->response = rex_extension::registerPoint(new rex_extension_point('Api.Cart.RemoveProductResponse', $this->response,[]));
     }
 
     private function api__custom_callback()

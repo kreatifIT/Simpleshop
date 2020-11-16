@@ -370,6 +370,9 @@ class Customer extends Model
                 $sql->setWhere(['id' => $user->getId()]);
                 $sql->update();
 
+                $user->setValue('lastlogin', date('Y-m-d H:i:s'));
+                $user->setValue('lang_id', \rex_clang::getCurrentId());
+
                 $result = \rex_extension::registerPoint(new \rex_extension_point('Customer.logged_in', $user, [
                     'password' => $password,
                 ]));

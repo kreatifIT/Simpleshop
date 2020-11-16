@@ -152,7 +152,26 @@ var SimpleshopBackend = (function ($) {
 
 
     functions.saveVariants = function (_this) {
-        updateVariantPrio($(_this).find('table.variants'));
+        var $form = $(_this),
+            url = $form.prop('action'),
+            data = $form.serialize();
+
+        updateVariantPrio($form.find('table.variants'));
+        var $loading = addLoading($form);
+
+        $.ajax({
+            url: url + '&func=save',
+            method: 'POST',
+            data: data
+        }).done(function (resp) {
+            if (resp.succeeded) {
+                window.location.href = url + '&func=edit';
+            } else {
+                $('#callout-container').html(resp.callout);
+                $loading.remove();
+            }
+        });
+        return false;
     };
 
     functions.cloneCoupon = function (_this) {
@@ -227,8 +246,7 @@ var SimpleshopBackend = (function ($) {
                 functionListParams.page = 0;
                 showFunctionList();
             }, 800);
-        }
-        else if (type === 'paging') {
+        } else if (type === 'paging') {
             var page = $(_this).data('page');
 
             if (page !== '') {
@@ -283,8 +301,7 @@ var SimpleshopBackend = (function ($) {
                 if (resp.succeeded) {
                     $container.html(resp.message.html);
                     loading.remove();
-                }
-                else {
+                } else {
                     for (var i in resp.message.errors) {
                         KreatifAddon.showAlert(resp.message.errors[i]);
                     }
@@ -296,8 +313,7 @@ var SimpleshopBackend = (function ($) {
     functions.removeOrderProduct = function (_this, orderId, productId, oldAmount, msg) {
         if (productId == '') {
             $(_this).parents('tr').remove();
-        }
-        else if (confirm(msg)) {
+        } else if (confirm(msg)) {
             var $container = $(_this).parents('#order-product-container'),
                 loading = addLoading($container);
 
@@ -317,8 +333,7 @@ var SimpleshopBackend = (function ($) {
                 if (resp.succeeded) {
                     $container.html(resp.message.html);
                     loading.remove();
-                }
-                else {
+                } else {
                     for (var i in resp.message.errors) {
                         KreatifAddon.showAlert(resp.message.errors[i]);
                     }
@@ -370,8 +385,7 @@ var SimpleshopBackend = (function ($) {
                             $input.val(value);
                             loading.remove();
                             blurHandle = null;
-                        }
-                        else {
+                        } else {
                             for (var i in resp.message.errors) {
                                 KreatifAddon.showAlert(resp.message.errors[i]);
                             }

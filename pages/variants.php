@@ -15,6 +15,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 echo \rex_view::title($this->i18n('label.variants'), '');
 
+$warnings   = [];
 $_FUNC      = \rex_request('func', 'string');
 $product_id = rex_get('data_id', 'int');
 $product    = \FriendsOfREDAXO\Simpleshop\Product::get($product_id);
@@ -29,7 +30,6 @@ if ($_FUNC == 'rm-variants') {
     $product->save();
 }
 
-
 $features    = $product->getFeatures();
 $product_url = \rex_url::backendPage('yform/manager/data_edit', [
     'table_name' => Product::TABLE,
@@ -43,8 +43,7 @@ if (!$product) {
     return;
 } else if (!$features && Variant::query()
         ->where('product_id', $product_id)
-        ->count()
-) {
+        ->count()) {
     $features = [];
     $variants = Variant::query()
         ->where('product_id', $product_id)
@@ -86,46 +85,58 @@ if (!$product) {
     return;
 }
 
+$versionCheckVariant = Variant::query()
+    ->where('product_id', $product_id)
+    ->orderBy('prio', 'desc')
+    ->findOne();
+
 if ($_FUNC == 'save') {
     $vIds  = [];
     $data  = [];
     $_data = rex_post('FORM', 'array');
 
-    // re-map be_table values
-    foreach ($_data as $key => $values) {
-        if (substr($key, 0, 9) == 'be_table|') {
-            list($_field, $_key, $_index) = explode('|', $key);
-            $data[$_key]['be_table'][$_index] = $values;
-        } else {
-            $data[$key] = array_merge((array)$data[$key], $values);
-        }
-    }
-
-    foreach ($data as $key => $values) {
-        // reset POST values
-        $_POST['FORM'] = [];
-        $Variant = Variant::query()
-            ->where('product_id', $product_id)
-            ->where('variant_key', $key)
-            ->findOne();
-
-        if (!$Variant) {
-            $Variant = Variant::create();
-            $Variant->setValue('variant_key', $key);
-            $Variant->setValue('product_id', $product_id);
-        }
-        foreach ($values as $name => $value) {
-            if (is_array($value) && $name == 'be_table') {
-                $_POST['FORM'] = array_merge($_POST['FORM'], $value);
+    if ($versionCheckVariant->getValue('updatedate') != rex_post('variant_udpate_version_ds', 'string')) {
+        $_url       = \rex_url::currentBackendPage(['table_name' => Variant::TABLE, 'data_id' => $product_id, 'func' => 'edit']);
+        $warnings[] = \Kreatif\Utils::getDatestampCheckErrorMsg($_url);
+    } else {
+        // re-map be_table values
+        foreach ($_data as $key => $values) {
+            if (substr($key, 0, 9) == 'be_table|') {
+                list($_field, $_key, $_index) = explode('|', $key);
+                $data[$_key]['be_table'][$_index] = $values;
+            } else {
+                $data[$key] = array_merge((array)$data[$key], $values);
             }
-            $Variant->setValue($name, $value);
         }
-        $Variant->save();
-        $vIds[] = $Variant->getId();
+
+        foreach ($data as $key => $values) {
+            // reset POST values
+            $_POST['FORM'] = [];
+
+            $Variant = Variant::query()
+                ->where('product_id', $product_id)
+                ->where('variant_key', $key)
+                ->findOne();
+
+            if (!$Variant) {
+                $Variant = Variant::create();
+                $Variant->setValue('variant_key', $key);
+                $Variant->setValue('product_id', $product_id);
+            }
+            foreach ($values as $name => $value) {
+                if (is_array($value) && $name == 'be_table') {
+                    $_POST['FORM'] = array_merge($_POST['FORM'], $value);
+                }
+                $Variant->setValue($name, $value);
+            }
+            $Variant->save();
+            $vIds[] = $Variant->getId();
+        }
+        $versionCheckVariant = $Variant;
+        // remove previously saved variants
+        \rex_sql::factory()
+            ->setQuery("DELETE FROM " . Variant::TABLE . " WHERE product_id = ? AND id NOT IN(" . implode(',', $vIds) . ")", [$product_id]);
     }
-    // remove previously saved variants
-    \rex_sql::factory()
-        ->setQuery("DELETE FROM " . Variant::TABLE . " WHERE product_id = ? AND id NOT IN(" . implode(',', $vIds) . ")", [$product_id]);
 }
 
 // load all columns from yform
@@ -219,11 +230,39 @@ $fragment     = new \rex_fragment();
 $fragment->setVar('elements', $formElements, false);
 $buttons = $fragment->parse('core/form/submit.php');
 
-echo '<form action="" method="post" onsubmit="SimpleshopBackend.saveVariants(this)">';
+if (count($warnings)) {
+    $callout = '<div class="alert alert-danger">' . implode('<br/>', $warnings) . '</div>';
+
+    if (\rex_request::isXmlHttpRequest()) {
+        \rex_response::sendJson([
+            'succeeded' => false,
+            'callout'   => $callout,
+        ]);
+        exit;
+    } else {
+        echo $callout;
+    }
+} else if (\rex_request::isXmlHttpRequest()) {
+    rex_set_session('variants_saved', 1);
+    \rex_response::sendJson([
+        'succeeded' => true,
+    ]);
+    exit;
+}
+
+if (rex_session('variants_saved', 'int') == 1) {
+    rex_set_session('variants_saved', 0);
+    echo '<div class="alert alert-info">' . \rex_i18n::msg('label.data_saved') . '</div>';
+}
+
+echo '<div id="callout-container"></div>';
+echo '<form action="' . \rex_url::currentBackendPage(['table_name' => Variant::TABLE, 'data_id' => $product_id]) . '" method="post" onsubmit="return SimpleshopBackend.saveVariants(this)">';
 $fragment = new \rex_fragment();
 $fragment->setVar('class', 'edit', false);
 $fragment->setVar('title', $product->getName() . ' [' . $product_id . ']');
 $fragment->setVar('content', \Wildcard::parse($content), false);
 $fragment->setVar('buttons', $buttons, false);
 echo $fragment->parse('core/page/section.php');
+
+echo '<input type="hidden" name="variant_udpate_version_ds" value="' . $versionCheckVariant->getValue('updatedate') . '"/>';
 echo '</form>';

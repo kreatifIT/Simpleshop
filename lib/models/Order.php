@@ -626,6 +626,7 @@ class Order extends Model
 
         $docTitle = $type == 'invoice' ? 'simpleshop.invoice_title' : 'simpleshop.orderdocument_title';
         $fragment->setVar('title', strtr(\Wildcard::get($docTitle), ['{NUM}' => $invoiceNum]));
+        $fragment->setVar('css_filename', 'shop.css');
         $fragment->setVar('content', $content, false);
         $html = $fragment->parse('simpleshop/pdf/invoice/wrapper.php');
 
@@ -676,6 +677,7 @@ class Order extends Model
         $content .= $fragment->parse('simpleshop/pdf/packing_list/items.php');
 
         $fragment->setVar('title', strtr(\Wildcard::parse(\Wildcard::get('label.packing_list_title')), ['{NUM}' => $refId]));
+        $fragment->setVar('css_filename', 'shop.css');
         $fragment->setVar('content', $content, false);
         $html = $fragment->parse('simpleshop/pdf/invoice/wrapper.php');
 

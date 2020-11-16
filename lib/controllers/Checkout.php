@@ -449,22 +449,24 @@ class CheckoutController extends Controller
         $Mail->setVar('config', []);
 
         // set order notification email
-        $Mail->AddAddress($Customer->getValue('email'));
+        $Mail->AddAddress(trim($Customer->getValue('email')));
+
         $orderMails = explode(',', \FriendsOfREDAXO\Simpleshop\Settings::getValue('order_notification_email', 'general'));
-
+        $orderMails = array_filter($orderMails);
         foreach ($orderMails as $orderMail) {
-            $Mail->AddAddress($orderMail);
+            $Mail->AddAddress(trim($orderMail));
         }
 
-        if (isset($this->params['addAddress'])) {
-            foreach (explode(',', $this->params['addAddress']) as $_add) {
-                $Mail->AddAddress($_add);
-            }
+        $_addAddresses = isset($this->params['addAddress']) ? explode(',', $this->params['addAddress']) : [];
+        $_addAddresses = array_filter($_addAddresses);
+        foreach ($_addAddresses as $_add) {
+            $Mail->AddAddress(trim($_add));
         }
-        if (isset($this->params['addCC'])) {
-            foreach (explode(',', $this->params['addCC']) as $_add) {
-                $Mail->addCC($_add);
-            }
+
+        $_cCs = isset($this->params['addCC']) ? explode(',', $this->params['addCC']) : [];
+        $_cCs = array_filter($_cCs);
+        foreach ($_cCs as $_add) {
+            $Mail->addCC(trim($_add));
         }
 
         $type = \FriendsOfREDAXO\Simpleshop\Utils::getSetting('use_invoicing', false) && $this->Order->getInvoiceNum() ? 'invoice' : 'order';

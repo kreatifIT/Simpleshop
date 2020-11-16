@@ -53,7 +53,10 @@ class Variant extends Model
         $fields  = [];
         $table   = \rex_yform_manager_table::get(self::TABLE);
         $columns = $table->getFields();
-        $params  = ['this' => \rex_yform::factory()];
+        $params  = [
+            'this'       => \rex_yform::factory(),
+            'form_array' => [],
+        ];
 
         $params['main_table'] = rex_request('table_name', 'string');
 
@@ -83,5 +86,15 @@ class Variant extends Model
             }
         }
         return [$labels, $fields];
+    }
+
+    public static function ext_yformDatestampValidate(\rex_extension_point $ep)
+    {
+        $doCheck   = $ep->getSubject();
+        $tablename = $ep->getParam('tablename');
+
+        if ($doCheck && $tablename == self::TABLE) {
+            $ep->setSubject(false);
+        }
     }
 }
