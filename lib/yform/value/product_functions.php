@@ -41,7 +41,7 @@ class rex_yform_value_product_functions extends rex_yform_value_abstract
                         </a>
                     ';
                 }
-                if (\FriendsOfREDAXO\Simpleshop\FragmentConfig::$data['has_variants']) {
+                if (\FriendsOfREDAXO\Simpleshop\FragmentConfig::$data['has_variants'] && count($Product->getArrayValue('features'))) {
                     $variantUrl = \rex_url::backendPage('simpleshop/variants', [
                         'table_name' => \FriendsOfREDAXO\Simpleshop\Variant::TABLE,
                         'data_id'    => $Product->getId(),
