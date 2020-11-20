@@ -289,7 +289,13 @@ class Session extends Model
         // update the quantity
         $cart_items[$product_key]['quantity'] = $quantity;
         // update extras
-        $cart_items[$product_key]['extras'] = array_merge((array)$cart_items[$product_key]['extras'], $extras);
+        $oldExtras = (array) $cart_items[$product_key]['extras'];
+        $cart_items[$product_key]['extras'] = array_merge($oldExtras, $extras);
+        $cart_items[$product_key]           = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Session.setProductData', $cart_items[$product_key], [
+            'product_key' => $product_key,
+            'old_extras'    => $oldExtras,
+            'new_extras'    => $extras,
+        ]));
         $session->writeSession(['cart_items' => $cart_items]);
     }
 
