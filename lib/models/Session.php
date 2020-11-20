@@ -297,6 +297,8 @@ class Session extends Model
             'new_extras'    => $extras,
         ]));
         $session->writeSession(['cart_items' => $cart_items]);
+
+        return $cart_items[$product_key];
     }
 
     public static function removeProduct($product_key)

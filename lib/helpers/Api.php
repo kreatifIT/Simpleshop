@@ -200,7 +200,7 @@ class rex_api_simpleshop_api extends rex_api_function
         if (!$product_key) {
             throw new ApiException("Invalid request arguments");
         }
-        rex_extension::registerPoint(new rex_extension_point('Api.Cart.BeforeRemoveProduct', $product_key,[]));
+        $product_key = rex_extension::registerPoint(new rex_extension_point('Api.Cart.BeforeRemoveProduct', $product_key,[]));
 
         \FriendsOfREDAXO\Simpleshop\Session::removeProduct($product_key);
 
