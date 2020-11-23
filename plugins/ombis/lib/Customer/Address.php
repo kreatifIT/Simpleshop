@@ -72,19 +72,18 @@ class Address
 
 
         $ombisId  = trim($address->getValue('ombis_id'));
-        $path     = $ombisId == '' ? '' : "/{$ombisId}";
-        $method   = $ombisId == '' ? 'POST' : 'PUT';
+        $path     = $ombisId == '' || $ombisId == 0 ? '' : "/{$ombisId}";
+        $method   = $path == '' ? 'POST' : 'PUT';
         $response = Api::curl('/adresse' . $path, $data, $method);
-
 
         if (isset($response['last_id'])) {
             $ombisId = $response['last_id'];
         }
         $response = Api::curl("/adresse/{$ombisId}", [], 'GET', ['ID', 'UUID']);
 
-
         $address->setValue('ombis_id', $response['Fields']->ID);
         $address->setValue('ombis_uid', $response['Fields']->UUID);
+
         return $address;
     }
 
