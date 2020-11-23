@@ -90,8 +90,8 @@ $Settings = $this->getVar('Settings');
                     <select name="ombis_payment_config[<?= $payment->plugin_name ?>]" class="form-control">
                         <option value="">-</option>
                         <?php foreach ($apiPayments as $apiPayment): ?>
-                            <option value="<?= $apiPayment->Fields->Code ?>" <?= $values[$payment->plugin_name] == $apiPayment->Fields->Code ? 'selected="selected"' : '' ?>>
-                                <?= $apiPayment->Fields->Name; ?>
+                            <option value="<?= $apiPayment['Fields']['Code'] ?>" <?= $values[$payment->plugin_name] == $apiPayment['Fields']['Code'] ? 'selected="selected"' : '' ?>>
+                                <?= $apiPayment['Fields']['Name']; ?>
                             </option>
                         <?php endforeach; ?>
                     </select>

@@ -69,7 +69,7 @@ class Order
             $_positions = Api::curl("/preliminarysalesdocument/{$ombisId}/docposition");
 
             foreach ($_positions['Data'] as $_position) {
-                $docPositions['Delete'][] = $_position->URI;
+                $docPositions['Delete'][] = $_position['URI'];
             }
         }
 

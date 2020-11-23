@@ -44,7 +44,7 @@ class Address
                 'filter' => "eq(ISOCode,{$country->getValue('iso2')})",
             ], 'GET', ['ID']);
             if (isset($countryData['Data'][0])) {
-                $ombisCountryId = $countryData['Data'][0]->Fields->ID;
+                $ombisCountryId = $countryData['Data'][0]['Fields']['ID'];
             }
         }
 
@@ -81,8 +81,8 @@ class Address
         }
         $response = Api::curl("/adresse/{$ombisId}", [], 'GET', ['ID', 'UUID']);
 
-        $address->setValue('ombis_id', $response['Fields']->ID);
-        $address->setValue('ombis_uid', $response['Fields']->UUID);
+        $address->setValue('ombis_id', $response['Fields']['ID']);
+        $address->setValue('ombis_uid', $response['Fields']['UUID']);
 
         return $address;
     }
@@ -97,7 +97,7 @@ class Address
         if (isset($response['Data'])) {
             $addressIds = [];
             foreach ($response['Data'] as $item) {
-                $addressIds[] = $item->Fields->{'Adresse.ID'};
+                $addressIds[] = $item['Fields']['Adresse.ID'];
             }
             $response = (array)Api::curl('/adresse', [
                 'filter' => 'in(ID,' . implode(',', $addressIds) . ')',
@@ -150,7 +150,7 @@ class Address
         if ($fiscalInfo == '') {
             $data = array_merge($data, (array)Address::findByAddressInfo($address->getName(), $address->getValue('postal'), $address->getValue('location'), $fields));
         } else {
-            $data = array_merge($data, Address::findByFiscalInfo($fiscalInfo, $fields));
+            $data = array_merge((array)$data, Address::findByFiscalInfo($fiscalInfo, $fields));
         }
 
         if (count($data)) {
@@ -159,25 +159,26 @@ class Address
                 if ($type == 'invoice') {
                     $vatNum = strtoupper(trim($address->getValue('vat_num')));
                     $fiscal = strtoupper(trim($address->getValue('fiscal_code')));
+                    $fields = $item['Fields'];
 
                     if ($vatNum == '' && $fiscal == '') {
                         $__address = $item;
-                    } else if ($vatNum != '' && ($vatNum == strtoupper($item->Fields->Steuernummer) || $vatNum == $item->Fields->MwStNummer || $vatNum == strtoupper($item->Fields->UStIDNummer))) {
+                    } else if ($vatNum != '' && ($vatNum == strtoupper($fields['Steuernummer']) || $vatNum == $fields['MwStNummer'] || $vatNum == strtoupper($fields['UStIDNummer']))) {
                         $__address = $item;
-                    } else if ($fiscal != '' && ($fiscal == strtoupper($item->Fields->Steuernummer) || $fiscal == $item->Fields->MwStNummer || $fiscal == strtoupper($item->Fields->UStIDNummer))) {
+                    } else if ($fiscal != '' && ($fiscal == strtoupper($fields['Steuernummer']) || $fiscal == $fields['MwStNummer'] || $fiscal == strtoupper($fields['UStIDNummer']))) {
                         $__address = $item;
-                    } else if ($item->Fields->Steuernummer == '' && $item->Fields->MwStNummer == '') {
+                    } else if ($fields['Steuernummer'] == '' && $fields['MwStNummer'] == '') {
                         $__address = $item;
                     }
-                    if ($__address && $item->Fields->PLZ == $address->getValue('postal') && $item->Fields->Ort == $address->getValue('location') && ($item->Fields->Strasse1 == $address->getValue('street') || $item->Fields->Strasse2 == $address->getValue('street'))) {
+                    if ($__address && $fields['PLZ'] == $address->getValue('postal') && $fields['Ort'] == $address->getValue('location') && ($fields['Strasse1'] == $address->getValue('street') || $fields['Strasse2'] == $address->getValue('street'))) {
                         $_address = $__address;
                         break;
                     }
                 } else {
-                    $_ombisPLZ     = strtoupper(trim($item->Fields->PLZ));
-                    $_ombisOrt     = strtoupper(trim($item->Fields->Ort));
-                    $_ombisStreet1 = strtoupper(trim($item->Fields->Strasse1));
-                    $_ombisStreet2 = strtoupper(trim($item->Fields->Strasse2));
+                    $_ombisPLZ     = strtoupper(trim($fields['PLZ']));
+                    $_ombisOrt     = strtoupper(trim($fields['Ort']));
+                    $_ombisStreet1 = strtoupper(trim($fields['Strasse1']));
+                    $_ombisStreet2 = strtoupper(trim($fields['Strasse2']));
 
                     $_shopPLZ    = strtoupper(trim($address->getValue('postal')));
                     $_shopOrt    = strtoupper(trim($address->getValue('location')));
@@ -192,8 +193,8 @@ class Address
         }
 
         if ($_address) {
-            $address->setValue('ombis_id', $_address->Fields->ID);
-            $address->setValue('ombis_uid', $_address->Fields->UUID);
+            $address->setValue('ombis_id', $fields['ID']);
+            $address->setValue('ombis_uid', $fields['UUID']);
         } else {
             $address = self::write($address);
         }
