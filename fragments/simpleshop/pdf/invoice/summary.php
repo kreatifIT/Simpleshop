@@ -43,7 +43,7 @@ $summary        = $Order->getValue($config['show_tax_info'] ? 'net_prices' : 'br
                     <?= $promotion->getName() ?>
                 </td>
                 <td align="right">
-                    &euro;&nbsp;-<?= format_price($promotion->getValue('value')) ?>
+                    &euro;&nbsp;-<?= format_price($promotion->getValue('value') / 1.22) ?>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -65,7 +65,7 @@ $summary        = $Order->getValue($config['show_tax_info'] ? 'net_prices' : 'br
                     ###label.gross_total###
                 </td>
                 <td align="right">
-                    &euro;&nbsp;<?= format_price(array_sum($summary) + $shipping_costs - $discount) ?>
+                    &euro;&nbsp;<?= format_price($total - array_sum($taxes)) ?>
                 </td>
             </tr>
 
