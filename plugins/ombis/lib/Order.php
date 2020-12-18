@@ -111,7 +111,7 @@ class Order
             $docPositions['Data'][] = [
                 'Fields' => [
                     'ItemCode'           => $discountCode,
-                    'Price'              => number_format($promotion->getValue('value') * -1, 2, '.', ''),
+                    'Price'              => number_format($promotion->getValue('value') / -1.22, 2, '.', ''),
                     'Quantity'           => '1',
                     'PricePerQuantity'   => '1',
                     'UnitCode'           => 'ST',
