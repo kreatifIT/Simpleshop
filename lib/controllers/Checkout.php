@@ -386,7 +386,15 @@ class CheckoutController extends Controller
     {
         $errors     = [];
         $postAction = rex_post('action', 'string');
-        $products   = Session::getCartItems();
+        try {
+            $products = Session::getCartItems();
+        } catch (CartException $ex) {
+            if ($ex->getCode() == 1) {
+                $warnings = Session::$errors;
+            }
+            $products = Session::getCartItems();
+        }
+
         $warnings   = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.orderWarnings', [], [
             'order'    => $this->Order,
             'action'   => $postAction,
