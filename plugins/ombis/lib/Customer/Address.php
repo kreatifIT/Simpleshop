@@ -18,6 +18,7 @@ use FriendsOfREDAXO\Simpleshop\Country;
 use FriendsOfREDAXO\Simpleshop\Customer;
 use FriendsOfREDAXO\Simpleshop\CustomerAddress;
 use FriendsOfREDAXO\Simpleshop\Ombis\Api;
+use FriendsOfREDAXO\Simpleshop\Settings;
 
 
 class Address
@@ -29,25 +30,15 @@ class Address
         return (array)Api::curl("/adresse/{$ombisId}");
     }
 
-    public static function write(CustomerAddress $address)
+    public static function write(CustomerAddress $address, Customer $customer = null)
     {
-        $isCompany      = $address->getValue('ctype') == 'company';
-        $customer       = $address->valueIsset('customer_id') ? Customer::get($address->getValue('customer_id')) : null;
-        $langId         = $customer ? $customer->getValue('lang_id') : $address->getValue('lang_id');
-        $lang           = $langId ? \rex_clang::get($langId) : null;
-        $countryId      = $address->getValue('country');
-        $country        = $countryId ? Country::get($countryId) : null;
-        $ombisCountryId = '';
-
-        if ($country) {
-            $countryData = Api::curl('/land', [
-                'filter' => "eq(ISOCode,{$country->getValue('iso2')})",
-            ], 'GET', ['ID']);
-            if (isset($countryData['Data'][0])) {
-                $ombisCountryId = $countryData['Data'][0]['Fields']['ID'];
-            }
-        }
-
+        $customer  = $customer ?: ($address->valueIsset('customer_id') ? Customer::get($address->getValue('customer_id')) : null);
+        $isCompany = $address->getValue('ctype') == 'company';
+        $langId    = $customer ? $customer->getValue('lang_id') : $address->getValue('lang_id');
+        $lang      = $langId ? \rex_clang::get($langId) : null;
+        $countryId = $address->getValue('country');
+        $country   = $countryId ? Country::get($countryId) : null;
+        $ombisId   = (int)$address->getValue('ombis_id');
 
         $data = [
             'Fields' => [
@@ -57,7 +48,7 @@ class Address
                 'Sprache'      => $lang ? $lang->getCode() : '',
                 'Steuernummer' => strtoupper($address->getValue('fiscal_code')),
                 'PLZ'          => (string)$address->getValue('postal'),
-                'Land'         => (string)$ombisCountryId,
+                'Land'         => (string)($country ? \FriendsOfREDAXO\Simpleshop\Ombis\Country::getId($country) : ''),
                 'Ort'          => $address->getValue('location'),
                 'Strasse1'     => $address->getValue('street'),
                 'Strasse2'     => (string)$address->getValue('street_additional'),
@@ -69,21 +60,25 @@ class Address
             $data['Fields']['UStIDNummer'] = strtoupper($address->getValue('vat_num'));
             $data['Fields']['Geschlecht']  = 'legalPerson';
         }
+        if ($ombisId == 0) {
+            $path   = '';
+            $method = 'POST';
+        } else {
+            $path   = "/{$ombisId}";
+            $method = 'PUT';
+        }
 
-
-        $ombisId  = trim($address->getValue('ombis_id'));
-        $path     = $ombisId == '' || $ombisId == 0 ? '' : "/{$ombisId}";
-        $method   = $path == '' ? 'POST' : 'PUT';
         $response = Api::curl('/adresse' . $path, $data, $method);
+
 
         if (isset($response['last_id'])) {
             $ombisId = $response['last_id'];
         }
         $response = Api::curl("/adresse/{$ombisId}", [], 'GET', ['ID', 'UUID']);
 
-        $address->setValue('ombis_id', $response['Fields']['ID']);
-        $address->setValue('ombis_uid', $response['Fields']['UUID']);
 
+        $address->setValue('ombis_id', $response['Fields']->ID);
+        $address->setValue('ombis_uid', $response['Fields']->UUID);
         return $address;
     }
 
@@ -97,10 +92,10 @@ class Address
         if (isset($response['Data'])) {
             $addressIds = [];
             foreach ($response['Data'] as $item) {
-                $addressIds[] = $item['Fields']['Adresse.ID'];
+                $addressIds[] = $item->Fields->{'Adresse.ID'};
             }
             $response = (array)Api::curl('/adresse', [
-                'filter' => 'in(ID,' . implode(',', $addressIds) . ')',
+                'filter' => 'in(ID,'. implode(',', $addressIds) .')',
                 'order'  => '-ID',
             ], 'GET', $fields);
         }
@@ -116,75 +111,42 @@ class Address
         return $response['Data'];
     }
 
-    public static function findByAddressInfo($name, $postal, $location, $fields = [])
-    {
-        $response = null;
-        $filter   = array_filter([
-            trim($postal) == '' ? '' : "eq(PLZ,'" . addslashes($postal) . "')",
-            trim($location) == '' ? '' : "eq(Ort,'" . addslashes($location) . "')",
-            trim($name) == '' ? '' : "like(Suchbegriff,'" . addslashes($name) . "')",
-        ]);
-
-        if (count($filter)) {
-            $filterString = count($filter) > 1 ? 'and(' . implode(',', $filter) . ')' : current($filter);
-            $_response    = (array)Api::curl('/adresse', [
-                'filter' => $filterString,
-                'order'  => 'ID',
-            ], 'GET', $fields);
-            $response     = $_response['Data'];
-        }
-        return $response;
-    }
-
     public static function findOrCreateByAddress(CustomerAddress $address, $type = 'invoice')
     {
-        $data       = [];
-        $fields     = ['ID', 'Name', 'UUID', 'PLZ', 'Ort', 'Strasse1', 'Strasse2', 'EMail', 'Steuernummer', 'MwStNummer', 'UStIDNummer'];
-        $isCompany  = $address->getValue('ctype') == 'company';
-        $customer   = $address->valueIsset('customer_id') ? Customer::get($address->getValue('customer_id')) : null;
-        $fiscalInfo = trim($isCompany ? $address->getValue('vat_num') : $address->getValue('fiscal_code'));
+        $data      = null;
+        $fields    = ['ID', 'Name', 'UUID', 'PLZ', 'Ort', 'Strasse1', 'Strasse2', 'EMail', 'Steuernummer', 'MwStNummer', 'UStIDNummer'];
+        $isCompany = $address->getValue('ctype') == 'company';
+        $customer  = $address->valueIsset('customer_id') ? Customer::get($address->getValue('customer_id')) : null;
 
         if ($customer) {
             $data = Address::findByEmail($customer->getValue('email'), $fields);
         }
-        if ($fiscalInfo == '') {
-            $data = array_merge($data, (array)Address::findByAddressInfo($address->getName(), $address->getValue('postal'), $address->getValue('location'), $fields));
-        } else {
-            $data = array_merge((array)$data, Address::findByFiscalInfo($fiscalInfo, $fields));
+        if (!$data) {
+            $fiscalInfo = $isCompany ? $address->getValue('vat_num') : $address->getValue('fiscal_code');
+            $data       = Address::findByFiscalInfo($fiscalInfo, $fields);
         }
 
-        if (count($data)) {
+        if ($data) {
             $_address = null;
             foreach ($data as $item) {
                 if ($type == 'invoice') {
                     $vatNum = strtoupper(trim($address->getValue('vat_num')));
                     $fiscal = strtoupper(trim($address->getValue('fiscal_code')));
-                    $fields = $item['Fields'];
 
                     if ($vatNum == '' && $fiscal == '') {
-                        $__address = $item;
-                    } else if ($vatNum != '' && ($vatNum == strtoupper($fields['Steuernummer']) || $vatNum == $fields['MwStNummer'] || $vatNum == strtoupper($fields['UStIDNummer']))) {
-                        $__address = $item;
-                    } else if ($fiscal != '' && ($fiscal == strtoupper($fields['Steuernummer']) || $fiscal == $fields['MwStNummer'] || $fiscal == strtoupper($fields['UStIDNummer']))) {
-                        $__address = $item;
-                    } else if ($fields['Steuernummer'] == '' && $fields['MwStNummer'] == '') {
-                        $__address = $item;
+                        $_address = $item;
+                    } else if ($vatNum != '' && ($vatNum == strtoupper($item->Fields->Steuernummer) || $vatNum == $item->Fields->MwStNummer || $vatNum == strtoupper($item->Fields->UStIDNummer))) {
+                        $_address = $item;
+                    } else if ($fiscal != '' && ($fiscal == strtoupper($item->Fields->Steuernummer) || $fiscal == $item->Fields->MwStNummer || $fiscal == strtoupper($item->Fields->UStIDNummer))) {
+                        $_address = $item;
+                    } else if ($item->Fields->Steuernummer == '' && $item->Fields->MwStNummer == '') {
+                        $_address = $item;
                     }
-                    if ($__address && $fields['PLZ'] == $address->getValue('postal') && $fields['Ort'] == $address->getValue('location') && ($fields['Strasse1'] == $address->getValue('street') || $fields['Strasse2'] == $address->getValue('street'))) {
-                        $_address = $__address;
+                    if ($_address && $item->Fields->PLZ == $address->getValue('postal') && $item->Fields->Ort == $address->getValue('location') && ($item->Fields->Strasse1 == $address->getValue('street') || $item->Fields->Strasse2 == $address->getValue('street'))) {
                         break;
                     }
                 } else {
-                    $_ombisPLZ     = strtoupper(trim($fields['PLZ']));
-                    $_ombisOrt     = strtoupper(trim($fields['Ort']));
-                    $_ombisStreet1 = strtoupper(trim($fields['Strasse1']));
-                    $_ombisStreet2 = strtoupper(trim($fields['Strasse2']));
-
-                    $_shopPLZ    = strtoupper(trim($address->getValue('postal')));
-                    $_shopOrt    = strtoupper(trim($address->getValue('location')));
-                    $_shopStreet = strtoupper(trim($address->getValue('street')));
-
-                    if (($_shopPLZ == '' || $_shopPLZ == $_ombisPLZ) && ($_shopOrt == '' || $_shopOrt == $_ombisOrt) && ($_shopStreet == '' || $_shopStreet == $_ombisStreet1 || $_shopStreet == $_ombisStreet2)) {
+                    if ($item->Fields->PLZ == $address->getValue('postal') && $item->Fields->Ort == $address->getValue('location') && ($item->Fields->Strasse1 == $address->getValue('street') || $item->Fields->Strasse2 == $address->getValue('street'))) {
                         $_address = $item;
                         break;
                     }
@@ -193,59 +155,12 @@ class Address
         }
 
         if ($_address) {
-            $address->setValue('ombis_id', $fields['ID']);
-            $address->setValue('ombis_uid', $fields['UUID']);
+            $address->setValue('ombis_id', $_address->Fields->ID);
+            $address->setValue('ombis_uid', $_address->Fields->UUID);
         } else {
             $address = self::write($address);
         }
         $address->save();
         return $address;
-    }
-
-    public static function ext__yformDataUpdated(\rex_extension_point $ep)
-    {
-        $table = $ep->getParam('table');
-        // todo: do a better check
-        return;
-
-        if ($table->getTableName() == CustomerAddress::TABLE) {
-            $yform         = $ep->getSubject();
-            $oldData       = $ep->getParam('old_data');
-            $object        = $ep->getParam('data');
-            $fieldsToCheck = \rex_extension::registerPoint(new \rex_extension_point('Ombis.AddressFieldsToCheck', [
-                'ctype',
-                'company_name',
-                'firstname',
-                'lastname',
-                'fiscal_code',
-                'vat_num',
-                'street',
-                'street_additional',
-                'postal',
-                'location',
-                'country',
-            ]));
-
-            foreach ($object->getData() as $name => $value) {
-                if (in_array($name, $fieldsToCheck) && $oldData[$name] !== $value) {
-                    $sql = \rex_sql::factory();
-                    $sql->setTable(CustomerAddress::TABLE);
-                    $sql->setValue('ombis_id', null);
-                    $sql->setValue('ombis_uid', null);
-                    $sql->setWhere(['id' => $object->getId()]);
-                    $sql->update();
-
-                    $object->setValue('ombis_id', null);
-                    $object->setValue('ombis_uid', null);
-
-                    $formData = [];
-                    foreach ($object->getData() as $_name => $_value) {
-                        $formData[] = "{$_name}|{$_value}";
-                    }
-                    $yform->setFormData(implode("\n", $formData));
-                    break;
-                }
-            }
-        }
     }
 }

@@ -5,26 +5,27 @@
  *
  * @author Kreatif GmbH
  * @author a.platter@kreatif.it
- * Date: 07.08.20
+ * Date: 12.01.21
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace FriendsOfREDAXO\Simpleshop\Ombis;
+namespace FriendsOfREDAXO\Simpleshop\Ombis\Customer;
 
 
+use FriendsOfREDAXO\Simpleshop\Ombis\Api;
 use Kreatif\WSConnectorException;
 
 
-class Payment
+class Mwstgruppe
 {
 
     public static function getAll($fields = [])
     {
         $response = [];
         try {
-            $response = (array)Api::curl('/zahlungsart', [], 'GET', $fields)['Data'];
+            $response = (array)Api::curl('/kundenmwstgruppe/', [], 'GET', $fields)['Data'];
         } catch (WSConnectorException $ex) {
         }
         return $response;
