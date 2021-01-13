@@ -45,6 +45,50 @@ rex_yform_manager_table_api::generateTableAndFields($yTable);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CUSTOMER table fields
+$table = \FriendsOfREDAXO\Simpleshop\Customer::TABLE;
+$field = \FriendsOfREDAXO\Simpleshop\Customer::getYformFieldByName('invoice_address_id');
+
+
+\Kreatif\Yform::ensureValueField($table, 'ombis_id', [], [
+    'type_name'   => 'integer',
+    'list_hidden' => 1,
+    'search'      => 1,
+    'label'       => 'Ombis-ID',
+    'db_type'     => 'int',
+    'attributes'  => '{"readonly":"readonly"}',
+    'prio'        => $field->getElement('prio') + 1,
+]);
+
+
+$yTable = rex_yform_manager_table::get($table);
+rex_yform_manager_table_api::generateTableAndFields($yTable);
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// COUNTRY table fields
+$table = \FriendsOfREDAXO\Simpleshop\Country::TABLE;
+$field = \FriendsOfREDAXO\Simpleshop\Country::getYformFieldByName('prio');
+
+
+\Kreatif\Yform::ensureValueField($table, 'ombis_id', [], [
+    'type_name'   => 'integer',
+    'list_hidden' => 1,
+    'search'      => 1,
+    'label'       => 'Ombis-ID',
+    'db_type'     => 'int',
+    'attributes'  => '{"readonly":"readonly"}',
+    'prio'        => $field->getElement('prio') - 1,
+]);
+
+
+$yTable = rex_yform_manager_table::get($table);
+rex_yform_manager_table_api::generateTableAndFields($yTable);
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ORDER table fields
 $table = \FriendsOfREDAXO\Simpleshop\Order::TABLE;
 $field = \FriendsOfREDAXO\Simpleshop\Order::getYformFieldByName('invoice_num');

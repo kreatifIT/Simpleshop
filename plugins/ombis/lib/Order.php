@@ -14,6 +14,7 @@
 namespace FriendsOfREDAXO\Simpleshop\Ombis;
 
 use FriendsOfREDAXO\Simpleshop\Ombis\Customer\Address;
+use FriendsOfREDAXO\Simpleshop\Ombis\Customer\Customer;
 use FriendsOfREDAXO\Simpleshop\Session;
 use FriendsOfREDAXO\Simpleshop\Settings;
 use FriendsOfREDAXO\Simpleshop\Utils;
@@ -27,17 +28,19 @@ class Order
     {
         $orderSync = \FriendsOfREDAXO\Simpleshop\Settings::getValue('ombis_order_sync', 'Ombis');
 
-        if ($orderSync == 'address_sync') {
+        if ($orderSync == 'customer_sync') {
+            $customer        = $order->getCustomerData();
             $invoiceAddress  = $order->getInvoiceAddress();
             $shippingAddress = $order->getShippingAddress();
 
             try {
-                if (!$invoiceAddress->valueIsset('ombis_uid') && $_address = Address::findOrCreateByAddress($invoiceAddress, 'invoice')) {
-                    $order->setValue('invoice_address', $_address);
-                }
-                if ($_address = Address::findOrCreateByAddress($shippingAddress, 'shipping')) {
-                    $order->setValue('shipping_address', $_address);
-                }
+                [$customer, $invoiceAddress, $shippingAddress] = Customer::write($customer, $invoiceAddress, $shippingAddress);
+                $customer->save();
+
+                $order->setValue('customer_data', $customer);
+                $order->setValue('invoice_address', $invoiceAddress);
+                $order->save();
+
                 $order = self::write($order);
             } catch (WSConnectorException $ex) {
                 // just go ahead
@@ -57,6 +60,7 @@ class Order
         $paymentConfig   = Settings::getValue('ombis_payment_config', 'Ombis');
         $shippingCode    = Settings::getValue('order_shipping_code', 'Ombis');
         $discountCode    = Settings::getValue('order_disount_code', 'Ombis');
+        $customer        = $order->getCustomerData();
         $invoiceAddress  = $order->getInvoiceAddress();
         $shippingAddress = $order->getShippingAddress();
         $payment         = $order->getValue('payment');
@@ -123,8 +127,9 @@ class Order
 
         $data = \rex_extension::registerPoint(new \rex_extension_point('Ombis.orderData', [
             'Fields'      => [
-                'CustomerNo'              => $dummyId,
-                'TypeOfPaymentCode'       => $paymentConfig[$payment->getPluginName()],
+                'Customer'                => (string)($customer ? $customer->getValue('ombis_id', false, $dummyId) : $dummyId),
+                'TypeOfPayment'           => (string)$paymentConfig[$payment->getPluginName()],
+                //'TermOfPayment'           => (string)$paymentConfig[$payment->getPluginName()],
                 'CustomerReferenceNumber' => (string)$order->getValue('id'),
                 'CustomerReferenceDate'   => date('Y-m-d'),
                 'InvoiceAddressUUID'      => $invoiceAddress->getValue('ombis_uid'),
@@ -136,10 +141,12 @@ class Order
                 'DocPosition' => $docPositions,
             ],
         ]));
-
-        //pr($data, 'blue');
-        //pr(json_encode($data));
-        //exit;
+        if ($invoiceAddress->getId() != $shippingAddress->getId()) {
+            $orderData['Fields']['ShippingAddressUUID'] = $shippingAddress->getValue('ombis_uid');
+        }
+        $data = \rex_extension::registerPoint(new \rex_extension_point('Ombis.orderData', $orderData, [
+            'order' => $order,
+        ]));
 
         $path     = $ombisId == '' || $ombisId == 0 ? '' : "/{$ombisId}";
         $method   = $ombisId == '' || $ombisId == 0 ? 'POST' : 'PUT';
@@ -150,6 +157,54 @@ class Order
             $order->save();
         }
         return $order;
+    }
+
+    public static function ext__orderFunctionsOutput(\rex_extension_point $ep)
+    {
+        $output = $ep->getSubject();
+        $order  = $ep->getParam('order');
+        $action = $ep->getParam('action');
+
+        if ($action == 'write-to-ombis') {
+            try {
+                $_ombisId = $order->getValue('ombis_id');
+
+                if ($_ombisId != '') {
+                    Api::curl("/preliminarysalesdocument/{$_ombisId}", [], 'GET', [], false, false);
+                }
+
+                $order   = self::writePreVKDokument($order);
+                $ombisId = $order->getValue('ombis_id');
+
+                if ($ombisId == 0 || $ombisId == '') {
+                    echo \rex_view::error('PreVKDokument konnte nicht übermittelt werden');
+                } else if ($_ombisId == '' || $_ombisId == 0) {
+                    echo \rex_view::info('Neues PreVKDokument erstellt mit ID = ' . $ombisId);
+                } else {
+                    echo \rex_view::info('PreVKDokument mit ID = ' . $ombisId . ' wurde aktualisiert');
+                }
+            } catch (\Exception $ex) {
+                if ($ex->getCode() == 3) {
+                    echo \rex_view::warning("PreVKDokument mit ID {$_ombisId} existiert nicht mehr");
+                } else {
+                    echo \rex_view::error($ex->getMessage());
+                }
+            }
+        }
+
+        $output[] = '
+             <a href="' . \rex_url::currentBackendPage([
+                'table_name' => \FriendsOfREDAXO\Simpleshop\Order::TABLE,
+                'data_id'    => $order->getId(),
+                'func'       => rex_request('func', 'string'),
+                'ss-action'  => 'write-to-ombis',
+                'ts'         => time(),
+            ]) . '" class="btn btn-default">
+                    <i class="fa fa-database"></i>&nbsp;
+                    ' . \rex_i18n::msg('label.write_to_ombis') . '
+            </a>
+        ';
+        $ep->setSubject($output);
     }
 
     public static function ext__createPreVKDokument(\rex_extension_point $ep)

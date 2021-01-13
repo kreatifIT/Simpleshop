@@ -23,7 +23,7 @@ use Kreatif\WSConnectorException;
 class Api extends WSConnector
 {
 
-    public static function curl($path, $data = [], $method = 'GET', $fields = [], $debug = false)
+    public static function curl($path, $data = [], $method = 'GET', $fields = [], $debug = false, $sendMail = true)
     {
         $apiUrl  = Settings::getValue('api_base_url', 'Ombis');
         $apiUser = Settings::getValue('api_username', 'Ombis');
@@ -60,7 +60,7 @@ class Api extends WSConnector
         $conn->setDebug($debug);
 
         $isWarnig = false;
-        $response = $conn->request($path, $data, $method);
+        $response = $conn->request($path, $data, $method, '', [], $sendMail);
 
         if ($method == 'POST' || $method == 'PUT') {
             foreach ($response['raw_resp_header'] as $headerLine) {

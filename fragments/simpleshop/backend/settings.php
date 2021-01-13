@@ -52,5 +52,10 @@ $Settings = $this->getVar('Settings');
         <br/>
         <br/>
     <?php endif; ?>
-
 </fieldset>
+
+
+<?= \rex_extension::registerPoint(new \rex_extension_point('simpleshop.settingsFragment', '', [
+    'values' => $Settings,
+])); ?>
+

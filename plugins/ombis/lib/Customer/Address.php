@@ -18,6 +18,7 @@ use FriendsOfREDAXO\Simpleshop\Country;
 use FriendsOfREDAXO\Simpleshop\Customer;
 use FriendsOfREDAXO\Simpleshop\CustomerAddress;
 use FriendsOfREDAXO\Simpleshop\Ombis\Api;
+use FriendsOfREDAXO\Simpleshop\Settings;
 
 
 class Address
@@ -29,25 +30,15 @@ class Address
         return (array)Api::curl("/adresse/{$ombisId}");
     }
 
-    public static function write(CustomerAddress $address)
+    public static function write(CustomerAddress $address, Customer $customer = null)
     {
-        $isCompany      = $address->getValue('ctype') == 'company';
-        $customer       = $address->valueIsset('customer_id') ? Customer::get($address->getValue('customer_id')) : null;
-        $langId         = $customer ? $customer->getValue('lang_id') : $address->getValue('lang_id');
-        $lang           = $langId ? \rex_clang::get($langId) : null;
-        $countryId      = $address->getValue('country');
-        $country        = $countryId ? Country::get($countryId) : null;
-        $ombisCountryId = '';
-
-        if ($country) {
-            $countryData = Api::curl('/land', [
-                'filter' => "eq(ISOCode,{$country->getValue('iso2')})",
-            ], 'GET', ['ID']);
-            if (isset($countryData['Data'][0])) {
-                $ombisCountryId = $countryData['Data'][0]->Fields->ID;
-            }
-        }
-
+        $customer  = $customer ?: ($address->valueIsset('customer_id') ? Customer::get($address->getValue('customer_id')) : null);
+        $isCompany = $address->getValue('ctype') == 'company';
+        $langId    = $customer ? $customer->getValue('lang_id') : $address->getValue('lang_id');
+        $lang      = $langId ? \rex_clang::get($langId) : null;
+        $countryId = $address->getValue('country');
+        $country   = $countryId ? Country::get($countryId) : null;
+        $ombisId   = (int)$address->getValue('ombis_id');
 
         $data = [
             'Fields' => [
@@ -57,7 +48,7 @@ class Address
                 'Sprache'      => $lang ? $lang->getCode() : '',
                 'Steuernummer' => strtoupper($address->getValue('fiscal_code')),
                 'PLZ'          => (string)$address->getValue('postal'),
-                'Land'         => (string)$ombisCountryId,
+                'Land'         => (string)($country ? \FriendsOfREDAXO\Simpleshop\Ombis\Country::getId($country) : ''),
                 'Ort'          => $address->getValue('location'),
                 'Strasse1'     => $address->getValue('street'),
                 'Strasse2'     => (string)$address->getValue('street_additional'),
@@ -69,11 +60,14 @@ class Address
             $data['Fields']['UStIDNummer'] = strtoupper($address->getValue('vat_num'));
             $data['Fields']['Geschlecht']  = 'legalPerson';
         }
+        if ($ombisId == 0) {
+            $path   = '';
+            $method = 'POST';
+        } else {
+            $path   = "/{$ombisId}";
+            $method = 'PUT';
+        }
 
-
-        $ombisId  = trim($address->getValue('ombis_id'));
-        $path     = $ombisId == '' ? '' : "/{$ombisId}";
-        $method   = $ombisId == '' ? 'POST' : 'PUT';
         $response = Api::curl('/adresse' . $path, $data, $method);
 
 
