@@ -41,21 +41,16 @@ $product_url = \rex_url::backendPage('yform/manager/data_edit', [
 if (!$product) {
     echo \rex_view::warning($this->i18n('error.no_product_choosen'));
     return;
-} else if (!$features && Variant::query()
-        ->where('product_id', $product_id)
-        ->count()) {
+} else if (!$features && Variant::query()->where('product_id', $product_id)->count()) {
     $features = [];
-    $variants = Variant::query()
-        ->where('product_id', $product_id)
-        ->find();
+    $variants = Variant::query()->where('product_id', $product_id)->find();
 
     foreach ($variants as $variant) {
         $_features = explode('|', $variant->getValue('variant_key'));
 
         foreach ($_features as $feature_id) {
             if (!isset($features[$feature_id])) {
-                $features[$feature_id] = FeatureValue::get($feature_id)
-                    ->getValue('name', true);
+                $features[$feature_id] = FeatureValue::get($feature_id)->getValue('name', true);
             }
         }
     }
@@ -85,58 +80,43 @@ if (!$product) {
     return;
 }
 
-$versionCheckVariant = Variant::query()
-    ->where('product_id', $product_id)
-    ->orderBy('prio', 'desc')
-    ->findOne();
-
 if ($_FUNC == 'save') {
     $vIds  = [];
     $data  = [];
     $_data = rex_post('FORM', 'array');
 
-    if ($versionCheckVariant->getValue('updatedate') != rex_post('variant_udpate_version_ds', 'string')) {
-        $_url       = \rex_url::currentBackendPage(['table_name' => Variant::TABLE, 'data_id' => $product_id, 'func' => 'edit']);
-        $warnings[] = \Kreatif\Utils::getDatestampCheckErrorMsg($_url);
-    } else {
-        // re-map be_table values
-        foreach ($_data as $key => $values) {
-            if (substr($key, 0, 9) == 'be_table|') {
-                list($_field, $_key, $_index) = explode('|', $key);
-                $data[$_key]['be_table'][$_index] = $values;
-            } else {
-                $data[$key] = array_merge((array)$data[$key], $values);
-            }
+    // re-map be_table values
+    foreach ($_data as $key => $values) {
+        if (substr($key, 0, 9) == 'be_table|') {
+            [$_field, $_key, $_index] = explode('|', $key);
+            $data[$_key]['be_table'][$_index] = $values;
+        } else {
+            $data[$key] = array_merge((array)$data[$key], $values);
         }
-
-        foreach ($data as $key => $values) {
-            // reset POST values
-            $_POST['FORM'] = [];
-
-            $Variant = Variant::query()
-                ->where('product_id', $product_id)
-                ->where('variant_key', $key)
-                ->findOne();
-
-            if (!$Variant) {
-                $Variant = Variant::create();
-                $Variant->setValue('variant_key', $key);
-                $Variant->setValue('product_id', $product_id);
-            }
-            foreach ($values as $name => $value) {
-                if (is_array($value) && $name == 'be_table') {
-                    $_POST['FORM'] = array_merge($_POST['FORM'], $value);
-                }
-                $Variant->setValue($name, $value);
-            }
-            $Variant->save();
-            $vIds[] = $Variant->getId();
-        }
-        $versionCheckVariant = $Variant;
-        // remove previously saved variants
-        \rex_sql::factory()
-            ->setQuery("DELETE FROM " . Variant::TABLE . " WHERE product_id = ? AND id NOT IN(" . implode(',', $vIds) . ")", [$product_id]);
     }
+
+    foreach ($data as $key => $values) {
+        // reset POST values
+        $_POST['FORM'] = [];
+
+        $Variant = Variant::query()->where('product_id', $product_id)->where('variant_key', $key)->findOne();
+
+        if (!$Variant) {
+            $Variant = Variant::create();
+            $Variant->setValue('variant_key', $key);
+            $Variant->setValue('product_id', $product_id);
+        }
+        foreach ($values as $name => $value) {
+            if (is_array($value) && $name == 'be_table') {
+                $_POST['FORM'] = array_merge($_POST['FORM'], $value);
+            }
+            $Variant->setValue($name, $value);
+        }
+        $Variant->save();
+        $vIds[] = $Variant->getId();
+    }
+    // remove previously saved variants
+    \rex_sql::factory()->setQuery("DELETE FROM " . Variant::TABLE . " WHERE product_id = ? AND id NOT IN(" . implode(',', $vIds) . ")", [$product_id]);
 }
 
 // load all columns from yform
@@ -144,13 +124,10 @@ $rows         = [];
 $featureNames = [];
 $featureKeys  = [];
 
-$variants = Variant::query()
-    ->where('product_id', $product_id)
-    ->orderBy('prio')
-    ->find();
+$variants = Variant::query()->where('product_id', $product_id)->orderBy('prio')->find();
 
 // load all yform fields to place them into columns
-list ($labels, $fields) = Variant::be_getYFields();
+[$labels, $fields] = Variant::be_getYFields();
 
 
 // calculate the possible variants
@@ -263,6 +240,4 @@ $fragment->setVar('title', $product->getName() . ' [' . $product_id . ']');
 $fragment->setVar('content', \Wildcard::parse($content), false);
 $fragment->setVar('buttons', $buttons, false);
 echo $fragment->parse('core/page/section.php');
-
-echo '<input type="hidden" name="variant_udpate_version_ds" value="' . $versionCheckVariant->getValue('updatedate') . '"/>';
 echo '</form>';
