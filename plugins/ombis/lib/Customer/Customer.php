@@ -95,7 +95,6 @@ class Customer
             ];
         }
 
-        pr($data);
         $response = Api::curl('/kunde' . $path, $data, $method);
 
         if (isset($response['last_id'])) {
