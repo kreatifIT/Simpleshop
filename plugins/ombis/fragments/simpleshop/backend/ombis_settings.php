@@ -91,6 +91,22 @@ $apiPaymentTerms = Ombis\Customer\Zahlungsbedingungen::getAll(['ID', 'Name']);
         </dd>
     </dl>
 
+    <?php if ($apiPaymentTerms): ?>
+        <dl class="rex-form-group form-group">
+            <dt>Zahlungsbedingungen:</dt>
+            <dd>
+                <select name="ombis_payment_term" class="form-control">
+                    <option value="">-</option>
+                    <?php foreach ($apiPaymentTerms as $item): ?>
+                        <option value="<?= $item['Fields']['ID'] ?>" <?= from_array($Settings, 'ombis_payment_term') == $item['Fields']['ID'] ? 'selected="selected"' : '' ?>>
+                            <?= $item['Fields']['Name']; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </dd>
+        </dl>
+    <?php endif; ?>
+
     <legend>Zahlungsmethoden</legend>
     <?php if (count($apiPayments) && count($payments)): ?>
         <?php
@@ -289,25 +305,6 @@ $apiPaymentTerms = Ombis\Customer\Zahlungsbedingungen::getAll(['ID', 'Name']);
                     <option value="">-</option>
                     <?php foreach ($apiStatistikgrp as $item): ?>
                         <option value="<?= $item['Fields']['ID'] ?>" <?= $values['default'] == $item['Fields']['ID'] ? 'selected="selected"' : '' ?>>
-                            <?= $item['Fields']['Name']; ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </dd>
-        </dl>
-    <?php endif; ?>
-
-    <?php if ($apiPaymentTerms): ?>
-        <?php
-        $values = from_array($Settings, 'ombis_customer_settings');
-        ?>
-        <dl class="rex-form-group form-group">
-            <dt>Zahlungsbedingungen:</dt>
-            <dd>
-                <select name="ombis_customer_settings[zahlungsbedingungen]" class="form-control">
-                    <option value="">-</option>
-                    <?php foreach ($apiPaymentTerms as $item): ?>
-                        <option value="<?= $item['Fields']['ID'] ?>" <?= $values['zahlungsbedingungen'] == $item['Fields']['ID'] ? 'selected="selected"' : '' ?>>
                             <?= $item['Fields']['Name']; ?>
                         </option>
                     <?php endforeach; ?>

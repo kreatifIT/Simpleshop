@@ -129,8 +129,7 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
             }
 
             if (\rex_addon::get('kreatif-mpdf')
-                ->isAvailable()
-            ) {
+                ->isAvailable()) {
                 $output[] = '
                     <a href="' . rex_url::currentBackendPage([
                         'table_name' => $table,
@@ -259,6 +258,11 @@ class rex_yform_value_order_functions extends rex_yform_value_abstract
                     </a>
                 ';
             }
+
+            $output = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.orderFunctionsOutput', $output, [
+                'order'  => $Order,
+                'action' => $action,
+            ]));
 
             $this->params['form_output'][$this->getId()] = '
                 <div class="row nested-panel">

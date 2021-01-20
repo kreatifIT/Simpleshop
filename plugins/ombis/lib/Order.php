@@ -13,6 +13,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop\Ombis;
 
+use FriendsOfREDAXO\Simpleshop\CustomerAddress;
 use FriendsOfREDAXO\Simpleshop\Ombis\Customer\Customer;
 use FriendsOfREDAXO\Simpleshop\Session;
 use FriendsOfREDAXO\Simpleshop\Settings;
@@ -32,12 +33,29 @@ class Order
             $invoiceAddress  = $order->getInvoiceAddress();
             $shippingAddress = $order->getShippingAddress();
 
+            $customer->setValue('ombis_id', \FriendsOfREDAXO\Simpleshop\Customer::get($customer->getId())
+                ->getValue('ombis_id'));
+
+            if ($invoiceAddress) {
+                $invoiceAddress->setValue('ombis_id', CustomerAddress::get($invoiceAddress->getId())
+                    ->getValue('ombis_id'));
+                $invoiceAddress->setValue('ombis_uid', CustomerAddress::get($invoiceAddress->getId())
+                    ->getValue('ombis_uid'));
+            }
+            if ($shippingAddress) {
+                $shippingAddress->setValue('ombis_id', CustomerAddress::get($shippingAddress->getId())
+                    ->getValue('ombis_id'));
+                $shippingAddress->setValue('ombis_uid', CustomerAddress::get($shippingAddress->getId())
+                    ->getValue('ombis_uid'));
+            }
+
             try {
                 [$customer, $invoiceAddress, $shippingAddress] = Customer::write($customer, $invoiceAddress, $shippingAddress);
                 $customer->save();
 
                 $order->setValue('customer_data', $customer);
                 $order->setValue('invoice_address', $invoiceAddress);
+                $order->setValue('shipping_address', $shippingAddress);
                 $order->save();
 
                 $order = self::write($order);
@@ -59,6 +77,7 @@ class Order
         $paymentConfig   = Settings::getValue('ombis_payment_config', 'Ombis');
         $shippingCode    = Settings::getValue('order_shipping_code', 'Ombis');
         $discountCode    = Settings::getValue('order_disount_code', 'Ombis');
+        $paymentTerm     = Settings::getValue('ombis_payment_term', 'Ombis');
         $customer        = $order->getCustomerData();
         $invoiceAddress  = $order->getInvoiceAddress();
         $shippingAddress = $order->getShippingAddress();
@@ -75,6 +94,7 @@ class Order
                 $docPositions['Delete'][] = $_position->URI;
             }
         }
+        pr($paymentTerm);
 
         foreach ($orderProducts as $orderProduct) {
             $product = $orderProduct->getValue('data');
@@ -128,27 +148,26 @@ class Order
             'Fields'      => [
                 'Customer'                => (string)($customer ? $customer->getValue('ombis_id', false, $dummyId) : $dummyId),
                 'TypeOfPayment'           => (string)$paymentConfig[$payment->getPluginName()],
-                //'TermOfPayment'           => (string)$paymentConfig[$payment->getPluginName()],
+                'TermOfPayment'           => (string)$paymentTerm,
                 'CustomerReferenceNumber' => (string)$order->getValue('id'),
                 'CustomerReferenceDate'   => date('Y-m-d'),
                 'InvoiceAddressUUID'      => $invoiceAddress->getValue('ombis_uid'),
-                'ShippingAddressUUID'     => $shippingAddress->getValue('ombis_uid'),
+                'ShippingAddressUUID'     => $shippingAddress ? $shippingAddress->getValue('ombis_uid') : '',
                 'Notes'                   => (string)$order->getValue('remarks'),
                 'DocType'                 => 'VkAuftrag',
             ],
             'Collections' => [
                 'DocPosition' => $docPositions,
             ],
-        ]));
-        if ($invoiceAddress->getId() != $shippingAddress->getId()) {
-            $orderData['Fields']['ShippingAddressUUID'] = $shippingAddress->getValue('ombis_uid');
-        }
-        $data = \rex_extension::registerPoint(new \rex_extension_point('Ombis.orderData', $orderData, [
+        ], [
             'order'           => $order,
             'customer'        => $customer,
             'invoiceAddress'  => $invoiceAddress,
             'shippingAddress' => $shippingAddress,
         ]));
+        if ($shippingAddress && $invoiceAddress->getId() != $shippingAddress->getId()) {
+            $orderData['Fields']['ShippingAddressUUID'] = $shippingAddress->getValue('ombis_uid');
+        }
 
         $path     = $ombisId == '' || $ombisId == 0 ? '' : "/{$ombisId}";
         $method   = $ombisId == '' || $ombisId == 0 ? 'POST' : 'PUT';
@@ -175,7 +194,7 @@ class Order
                     Api::curl("/preliminarysalesdocument/{$_ombisId}", [], 'GET', [], false, false);
                 }
 
-                $order   = self::writePreVKDokument($order);
+                $order   = self::createPreVKDokument($order);
                 $ombisId = $order->getValue('ombis_id');
 
                 if ($ombisId == 0 || $ombisId == '') {
@@ -203,7 +222,7 @@ class Order
                 'ts'         => time(),
             ]) . '" class="btn btn-default">
                     <i class="fa fa-database"></i>&nbsp;
-                    ' . \rex_i18n::msg('label.write_to_ombis') . '
+                    an Ombis übermitteln
             </a>
         ';
         $ep->setSubject($output);
