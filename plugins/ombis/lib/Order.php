@@ -94,7 +94,6 @@ class Order
                 $docPositions['Delete'][] = $_position->URI;
             }
         }
-        pr($paymentTerm);
 
         foreach ($orderProducts as $orderProduct) {
             $product = $orderProduct->getValue('data');
@@ -144,9 +143,12 @@ class Order
             ];
         }
 
+        $customerId = $customer ? $customer->getValue('ombis_id') : '';
+        $customerId = $customerId == '' ? $dummyId : $customerId;
+
         $data = \rex_extension::registerPoint(new \rex_extension_point('Ombis.orderData', [
             'Fields'      => [
-                'Customer'                => (string)($customer ? $customer->getValue('ombis_id', false, $dummyId) : $dummyId),
+                'Customer'                => (string)$customerId,
                 'TypeOfPayment'           => (string)$paymentConfig[$payment->getPluginName()],
                 'TermOfPayment'           => (string)$paymentTerm,
                 'CustomerReferenceNumber' => (string)$order->getValue('id'),
