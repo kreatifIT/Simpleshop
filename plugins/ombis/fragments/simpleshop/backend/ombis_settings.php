@@ -28,6 +28,7 @@ $apiBranche      = Ombis\Customer\Branche::getAll(['ID', 'Name']);
 $apiVerkaufer    = Ombis\Customer\Verkaeufer::getAll(['ID', 'DisplayName']);
 $apiKontingent   = Ombis\Customer\Kontingentgebiet::getAll(['ID', 'Name']);
 $apiStatistikgrp = Ombis\Customer\Statistikgruppe::getAll(['ID', 'Name']);
+$apiPaymentTerms = Ombis\Customer\Zahlungsbedingungen::getAll(['ID', 'Name']);
 
 ?>
 <fieldset>
@@ -288,6 +289,25 @@ $apiStatistikgrp = Ombis\Customer\Statistikgruppe::getAll(['ID', 'Name']);
                     <option value="">-</option>
                     <?php foreach ($apiStatistikgrp as $item): ?>
                         <option value="<?= $item['Fields']['ID'] ?>" <?= $values['default'] == $item['Fields']['ID'] ? 'selected="selected"' : '' ?>>
+                            <?= $item['Fields']['Name']; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </dd>
+        </dl>
+    <?php endif; ?>
+
+    <?php if ($apiPaymentTerms): ?>
+        <?php
+        $values = from_array($Settings, 'ombis_customer_settings');
+        ?>
+        <dl class="rex-form-group form-group">
+            <dt>Zahlungsbedingungen:</dt>
+            <dd>
+                <select name="ombis_customer_settings[zahlungsbedingungen]" class="form-control">
+                    <option value="">-</option>
+                    <?php foreach ($apiPaymentTerms as $item): ?>
+                        <option value="<?= $item['Fields']['ID'] ?>" <?= $values['zahlungsbedingungen'] == $item['Fields']['ID'] ? 'selected="selected"' : '' ?>>
                             <?= $item['Fields']['Name']; ?>
                         </option>
                     <?php endforeach; ?>

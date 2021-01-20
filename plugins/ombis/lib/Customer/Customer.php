@@ -56,6 +56,7 @@ class Customer
                 'Buchungsgruppe'               => (string)$customerSettings['buchungsgruppe'],
                 'Verkaeufer'                   => (string)$customerSettings['seller'],
                 'Branche'                      => (string)$customerSettings['branche'],
+                'Zahlungsbedingung'            => (string)$customerSettings['zahlungsbedingungen'],
                 'KuLiStatistikgruppe1'         => (string)$statsGroup,
                 'PeriodizitaetRechnungslegung' => 'Manuell',
                 // todo: sollen alle Werte auch bei Aktualisierungen geschrieben werden?
