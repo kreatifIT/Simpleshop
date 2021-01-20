@@ -68,6 +68,11 @@ class Address
             $method = 'PUT';
         }
 
+
+        $data = \rex_extension::registerPoint(new \rex_extension_point('Ombis.addressData', $data, [
+            'address' => $address,
+        ]));
+
         $response = Api::curl('/adresse' . $path, $data, $method);
 
 
@@ -95,7 +100,7 @@ class Address
                 $addressIds[] = $item->Fields->{'Adresse.ID'};
             }
             $response = (array)Api::curl('/adresse', [
-                'filter' => 'in(ID,'. implode(',', $addressIds) .')',
+                'filter' => 'in(ID,' . implode(',', $addressIds) . ')',
                 'order'  => '-ID',
             ], 'GET', $fields);
         }

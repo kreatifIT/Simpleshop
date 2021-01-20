@@ -13,7 +13,6 @@
 
 namespace FriendsOfREDAXO\Simpleshop\Ombis;
 
-use FriendsOfREDAXO\Simpleshop\Ombis\Customer\Address;
 use FriendsOfREDAXO\Simpleshop\Ombis\Customer\Customer;
 use FriendsOfREDAXO\Simpleshop\Session;
 use FriendsOfREDAXO\Simpleshop\Settings;
@@ -145,7 +144,10 @@ class Order
             $orderData['Fields']['ShippingAddressUUID'] = $shippingAddress->getValue('ombis_uid');
         }
         $data = \rex_extension::registerPoint(new \rex_extension_point('Ombis.orderData', $orderData, [
-            'order' => $order,
+            'order'           => $order,
+            'customer'        => $customer,
+            'invoiceAddress'  => $invoiceAddress,
+            'shippingAddress' => $shippingAddress,
         ]));
 
         $path     = $ombisId == '' || $ombisId == 0 ? '' : "/{$ombisId}";
