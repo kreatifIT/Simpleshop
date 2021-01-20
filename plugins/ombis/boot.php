@@ -13,7 +13,6 @@
 
 \rex_extension::register('simpleshop.orderFunctionsOutput', ['\FriendsOfREDAXO\Simpleshop\Ombis\Order', 'ext__orderFunctionsOutput']);
 \rex_extension::register('simpleshop.Order.completeOrder', ['\FriendsOfREDAXO\Simpleshop\Ombis\Order', 'ext__createPreVKDokument']);
-\rex_extension::register('simpleshop.Order.completeOrder', ['\FriendsOfREDAXO\Simpleshop\Ombis\Order', 'ext__orderFunctionsOutput']);
 
 if (rex::isBackend() && rex::getUser()) {
     $currentAddon = current(explode('/', rex_be_controller::getCurrentPage()));
