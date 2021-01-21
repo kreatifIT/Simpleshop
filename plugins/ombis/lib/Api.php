@@ -70,9 +70,7 @@ class Api extends WSConnector
                 }
                 if (strpos($headerLine, 'content-length:') !== false) {
                     $contentLength = str_replace('content-length:', '', $headerLine);
-                    if ((int)$contentLength > 0) {
-                        $isWarnig = true;
-                    }
+                    $isWarnig      = (int)$contentLength > 0;
                 }
             }
         }
