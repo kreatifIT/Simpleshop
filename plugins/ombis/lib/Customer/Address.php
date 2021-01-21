@@ -80,8 +80,8 @@ class Address
         }
         $response = Api::curl("/adresse/{$ombisId}", [], 'GET', ['ID', 'UUID']);
 
-        $address->setValue('ombis_id', $ombisId);
-        $address->setValue('ombis_uid', $response['Fields']->UUID);
+        $address->setValue('ombis_id', $response['Fields']['ID']);
+        $address->setValue('ombis_uid', $response['Fields']['UUID']);
         return $address;
     }
 

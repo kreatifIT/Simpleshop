@@ -91,7 +91,7 @@ class Order
             $_positions = Api::curl("/preliminarysalesdocument/{$ombisId}/docposition");
 
             foreach ($_positions['Data'] as $_position) {
-                $docPositions['Delete'][] = $_position->URI;
+                $docPositions['Delete'][] = (string)$_position['URI'];
             }
         }
 
@@ -154,7 +154,6 @@ class Order
                 'CustomerReferenceNumber' => (string)$order->getValue('id'),
                 'CustomerReferenceDate'   => date('Y-m-d'),
                 'InvoiceAddressUUID'      => $invoiceAddress->getValue('ombis_uid'),
-                'ShippingAddressUUID'     => $shippingAddress ? $shippingAddress->getValue('ombis_uid') : '',
                 'Notes'                   => (string)$order->getValue('remarks'),
                 'DocType'                 => 'VkAuftrag',
             ],
@@ -165,10 +164,9 @@ class Order
             'order'           => $order,
             'customer'        => $customer,
             'invoiceAddress'  => $invoiceAddress,
-            'shippingAddress' => $shippingAddress,
         ]));
         if ($shippingAddress && $invoiceAddress->getId() != $shippingAddress->getId()) {
-            $orderData['Fields']['ShippingAddressUUID'] = $shippingAddress->getValue('ombis_uid');
+            $data['Fields']['ShippingAddressUUID'] = $shippingAddress->getValue('ombis_uid');
         }
 
         $path     = $ombisId == '' || $ombisId == 0 ? '' : "/{$ombisId}";
