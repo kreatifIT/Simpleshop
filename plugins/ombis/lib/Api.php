@@ -69,7 +69,8 @@ class Api extends WSConnector
                     $response['last_id'] = array_pop($chunks);
                 }
                 if (strpos($headerLine, 'content-length:') !== false) {
-                    if ((int)str_replace('content-length:', '',$headerLine) > 0) {
+                    $contentLength = str_replace('content-length:', '', $headerLine);
+                    if ((int)$contentLength > 0) {
                         $isWarnig = true;
                     }
                 }
