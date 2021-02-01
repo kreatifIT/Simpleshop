@@ -44,4 +44,18 @@ class Package extends Model
         }
         return true;
     }
+
+    public static function checkIfPackageItem($products) {
+        $useTaxPrices = false;
+
+        if ($products && count($products)) {
+            foreach ($products as $product) {
+                if ($product->getValue('type') == 'package') {
+                    $useTaxPrices = true;
+                    break;
+                }
+            }
+        }
+        return $useTaxPrices;
+    }
 }
