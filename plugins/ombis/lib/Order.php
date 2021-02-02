@@ -14,6 +14,7 @@
 namespace FriendsOfREDAXO\Simpleshop\Ombis;
 
 use FriendsOfREDAXO\Simpleshop\CustomerAddress;
+use FriendsOfREDAXO\Simpleshop\Model;
 use FriendsOfREDAXO\Simpleshop\Ombis\Customer\Customer;
 use FriendsOfREDAXO\Simpleshop\Session;
 use FriendsOfREDAXO\Simpleshop\Settings;
@@ -33,31 +34,40 @@ class Order
             $invoiceAddress  = $order->getInvoiceAddress();
             $shippingAddress = $order->getShippingAddress();
 
-            $customer->setValue('ombis_id', \FriendsOfREDAXO\Simpleshop\Customer::get($customer->getId())
-                ->getValue('ombis_id'));
+            $customer->setValue('ombis_id', \FriendsOfREDAXO\Simpleshop\Customer::get($customer->getId())->getValue('ombis_id'));
 
             if ($invoiceAddress) {
-                $invoiceAddress->setValue('ombis_id', CustomerAddress::get($invoiceAddress->getId())
-                    ->getValue('ombis_id'));
-                $invoiceAddress->setValue('ombis_uid', CustomerAddress::get($invoiceAddress->getId())
-                    ->getValue('ombis_uid'));
+                $invoiceAddress->setValue('ombis_id', CustomerAddress::get($invoiceAddress->getId())->getValue('ombis_id'));
+                $invoiceAddress->setValue('ombis_uid', CustomerAddress::get($invoiceAddress->getId())->getValue('ombis_uid'));
             }
             if ($shippingAddress) {
-                $shippingAddress->setValue('ombis_id', CustomerAddress::get($shippingAddress->getId())
-                    ->getValue('ombis_id'));
-                $shippingAddress->setValue('ombis_uid', CustomerAddress::get($shippingAddress->getId())
-                    ->getValue('ombis_uid'));
+                $shippingAddress->setValue('ombis_id', CustomerAddress::get($shippingAddress->getId())->getValue('ombis_id'));
+                $shippingAddress->setValue('ombis_uid', CustomerAddress::get($shippingAddress->getId())->getValue('ombis_uid'));
             }
 
             try {
+                $sql = \rex_sql::factory();
                 [$customer, $invoiceAddress, $shippingAddress] = Customer::write($customer, $invoiceAddress, $shippingAddress);
-                $customer->save();
+
+                $sql->setTable(\FriendsOfREDAXO\Simpleshop\Customer::TABLE);
+                $sql->setValue('ombis_id', $customer->getValue('ombis_id'));
+                $sql->setWhere('id = :id', ['id' => $customer->getId()]);
+                $sql->update();
 
                 $order->setValue('customer_data', $customer);
                 $order->setValue('invoice_address', $invoiceAddress);
                 $order->setValue('shipping_address', $shippingAddress);
-                $order->save();
+                $_order = Model::prepare($order);
 
+                $sql = \rex_sql::factory();
+                $sql->setTable(\FriendsOfREDAXO\Simpleshop\Order::TABLE);
+                $sql->setValue('customer_data', $_order['customer_data']);
+                $sql->setValue('invoice_address', $_order['invoice_address']);
+                $sql->setValue('shipping_address', $_order['shipping_address']);
+                $sql->setWhere('id = :id', ['id' => $order->getId()]);
+                $sql->update();
+
+                $order->invalidateData();
                 $order = self::write($order);
             } catch (WSConnectorException $ex) {
                 // just go ahead
@@ -161,9 +171,9 @@ class Order
                 'DocPosition' => $docPositions,
             ],
         ], [
-            'order'           => $order,
-            'customer'        => $customer,
-            'invoiceAddress'  => $invoiceAddress,
+            'order'          => $order,
+            'customer'       => $customer,
+            'invoiceAddress' => $invoiceAddress,
         ]));
         if ($shippingAddress && $invoiceAddress->getId() != $shippingAddress->getId()) {
             $data['Fields']['ShippingAddressUUID'] = $shippingAddress->getValue('ombis_uid');
