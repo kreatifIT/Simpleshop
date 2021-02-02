@@ -42,13 +42,14 @@ class Customer
         $taxGroupSettings   = Settings::getValue('ombis_tax_group', 'Ombis');
         $statsGroupSettings = Settings::getValue('ombis_statistic_group', 'Ombis');
 
-        if ($postal >= 39000 && 39000 <= 39999) {
+        if ($countryId == 93 && $postal >= 39000 && $postal <= 39999) {
             $statsGroup = $statsGroupSettings['southtyrol'];
         } else if (isset($statsGroupSettings[$countryId])) {
             $statsGroup = $statsGroupSettings[$countryId];
         } else {
             $statsGroup = $statsGroupSettings['default'];
         }
+
 
         $data = \rex_extension::registerPoint(new \rex_extension_point('Ombis.customerData', [
             'Fields' => [
