@@ -27,8 +27,13 @@ $apiMwstgruppe   = Ombis\Customer\Mwstgruppe::getAll(['ID', 'Name']);
 $apiBranche      = Ombis\Customer\Branche::getAll(['ID', 'Name']);
 $apiVerkaufer    = Ombis\Customer\Verkaeufer::getAll(['ID', 'DisplayName']);
 $apiKontingent   = Ombis\Customer\Kontingentgebiet::getAll(['ID', 'Name']);
+$apiGebiet       = Ombis\Customer\Verkaufsgebiet::getAll(['ID', 'Name']);
 $apiStatistikgrp = Ombis\Customer\Statistikgruppe::getAll(['ID', 'Name']);
 $apiPaymentTerms = Ombis\Customer\Zahlungsbedingungen::getAll(['ID', 'Name']);
+
+$query = \Kreatif\Model\Country::query();
+$query->where('status', 1);
+$countries = $query->find();
 
 ?>
 <fieldset>
@@ -325,5 +330,22 @@ $apiPaymentTerms = Ombis\Customer\Zahlungsbedingungen::getAll(['ID', 'Name']);
             </dd>
         </dl>
     <?php endif; ?>
+
+    <?php $values = from_array($Settings, 'ombis_gebiete');  ?>
+    <?php foreach ($countries as $country): ?>
+        <dl class="rex-form-group form-group">
+            <dt>Verkaufsgebiet <?= $country->getName() ?>:</dt>
+            <dd>
+                <select name="ombis_gebiete[<?= $country->getId() ?>]" class="form-control">
+                    <option value="">-</option>
+                    <?php foreach ($apiGebiet as $item): ?>
+                        <option value="<?= $item['Fields']['ID'] ?>" <?= $values[$country->getId()] == $item['Fields']['ID'] ? 'selected="selected"' : '' ?>>
+                            <?= $item['Fields']['Name']; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </dd>
+        </dl>
+    <?php endforeach; ?>
 
 </fieldset>

@@ -41,6 +41,7 @@ class Customer
         $customerSettings   = Settings::getValue('ombis_customer_settings', 'Ombis');
         $taxGroupSettings   = Settings::getValue('ombis_tax_group', 'Ombis');
         $statsGroupSettings = Settings::getValue('ombis_statistic_group', 'Ombis');
+        $gebieteSettings    = Settings::getValue('ombis_gebiete', 'Ombis');
 
         if ($countryId == 93 && $postal >= 39000 && $postal <= 39999) {
             $statsGroup = $statsGroupSettings['southtyrol'];
@@ -66,6 +67,7 @@ class Customer
                 'Buchungsgruppe'               => (string)$customerSettings['buchungsgruppe'],
                 'Verkaeufer'                   => (string)$customerSettings['seller'],
                 'Branche'                      => (string)$customerSettings['branche'],
+                'Verkaufsgebiet'               => (string)$gebieteSettings[$countryId],
                 'KuLiStatistikgruppe1'         => (string)$statsGroup,
                 'PeriodizitaetRechnungslegung' => 'Manuell',
                 // todo: sollen alle Werte auch bei Aktualisierungen geschrieben werden?
