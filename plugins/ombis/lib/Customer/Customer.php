@@ -50,11 +50,17 @@ class Customer
             $statsGroup = $statsGroupSettings['default'];
         }
 
+        if ($countryId == 93) {
+            $kontingentGebiet = $customerSettings['kontingentgebiet_inland'];
+        } else {
+            $kontingentGebiet = $customerSettings['kontingentgebiet_ausland'];
+        }
+
 
         $data = \rex_extension::registerPoint(new \rex_extension_point('Ombis.customerData', [
             'Fields' => [
                 'Rechtssitz'                   => (string)$invoiceAddress->getValue('ombis_id'),
-                'Kontingentgebiet'             => (string)$customerSettings['kontingentgebiet'],
+                'Kontingentgebiet'             => (string)$kontingentGebiet,
                 'MwStGruppe'                   => $taxGroupSettings[$countryId] ?: $taxGroupSettings['default'],
                 'Sammelkontogruppe'            => (string)$customerSettings['sammelkontogruppe'],
                 'Buchungsgruppe'               => (string)$customerSettings['buchungsgruppe'],

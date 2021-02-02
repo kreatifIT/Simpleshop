@@ -220,12 +220,25 @@ $apiPaymentTerms = Ombis\Customer\Zahlungsbedingungen::getAll(['ID', 'Name']);
         $values = from_array($Settings, 'ombis_customer_settings');
         ?>
         <dl class="rex-form-group form-group">
-            <dt>Kontingentgebiet:</dt>
+            <dt>Kontingentgebiet Inland:</dt>
             <dd>
-                <select name="ombis_customer_settings[kontingentgebiet]" class="form-control">
+                <select name="ombis_customer_settings[kontingentgebiet_inland]" class="form-control">
                     <option value="">-</option>
                     <?php foreach ($apiKontingent as $item): ?>
-                        <option value="<?= $item['Fields']['ID'] ?>" <?= $values['kontingentgebiet'] == $item['Fields']['ID'] ? 'selected="selected"' : '' ?>>
+                        <option value="<?= $item['Fields']['ID'] ?>" <?= $values['kontingentgebiet_inland'] == $item['Fields']['ID'] ? 'selected="selected"' : '' ?>>
+                            <?= $item['Fields']['Name']; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </dd>
+        </dl>
+        <dl class="rex-form-group form-group">
+            <dt>Kontingentgebiet Ausland:</dt>
+            <dd>
+                <select name="ombis_customer_settings[kontingentgebiet_ausland]" class="form-control">
+                    <option value="">-</option>
+                    <?php foreach ($apiKontingent as $item): ?>
+                        <option value="<?= $item['Fields']['ID'] ?>" <?= $values['kontingentgebiet_ausland'] == $item['Fields']['ID'] ? 'selected="selected"' : '' ?>>
                             <?= $item['Fields']['Name']; ?>
                         </option>
                     <?php endforeach; ?>
