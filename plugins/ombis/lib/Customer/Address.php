@@ -43,7 +43,7 @@ class Address
             'Fields' => [
                 'Name1'           => $isCompany ? $address->getName() : $address->getValue('lastname'),
                 'Name2'           => $isCompany ? '' : $address->getValue('firstname'),
-                'Email'           => $customer ? $customer->getValue('email') : $address->getValue('email'),
+                'Email'           => (string)$address->getValue('email'),
                 'Sprache'         => $lang ? $lang->getCode() : '',
                 'Steuernummer'    => strtoupper($address->getValue('fiscal_code')),
                 'PLZ'             => (string)$address->getValue('postal'),

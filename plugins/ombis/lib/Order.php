@@ -174,6 +174,7 @@ class Order
             'order'          => $order,
             'customer'       => $customer,
             'invoiceAddress' => $invoiceAddress,
+            'shippingAddress' => $shippingAddress,
         ]));
         if ($shippingAddress && $invoiceAddress->getId() != $shippingAddress->getId()) {
             $data['Fields']['ShippingAddressUUID'] = $shippingAddress->getValue('ombis_uid');
