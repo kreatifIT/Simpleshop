@@ -51,7 +51,7 @@ class Address
                 'Ort'             => $address->getValue('location'),
                 'Strasse1'        => $address->getValue('street'),
                 'Strasse2'        => (string)$address->getValue('street_additional'),
-                'KommunikationM1' => (string)$address->getValue('phone'),
+                'KommunikationM1' => (string)$address->getValue('tel'),
             ],
         ];
 
