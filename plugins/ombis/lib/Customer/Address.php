@@ -41,17 +41,17 @@ class Address
 
         $data = [
             'Fields' => [
-                'Name1'        => $isCompany ? $address->getName() : $address->getValue('lastname'),
-                'Name2'        => $isCompany ? '' : $address->getValue('firstname'),
-                'Email'        => $customer ? $customer->getValue('email') : $address->getValue('email'),
-                'Sprache'      => $lang ? $lang->getCode() : '',
-                'Steuernummer' => strtoupper($address->getValue('fiscal_code')),
-                'PLZ'          => (string)$address->getValue('postal'),
-                'Land'         => (string)($country ? \FriendsOfREDAXO\Simpleshop\Ombis\Country::getId($country) : ''),
-                'Ort'          => $address->getValue('location'),
-                'Strasse1'     => $address->getValue('street'),
-                'Strasse2'     => (string)$address->getValue('street_additional'),
-                'Mobiltelefon' => (string)$address->getValue('phone'),
+                'Name1'           => $isCompany ? $address->getName() : $address->getValue('lastname'),
+                'Name2'           => $isCompany ? '' : $address->getValue('firstname'),
+                'Email'           => $customer ? $customer->getValue('email') : $address->getValue('email'),
+                'Sprache'         => $lang ? $lang->getCode() : '',
+                'Steuernummer'    => strtoupper($address->getValue('fiscal_code')),
+                'PLZ'             => (string)$address->getValue('postal'),
+                'Land'            => (string)($country ? \FriendsOfREDAXO\Simpleshop\Ombis\Country::getId($country) : ''),
+                'Ort'             => $address->getValue('location'),
+                'Strasse1'        => $address->getValue('street'),
+                'Strasse2'        => (string)$address->getValue('street_additional'),
+                'KommunikationM1' => (string)$address->getValue('phone'),
             ],
         ];
 
