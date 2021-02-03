@@ -18,7 +18,6 @@ use FriendsOfREDAXO\Simpleshop\Country;
 use FriendsOfREDAXO\Simpleshop\Customer;
 use FriendsOfREDAXO\Simpleshop\CustomerAddress;
 use FriendsOfREDAXO\Simpleshop\Ombis\Api;
-use FriendsOfREDAXO\Simpleshop\Settings;
 
 
 class Address
@@ -42,17 +41,17 @@ class Address
 
         $data = [
             'Fields' => [
-                'Name1'        => $isCompany ? $address->getName() : $address->getValue('lastname'),
-                'Name2'        => $isCompany ? '' : $address->getValue('firstname'),
-                'Email'        => $customer ? $customer->getValue('email') : $address->getValue('email'),
-                'Sprache'      => $lang ? $lang->getCode() : '',
-                'Steuernummer' => strtoupper($address->getValue('fiscal_code')),
-                'PLZ'          => (string)$address->getValue('postal'),
-                'Land'         => (string)($country ? \FriendsOfREDAXO\Simpleshop\Ombis\Country::getId($country) : ''),
-                'Ort'          => $address->getValue('location'),
-                'Strasse1'     => $address->getValue('street'),
-                'Strasse2'     => (string)$address->getValue('street_additional'),
-                'Mobiltelefon' => (string)$address->getValue('phone'),
+                'Name1'           => $isCompany ? $address->getName() : $address->getValue('lastname'),
+                'Name2'           => $isCompany ? '' : $address->getValue('firstname'),
+                'Email'           => (string)$address->getValue('email'),
+                'Sprache'         => $lang ? $lang->getCode() : '',
+                'Steuernummer'    => strtoupper($address->getValue('fiscal_code')),
+                'PLZ'             => (string)$address->getValue('postal'),
+                'Land'            => (string)($country ? \FriendsOfREDAXO\Simpleshop\Ombis\Country::getId($country) : ''),
+                'Ort'             => $address->getValue('location'),
+                'Strasse1'        => $address->getValue('street'),
+                'Strasse2'        => (string)$address->getValue('street_additional'),
+                'KommunikationM1' => (string)$address->getValue('tel'),
             ],
         ];
 
@@ -68,6 +67,11 @@ class Address
             $method = 'PUT';
         }
 
+
+        $data = \rex_extension::registerPoint(new \rex_extension_point('Ombis.addressData', $data, [
+            'address' => $address,
+        ]));
+
         $response = Api::curl('/adresse' . $path, $data, $method);
 
 
@@ -76,9 +80,8 @@ class Address
         }
         $response = Api::curl("/adresse/{$ombisId}", [], 'GET', ['ID', 'UUID']);
 
-
-        $address->setValue('ombis_id', $response['Fields']->ID);
-        $address->setValue('ombis_uid', $response['Fields']->UUID);
+        $address->setValue('ombis_id', $response['Fields']['ID']);
+        $address->setValue('ombis_uid', $response['Fields']['UUID']);
         return $address;
     }
 
@@ -95,7 +98,7 @@ class Address
                 $addressIds[] = $item->Fields->{'Adresse.ID'};
             }
             $response = (array)Api::curl('/adresse', [
-                'filter' => 'in(ID,'. implode(',', $addressIds) .')',
+                'filter' => 'in(ID,' . implode(',', $addressIds) . ')',
                 'order'  => '-ID',
             ], 'GET', $fields);
         }

@@ -27,7 +27,13 @@ $apiMwstgruppe   = Ombis\Customer\Mwstgruppe::getAll(['ID', 'Name']);
 $apiBranche      = Ombis\Customer\Branche::getAll(['ID', 'Name']);
 $apiVerkaufer    = Ombis\Customer\Verkaeufer::getAll(['ID', 'DisplayName']);
 $apiKontingent   = Ombis\Customer\Kontingentgebiet::getAll(['ID', 'Name']);
+$apiGebiet       = Ombis\Customer\Verkaufsgebiet::getAll(['ID', 'Name']);
 $apiStatistikgrp = Ombis\Customer\Statistikgruppe::getAll(['ID', 'Name']);
+$apiPaymentTerms = Ombis\Customer\Zahlungsbedingungen::getAll(['ID', 'Name']);
+
+$query = \Kreatif\Model\Country::query();
+$query->where('status', 1);
+$countries = $query->find();
 
 ?>
 <fieldset>
@@ -89,6 +95,22 @@ $apiStatistikgrp = Ombis\Customer\Statistikgruppe::getAll(['ID', 'Name']);
             </select>
         </dd>
     </dl>
+
+    <?php if ($apiPaymentTerms): ?>
+        <dl class="rex-form-group form-group">
+            <dt>Zahlungsbedingungen:</dt>
+            <dd>
+                <select name="ombis_payment_term" class="form-control">
+                    <option value="">-</option>
+                    <?php foreach ($apiPaymentTerms as $item): ?>
+                        <option value="<?= $item['Fields']['ID'] ?>" <?= from_array($Settings, 'ombis_payment_term') == $item['Fields']['ID'] ? 'selected="selected"' : '' ?>>
+                            <?= $item['Fields']['Name']; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </dd>
+        </dl>
+    <?php endif; ?>
 
     <legend>Zahlungsmethoden</legend>
     <?php if (count($apiPayments) && count($payments)): ?>
@@ -203,12 +225,25 @@ $apiStatistikgrp = Ombis\Customer\Statistikgruppe::getAll(['ID', 'Name']);
         $values = from_array($Settings, 'ombis_customer_settings');
         ?>
         <dl class="rex-form-group form-group">
-            <dt>Kontingentgebiet:</dt>
+            <dt>Kontingentgebiet Inland:</dt>
             <dd>
-                <select name="ombis_customer_settings[kontingentgebiet]" class="form-control">
+                <select name="ombis_customer_settings[kontingentgebiet_inland]" class="form-control">
                     <option value="">-</option>
                     <?php foreach ($apiKontingent as $item): ?>
-                        <option value="<?= $item['Fields']['ID'] ?>" <?= $values['kontingentgebiet'] == $item['Fields']['ID'] ? 'selected="selected"' : '' ?>>
+                        <option value="<?= $item['Fields']['ID'] ?>" <?= $values['kontingentgebiet_inland'] == $item['Fields']['ID'] ? 'selected="selected"' : '' ?>>
+                            <?= $item['Fields']['Name']; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </dd>
+        </dl>
+        <dl class="rex-form-group form-group">
+            <dt>Kontingentgebiet Ausland:</dt>
+            <dd>
+                <select name="ombis_customer_settings[kontingentgebiet_ausland]" class="form-control">
+                    <option value="">-</option>
+                    <?php foreach ($apiKontingent as $item): ?>
+                        <option value="<?= $item['Fields']['ID'] ?>" <?= $values['kontingentgebiet_ausland'] == $item['Fields']['ID'] ? 'selected="selected"' : '' ?>>
                             <?= $item['Fields']['Name']; ?>
                         </option>
                     <?php endforeach; ?>
@@ -295,5 +330,22 @@ $apiStatistikgrp = Ombis\Customer\Statistikgruppe::getAll(['ID', 'Name']);
             </dd>
         </dl>
     <?php endif; ?>
+
+    <?php $values = from_array($Settings, 'ombis_gebiete');  ?>
+    <?php foreach ($countries as $country): ?>
+        <dl class="rex-form-group form-group">
+            <dt>Verkaufsgebiet <?= $country->getName() ?>:</dt>
+            <dd>
+                <select name="ombis_gebiete[<?= $country->getId() ?>]" class="form-control">
+                    <option value="">-</option>
+                    <?php foreach ($apiGebiet as $item): ?>
+                        <option value="<?= $item['Fields']['ID'] ?>" <?= $values[$country->getId()] == $item['Fields']['ID'] ? 'selected="selected"' : '' ?>>
+                            <?= $item['Fields']['Name']; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </dd>
+        </dl>
+    <?php endforeach; ?>
 
 </fieldset>

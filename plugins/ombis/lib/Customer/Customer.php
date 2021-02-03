@@ -33,13 +33,17 @@ class Customer
         if ($invoiceAddress->getId() != $shippingAddress->getId()) {
             $shippingAddress = Address::write($shippingAddress);
             $shippingAddress->save();
+            $shippingAdrId = $shippingAddress->getValue('ombis_id');
+        } else {
+            $shippingAdrId = $invoiceAddress->getValue('ombis_id');
         }
 
         $customerSettings   = Settings::getValue('ombis_customer_settings', 'Ombis');
         $taxGroupSettings   = Settings::getValue('ombis_tax_group', 'Ombis');
         $statsGroupSettings = Settings::getValue('ombis_statistic_group', 'Ombis');
+        $gebieteSettings    = Settings::getValue('ombis_gebiete', 'Ombis');
 
-        if ($postal >= 39000 && 39000 <= 39999) {
+        if ($countryId == 93 && $postal >= 39000 && $postal <= 39999) {
             $statsGroup = $statsGroupSettings['southtyrol'];
         } else if (isset($statsGroupSettings[$countryId])) {
             $statsGroup = $statsGroupSettings[$countryId];
@@ -47,15 +51,23 @@ class Customer
             $statsGroup = $statsGroupSettings['default'];
         }
 
+        if ($countryId == 93) {
+            $kontingentGebiet = $customerSettings['kontingentgebiet_inland'];
+        } else {
+            $kontingentGebiet = $customerSettings['kontingentgebiet_ausland'];
+        }
+
+
         $data = \rex_extension::registerPoint(new \rex_extension_point('Ombis.customerData', [
             'Fields' => [
                 'Rechtssitz'                   => (string)$invoiceAddress->getValue('ombis_id'),
-                'Kontingentgebiet'             => (string)$customerSettings['kontingentgebiet'],
+                'Kontingentgebiet'             => (string)$kontingentGebiet,
                 'MwStGruppe'                   => $taxGroupSettings[$countryId] ?: $taxGroupSettings['default'],
                 'Sammelkontogruppe'            => (string)$customerSettings['sammelkontogruppe'],
                 'Buchungsgruppe'               => (string)$customerSettings['buchungsgruppe'],
                 'Verkaeufer'                   => (string)$customerSettings['seller'],
                 'Branche'                      => (string)$customerSettings['branche'],
+                'Verkaufsgebiet'               => (string)$gebieteSettings[$countryId],
                 'KuLiStatistikgruppe1'         => (string)$statsGroup,
                 'PeriodizitaetRechnungslegung' => 'Manuell',
                 // todo: sollen alle Werte auch bei Aktualisierungen geschrieben werden?
@@ -82,19 +94,18 @@ class Customer
             $method = 'POST';
         }
 
-        if (!in_array($shippingAddress->getValue('ombis_id'), $shippingAddrIds)) {
+        if (!in_array($shippingAdrId, $shippingAddrIds)) {
             $data['Collections'] = [
                 'Lieferadresse' => [
                     'Data' => [
                         [
-                            'Fields' => ['Adresse' => (string)$shippingAddress->getValue('ombis_id')],
+                            'Fields' => ['Adresse' => (string)$shippingAdrId],
                         ],
                     ],
                 ],
             ];
         }
 
-        pr($data);
         $response = Api::curl('/kunde' . $path, $data, $method);
 
         if (isset($response['last_id'])) {

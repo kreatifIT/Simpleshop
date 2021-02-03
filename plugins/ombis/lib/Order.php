@@ -13,7 +13,8 @@
 
 namespace FriendsOfREDAXO\Simpleshop\Ombis;
 
-use FriendsOfREDAXO\Simpleshop\Ombis\Customer\Address;
+use FriendsOfREDAXO\Simpleshop\CustomerAddress;
+use FriendsOfREDAXO\Simpleshop\Model;
 use FriendsOfREDAXO\Simpleshop\Ombis\Customer\Customer;
 use FriendsOfREDAXO\Simpleshop\Session;
 use FriendsOfREDAXO\Simpleshop\Settings;
@@ -33,14 +34,40 @@ class Order
             $invoiceAddress  = $order->getInvoiceAddress();
             $shippingAddress = $order->getShippingAddress();
 
+            $customer->setValue('ombis_id', \FriendsOfREDAXO\Simpleshop\Customer::get($customer->getId())->getValue('ombis_id'));
+
+            if ($invoiceAddress) {
+                $invoiceAddress->setValue('ombis_id', CustomerAddress::get($invoiceAddress->getId())->getValue('ombis_id'));
+                $invoiceAddress->setValue('ombis_uid', CustomerAddress::get($invoiceAddress->getId())->getValue('ombis_uid'));
+            }
+            if ($shippingAddress) {
+                $shippingAddress->setValue('ombis_id', CustomerAddress::get($shippingAddress->getId())->getValue('ombis_id'));
+                $shippingAddress->setValue('ombis_uid', CustomerAddress::get($shippingAddress->getId())->getValue('ombis_uid'));
+            }
+
             try {
+                $sql = \rex_sql::factory();
                 [$customer, $invoiceAddress, $shippingAddress] = Customer::write($customer, $invoiceAddress, $shippingAddress);
-                $customer->save();
+
+                $sql->setTable(\FriendsOfREDAXO\Simpleshop\Customer::TABLE);
+                $sql->setValue('ombis_id', $customer->getValue('ombis_id'));
+                $sql->setWhere('id = :id', ['id' => $customer->getId()]);
+                $sql->update();
 
                 $order->setValue('customer_data', $customer);
                 $order->setValue('invoice_address', $invoiceAddress);
-                $order->save();
+                $order->setValue('shipping_address', $shippingAddress);
+                $_order = Model::prepare($order);
 
+                $sql = \rex_sql::factory();
+                $sql->setTable(\FriendsOfREDAXO\Simpleshop\Order::TABLE);
+                $sql->setValue('customer_data', $_order['customer_data']);
+                $sql->setValue('invoice_address', $_order['invoice_address']);
+                $sql->setValue('shipping_address', $_order['shipping_address']);
+                $sql->setWhere('id = :id', ['id' => $order->getId()]);
+                $sql->update();
+
+                $order->invalidateData();
                 $order = self::write($order);
             } catch (WSConnectorException $ex) {
                 // just go ahead
@@ -60,6 +87,7 @@ class Order
         $paymentConfig   = Settings::getValue('ombis_payment_config', 'Ombis');
         $shippingCode    = Settings::getValue('order_shipping_code', 'Ombis');
         $discountCode    = Settings::getValue('order_disount_code', 'Ombis');
+        $paymentTerm     = Settings::getValue('ombis_payment_term', 'Ombis');
         $customer        = $order->getCustomerData();
         $invoiceAddress  = $order->getInvoiceAddress();
         $shippingAddress = $order->getShippingAddress();
@@ -73,7 +101,7 @@ class Order
             $_positions = Api::curl("/preliminarysalesdocument/{$ombisId}/docposition");
 
             foreach ($_positions['Data'] as $_position) {
-                $docPositions['Delete'][] = $_position->URI;
+                $docPositions['Delete'][] = (string)$_position['URI'];
             }
         }
 
@@ -125,28 +153,32 @@ class Order
             ];
         }
 
+        $customerId = $customer ? $customer->getValue('ombis_id') : '';
+        $customerId = $customerId == '' ? $dummyId : $customerId;
+
         $data = \rex_extension::registerPoint(new \rex_extension_point('Ombis.orderData', [
             'Fields'      => [
-                'Customer'                => (string)($customer ? $customer->getValue('ombis_id', false, $dummyId) : $dummyId),
+                'Customer'                => (string)$customerId,
                 'TypeOfPayment'           => (string)$paymentConfig[$payment->getPluginName()],
-                //'TermOfPayment'           => (string)$paymentConfig[$payment->getPluginName()],
+                'TermOfPayment'           => (string)$paymentTerm,
                 'CustomerReferenceNumber' => (string)$order->getValue('id'),
                 'CustomerReferenceDate'   => date('Y-m-d'),
                 'InvoiceAddressUUID'      => $invoiceAddress->getValue('ombis_uid'),
-                'ShippingAddressUUID'     => $shippingAddress->getValue('ombis_uid'),
                 'Notes'                   => (string)$order->getValue('remarks'),
                 'DocType'                 => 'VkAuftrag',
             ],
             'Collections' => [
                 'DocPosition' => $docPositions,
             ],
+        ], [
+            'order'          => $order,
+            'customer'       => $customer,
+            'invoiceAddress' => $invoiceAddress,
+            'shippingAddress' => $shippingAddress,
         ]));
-        if ($invoiceAddress->getId() != $shippingAddress->getId()) {
-            $orderData['Fields']['ShippingAddressUUID'] = $shippingAddress->getValue('ombis_uid');
+        if ($shippingAddress && $invoiceAddress->getId() != $shippingAddress->getId()) {
+            $data['Fields']['ShippingAddressUUID'] = $shippingAddress->getValue('ombis_uid');
         }
-        $data = \rex_extension::registerPoint(new \rex_extension_point('Ombis.orderData', $orderData, [
-            'order' => $order,
-        ]));
 
         $path     = $ombisId == '' || $ombisId == 0 ? '' : "/{$ombisId}";
         $method   = $ombisId == '' || $ombisId == 0 ? 'POST' : 'PUT';
@@ -173,7 +205,7 @@ class Order
                     Api::curl("/preliminarysalesdocument/{$_ombisId}", [], 'GET', [], false, false);
                 }
 
-                $order   = self::writePreVKDokument($order);
+                $order   = self::createPreVKDokument($order);
                 $ombisId = $order->getValue('ombis_id');
 
                 if ($ombisId == 0 || $ombisId == '') {
@@ -201,7 +233,7 @@ class Order
                 'ts'         => time(),
             ]) . '" class="btn btn-default">
                     <i class="fa fa-database"></i>&nbsp;
-                    ' . \rex_i18n::msg('label.write_to_ombis') . '
+                    an Ombis übermitteln
             </a>
         ';
         $ep->setSubject($output);

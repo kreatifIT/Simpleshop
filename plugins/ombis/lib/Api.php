@@ -67,11 +67,11 @@ class Api extends WSConnector
                 if (strpos($headerLine, 'location:') !== false) {
                     $chunks              = explode('/', trim($headerLine));
                     $response['last_id'] = array_pop($chunks);
-                    break;
                 }
-            }
-            if (trim($response['response']) != '') {
-                $isWarnig = true;
+                if (strpos($headerLine, 'content-length:') !== false) {
+                    $contentLength = str_replace('content-length:', '', $headerLine);
+                    $isWarnig      = (int)$contentLength > 0;
+                }
             }
         }
         $logMsg = "
