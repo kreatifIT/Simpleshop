@@ -501,7 +501,7 @@ class CheckoutController extends Controller
         $Mail     = new Mail();
         $Customer = $this->Order->getCustomerData();
 
-        $Mail->Subject = str_replace('{{ORDER_NUM}}', $this->Order->getId(), '###label.email__order_complete###');
+        $Mail->Subject = str_replace('{{ORDER_NUM}}', $this->Order->getId(), Wildcard::get('label.email__order_complete'));
         $Mail->setFragmentPath('simpleshop/email/order/complete.php');
 
         // add vars
