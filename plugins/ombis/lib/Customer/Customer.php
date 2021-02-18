@@ -77,7 +77,9 @@ class Customer
             'address'  => $invoiceAddress,
         ]));
 
-        if ($ombisId = (int)$customer->getValue('ombis_id')) {
+        $ombisId = (int)$customer->getValue('ombis_id');
+
+        if ($ombisId > 0) {
             $path   = "/{$ombisId}";
             $method = 'PUT';
 

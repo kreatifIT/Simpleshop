@@ -64,11 +64,11 @@ class Api extends WSConnector
 
         if ($method == 'POST' || $method == 'PUT') {
             foreach ($response['raw_resp_header'] as $headerLine) {
-                if (strpos($headerLine, 'location:') !== false) {
+                if (strpos(strtolower($headerLine), 'location:') !== false) {
                     $chunks              = explode('/', trim($headerLine));
                     $response['last_id'] = array_pop($chunks);
                 }
-                if (strpos($headerLine, 'content-length:') !== false) {
+                if (strpos(strtolower($headerLine), 'content-length:') !== false) {
                     $contentLength = str_replace('content-length:', '', $headerLine);
                     $isWarnig      = (int)$contentLength > 0;
                 }
