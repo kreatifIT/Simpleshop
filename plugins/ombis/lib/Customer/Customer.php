@@ -34,8 +34,6 @@ class Customer
             $shippingAddress = Address::write($shippingAddress);
             $shippingAddress->save();
             $shippingAdrId = $shippingAddress->getValue('ombis_id');
-        } else {
-            $shippingAdrId = $invoiceAddress->getValue('ombis_id');
         }
 
         $customerSettings   = Settings::getValue('ombis_customer_settings', 'Ombis');
@@ -96,7 +94,7 @@ class Customer
             $method = 'POST';
         }
 
-        if (!in_array($shippingAdrId, $shippingAddrIds)) {
+        if ($shippingAdrId && !in_array($shippingAdrId, $shippingAddrIds)) {
             $data['Collections'] = [
                 'Lieferadresse' => [
                     'Data' => [
