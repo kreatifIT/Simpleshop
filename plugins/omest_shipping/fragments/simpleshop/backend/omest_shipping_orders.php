@@ -19,7 +19,7 @@ $orders    = $this->getVar('orders');
 $order_ids = $this->getVar('order_ids');
 
 $pallet_types = [
-    '80x60',
+    '60x80',
     '80x80',
     '80x120',
     '100x100',
