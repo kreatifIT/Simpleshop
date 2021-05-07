@@ -75,7 +75,7 @@ class Variant extends Model
             $field->fieldIndex = $index;
             $fields[]          = $field;
 
-            if ($type != 'hidden_input' && $name != 'prio') {
+            if (!in_array($type, ['hidden_input', 'prio', 'tab_start', 'tab_break', 'tab_end'])) {
                 $labels[] = [
                     'label'  => $field->getLabel(),
                     'notice' => $notice,
