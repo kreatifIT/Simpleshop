@@ -1,5 +1,8 @@
 <?php
 
+use FriendsOfREDAXO\Simpleshop\ProductException;
+
+
 /**
  * This file is part of the Simpleshop package.
  *
@@ -25,7 +28,11 @@ class rex_yform_value_product_variant_select extends rex_yform_value_select
 
         $real_values = [];
         foreach ($values as $value) {
-            $Product = \FriendsOfREDAXO\Simpleshop\Product::getProductVariant($value);
+            try {
+                $Product = \FriendsOfREDAXO\Simpleshop\Product::getProductVariant($value);
+            } catch (ProductException $ex) {
+                // just set the product to empty
+            }
 
             if ($Product) {
                 $real_values[] = $value;
