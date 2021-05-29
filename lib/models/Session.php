@@ -278,6 +278,9 @@ class Session extends Model
 
     public static function addProduct($product_key, $quantity = 1, $extras = [])
     {
+
+        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Session.addProduct', $product_key));
+
         $cart_items = self::_getCartItems(true, false);
         self::setProductData($product_key, $cart_items[$product_key]['quantity'] + $quantity, $extras);
     }
