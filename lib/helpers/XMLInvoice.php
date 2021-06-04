@@ -58,8 +58,11 @@ class XMLInvoice
         self::$inst->data["company_name"]               = "###company.name##";
         self::$inst->data["company_fiscal_code"]        = "RF01"; //FISCAL CODE - LOOK AT CODE TABLE
 
-        self::$inst->data["company_head_quarter_street"]    = "###company.street###";
-        self::$inst->data["company_head_quarter_street_no"] = " ";
+        $street = explode(' ', \Wildcard::get('company.street'));
+        $number = array_pop($street);
+
+        self::$inst->data["company_head_quarter_street"]    = implode(' ', $street);
+        self::$inst->data["company_head_quarter_street_no"] = $number;
         self::$inst->data["company_head_quarter_zip"]       = "###company.postal###";
         self::$inst->data["company_head_quarter_city"]      = "###company.location###";
         self::$inst->data["company_head_quarter_province"]  = "###company.province###";
