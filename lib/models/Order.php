@@ -507,16 +507,19 @@ class Order extends Model
         $iDate       = date('Y-m-d', $iDateTs);
         $totalnetto  = number_format(abs($this->getValue('total')) / 122 * 100, 2, '.', '');
         $totalbrutto = number_format($totalnetto * 1.22, 2, '.', '');
+        $street      = explode(' ', $Customer->getValue('street', false, 'Via/Str 1'));
+        $number      = array_pop($street);
 
-        $xmlData["document_lines"]                 = [];
-        $xmlData['document_type']                  = $this->getValue('status') == 'CN' ? 'TD04' : 'TD01';
-        $xmlData['receiver_name']                  = trim($Customer->getName());
-        $xmlData['receiver_private_vat_number']    = mb_strtoupper($Customer->getValue('fiscal_code'));
-        $xmlData['receiver_head_quarter_street']   = $Customer->getValue('street', false, 'Via/Str');
-        $xmlData['receiver_head_quarter_zip']      = $Customer->getValue('postal', false, '00000');
-        $xmlData['receiver_head_quarter_city']     = $Customer->getValue('location', false, 'I');
-        $xmlData['receiver_head_quarter_province'] = 'BZ';
-        $xmlData['receiver_head_quarter_nation']   = 'IT';
+        $xmlData["document_lines"]                  = [];
+        $xmlData['document_type']                   = $this->getValue('status') == 'CN' ? 'TD04' : 'TD01';
+        $xmlData['receiver_name']                   = trim($Customer->getName());
+        $xmlData['receiver_private_vat_number']     = mb_strtoupper($Customer->getValue('fiscal_code'));
+        $xmlData['receiver_head_quarter_street']    = implode(' ', $street);
+        $xmlData['receiver_head_quarter_street_no'] = $number;
+        $xmlData['receiver_head_quarter_zip']       = $Customer->getValue('postal', false, '00000');
+        $xmlData['receiver_head_quarter_city']      = $Customer->getValue('location', false, 'I');
+        $xmlData['receiver_head_quarter_province']  = 'BZ';
+        $xmlData['receiver_head_quarter_nation']    = 'IT';
 
         $xmlData['document_date']   = $iDate;
         $xmlData['document_number'] = $invoice_num;
