@@ -508,7 +508,12 @@ class Order extends Model
         $totalnetto  = number_format(abs($this->getValue('total')) / 122 * 100, 2, '.', '');
         $totalbrutto = number_format($totalnetto * 1.22, 2, '.', '');
         $street      = explode(' ', $Customer->getValue('street', false, 'Via/Str 1'));
-        $number      = array_pop($street);
+        
+        if (count($street) <= 1) {
+            $number = 1;
+        } else {
+            $number = array_pop($street);
+        }
 
         $xmlData["document_lines"]                  = [];
         $xmlData['document_type']                   = $this->getValue('status') == 'CN' ? 'TD04' : 'TD01';
