@@ -408,6 +408,8 @@ class Product extends Model
         ]));
 
         if ($_features && count($feature_ids)) {
+            $feature_ids = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Product.getProductByKey.featureIds', $feature_ids));
+
             foreach ($feature_ids as $feature_id) {
                 // get variants
                 $stmt = FeatureValue::query();
