@@ -1,0 +1,9 @@
+package: simpleshop/klarna
+version: '1.0'
+author: FriendsOfREDAXO
+
+page:
+    title: Klarna
+    perm: shop[klarna]
+    subpages:
+        settings: { title: translate:settings, hidden: true }
