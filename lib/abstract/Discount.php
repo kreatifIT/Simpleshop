@@ -34,16 +34,20 @@ abstract class Discount extends Model
         }
 
         if ($discount > 0) {
-            $discount = $discount - $this->applyToGrossPrices($discount, $gross_prices);
+            [$discountValue, $netDiscounts, $taxDiscount] = $this->applyToGrossPrices($discount, $gross_prices);
+            $discount = $discount - $discountValue;
         }
         $this->setValue('value', $discount);
-        
+        $this->setValue('net_values', $netDiscounts);
+        $this->setValue('tax_value', $taxDiscount);
+
         return $discount;
     }
 
     public function applyToCart(&$brut_prices)
     {
         $discount = 0;
+        $taxDiscount = 0;
 
         if ($this->getValue('free_shipping')) {
             // nothing to do?
@@ -55,9 +59,12 @@ abstract class Discount extends Model
         }
 
         if ($discount > 0) {
-            $discount = $discount - $this->applyToGrossPrices($discount, $brut_prices);
+            [$discountValue, $netDiscounts, $taxDiscount] = $this->applyToGrossPrices($discount, $brut_prices);
+            $discount = $discount - $discountValue;
         }
         $this->setValue('value', $discount);
+        $this->setValue('net_values', $netDiscounts);
+        $this->setValue('tax_value', $taxDiscount);
 
         return $discount;
     }
@@ -66,15 +73,21 @@ abstract class Discount extends Model
     {
         // sort by tax percent
         krsort($gross_prices);
+        $taxDiscount = [];
+        $netDiscounts = [];
 
         foreach ($gross_prices as $tax => &$gross_price) {
+            $_grossPrice = $gross_price;
             $gross_price = $this->calcPriceAndDiff($gross_price, $_discount);
+            $discountValue = $_grossPrice - $gross_price;
+            $taxDiscount[$tax] = $discountValue / ($tax + 100) * $tax;
+            $netDiscounts[$tax] = $discountValue / ($tax + 100) * 100;
 
             if ($_discount <= 0) {
                 break;
             }
         }
-        return $_discount;
+        return [$_discount, $netDiscounts, $taxDiscount];
     }
 
     protected function calcPriceAndDiff($price, &$diff)

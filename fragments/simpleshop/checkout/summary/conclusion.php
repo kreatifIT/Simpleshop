@@ -37,7 +37,7 @@ $shippingCosts = $Order->getValue('shipping_costs');
             ?>
             <div class="promotions ">
                 <span class="label"><?= $promotion->getName() ?></span>
-                <span class="price">&euro;&nbsp;-<?= format_price($promotion->getValue('value')) ?></span>
+                <span class="price">&euro;&nbsp;-<?= format_price(array_sum($promotion->getValue('net_values'))) ?></span>
             </div>
         <?php endforeach; ?>
 
