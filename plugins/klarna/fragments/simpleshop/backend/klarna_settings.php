@@ -25,6 +25,15 @@ if (empty($Settings)) {
 <fieldset>
 
     <legend><?= $Addon->i18n('klarna.api_settings'); ?></legend>
+
+    <p>
+        Portal für Testmodus: <a href="https://playground.eu.portal.klarna.com/" target="_blank">https://playground.eu.portal.klarna.com/</a>
+        <br/>
+        Kunde muss sich auf Klarna hier registrieren (Fragebogen) <a href="https://www.klarna.com/it/commercianti/" target="_blank">https://www.klarna.com/it/commercianti/</a>
+        <br/>
+        <br/>
+    </p>
+
     <dl class="rex-form-group form-group">
         <dt>API-Username:</dt>
         <dd>
