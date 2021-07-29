@@ -56,6 +56,11 @@ class Customer extends Model
         return $result;
     }
 
+    public function getLang()
+    {
+        return \rex_clang::get($this->getValue('lang_id'));
+    }
+
     public function getName($lang_id = null, $companyFallback = false)
     {
         $addressSetting = Settings::getValue('customer_addresses_setting');

@@ -46,6 +46,11 @@ class CustomerAddress extends Model
         return $this->getValue('ctype') == 'company';
     }
 
+    public function getCountry()
+    {
+        return Model\Country::get($this->getValue('country'));
+    }
+
     public function isTaxFree()
     {
         if ($this->isCompany()) {
