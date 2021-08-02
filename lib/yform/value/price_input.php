@@ -66,7 +66,7 @@ class rex_yform_value_price_input extends rex_yform_value_number
         $item  = \FriendsOfREDAXO\Simpleshop\Product::get($params['list']->getValue('id'));
         $field = \FriendsOfREDAXO\Simpleshop\Product::getYformFieldByName($params['field']);
 
-        return format_price($item->getPrice(true)) . " {$field->getElement('unit')}";
+        return $item->valueIsset('tax') ? format_price($item->getPrice(true)) . " {$field->getElement('unit')}" : '';
     }
 
     public function getDefinitions($values = [])
