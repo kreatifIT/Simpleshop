@@ -129,6 +129,8 @@ class Session extends Model
                 if (is_array($item)) {
                     try {
                         $product = Product::getProductByKey($key, $item['quantity'], $item['extras']);
+                        $product = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Session.getCartItem', $product, []));
+
                     } catch (ProductException $ex) {
                         if ($throwErrors) {
                             throw new ProductException($ex->getMessage(), $ex->getCode());
