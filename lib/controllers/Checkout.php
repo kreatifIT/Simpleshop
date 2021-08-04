@@ -385,17 +385,19 @@ class CheckoutController extends Controller
     protected function getSummaryView()
     {
         $errors     = [];
+        $warnings   = [];
         $postAction = rex_post('action', 'string');
         try {
             $products = Session::getCartItems();
-        } catch (CartException $ex) {
+        }
+        catch (CartException $ex) {
             if ($ex->getCode() == 1) {
                 $warnings = Session::$errors;
             }
             $products = Session::getCartItems();
         }
 
-        $warnings   = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.orderWarnings', [], [
+        $warnings = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.orderWarnings', $warnings, [
             'order'    => $this->Order,
             'action'   => $postAction,
             'products' => $products,

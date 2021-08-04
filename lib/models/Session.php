@@ -129,9 +129,11 @@ class Session extends Model
                 if (is_array($item)) {
                     try {
                         $product = Product::getProductByKey($key, $item['quantity'], $item['extras']);
-                        $product = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Session.getCartItem', $product, []));
-
-                    } catch (ProductException $ex) {
+                        $product = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Session.getCartItem', $product, [
+                            'throwErrors' => $throwErrors,
+                        ]));
+                    }
+                    catch (ProductException $ex) {
                         if ($throwErrors) {
                             throw new ProductException($ex->getMessage(), $ex->getCode());
                         }
@@ -212,7 +214,7 @@ class Session extends Model
 
     public static function getCartItemCount()
     {
-        $cartItems   = self::getCartItems(true);
+        $cartItems   = self::getCartItems(true, false);
         $cartItemCnt = 0;
         if ($cartItems) {
             foreach ($cartItems as $item) {
