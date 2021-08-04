@@ -209,9 +209,9 @@ class Session extends Model
         return array_filter($products);
     }
 
-    public static function getCartItemCount()
+    public static function getCartItemCount($raw = true, $throwErrors = false)
     {
-        $cartItems   = self::getCartItems(true);
+        $cartItems   = self::getCartItems($raw, $throwErrors);
         $cartItemCnt = 0;
         if ($cartItems) {
             foreach ($cartItems as $item) {
