@@ -47,7 +47,7 @@ class CheckoutController extends Controller
 
         switch ($this->params['action']) {
             default:
-                $this->products = Session::getCartItems(true,false);
+                $this->products = Session::getCartItems(true);
 
                 if (count($this->products)) {
                     $currentStep = $this->getCurrentStep();
@@ -395,7 +395,7 @@ class CheckoutController extends Controller
             $products = Session::getCartItems();
         }
 
-        $warnings   = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.orderWarnings', $warnings, [
+        $warnings   = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Checkout.orderWarnings', [], [
             'order'    => $this->Order,
             'action'   => $postAction,
             'products' => $products,
