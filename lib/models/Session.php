@@ -134,7 +134,6 @@ class Session extends Model
                             throw new ProductException($ex->getMessage(), $ex->getCode());
                         }
                     }
-                    $product = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Session.cartItem', $product, [])); 
                     if ($product) {
                         self::$has_shipping = self::$has_shipping || $product->getValue('type') == 'product';
                         $results[]          = $product;
