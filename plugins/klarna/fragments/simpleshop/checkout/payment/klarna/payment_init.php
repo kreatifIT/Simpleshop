@@ -15,20 +15,21 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 Utils::setCalcLocale();
 
-$errors  = [];
-$Order   = $this->getVar('Order');
-$Payment = $Order->getValue('payment');
+$Order     = $this->getVar('Order');
+$payment   = $Order->getValue('payment');
+
 
 try {
-    /** @var Klarna $Payment */
-    $response = $Payment->initPayment($Order);
+    /** @var Klarna $payment */
+    $payment->placeOrder($Order);
+    rex_redirect(null, null, ['action' => 'complete', 'ts' => time()]);
 } catch (\Throwable $ex) {
-    if (\rex_addon::get('project')->getProperty('compile') == 1) {
-        $errors[] = $ex->getMessage();
-    } else {
-        $errors[] = 'Request Failed, pleas retry';
+    switch ($ex->getCode()) {
+        default:
+            $errors[] = $ex->getMessage();
+            break;
     }
-    Utils::log('Klarna.initPayment', $ex->getMessage(), 'Error');
+    Utils::log('Klarna.placeOrder', $ex->getMessage(), 'Error');
 }
 
 Utils::resetLocale();
@@ -41,7 +42,4 @@ if (count($errors)): ?>
             <?php endforeach; ?>
         </div>
     </div>
-<?php else: ?>
-    <div class="margin-top margin-bottom"><h1>###simpleshop.klarna_payment_title###</h1></div>
-    <?= $response['html_snippet'] ?>
 <?php endif; ?>

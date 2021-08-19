@@ -348,7 +348,24 @@ class CheckoutController extends Controller
             }
 
             try {
-                $this->Order->setValue('payment', Order::prepareData(Payment::get(rex_post('payment', 'string'))));
+                $paymentFullName = rex_post('payment', 'string');
+                $authRepsonse    = trim(rex_post('payment_auth_response', 'string'));
+                $_payment        = $this->Order->getValue('payment');
+                $payment         = Payment::get($paymentFullName);
+                $responses = [];
+
+                if ($_payment && $_payment->getPluginName() == $payment->getPluginName()) {
+                    $responses = $_payment->getValue('responses');
+                }
+                if ('' != $authRepsonse) {
+                    $jsonData = json_decode($authRepsonse, true);
+                    if (json_last_error() != JSON_ERROR_NONE) {
+                        $jsonData = $authRepsonse;
+                    }
+                    $responses['authResponse'] = $jsonData;
+                }
+                $payment->setValue('responses', $responses);
+                $this->Order->setValue('payment', Order::prepareData($payment));
             } catch (RuntimeException $ex) {
             }
 

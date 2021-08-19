@@ -26,8 +26,8 @@ use Sprog\Wildcard;
 class Klarna extends PaymentAbstract
 {
     const NAME             = 'simpleshop.klarna';
-    const LIVE_BASE_URL    = 'https://api.klarna.com/';
-    const SANDBOX_BASE_URL = 'https://api.playground.klarna.com/';
+    const LIVE_BASE_URL    = 'https://api.klarna.com';
+    const SANDBOX_BASE_URL = 'https://api.playground.klarna.com';
 
     protected $responses = [];
 
@@ -48,29 +48,112 @@ class Klarna extends PaymentAbstract
         return str_replace('_', '-', $lang);
     }
 
-    public function initPayment($Order)
+    public function createSession()
+    {
+        $_responses = [];
+        $order      = Session::getCurrentOrder();
+        $_payment   = $order->getValue('payment');
+
+        if ($_payment instanceof self) {
+            $_responses = $_payment->getValue('responses');
+        }
+
+        if (!isset($_responses['createSession']) || !isset($_responses['createSession']['client_token'])) {
+            include_once \rex_path::addon('simpleshop', '/vendor/autoload.php');
+
+            $Settings  = \rex::getConfig('simpleshop.Klarna.Settings');
+            $test_mode = from_array($Settings, 'use_test_mode', false);
+            $base_url  = $test_mode ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
+            $alias     = $test_mode ? $Settings['sandbox_alias'] : $Settings['alias'];
+            $secret    = $test_mode ? $Settings['sandbox_secret'] : $Settings['secret'];
+
+            if ($alias == '' || $secret == '') {
+                throw new KlarnaException('The Klarna Credentials are not set!', 1);
+            }
+
+            $currency     = 'EUR';
+            $total        = 1.22;
+            $taxes        = $total / 122 * 22;
+            $shippingAddr = $order->getShippingAddress();
+            $country      = $shippingAddr->valueIsset('country') ? Country::get($shippingAddr->getValue('country')) : null;
+            $langCode     = $this->getLangCode();
+
+            $jsonBody = [
+                'purchase_country'  => $country ? $country->getValue('iso2') : 'IT',
+                'purchase_currency' => $currency,
+                'locale'            => $langCode,
+                'order_amount'      => number_format($total, 2, '', ''),
+                'order_tax_amount'  => number_format($taxes, 2, '', ''),
+                'order_lines'       => [
+                    [
+                        'type'             => 'physical',
+                        'name'             => 'Create Session',
+                        'quantity'         => 1,
+                        'unit_price'       => number_format($total, 2, '', ''),
+                        'tax_rate'         => number_format(22, 2, '', ''),
+                        'total_amount'     => number_format($total, 2, '', ''),
+                        'total_tax_amount' => number_format($taxes, 2, '', ''),
+                    ],
+                ],
+            ];
+            $jsonBody = $this->addBillingAddress($order, $jsonBody);
+
+            try {
+                $client       = new Client();
+                $response     = $client->request('POST', "{$base_url}/payments/v1/sessions", [
+                    'auth' => [$alias, $secret],
+                    'json' => $jsonBody,
+                ]);
+                $jsonResponse = $response->getBody()
+                    ->getContents();
+            } catch (ClientException $ex) {
+                $response     = $ex->getResponse()
+                    ->getBody()
+                    ->getContents();
+                $responseData = \GuzzleHttp\json_decode($response, true);
+
+                Utils::log('Klarna.createSession', 'Error-Data: ' . print_r($responseData, true), 'ERROR');
+
+                throw new KlarnaException($responseData['error_messages'][0]);
+            }
+            $responseData = \GuzzleHttp\json_decode($jsonResponse, true);
+
+            $responses                  = (array)$this->getValue('responses');
+            $responses['createSession'] = $jsonResponse;
+            $this->setValue('responses', $responses);
+            $order->setValue('payment', Order::prepareData($this));
+            $order->save();
+
+
+            Utils::log('Klarna.createSession', 'Data: ' . print_r($responseData, true), 'INFO');
+            Session::setCheckoutData('Order', $order);
+
+            return $responseData;
+        } else {
+            return $_responses['createSession'];
+        }
+    }
+
+    public function placeOrder($Order)
     {
         include_once \rex_path::addon('simpleshop', '/vendor/autoload.php');
 
-        $Settings  = \rex::getConfig('simpleshop.Klarna.Settings');
-        $test_mode = from_array($Settings, 'use_test_mode', false);
-        $base_url  = $test_mode ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
-        $alias     = $test_mode ? $Settings['sandbox_alias'] : $Settings['alias'];
-        $secret    = $test_mode ? $Settings['sandbox_secret'] : $Settings['secret'];
+        $Settings      = \rex::getConfig('simpleshop.Klarna.Settings');
+        $test_mode     = from_array($Settings, 'use_test_mode', false);
+        $base_url      = $test_mode ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
+        $alias         = $test_mode ? $Settings['sandbox_alias'] : $Settings['alias'];
+        $secret        = $test_mode ? $Settings['sandbox_secret'] : $Settings['secret'];
+        $authResponses = $this->getValue('responses')['authResponse'];
 
         if ($alias == '' || $secret == '') {
             throw new KlarnaException('The Klarna Credentials are not set!', 1);
+        } else if (!isset($authResponses['authorization_token'])) {
+            throw new KlarnaException('The authorization token is missing ', 3);
         }
 
         $currency      = 'EUR';
-        $total         = number_format(
-            $Order->getValue('total'),
-            2,
-            '',
-            ''
-        ); // total payment (including tax + shipping)
+        $total         = number_format($Order->getValue('total'), 2, '', ''); // total payment (including tax + shipping)
         $taxes         = array_sum($Order->getValue('taxes'));
-        $tosPage       = Settings::getArticle('tos_page_id');
         $shippingAddr  = $Order->getShippingAddress();
         $country       = $shippingAddr->valueIsset('country') ? Country::get($shippingAddr->getValue('country')) : null;
         $langCode      = $this->getLangCode();
@@ -87,70 +170,36 @@ class Klarna extends PaymentAbstract
             'order_amount'      => $total,
             'order_tax_amount'  => number_format($taxes, 2, '', ''),
             'order_lines'       => $this->getOrderLines($Order),
-            'merchant_urls'     => [
-                'terms'        => html_entity_decode($tosPage->getUrl()),
-                'checkout'     => html_entity_decode(
-                    rex_getUrl(null, null, ['sid' => '{checkout.order.id}', 'ts' => time()])
-                ),
-                'confirmation' => html_entity_decode(
-                    rex_getUrl(
-                        null,
-                        null,
-                        [
-                            'action'   => 'pay-process',
-                            'sid'      => '{checkout.order.id}',
-                            'order_id' => $Order->getId(),
-                            'ts'       => time(),
-                        ]
-                    )
-                ),
-                'push'         => html_entity_decode(
-                    rex_getUrl(
-                        null,
-                        null,
-                        [
-                            'action'   => 'process_ipn',
-                            'sid'      => '{checkout.order.id}',
-                            'order_id' => $Order->getId(),
-                        ]
-                    )
-                ),
-            ],
         ];
         $jsonBody = $this->addBillingAddress($Order, $jsonBody);
 
         try {
             $client       = new Client();
-            $response     = $client->request(
-                'POST',
-                "{$base_url}/checkout/v3/orders",
-                [
-                    'auth' => [$alias, $secret],
-                    'json' => $jsonBody,
-                ]
-            );
-            $jsonResponse = $response->getBody()->getContents();
+            $response     = $client->request('POST', "{$base_url}/payments/v1/authorizations/{$authResponses['authorization_token']}/order", [
+                'auth' => [$alias, $secret],
+                'json' => $jsonBody,
+            ]);
+            $jsonResponse = $response->getBody()
+                ->getContents();
         } catch (ClientException $ex) {
-            $response     = $ex->getResponse()->getBody()->getContents();
+            $response     = $ex->getResponse()
+                ->getBody()
+                ->getContents();
             $responseData = \GuzzleHttp\json_decode($response, true);
 
-            if (\rex_addon::get('project')->getProperty('compile') == 1) {
-                pr($jsonBody, 'brown');
-            }
-
-            Utils::log('Klarna.initPayment', 'Error-Data: ' . print_r($responseData, true), 'ERROR');
+            Utils::log('Klarna.placeOrder', 'Error-Data: ' . print_r($responseData, true), 'ERROR');
 
             throw new KlarnaException($responseData['error_messages'][0]);
         }
         $responseData = \GuzzleHttp\json_decode($jsonResponse, true);
 
-        $responses                = (array)$this->getValue('responses');
-        $responses['initPayment'] = $jsonResponse;
+        $responses               = (array)$this->getValue('responses');
+        $responses['placeOrder'] = $jsonResponse;
         $this->setValue('responses', $responses);
         $Order->setValue('payment', Order::prepareData($this));
         $Order->save();
 
-        Utils::log('Klarna.initPayment', 'Data: ' . print_r($responseData, true), 'INFO');
+        Utils::log('Klarna.placeOrder', 'Data: ' . print_r($responseData, true), 'INFO');
 
         return $responseData;
     }
@@ -159,6 +208,7 @@ class Klarna extends PaymentAbstract
     {
         $customerData = $Order->getCustomerData();
         $invoiceAddr  = $Order->getInvoiceAddress();
+        $country      = $invoiceAddr->valueIsset('country') ? Country::get($invoiceAddr->getValue('country')) : null;
 
         $klarnaParams['billing_address'] = [
             'given_name'     => $invoiceAddr->getValue('firstname'),
@@ -167,6 +217,7 @@ class Klarna extends PaymentAbstract
             'street_address' => $invoiceAddr->getValue('street'),
             'postal_code'    => $invoiceAddr->getValue('postal'),
             'city'           => $invoiceAddr->getValue('location'),
+            'country'        => $country ? $country->getValue('iso2') : 'IT',
         ];
         return $klarnaParams;
     }
@@ -227,27 +278,29 @@ class Klarna extends PaymentAbstract
         return $orderLines;
     }
 
-    public function processPayment($Order)
+    public function captureOrder($Order)
     {
         include_once \rex_path::addon('simpleshop', '/vendor/autoload.php');
 
-        $Settings  = \rex::getConfig('simpleshop.Klarna.Settings');
-        $test_mode = from_array($Settings, 'use_test_mode', false);
-        $base_url  = $test_mode ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
-        $alias     = $test_mode ? $Settings['sandbox_alias'] : $Settings['alias'];
-        $secret    = $test_mode ? $Settings['sandbox_secret'] : $Settings['secret'];
-        $klarnaId  = \rex_request('sid', 'string');
+        $Settings       = \rex::getConfig('simpleshop.Klarna.Settings');
+        $test_mode      = from_array($Settings, 'use_test_mode', false);
+        $base_url       = $test_mode ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
+        $alias          = $test_mode ? $Settings['sandbox_alias'] : $Settings['alias'];
+        $secret         = $test_mode ? $Settings['sandbox_secret'] : $Settings['secret'];
+        $placeOrderResp = $this->getValue('responses')['placeOrder'];
 
+        if (!isset($placeOrderResp['order_id'])) {
+            Utils::log('Klarna.processPayment', 'order_id is not set', 'ERROR');
+        }
 
         try {
             $client   = new Client();
-            $response = $client->request(
-                'GET',
-                "{$base_url}/checkout/v3/orders/{$klarnaId}",
-                ['auth' => [$alias, $secret]]
-            );
+            $response = $client->request('GET', "{$base_url}/checkout/v3/orders/{$placeOrderResp['order_id']}", ['auth' => [$alias, $secret]]);
         } catch (ClientException $ex) {
-            $response     = $ex->getResponse()->getBody()->getContents();
+            $response = $ex->getResponse()
+                ->getBody()
+                ->getContents();
+
             $responseData = \GuzzleHttp\json_decode($response, true);
 
             Utils::log('Klarna.processPayment', 'Error-Data: ' . print_r($responseData, true), 'ERROR');
@@ -255,11 +308,12 @@ class Klarna extends PaymentAbstract
             throw new KlarnaException($ex->getMessage());
         }
 
-        $jsonResponse = $response->getBody()->getContents();
+        $jsonResponse = $response->getBody()
+            ->getContents();
         $responseData = \GuzzleHttp\json_decode($jsonResponse, true);
 
-        $responses                = (array)$this->getValue('responses');
-        $responses['pay-process'] = $jsonResponse;
+        $responses                   = (array)$this->getValue('responses');
+        $responses['processPayment'] = $jsonResponse;
         $this->setValue('responses', $responses);
         $Order->setValue('payment', Order::prepareData($this));
 
@@ -293,13 +347,11 @@ class Klarna extends PaymentAbstract
 
         try {
             $client   = new Client();
-            $response = $client->request(
-                'GET',
-                "{$base_url}/ordermanagement/v1/orders/{$klarnaId}",
-                ['auth' => [$alias, $secret]]
-            );
+            $response = $client->request('GET', "{$base_url}/ordermanagement/v1/orders/{$klarnaId}", ['auth' => [$alias, $secret]]);
         } catch (ClientException $ex) {
-            $response     = $ex->getResponse()->getBody()->getContents();
+            $response     = $ex->getResponse()
+                ->getBody()
+                ->getContents();
             $responseData = \GuzzleHttp\json_decode($response, true);
 
             Utils::log('Klarna.processIPN', 'Error-Data: ' . print_r($responseData, true), 'ERROR');
@@ -307,17 +359,16 @@ class Klarna extends PaymentAbstract
             throw new KlarnaException($ex->getMessage());
         }
 
-        $responses['process_ipn'] = $response->getBody()->getContents();
+        $responses['process_ipn'] = $response->getBody()
+            ->getContents();
 
         try {
             $client   = new Client();
-            $response = $client->request(
-                'POST',
-                "{$base_url}/ordermanagement/v1/orders/{$klarnaId}/acknowledge",
-                ['auth' => [$alias, $secret], 'headers' => ['Content-Type' => 'application/json']]
-            );
+            $response = $client->request('POST', "{$base_url}/ordermanagement/v1/orders/{$klarnaId}/acknowledge", ['auth' => [$alias, $secret], 'headers' => ['Content-Type' => 'application/json']]);
         } catch (ClientException $ex) {
-            $response     = $ex->getResponse()->getBody()->getContents();
+            $response     = $ex->getResponse()
+                ->getBody()
+                ->getContents();
             $responseData = \GuzzleHttp\json_decode($response, true);
 
             Utils::log('Klarna.acknowledge', 'Error-Data: ' . print_r($responseData, true), 'ERROR');
@@ -325,7 +376,8 @@ class Klarna extends PaymentAbstract
             throw new KlarnaException($ex->getMessage());
         }
 
-        $responses['acknowledge'] = $response->getBody()->getContents();
+        $responses['acknowledge'] = $response->getBody()
+            ->getContents();
 
         $this->setValue('responses', $responses);
         $Order->setValue('payment', Order::prepareData($this));

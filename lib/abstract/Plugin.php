@@ -71,7 +71,8 @@ abstract class Plugin
     {
         $result = [];
         foreach ((array)self::$classes[static::$type] as $class => $data) {
-            $result[] = self::getByClass($class);
+            $_plugin = self::getByClass($class);
+            $result[$_plugin->getPluginName()] = $_plugin;
         }
         return $result;
     }
