@@ -58,80 +58,90 @@ class Klarna extends PaymentAbstract
             $_responses = $_payment->getValue('responses');
         }
 
-        if (!isset($_responses['createSession']) || !isset($_responses['createSession']['client_token'])) {
-            include_once \rex_path::addon('simpleshop', '/vendor/autoload.php');
+        if (isset($_responses['createSession']) && isset($_responses['createSession']['client_token'])) {
+            $path = "/payments/v1/sessions/{$_responses['createSession']['session_id']}";
+        } else {
+            $path = '/payments/v1/sessions';
+        }
 
-            $Settings  = \rex::getConfig('simpleshop.Klarna.Settings');
-            $test_mode = from_array($Settings, 'use_test_mode', false);
-            $base_url  = $test_mode ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
-            $alias     = $test_mode ? $Settings['sandbox_alias'] : $Settings['alias'];
-            $secret    = $test_mode ? $Settings['sandbox_secret'] : $Settings['secret'];
+        include_once \rex_path::addon('simpleshop', '/vendor/autoload.php');
 
-            if ($alias == '' || $secret == '') {
-                throw new KlarnaException('The Klarna Credentials are not set!', 1);
-            }
+        $Settings  = \rex::getConfig('simpleshop.Klarna.Settings');
+        $test_mode = from_array($Settings, 'use_test_mode', false);
+        $base_url  = $test_mode ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
+        $alias     = $test_mode ? $Settings['sandbox_alias'] : $Settings['alias'];
+        $secret    = $test_mode ? $Settings['sandbox_secret'] : $Settings['secret'];
 
-            $currency     = 'EUR';
-            $total        = 1.22;
-            $taxes        = $total / 122 * 22;
-            $shippingAddr = $order->getShippingAddress();
-            $country      = $shippingAddr->valueIsset('country') ? Country::get($shippingAddr->getValue('country')) : null;
-            $langCode     = $this->getLangCode();
+        if ($alias == '' || $secret == '') {
+            throw new KlarnaException('The Klarna Credentials are not set!', 1);
+        }
 
-            $jsonBody = [
-                'purchase_country'  => $country ? $country->getValue('iso2') : 'IT',
-                'purchase_currency' => $currency,
-                'locale'            => $langCode,
-                'order_amount'      => number_format($total, 2, '', ''),
-                'order_tax_amount'  => number_format($taxes, 2, '', ''),
-                'order_lines'       => [
-                    [
-                        'type'             => 'physical',
-                        'name'             => 'Create Session',
-                        'quantity'         => 1,
-                        'unit_price'       => number_format($total, 2, '', ''),
-                        'tax_rate'         => number_format(22, 2, '', ''),
-                        'total_amount'     => number_format($total, 2, '', ''),
-                        'total_tax_amount' => number_format($taxes, 2, '', ''),
-                    ],
+        $currency     = 'EUR';
+        $total        = 1.22;
+        $taxes        = $total / 122 * 22;
+        $shippingAddr = $order->getShippingAddress();
+        $country      = $shippingAddr->valueIsset('country') ? Country::get($shippingAddr->getValue('country')) : null;
+        $langCode     = $this->getLangCode();
+
+        $jsonBody = [
+            'purchase_country'  => $country ? $country->getValue('iso2') : 'IT',
+            'purchase_currency' => $currency,
+            'locale'            => $langCode,
+            'order_amount'      => number_format($total, 2, '', ''),
+            'order_tax_amount'  => number_format($taxes, 2, '', ''),
+            'order_lines'       => [
+                [
+                    'type'             => 'physical',
+                    'name'             => 'Create Session',
+                    'quantity'         => 1,
+                    'unit_price'       => number_format($total, 2, '', ''),
+                    'tax_rate'         => number_format(22, 2, '', ''),
+                    'total_amount'     => number_format($total, 2, '', ''),
+                    'total_tax_amount' => number_format($taxes, 2, '', ''),
                 ],
-            ];
-            $jsonBody = $this->addBillingAddress($order, $jsonBody);
+            ],
+        ];
+        $jsonBody = $this->addBillingAddress($order, $jsonBody);
 
-            try {
-                $client       = new Client();
-                $response     = $client->request('POST', "{$base_url}/payments/v1/sessions", [
-                    'auth' => [$alias, $secret],
-                    'json' => $jsonBody,
-                ]);
-                $jsonResponse = $response->getBody()
-                    ->getContents();
-            } catch (ClientException $ex) {
-                $response     = $ex->getResponse()
-                    ->getBody()
-                    ->getContents();
-                $responseData = \GuzzleHttp\json_decode($response, true);
+        try {
+            $client       = new Client();
+            $response     = $client->request('POST', $base_url . $path, [
+                'auth' => [$alias, $secret],
+                'json' => $jsonBody,
+            ]);
+            $jsonResponse = $response->getBody()
+                ->getContents();
+        } catch (ClientException $ex) {
+            $response     = $ex->getResponse()
+                ->getBody()
+                ->getContents();
+            $responseData = \GuzzleHttp\json_decode($response, true);
 
-                Utils::log('Klarna.createSession', 'Error-Data: ' . print_r($responseData, true), 'ERROR');
+            Utils::log('Klarna.createSession', 'Error-Data: ' . print_r($responseData, true), 'ERROR');
 
+            if ($responseData['error_code'] == 'NOT_FOUND') {
+                Utils::log('Klarna.createSession', 'session-id = "'. $_responses['createSession']['session_id'] .'" not found', 'INFO');
+                $this->setValue('responses', []);
+                $order->setValue('payment', Order::prepareData($this));
+                Session::setCheckoutData('Order', $order);
+                throw new KlarnaException($responseData['error_messages'][0], 100);
+            } else {
                 throw new KlarnaException($responseData['error_messages'][0]);
             }
-            $responseData = \GuzzleHttp\json_decode($jsonResponse, true);
-
-            $responses                  = (array)$this->getValue('responses');
-            $responses['createSession'] = $jsonResponse;
-            $this->setValue('responses', $responses);
-            $order->setValue('payment', Order::prepareData($this));
-            $order->save();
-
-
-            Utils::log('Klarna.createSession', 'Data: ' . print_r($responseData, true), 'INFO');
-            Session::setCheckoutData('Order', $order);
-
-            return $responseData;
-        } else {
-            return $_responses['createSession'];
         }
+        $responseData = \GuzzleHttp\json_decode($jsonResponse, true);
+
+        $responses                  = (array)$this->getValue('responses');
+        $responses['createSession'] = $jsonResponse;
+        $this->setValue('responses', $responses);
+        $order->setValue('payment', Order::prepareData($this));
+        $order->save();
+
+
+        Utils::log('Klarna.createSession', 'Data: ' . print_r($responseData, true), 'INFO');
+        Session::setCheckoutData('Order', $order);
+
+        return $responseData;
     }
 
     public function placeOrder($Order)

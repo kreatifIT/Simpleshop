@@ -20,6 +20,19 @@ $is_active = is_object($payment) && $payment->getPluginName() == $self->getPlugi
 try {
     /** @var Klarna $self */
     $response = $self->createSession();
+} catch (KlarnaException $ex) {
+    if ($ex->getCode() == 100) {
+        try {
+            /** @var Klarna $self */
+            $response = $self->createSession();
+        } catch (\Throwable $ex) {
+            $errors[] = $ex->getMessage();
+            Utils::log('Klarna.createSession', $ex->getMessage(), 'Error');
+        }
+    } else {
+        $errors[] = $ex->getMessage();
+        Utils::log('Klarna.createSession', $ex->getMessage(), 'Error');
+    }
 } catch (\Throwable $ex) {
     $errors[] = $ex->getMessage();
     Utils::log('Klarna.createSession', $ex->getMessage(), 'Error');
@@ -27,7 +40,7 @@ try {
 
 ?>
 
-    <?php if (count($response['payment_method_categories'])): ?>
+    <?php if ($response && count($response['payment_method_categories'])): ?>
 
     <?php foreach ($response['payment_method_categories'] as $index => $paymentMethodCategory): ?>
         <div class="cell large-6 xlarge-4">
