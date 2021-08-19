@@ -50,15 +50,16 @@ class Klarna extends PaymentAbstract
 
     public function createSession()
     {
-        $_responses = [];
-        $order      = Session::getCurrentOrder();
-        $_payment   = $order->getValue('payment');
+        $_responses      = [];
+        $order           = Session::getCurrentOrder();
+        $_payment        = $order->getValue('payment');
+        $isSessionUpdate = isset($_responses['createSession']) && isset($_responses['createSession']['client_token']);
 
         if ($_payment instanceof self) {
             $_responses = $_payment->getValue('responses');
         }
 
-        if (isset($_responses['createSession']) && isset($_responses['createSession']['client_token'])) {
+        if ($isSessionUpdate) {
             $path = "/payments/v1/sessions/{$_responses['createSession']['session_id']}";
         } else {
             $path = '/payments/v1/sessions';
@@ -120,7 +121,7 @@ class Klarna extends PaymentAbstract
             Utils::log('Klarna.createSession', 'Error-Data: ' . print_r($responseData, true), 'ERROR');
 
             if ($responseData['error_code'] == 'NOT_FOUND') {
-                Utils::log('Klarna.createSession', 'session-id = "'. $_responses['createSession']['session_id'] .'" not found', 'INFO');
+                Utils::log('Klarna.createSession', 'session-id = "' . $_responses['createSession']['session_id'] . '" not found', 'INFO');
                 $this->setValue('responses', []);
                 $order->setValue('payment', Order::prepareData($this));
                 Session::setCheckoutData('Order', $order);
@@ -129,10 +130,15 @@ class Klarna extends PaymentAbstract
                 throw new KlarnaException($responseData['error_messages'][0]);
             }
         }
-        $responseData = \GuzzleHttp\json_decode($jsonResponse, true);
+
+        if ($isSessionUpdate) {
+            $responseData = $_responses['createSession'];
+        } else {
+            $responseData = json_decode($jsonResponse, true);
+        }
 
         $responses                  = (array)$this->getValue('responses');
-        $responses['createSession'] = $jsonResponse;
+        $responses['createSession'] = $responseData;
         $this->setValue('responses', $responses);
         $order->setValue('payment', Order::prepareData($this));
         $order->save();
