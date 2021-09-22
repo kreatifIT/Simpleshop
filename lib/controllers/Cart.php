@@ -66,13 +66,8 @@ class CartController extends Controller
             $coupon_code = Session::getCheckoutData('coupon_code');
             $Coupon      = $coupon_code != '' ? Coupon::getByCode($coupon_code) : null;
 
-            if (!$shipping || !$shipping->getValue('hasCosts')) {
-                foreach (Shipping::getAll() as $_shipping) {
-                    if ($_shipping->getValue('hasCosts')) {
-                        $shipping = $_shipping;
-                        break;
-                    }
-                }
+            if (!$shipping) {
+                $shipping = current(Shipping::getAll(true));
             }
             if (!$order->getValue('customer_data')) {
                 if (!$customer) {

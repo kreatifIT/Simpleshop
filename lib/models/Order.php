@@ -409,11 +409,11 @@ class Order extends Model
         $this->setValue('brut_prices', $gross_prices);
         $this->setValue('initial_total', array_sum($gross_prices));
 
+        $shipping = $this->getValue('shipping');
 
         // get shipping costs
-        if ($this->getValue('shipping')) {
+        if ($shipping && $shipping->hasCosts()) {
             try {
-                $shipping = $this->getValue('shipping');
                 $this->setValue('shipping_costs', (float)$shipping->getGrossPrice($this, $products));
             } catch (\Exception $ex) {
                 $msg = trim($ex->getLabelByCode());
