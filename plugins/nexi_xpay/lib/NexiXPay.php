@@ -17,6 +17,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Kreatif\Model\Country;
 use Sprog\Wildcard;
 
 
@@ -46,6 +47,7 @@ class NexiXPay extends PaymentAbstract
 
     public function initPayment($Order)
     {
+        $Order     = Session::getCurrentOrder();
         $Settings  = \rex::getConfig('simpleshop.NexiXPay.Settings');
         $test_mode = from_array($Settings, 'use_test_mode', false);
         $base_url  = $test_mode ? self::SANDBOX_BASE_URL : self::LIVE_BASE_URL;
@@ -56,25 +58,58 @@ class NexiXPay extends PaymentAbstract
             throw new NexiXPayException('The NexiXPay Credentials are not set!', 1);
         }
 
-        $currency   = 'EUR';
-        $trans_code = 'Order' . $Order->getId() . '-' . date('YmdHis');
-        $total      = number_format($Order->getValue('total'), 2, '', ''); // total payment (including tax + shipping)
+        $currency        = 'EUR';
+        $trans_code      = 'Order' . $Order->getId() . '-' . date('YmdHis');
+        $total           = number_format(
+            $Order->getValue('total'),
+            2,
+            '',
+            ''
+        ); // total payment (including tax + shipping)
+        $customer        = $Order->getCustomerData();
+        $shipping        = $Order->getShippingAddress();
+        $invoice         = $Order->getInvoiceAddress();
+        $shippingMethod  = $Order->getValue('shipping');
+        $_countryId      = $shipping->getValue('country');
+        $shippingCountry = $_countryId ? Country::get($_countryId) : null;
+        $_countryId      = $invoice->getValue('country');
+        $invoiceCountry  = $_countryId ? Country::get($_countryId) : null;
 
         // Calcolo MAC
         $mac  = sha1("codTrans={$trans_code}divisa={$currency}importo={$total}{$secret}");
         $data = [
-            'alias'       => $alias,
-            'importo'     => $total,
-            'divisa'      => $currency,
-            'codTrans'    => $trans_code,
-            'mac'         => $mac,
-            'languageId'  => $this->getLangCode(),
-            'url'         => html_entity_decode(rex_getUrl(null, null, ['action' => 'pay-process', 'ts' => time()])),
-            'url_back'    => html_entity_decode(rex_getUrl(null, null, ['action' => 'cancelled', 'ts' => time()])),
+            'alias'                     => $alias,
+            'importo'                   => $total,
+            'divisa'                    => $currency,
+            'codTrans'                  => $trans_code,
+            'mac'                       => $mac,
+            'languageId'                => $this->getLangCode(),
+            'url'                       => html_entity_decode(
+                rex_getUrl(null, null, ['action' => 'pay-process', 'ts' => time()])
+            ),
+            'url_back'                  => html_entity_decode(
+                rex_getUrl(null, null, ['action' => 'cancelled', 'ts' => time()])
+            ),
             //'urlpost'     => html_entity_decode(rex_getUrl(null, null, ['action' => 'process-ipn', 'order_id' => $Order->getId()])),
-            'descrizione' => 'Order #' . $Order->getId(),
-            'session_id'  => session_id(),
-            //'OPTION_CF' => '' // codice fiscale
+            'descrizione'               => 'Order #' . $Order->getId(),
+            'session_id'                => session_id(),
+            // 3D Secure 2.1 options
+            'Buyer_email'               => $customer->getValue('email'),
+            'Dest_city'                 => $shipping->getValue('location'),
+            'Dest_street'               => $shipping->getValue('street'),
+            'Dest_street2'              => $shipping->getValue('street_additional'),
+            'Dest_cap'                  => $shipping->getValue('postal'),
+            'Dest_state'                => $shipping->getValue('state') ?? 'AN',
+            'Dest_country'              => $shippingCountry ? $shippingCountry->getValue('iso3') : '',
+            'Bill_city'                 => $invoice->getValue('location'),
+            'Bill_street'               => $invoice->getValue('street'),
+            'Bill_street2'              => $invoice->getValue('street_additional'),
+            'Bill_cap'                  => $invoice->getValue('postal'),
+            'Bill_state'                => $invoice->getValue('state') ?? 'AN',
+            'Bill_country'              => $invoiceCountry ? $invoiceCountry->getValue('iso3') : '',
+            'chAccDate'                 => date('Y-m-d', strtotime($customer->getValue('createdate'))),
+            'preOrderPurchaseIndicator' => 1,
+            'shipIndicator'             => 3,
         ];
 
         \rex_extension::registerPoint(new \rex_extension_point('simpleshop.NexiXPay.initPaymentData', $data));
@@ -84,7 +119,6 @@ class NexiXPay extends PaymentAbstract
         $data['redirect_url']           = $redirect_url;
         $this->responses['initPayment'] = $data;
 
-        $Order = Session::getCurrentOrder();
         $Order->setValue('payment', $this);
         Session::setCheckoutData('Order', $Order);
         $Order->save();
