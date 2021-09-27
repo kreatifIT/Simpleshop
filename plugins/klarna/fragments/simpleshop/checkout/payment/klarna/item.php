@@ -77,7 +77,7 @@ try {
         window.klarnaAsyncCallback = function () {
             Klarna.Payments.init({
                 client_token: '<?= $response['client_token'] ?>'
-            })
+            });
             <?= implode("\n", $script) ?>
         };
 
