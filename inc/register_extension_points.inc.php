@@ -27,6 +27,7 @@ namespace FriendsOfREDAXO\Simpleshop;
 \rex_extension::register('kreatif.Model.queryCollection', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_queryCollection']);
 \rex_extension::register('project.layoutBottom', ['\FriendsOfREDAXO\Simpleshop\CartController', 'ext_project_layoutBottom']);
 \rex_extension::register('kreatif.setUrlObject', ['\FriendsOfREDAXO\Simpleshop\Product', 'ext_setUrlObject']);
+\rex_extension::register('simpleshop.Order.applyDiscounts', ['\FriendsOfREDAXO\Simpleshop\Coupon', 'ext_applyDiscounts']);
 
 
 \rex_extension::register('PACKAGES_INCLUDED', function (\rex_extension_point $Ep) {

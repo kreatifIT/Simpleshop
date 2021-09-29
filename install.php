@@ -20,6 +20,7 @@ $migrations      = glob($this->getPath('install') . '/db_migrations/*.php');
 $isInstalled     = $this->getConfig('installed');
 
 \Sprog\Sync::ensureAddonWildcards($this);
+include_once $this->getPath('install/inc/ensureDbStructure.inc.php');
 
 
 if ($isInstalled) {

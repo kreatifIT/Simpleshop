@@ -589,6 +589,52 @@ class Order extends Model
         return $Mpdf;
     }
 
+    public function getGrossTotal()
+    {
+        return array_sum((array)$this->getValue('brut_prices'));
+    }
+
+    public function getDiscount($includeTax = true)
+    {
+        $discount = $this->getValue('discount');
+
+        if (!$includeTax) {
+            $grossTotal = array_sum($this->getValue('brut_prices'));
+            $nettoTotal = array_sum($this->getValue('net_prices'));
+
+            $_percent   = $discount / $grossTotal;
+            $discount   = $nettoTotal * $_percent;
+        }
+        return $discount;
+    }
+
+    public function getNettoTotal($applyShippingAndDiscounts = false)
+    {
+        $total = array_sum((array)$this->getValue('net_prices'));
+
+        if ($applyShippingAndDiscounts) {
+            if ($this->getValue('shipping_costs') > 0) {
+                $shipping = $this->getValue('shipping');
+
+                if ($shipping) {
+                    $total += $shipping->getNetPrice($this);
+                }
+            }
+            $total -= $this->getDiscount(false);
+        }
+        return $total;
+    }
+
+    public function getSubtotal($includeTax = true)
+    {
+        if ($includeTax) {
+            $subtotal = $this->getGrossTotal();
+        } else {
+            $subtotal = $this->getNettoTotal();
+        }
+        return $subtotal;
+    }
+
     public function getPackingListPDF($debug = false)
     {
         $Customer = $this->getCustomerData();

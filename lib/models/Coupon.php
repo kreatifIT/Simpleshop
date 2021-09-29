@@ -35,12 +35,10 @@ class Coupon extends Discount
         if (!$_this) {
             throw new CouponException('Coupon not exists', 1);
         }
-        \rex_extension::register('simpleshop.Order.applyDiscounts', [$_this, 'ext_applyDiscounts']);
-
         return $_this;
     }
 
-    public static function cloneCode($codeId, $amount = 1, $_data = [], $status = 'usable')
+    public static function cloneCode($codeId, $amount = 1, $status = 'usable')
     {
         \rex_yform_manager_dataset::clearInstancePool();
 
@@ -58,9 +56,6 @@ class Coupon extends Discount
 
             foreach ($data as $name => $value) {
                 $clone->setValue($name, $value);
-            }
-            foreach ($_data as $_key => $_value) {
-                $clone->setValue($_key, $_value);
             }
             $clone->setValue('orders', null);
             $clone->setValue('code', \rex_yform_value_coupon_code::getRandomCode());
@@ -100,20 +95,14 @@ class Coupon extends Discount
         $extras['coupon_code'] = $_this->prefix . '-' . $_this->code;
         $Product->setValue('extras', $extras);
 
-        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Coupon.createGiftcard.CREATED', $_this, ['Order' => $Order, 'Product' => $Product]));
+        \rex_extension::registerPoint(
+            new \rex_extension_point(
+                'simpleshop.Coupon.createGiftcard.CREATED', $_this, ['Order' => $Order, 'Product' => $Product]
+            )
+        );
     }
 
     public function applyToOrder($Order, &$brut_prices, $name = '')
-    {
-        return $this->apply('to-order', $Order, $brut_prices);
-    }
-
-    public function applyToCart(&$brut_prices)
-    {
-        return $this->apply('to-cart', null, $brut_prices);
-    }
-
-    protected function apply($method, $Order, &$brut_prices)
     {
         $start   = strtotime($this->getValue('start_time') . ' 00:00:00');
         $endDate = $this->getValue('end_date');
@@ -122,6 +111,7 @@ class Coupon extends Discount
         $percent = $this->getValue('discount_percent');
         $orders  = array_filter((array)$this->getValue('orders'));
         $user    = Customer::getCurrentUser();
+
 
         // calculate residual balance
         if ($this->getValue('is_multi_use') == 3) {
@@ -135,9 +125,9 @@ class Coupon extends Discount
                     }
                 }
             }
-        } else if ($this->getValue('is_multi_use') == 2 && count($orders)) {
+        } elseif ($this->getValue('is_multi_use') == 2 && count($orders)) {
             throw new CouponException('Coupon consumed', 2);
-        } else if ($this->getValue('is_multi_use') != 1 && $value && count($orders)) {
+        } elseif ($this->getValue('is_multi_use') != 1 && $value && count($orders)) {
             $_value = $value;
             foreach ($orders as $order_id => $order_discount) {
                 $value -= (float)$order_discount;
@@ -148,17 +138,41 @@ class Coupon extends Discount
         // do some checks
         if ($this->getValue('is_multi_use') == 0 && count($orders) && ($value <= 0 || $percent)) {
             throw new CouponException('Coupon consumed', 2);
-        } else if ($start > time()) {
+        } elseif ($start > time()) {
             throw new CouponException('Coupon not yet valid', 3);
-        } else if ($end && $end <= time()) {
+        } elseif ($end && $end <= time()) {
             throw new CouponException('Coupon not valid anymore', 4);
         }
 
-        if ($method == 'to-order') {
-            $discount = parent::applyToOrder($Order, $brut_prices, 'coupon');
-        } else if ($method == 'to-cart') {
-            $discount = parent::applyToCart($brut_prices);
+        if ('products' == $this->getValue('apply_to')) {
+            $discount    = 0;
+            $productKeys = array_filter(array_unique(explode('+', $this->getValue('products'))));
+
+            if (count($productKeys)) {
+                $_applied = false;
+                $products = Session::getCartItems();
+
+                foreach ($products as $product) {
+                    if (in_array($product->getKey(), $productKeys)) {
+                        $_applied = true;
+                        if ($this->getValue('action') == 'percent_discount') {
+                            $price    = $product->getPrice() * $product->getValue('cart_quantity');
+                            $discount = $price / 100 * $this->getValue('discount_percent');
+                        } elseif ($this->getValue('action') == 'fixed_discount') {
+                            $discount = $product->getValue('cart_quantity') * $this->getValue('discount_value');
+                        }
+                    }
+                }
+                if (!$_applied) {
+                    throw new CouponException('No product present to apply coupon', 6, $productKeys);
+                }
+            }
+            $this->setValue('discount_value', $discount);
+            $discountName = 'manual_discount';
+        } else {
+            $discountName = 'coupon';
         }
+        $discount = parent::applyToOrder($Order, $brut_prices, $discountName);
 
         if (isset ($_value)) {
             $this->setValue('discount_value', $_value);
@@ -187,22 +201,69 @@ class Coupon extends Discount
         if (trim($code) == '') {
             return false;
         }
-        return self::query()
-            ->whereRaw('(code = :w1 AND prefix = "") OR CONCAT(prefix, "-", code) = :w1', ['w1' => $code])
-            ->findOne();
+        return self::query()->whereRaw(
+            '(code = :w1 AND prefix = "") OR CONCAT(prefix, "-", code) = :w1',
+            ['w1' => $code]
+        )->findOne();
     }
 
-    public function ext_applyDiscounts(\rex_extension_point $Ep)
+    public static function ext_applyDiscounts(\rex_extension_point $Ep)
     {
-        $promotions           = $Ep->getSubject();
-        $promotions['coupon'] = $this;
-        return $promotions;
+        $code  = Session::getCheckoutData('coupon_code');
+        $_this = self::getByCode($code);
+
+        if ($_this) {
+            $promotions           = $Ep->getSubject();
+            $promotions['coupon'] = $_this;
+            $Ep->setSubject($promotions);
+        }
     }
 
     public function getCode()
     {
         $code = $this->getValue("prefix");
         return $code != "" ? $code . "-" . $this->getValue("code") : $this->getValue("code");
+    }
+
+    public static function ext__processSettings(\rex_extension_point $ep)
+    {
+        $sql     = \rex_sql::factory();
+        $options = (array)Settings::getValue('coupon_use_options');
+        $yTable  = \rex_yform_manager_table::get(Coupon::TABLE);
+
+        $sql->setTable('rex_yform_table');
+        $sql->setValue('hidden', (int)!(count($options) > 0));
+        $sql->setWhere(['table_name' => Coupon::TABLE]);
+        $sql->update();
+
+        if (count($options) > 0) {
+            if (in_array('global_use_single', $options)) {
+                $choices['translate:coupon.global_use_single'] = 3;
+            }
+            if (in_array('global', $options)) {
+                $choices['translate:coupon.use_global'] = 1;
+            }
+            if (in_array('fixedprice', $options)) {
+                $choices['translate:coupon.use_fixedprice'] = 0;
+            }
+            if (in_array('single', $options)) {
+                $choices['translate:coupon.use_single'] = 2;
+            }
+            Yform::ensureValueField(
+                Coupon::TABLE,
+                'is_multi_use',
+                'choice',
+                [
+                    'db_type'  => 'int',
+                    'default'  => 0,
+                    'no_db'    => 0,
+                    'multiple' => 0,
+                    'expanded' => 0,
+                    'choices'  => json_encode($choices),
+                ]
+            );
+        }
+        \rex_yform_manager_table_api::generateTableAndFields($yTable);
     }
 
     public static function ext_completeOrder(\rex_extension_point $ep)
@@ -244,6 +305,18 @@ class Coupon extends Discount
 
 class CouponException extends \Exception
 {
+    protected $additional;
+
+    public function __construct($message = "", $code = 0, $additional = null, Throwable $previous = null)
+    {
+        $this->additional = $additional;
+        parent::__construct(
+            $message,
+            $code,
+            $previous
+        );
+    }
+
     public function getLabelByCode()
     {
         switch ($this->getCode()) {
@@ -261,6 +334,14 @@ class CouponException extends \Exception
                 break;
             case 5:
                 $errors = '###error.coupon_already_used###';
+                break;
+            case 6:
+                $products = [];
+                foreach ($this->additional as $productKey) {
+                    $_product = Product::getProductByKey($productKey);
+                    $products[] = "<a href='{$_product->getUrl()}'>{$_product->getName()}</a>";
+                }
+                $errors = str_replace('{{PRODUCTS}}', implode('<br/>', $products), Wildcard::get('error.coupon_products_missing'));
                 break;
             default:
                 $errors = $this->getMessage();

@@ -27,6 +27,7 @@ class CartController extends Controller
 
         $errors      = [];
         $discount    = 0;
+        $order       = Session::getCurrentOrder();
         $postAction  = rex_request('action', 'string');
         $minOrderVal = self::getMinOrderValue();
 
@@ -45,27 +46,51 @@ class CartController extends Controller
 
         switch ($postAction) {
             case 'redeem_coupon':
-                $coupon_code = trim(rex_get('coupon_code', 'string'));
+                $coupon_code = trim(rex_request('coupon_code', 'string'));
 
+                if ($coupon_code == '') {
+                    $coupon_code = trim(rex_request('coupon', 'string'));
+                }
                 Session::setCheckoutData('coupon_code', $coupon_code);
                 break;
         }
 
         $grossTotals  = Session::getGrossTotals();
         $coupon_code  = Session::getCheckoutData('coupon_code');
-        $grossTotals2 = $grossTotals;
         $Coupon       = $coupon_code != '' ? Coupon::getByCode($coupon_code) : null;
 
         if ($Coupon) {
             try {
-                $discount = $Coupon->applyToCart($grossTotals2);
-            } catch (CouponException $ex) {
+                $Coupon->applyToOrder($order, $order->getValue('brut_prices'));
+            }
+            catch (CouponException $ex) {
                 Session::setCheckoutData('coupon_code', null);
                 $errors[] = ['label' => $ex->getLabelByCode()];
             }
-        } else if ($coupon_code != '') {
+        }
+        else if ($coupon_code != '') {
             Session::setCheckoutData('coupon_code', null);
             $errors[] = ['label' => '###error.coupon_not_exists###'];
+        }
+
+
+        try {
+            $_errors    = $order->recalculateDocument($this->products);
+            $errors     = array_merge($errors, $_errors);
+            $promotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.applyDiscounts', [], [
+                'Order'      => $order,
+                'products'   => $this->products,
+                'country_id' => $this->params['country-id'],
+            ]));
+            $_errors    = $order->recalculateDocument($this->products, $promotions);
+            $errors     = array_merge($errors, $_errors);
+            $discount   = $order->getValue('discount');
+        }
+        catch (OrderException $ex) {
+            $errors[] = ['label' => $ex->getMessage()];
+        }
+        catch (\Exception $ex) {
+            $errors[] = ['label' => $ex->getLabelByCode()];
         }
 
         if ($minOrderVal > array_sum($grossTotals)) {
