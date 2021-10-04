@@ -36,8 +36,7 @@ class DefaultShipping extends ShippingAbstract
     {
         $customer  = $Order->getCustomerData();
         $countryId = $this->getValue('country_id');
-        $isCompany = $customer ? $customer->isB2B() : false;
-        $total     = $Order->getSubtotal(!$isCompany);
+        $total     = $Order->getSubtotal(!$customer->isTaxFree());
         $Settings  = \rex::getConfig('simpleshop.DefaultShipping.Settings');
 
         if (!$countryId) {
@@ -103,7 +102,7 @@ class DefaultShipping extends ShippingAbstract
         $customer   = $order->getCustomerData();
 
         $priceDiff = 0;
-        $subTotal  = $order->getSubtotal(!$customer->isB2B());
+        $subTotal  = $order->getSubtotal(!$customer->isTaxFree());
 
         if ($Country && isset($Settings['costs'][$Country->getId()])) {
             if (current($Settings['costs'][$Country->getId()]) == 0) {

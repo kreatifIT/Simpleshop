@@ -168,6 +168,12 @@ class Customer extends Model
         return $address ? $address->isCompany() : false;
     }
 
+    public function isTaxFree()
+    {
+        $address = $this->getInvoiceAddress();
+        return $address ? $address->isTaxFree() : false;
+    }
+
     public function getInvoiceAddress()
     {
         $invoiceAddrId = $this->getvalue('invoice_address_id');
