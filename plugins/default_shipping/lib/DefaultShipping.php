@@ -68,6 +68,6 @@ class DefaultShipping extends ShippingAbstract
     public function getNetPrice($Order, $products = null)
     {
         $this->calculatePrice($Order);
-        return parent::getNetPrice($order, $products);
+        return parent::getNetPrice($Order, $products);
     }
 }

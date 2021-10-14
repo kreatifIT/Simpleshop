@@ -10,7 +10,7 @@ $total          = $Order->getValue('total');
 $taxes          = $Order->getValue('taxes');
 $shipping       = $Order->getValue('shipping');
 $promotions     = (array)$Order->getValue('promotions');
-$shipping_costs = $shipping && $config['show_tax_info'] ? $shipping->getPrice($Order) : $Order->getValue('shipping_costs');
+$shipping_costs = $shipping && $config['show_tax_info'] ? $shipping->getNetPrice($Order) : $Order->getValue('shipping_costs');
 $summary        = $Order->getValue($config['show_tax_info'] ? 'net_prices' : 'brut_prices');
 
 ?>

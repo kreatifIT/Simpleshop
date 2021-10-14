@@ -370,7 +370,8 @@ class Order extends Model
         if ($this->getValue('shipping')) {
             try {
                 $shipping = $this->getValue('shipping');
-                $this->setValue('shipping_costs', (float)$shipping->getNetPrice($this, $products));
+                $this->setValue('shipping_costs', (float)$shipping->getPrice($this, $products));
+                $this->setValue('shipping', $shipping);
             } catch (\Exception $ex) {
                 $msg = trim($ex->getLabelByCode());
 
@@ -469,14 +470,11 @@ class Order extends Model
 
         // set shipping costs
         if ($this->getValue('shipping_costs') > 0 && !$this->isTaxFree()) {
-            $tax = $this->getValue('shipping')
-                ->getTaxPercentage();
-
+            $tax = $this->getValue('shipping')->getTaxPercentage();
 
             if ($tax > 0) {
                 $this->setValue('net_shipping_costs', (float)$this->getValue('shipping_costs') / (100 + $tax) * 100);
-                $taxes[$tax] += $this->getValue('shipping')
-                    ->getTax();
+                $taxes[$tax] += $this->getValue('shipping')->getTax();
             }
         }
         ksort($taxes);
