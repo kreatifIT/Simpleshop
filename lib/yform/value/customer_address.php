@@ -16,9 +16,17 @@ class rex_yform_value_customer_address extends rex_yform_value_abstract
 
     public function enterObject()
     {
+        $order = $this->params['main_id'] ? \FriendsOfREDAXO\Simpleshop\Order::get($this->params['main_id']) : null;
+
+        if ($this->getValue() == '' && $order) {
+            $address = $order->getShippingAddress();
+            if ($address) {
+                $this->setValue($address->getId());
+            }
+        }
+
         if ($this->params['send'] == 1 && $this->getValue() != '') {
             if ($this->params['main_table'] == \FriendsOfREDAXO\Simpleshop\Order::TABLE) {
-                $order            = $this->params['main_id'] ? \FriendsOfREDAXO\Simpleshop\Order::get($this->params['main_id']) : null;
                 $currentAddressId = $order ? $order->getValue($this->getName()) : 0;
 
                 if ($this->getValue() != $currentAddressId) {
@@ -59,18 +67,16 @@ class rex_yform_value_customer_address extends rex_yform_value_abstract
 
     public static function getListValue($params)
     {
-        $value   = $params['subject'];
-        $address = $value ? \FriendsOfREDAXO\Simpleshop\CustomerAddress::get($value) : null;
+        $orderId        = $params['list']->getValue('id');
+        $order          = \FriendsOfREDAXO\Simpleshop\Order::get($orderId);
 
-
-        if ($address) {
-            $customer = \FriendsOfREDAXO\Simpleshop\Customer::get($address->getValue('customer_id'));
-            $value    = implode(' | ', array_unique(array_filter([
-                $address->getName(null, true),
-                $customer ? $customer->getName(null, true) : '',
-            ])));
-        }
-        return $value;
+        $invoiceAddr  = $order->getInvoiceAddress();
+        $shippingAddr = $order->getShippingAddress();
+        $nameChunks   = [
+            $invoiceAddr->getName(null, true),
+            $shippingAddr->getName(null, true),
+        ];
+        return implode(' | ', array_unique(array_filter($nameChunks)));
     }
 
     public function getDefinitions($values = [])
