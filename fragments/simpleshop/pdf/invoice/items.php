@@ -57,8 +57,8 @@ if (count($products) == 0) {
                 <?php endif; ?>
             </td>
             <td align="center"><?= $quantity ?></td>
-            <td align="right">&euro; <?= format_price($product->getPrice(!$config['show_tax_info'])) ?></td>
-            <td align="right">&euro; <?= format_price($product->getPrice(!$config['show_tax_info']) * $quantity) ?></td>
+            <td align="right">&euro; <?= format_price($product->getPrice(!$Order->isTaxFree())) ?></td>
+            <td align="right">&euro; <?= format_price($product->getPrice(!$Order->isTaxFree()) * $quantity) ?></td>
         </tr>
     <?php endforeach; ?>
 
