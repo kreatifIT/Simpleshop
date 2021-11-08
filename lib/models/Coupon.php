@@ -156,7 +156,7 @@ class Coupon extends Discount
                     if (in_array($product->getKey(), $productKeys)) {
                         $_applied = true;
                         if ($this->getValue('action') == 'percent_discount') {
-                            $price    = $product->getPrice() * $product->getValue('cart_quantity');
+                            $price    = $product->getPrice(!$Order->isTaxFree()) * $product->getValue('cart_quantity');
                             $discount = $price / 100 * $this->getValue('discount_percent');
                         } elseif ($this->getValue('action') == 'fixed_discount') {
                             $discount = $product->getValue('cart_quantity') * $this->getValue('discount_value');
