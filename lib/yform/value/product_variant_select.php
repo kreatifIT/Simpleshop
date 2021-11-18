@@ -25,7 +25,13 @@ class rex_yform_value_product_variant_select extends rex_yform_value_select
 
         $real_values = [];
         foreach ($values as $value) {
-            $Product = \FriendsOfREDAXO\Simpleshop\Product::getProductVariant($value);
+            try {
+                $Product = \FriendsOfREDAXO\Simpleshop\Product::getProductVariant($value);
+            } catch (\FriendsOfREDAXO\Simpleshop\ProductException $ex) {
+                if (3 == $ex->getCode() && rex::isBackend()) {
+                    echo rex_view::error(rex_i18n::msg('error.select_has_not_existing_variant'));
+                }
+            }
 
             if ($Product) {
                 $real_values[] = $value;

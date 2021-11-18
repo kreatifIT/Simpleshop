@@ -155,6 +155,7 @@ foreach ($features as $feature) {
 $fragment = new \rex_fragment();
 $fragment->setVar('fields', $fields);
 
+$featureKeys = array_unique(array_filter($featureKeys));
 foreach ($variants as $Variant) {
     $name   = [];
     $vkey   = $Variant->getValue('variant_key');
