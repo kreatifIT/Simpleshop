@@ -40,7 +40,7 @@ class Order extends Model
                 break;
             }
         }
-        if (!$order){
+        if (!$order) {
             $order = Session::getCurrentOrder();
         }
         return $order;
@@ -87,11 +87,13 @@ class Order extends Model
 
     public function getProducts($raw = true)
     {
-        $products = OrderProduct::getAll(false, [
-            'filter'  => [['order_id', $this->getId()]],
-            'orderBy' => 'id',
-        ])
-            ->toArray();
+        $products = OrderProduct::getAll(
+            false,
+            [
+                'filter'  => [['order_id', $this->getId()]],
+                'orderBy' => 'id',
+            ]
+        )->toArray();
 
 
         if (!$raw) {
@@ -123,27 +125,39 @@ class Order extends Model
             $invoice_num = null;
         }
 
-        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.getInvoiceNum', $invoice_num, [
-            'Order' => $this,
-        ]));
+        return \rex_extension::registerPoint(
+            new \rex_extension_point(
+                'simpleshop.Order.getInvoiceNum', $invoice_num, [
+                                                    'Order' => $this,
+                                                ]
+            )
+        );
     }
 
     public function getReferenceId()
     {
         $_refId = date('Ym', strtotime($this->getValue('createdate'))) . str_pad($this->getId(), 6, '0', STR_PAD_LEFT);
 
-        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.getReferenceId', $_refId, [
-            'Order' => $this,
-        ]));
+        return \rex_extension::registerPoint(
+            new \rex_extension_point(
+                'simpleshop.Order.getReferenceId', $_refId, [
+                                                     'Order' => $this,
+                                                 ]
+            )
+        );
     }
 
     public function getShippingKey($forBarcode = false)
     {
         $refId = $this->getReferenceId();
-        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.getShippingKey', $refId, [
-            'Order'      => $this,
-            'forBarcode' => $forBarcode,
-        ]));
+        return \rex_extension::registerPoint(
+            new \rex_extension_point(
+                'simpleshop.Order.getShippingKey', $refId, [
+                                                     'Order'      => $this,
+                                                     'forBarcode' => $forBarcode,
+                                                 ]
+            )
+        );
     }
 
     public function getBarCodeImg()
@@ -153,16 +167,20 @@ class Order extends Model
 
         if (strlen($key) == 12 || strlen($key) == 13) {
             $Barcode = new \barcode_generator();
-            $image   = $Barcode->render_image('code-128', $key, [
-                'ph' => 0,
-                'sf' => 1,
-                'sx' => 2,
-                'pt' => 0,
-                'pb' => 16,
-                'ts' => 12,
-                'th' => 16,
-                'wq' => 0,
-            ]);
+            $image   = $Barcode->render_image(
+                'code-128',
+                $key,
+                [
+                    'ph' => 0,
+                    'sf' => 1,
+                    'sx' => 2,
+                    'pt' => 0,
+                    'pb' => 16,
+                    'ts' => 12,
+                    'th' => 16,
+                    'wq' => 0,
+                ]
+            );
             ob_start();
             imagepng($image);
             $image = 'data:image/png;base64,' . base64_encode(ob_get_clean());
@@ -175,18 +193,24 @@ class Order extends Model
         self::$_finalizeOrder = true;
 
         $products = Session::getCartItems();
-        $result = $this->save(false, $products);
+        $result   = $this->save(false, $products);
 
-        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.completeOrder', $result, [
-            'Order' => $this,
-        ]));
+        return \rex_extension::registerPoint(
+            new \rex_extension_point(
+                'simpleshop.Order.completeOrder', $result, [
+                                                    'Order' => $this,
+                                                ]
+            )
+        );
     }
 
     public function save($simple_save = true, $products = null)
     {
         Utils::setCalcLocale();
 
-        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['finalize_order' => self::$_finalizeOrder, 'simple_save' => $simple_save]));
+        \rex_extension::registerPoint(
+            new \rex_extension_point('simpleshop.Order.preSave', $this, ['finalize_order' => self::$_finalizeOrder, 'simple_save' => $simple_save])
+        );
 
         $sql            = \rex_sql::factory();
         $date_now       = date('Y-m-d H:i:s');
@@ -208,7 +232,9 @@ class Order extends Model
             $query = 'SELECT IFNULL(MAX(invoice_num), 0) + 1 as num FROM ' . Order::TABLE . ' WHERE createdate >= "' . date('Y-01-01 00:00:00') . '"';
             $sql->setQuery($query);
             $num = $sql->getValue('num');
-            $num = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoice_num', $num, ['Order' => $this, 'value' => $value]));
+            $num = \rex_extension::registerPoint(
+                new \rex_extension_point('simpleshop.Order.invoice_num', $num, ['Order' => $this, 'value' => $value])
+            );
 
             if ($num == 0) {
                 $num = null;
@@ -276,7 +302,7 @@ class Order extends Model
             $where = ["order_id = {$order_id}"];
 
             if (count($orderProductIds)) {
-                $where[] = 'id NOT IN('. implode(',', $orderProductIds) .')';
+                $where[] = 'id NOT IN(' . implode(',', $orderProductIds) . ')';
             }
             $sql->setTable(OrderProduct::TABLE);
             $sql->setWhere(implode(' AND ', $where));
@@ -320,9 +346,13 @@ class Order extends Model
         $OrderProduct->setValue('cart_quantity', $quantity);
         $OrderProduct->setValue('order_id', $this->getId());
 
-        $OrderProduct = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.saveOrderProduct', $OrderProduct, [
-            'Order' => $this,
-        ]));
+        $OrderProduct = \rex_extension::registerPoint(
+            new \rex_extension_point(
+                'simpleshop.Order.saveOrderProduct', $OrderProduct, [
+                                                       'Order' => $this,
+                                                   ]
+            )
+        );
 
         $OrderProduct->save(true);
         return $OrderProduct->getId();
@@ -332,8 +362,8 @@ class Order extends Model
     {
         Utils::setCalcLocale();
 
-        $gross_prices    = [];
-        $net_prices      = [];
+        $grossPrices     = [];
+        $netPrices       = [];
         $this->quantity  = 0;
         $this->discount  = 0;
         $manual_discount = $this->getValue('manual_discount', false, 0);
@@ -343,27 +373,26 @@ class Order extends Model
             $ROrder = Order::get($this->getValue('ref_order_id'));
 
             if ($ROrder) {
-                $gross_prices = $this->calculateCreditNote($ROrder);
+                $netPrices = $this->calculateCreditNote($ROrder);
             }
         } else {
             // calculate products total
             foreach ($products as $product) {
                 $quantity = $product->getValue('cart_quantity');
-                $tax_perc = $this->isTaxFree() ? 0 : Tax::get($product->getValue('tax'))
-                    ->getValue('tax');
+                $tax_perc = $this->isTaxFree() ? 0 : Tax::get($product->getValue('tax'))->getValue('tax');
 
-                $net_prices[$tax_perc]   += (float)$product->getPrice(false) * $quantity;
-                $gross_prices[$tax_perc] += (float)$product->getPrice(!$this->isTaxFree()) * $quantity;
-                $this->quantity          += $quantity;
+                $netPrices[$tax_perc]   += (float)$product->getPrice(false) * $quantity;
+                $grossPrices[$tax_perc] += (float)$product->getPrice(!$this->isTaxFree()) * $quantity;
+                $this->quantity         += $quantity;
             }
         }
-        ksort($gross_prices);
-        ksort($net_prices);
+        ksort($grossPrices);
+        ksort($netPrices);
 
         $this->setValue('updatedate', date('Y-m-d H:i:s'));
-        $this->setValue('net_prices', $net_prices);
-        $this->setValue('brut_prices', $gross_prices);
-        $this->setValue('initial_total', array_sum($gross_prices));
+        $this->setValue('net_prices', $netPrices);
+        $this->setValue('brut_prices', $grossPrices);
+        $this->setValue('initial_total', array_sum($grossPrices));
 
 
         // get shipping costs
@@ -395,7 +424,7 @@ class Order extends Model
         }
 
         // set promotions for order history
-        list($_errors, $promotions) = $this->calculatePrices($promotions);
+        [$_errors, $promotions] = $this->calculatePrices($promotions);
 
         $errors = array_merge((array)$errors, (array)$_errors);
 
@@ -420,39 +449,42 @@ class Order extends Model
 
     public function calculateCreditNote(Order $ReferenceOrder)
     {
-        $total        = $ReferenceOrder->getValue('total') * -1;
-        $gross_prices = $ReferenceOrder->getValue('brut_prices');
+        $grossPrices = [];
+        $total       = $ReferenceOrder->getValue('total') * -1;
+        $netPrices   = $ReferenceOrder->getValue('net_prices');
 
-        foreach ($gross_prices as &$gross_price) {
-            $gross_price = $gross_price * -1;
+        foreach ($netPrices as $taxPercent => &$netPrice) {
+            $netPrice                 = $netPrice * -1;
+            $grossPrices[$taxPercent] = $netPrice / 100 * $taxPercent;
         }
 
         $this->setValue('customer_id', $ReferenceOrder->getValue('customer_id'));
         $this->setValue('status', 'CN');
         $this->setValue('initial_total', $total);
-        $this->setValue('brut_prices', $gross_prices);
+        $this->setValue('net_prices', $netPrices);
+        $this->setValue('brut_prices', $grossPrices);
         $this->setValue('address_1', $ReferenceOrder->getValue('address_1'));
         $this->setValue('ip_address', rex_server('REMOTE_ADDR', 'string', 'notset'));
         $this->setValue('total', $total);
         $this->setValue('ref_order_id', $ReferenceOrder->getId());
 
         self::$_finalizeOrder = true;
-
-        return $gross_prices;
+        return $netPrices;
     }
 
     private function calculatePrices($promotions)
     {
-        $discount     = 0;
-        $taxes        = [];
-        $errors       = [];
-        $_promotions  = [];
-        $gross_prices = $this->getValue('brut_prices');
+        $discount    = 0;
+        $total       = 0;
+        $taxes       = [];
+        $errors      = [];
+        $_promotions = [];
+        $netPrices   = $this->getValue('net_prices');
 
         foreach ($promotions as $name => $promotion) {
             try {
                 if (is_object($promotion)) {
-                    $discount += $promotion->applyToOrder($this, $gross_prices, $name);
+                    $discount += $promotion->applyToOrder($this, $netPrices, $name);
                 }
             } catch (\Exception $ex) {
                 $errors[]  = ['label' => $ex->getLabelByCode()];
@@ -464,8 +496,10 @@ class Order extends Model
         }
 
         // set tax costs
-        foreach ($gross_prices as $tax => $gross_price) {
-            $taxes[$tax] += (float)($gross_price / ($tax + 100) * $tax);
+        foreach ($netPrices as $tax => $netPrice) {
+            $_tax        = (float)($netPrice / 100 * $tax);
+            $taxes[$tax] += $_tax;
+            $total       += ($netPrice + $_tax);
         }
 
         // set shipping costs
@@ -473,7 +507,8 @@ class Order extends Model
             $tax = $this->getValue('shipping')->getTaxPercentage();
 
             if ($tax > 0) {
-                $this->setValue('net_shipping_costs', (float)$this->getValue('shipping_costs') / (100 + $tax) * 100);
+                $_shippingCosts = (float)$this->getValue('shipping_costs') / (100 + $tax) * 100;
+                $this->setValue('net_shipping_costs', $_shippingCosts);
                 $taxes[$tax] += $this->getValue('shipping')->getTax();
             }
         }
@@ -481,7 +516,7 @@ class Order extends Model
 
         $this->setValue('taxes', $taxes);
         $this->setValue('discount', $discount);
-        $this->setValue('total', $this->getValue('shipping_costs') + array_sum($gross_prices));
+        $this->setValue('total', $this->getValue('shipping_costs') + $total);
 
         return [$errors, $_promotions];
     }
@@ -498,10 +533,14 @@ class Order extends Model
         }
 
         try {
-            $promotions = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.applyDiscounts', [], [
-                'Order'    => $this,
-                'products' => $products,
-            ]));
+            $promotions = \rex_extension::registerPoint(
+                new \rex_extension_point(
+                    'simpleshop.Order.applyDiscounts', [], [
+                                                         'Order'    => $this,
+                                                         'products' => $products,
+                                                     ]
+                )
+            );
         } catch (\Exception $ex) {
             $promotions = [];
             $errors[]   = ['label' => $ex->getLabelByCode()];
@@ -519,9 +558,7 @@ class Order extends Model
     {
         $result = $params->getSubject();
 
-        if ($result !== false && $params->getParam('table')
-                ->getTableName() == self::TABLE
-        ) {
+        if ($result !== false && $params->getParam('table')->getTableName() == self::TABLE) {
             // remove all related order products
             $obj_id = $params->getParam('data_id');
             $query  = "DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$obj_id}";
@@ -538,14 +575,16 @@ class Order extends Model
         }
 
         $fragment   = new \rex_fragment();
-        $Mpdf       = $_Mpdf ?: new \Kreatif\Mpdf\Mpdf([
-            'margin_left'   => 20,
-            'margin_right'  => 15,
-            'margin_top'    => 10,
-            'margin_bottom' => 34,
-            'margin_header' => 0,
-            'margin_footer' => 0,
-        ]);
+        $Mpdf       = $_Mpdf ?: new \Kreatif\Mpdf\Mpdf(
+            [
+                'margin_left'   => 20,
+                'margin_right'  => 15,
+                'margin_top'    => 10,
+                'margin_bottom' => 34,
+                'margin_header' => 0,
+                'margin_footer' => 0,
+            ]
+        );
         $invoiceNum = $this->getInvoiceNum();
 
         if ($invoiceNum == null) {
@@ -575,11 +614,17 @@ class Order extends Model
         $fragment->setVar('content', $content, false);
         $html = $fragment->parse('simpleshop/pdf/invoice/wrapper.php');
 
-        list($Mpdf, $html) = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.invoicePDFContent', [$Mpdf, $html], [
-            'order' => $this,
-        ]));
+        [$Mpdf, $html] = \rex_extension::registerPoint(
+            new \rex_extension_point(
+                'simpleshop.Order.invoicePDFContent', [$Mpdf, $html], [
+                                                        'order' => $this,
+                                                    ]
+            )
+        );
         if ($debug) {
-            echo \Wildcard::parse("<div style='background:#666;height:100vh;padding:20px;'><div style='max-width:800px;margin:0px auto;background:#fff;'>{$html}</div></div>");
+            echo \Wildcard::parse(
+                "<div style='background:#666;height:100vh;padding:20px;'><div style='max-width:800px;margin:0px auto;background:#fff;'>{$html}</div></div>"
+            );
             exit;
         }
         $Mpdf->WriteHTML($html);
@@ -600,8 +645,8 @@ class Order extends Model
             $grossTotal = array_sum($this->getValue('brut_prices'));
             $nettoTotal = array_sum($this->getValue('net_prices'));
 
-            $_percent   = $discount / $grossTotal;
-            $discount   = $nettoTotal * $_percent;
+            $_percent = $discount / $grossTotal;
+            $discount = $nettoTotal * $_percent;
         }
         return $discount;
     }
@@ -644,16 +689,18 @@ class Order extends Model
         $content  = '';
         $refId    = $this->getReferenceId();
         $fragment = new \rex_fragment();
-        $Mpdf     = new \Kreatif\Mpdf\Mpdf([
-            'orientation'      => 'L',
-            'margin_left'      => 20,
-            'margin_right'     => 15,
-            'margin_top'       => 5,
-            'margin_bottom'    => 5,
-            'margin_header'    => 10,
-            'margin_footer'    => 0,
-            'setAutoTopMargin' => 'pad',
-        ]);
+        $Mpdf     = new \Kreatif\Mpdf\Mpdf(
+            [
+                'orientation'      => 'L',
+                'margin_left'      => 20,
+                'margin_right'     => 15,
+                'margin_top'       => 5,
+                'margin_bottom'    => 5,
+                'margin_header'    => 10,
+                'margin_footer'    => 0,
+                'setAutoTopMargin' => 'pad',
+            ]
+        );
 
         $Mpdf->SetProtection(['print']);
         $Mpdf->SetDisplayMode('fullpage');
@@ -689,7 +736,7 @@ class Order extends Model
 
         if (!$Product) {
             \rex_api_simpleshop_be_api::$inst->errors[] = 'Product not found with ID: ' . $product_id;
-        } else if (!$Order) {
+        } elseif (!$Order) {
             \rex_api_simpleshop_be_api::$inst->errors[] = 'Oder not found with ID: ' . $order_id;
         } else {
             $Product->setValue('cart_quantity', 1);
@@ -711,7 +758,7 @@ class Order extends Model
 
         if (!$OrderProduct) {
             \rex_api_simpleshop_be_api::$inst->errors[] = 'OderProduct not found with ID: ' . $product_id;
-        } else if (!$Order) {
+        } elseif (!$Order) {
             \rex_api_simpleshop_be_api::$inst->errors[] = 'Oder not found with ID: ' . $order_id;
         } else {
             $Product = $OrderProduct->getValue('data');
@@ -747,7 +794,7 @@ class Order extends Model
 
         if (!$OrderProduct) {
             \rex_api_simpleshop_be_api::$inst->errors[] = 'OderProduct not found with ID: ' . $product_id;
-        } else if (!$Order) {
+        } elseif (!$Order) {
             \rex_api_simpleshop_be_api::$inst->errors[] = 'Oder not found with ID: ' . $order_id;
         } else {
             $Product = $OrderProduct->getValue('data');
@@ -766,10 +813,14 @@ class Order extends Model
 
             $Product->setValue('cart_quantity', $amount);
 
-            \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.before_be__changeProductQuantity', $Product, [
-                'Order'        => $Order,
-                'OrderProduct' => $OrderProduct,
-            ]));
+            \rex_extension::registerPoint(
+                new \rex_extension_point(
+                    'simpleshop.Order.before_be__changeProductQuantity', $Product, [
+                                                                           'Order'        => $Order,
+                                                                           'OrderProduct' => $OrderProduct,
+                                                                       ]
+                )
+            );
 
             $Order->saveOrderProduct($Product, true, $OrderProduct);
 

@@ -61,7 +61,7 @@ class CartController extends Controller
 
         if ($Coupon) {
             try {
-                $Coupon->applyToOrder($order, $order->getValue('brut_prices'));
+                $Coupon->applyToOrder($order, $order->getValue('net_prices'));
             }
             catch (CouponException $ex) {
                 Session::setCheckoutData('coupon_code', null);
@@ -106,6 +106,7 @@ class CartController extends Controller
 
         if (count($this->products)) {
             $this->setVar('products', $this->products);
+            $this->setVar('order', $order);
             $this->setVar('totals', $grossTotals);
             $this->setVar('discount', $discount);
             $this->fragment_path[] = 'simpleshop/cart/table-wrapper.php';

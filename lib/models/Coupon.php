@@ -102,7 +102,7 @@ class Coupon extends Discount
         );
     }
 
-    public function applyToOrder($Order, &$brut_prices, $name = '')
+    public function applyToOrder($Order, &$netPrices, $name = '')
     {
         $start   = strtotime($this->getValue('start_time') . ' 00:00:00');
         $endDate = $this->getValue('end_date');
@@ -172,7 +172,7 @@ class Coupon extends Discount
         } else {
             $discountName = 'coupon';
         }
-        $discount = parent::applyToOrder($Order, $brut_prices, $discountName);
+        $discount = parent::applyToOrder($Order, $netPrices, $discountName);
 
         if (isset ($_value)) {
             $this->setValue('discount_value', $_value);

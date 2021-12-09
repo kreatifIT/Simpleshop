@@ -56,6 +56,16 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
             </label>
         </dd>
     </dl>
+    <dl class="rex-form-group form-group">
+        <dt>Rabattfunktion</dt>
+        <dd>
+            <label class="form-label">
+                <input type="checkbox" name="not_apply_discounts_to_shipping" value="1" <?= from_array($Settings, 'not_apply_discounts_to_shipping') == 1 ? 'checked="checked"' : '' ?>/>
+                <span></span>
+                Rabatte Versand NICHT anwenden
+            </label>
+        </dd>
+    </dl>
 
     <br>
     <br>
