@@ -23,11 +23,6 @@ echo \rex_view::title($title);
 
 if ($_FUNC == 'save') {
     unset($_POST['func']);
-    $toUnset = array_diff_key($config, $_POST);
-
-    foreach ($toUnset as $_key => $_value) {
-        unset($config[$_key]);
-    }
     $config = array_merge($config, $_POST);
     \rex::setConfig($key, $config);
     echo \rex_view::info(\rex_i18n::msg('label.data_saved'));
