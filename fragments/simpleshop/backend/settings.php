@@ -37,7 +37,7 @@ $Settings = $this->getVar('Settings');
     <br/>
     <br/>
 
-    <?php if (DiscountGroup::isRegistered(DiscountGroup::TABLE)): ?>
+    <?php if (class_exists('\FriendsOfREDAXO\Simpleshop\DiscountGroup') && DiscountGroup::isRegistered(DiscountGroup::TABLE)): ?>
         <legend><?= $Addon->i18n('settings.discount_settings'); ?></legend>
         <dl class="rex-form-group form-group">
             <dt><?= $Addon->i18n('settings.discount_application'); ?></dt>
