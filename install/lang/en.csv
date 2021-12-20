@@ -211,3 +211,5 @@ action.add_product_amount_to_get_promotion;Add {{AMOUNT}} more products to secur
 action.reset;Reset
 label.subtotal;
 error.wsconnector_exception;Connector error
+label.order_ready_to_send;The order {{ODER_NUMBER}} is shipped
+label.order_ready_to_send_message;We are pleased to announce that the order is being prepared for shipment. The package can be tracked at the following link: {{TRACKING_URL}}

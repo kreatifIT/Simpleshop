@@ -272,6 +272,27 @@ $table = \FriendsOfREDAXO\Simpleshop\Order::TABLE;
     'attributes'  => '{"readonly":"readonly"}',
 ]);
 
+\Kreatif\Yform::ensureValueField($table, 'shipping_tracking_url', 'hidden_input', [
+    'label'     => 'Tracking-Url',
+    'prio'      => $prio++,
+], [
+     'db_type'     => 'varchar(191)',
+     'list_hidden' => 1,
+     'search'      => 0,
+ ]);
+
+\Kreatif\Yform::ensureValueField($table, 'shipping_info_sent', 'datestamp', [
+    'label' => 'Shipping info sent via mail',
+    'prio'  => $prio++,
+], [
+     'db_type'     => 'datetime',
+     'list_hidden' => 1,
+     'search'      => 0,
+     'format'      => 'Y-m-d H:i:s',
+     'only_empty'  => 2,
+     'show_value'  => 1,
+]);
+
 \Kreatif\Yform::ensureValueField($table, 'extras', 'data_output', [
     'label' => 'Extras',
     'prio'  => $prio++,

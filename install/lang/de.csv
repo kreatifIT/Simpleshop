@@ -213,3 +213,5 @@ action.add_product_price_to_get_promotion;Fügen Sie noch Waren im Wert von {{PR
 action.add_product_amount_to_get_promotion;Fügen Sie noch weitere {{AMOUNT}} Produkte hinzu um sich die Promotion "{{NAME}}" zu sichern
 label.subtotal;Zwischensumme
 error.wsconnector_exception;Connector error
+label.order_ready_to_send;Die Bestellung {{ODER_NUMBER}} wird versendet
+label.order_ready_to_send_message;Es freud uns dass soeben die Bestellung für den Versand vorbereitet wird. Unter folgendem Link kann das Paket verfolgt werden: {{TRACKING_URL}}

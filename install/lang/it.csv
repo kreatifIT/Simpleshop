@@ -211,3 +211,5 @@ action.back_to_overview;ritorna all'elenco
 action.reset;Ripristina
 label.subtotal;Subtotale
 error.wsconnector_exception;Connector error
+label.order_ready_to_send;L'ordine {{ODER_NUMBER}} viene spedito
+label.order_ready_to_send_message;Siamo lieti di annunciare che l'ordine è in preparazione per la spedizione. Il pacco può essere rintracciato al seguente link: {{TRACKING_URL}}

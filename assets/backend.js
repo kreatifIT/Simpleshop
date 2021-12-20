@@ -342,6 +342,38 @@ var SimpleshopBackend = (function ($) {
         }
     };
 
+    functions.saveTrackingUrl = function (_this) {
+        var $this = $(_this),
+            $container = $('[data-tracking-url-container]'),
+            loading = addLoading($container),
+            formData = $container.find('input').serialize(),
+            pjaxUrl = $this.prop('href');
+
+        window.setTimeout(function () {
+            var sendMail = window.confirm('Möchtest du dem Kunden den Link via Mail zusenden und den Status auf "Versendet" setzen?');
+
+            $.ajax({
+                url: pjaxUrl,
+                method: 'POST',
+                cache: false,
+                data: {
+                    sendMail: sendMail ? 1 : 0,
+                    formData: formData
+                }
+            }).done(function (resp) {
+                loading.remove();
+
+                if (typeof resp == 'string') {
+                    var $resp = $(resp);
+                    $container.html($resp.find('[data-tracking-url-container]').html());
+                } else {
+                    KreatifAddon.showAlert(resp.message);
+                }
+            });
+        }, 500);
+        return false;
+    };
+
     functions.changeOrderProductQuantity = function (_this, orderId, productId, oldAmount, event) {
         var which = window.event.which;
         if (which == 0 || which == 13 || which == 27) {

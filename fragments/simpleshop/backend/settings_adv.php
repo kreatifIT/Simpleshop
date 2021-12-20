@@ -88,6 +88,15 @@ $ma_contents = (array)\rex_extension::registerPoint(new \rex_extension_point('si
         </dd>
     </dl>
     <dl class="rex-form-group form-group">
+        <dt><?= $Addon->i18n('action.use_shipping_tracking'); ?></dt>
+        <dd>
+            <select name="use_shipping_tracking" class="form-control">
+                <option value="0"><?= $Addon->i18n('no'); ?></option>
+                <option value="1" <?= from_array($Settings, 'use_shipping_tracking') == 1 ? 'selected' : '' ?>><?= $Addon->i18n('yes'); ?></option>
+            </select>
+        </dd>
+    </dl>
+    <dl class="rex-form-group form-group">
         <dt><?= $Addon->i18n('action.use_invoicing'); ?></dt>
         <dd>
             <select name="use_invoicing" class="form-control">

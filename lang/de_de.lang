@@ -98,6 +98,7 @@ action.edit_product_add_feature = Dem Produkt die fehlenden Eigenschaften zuweis
 action.remove_all_variants = Alle Varianten entfernen
 action.remove = entfernen
 action.use_invoicing = Rechnungslegung verwenden
+action.use_shipping_tracking = Versand-Tracking aktivieren
 
 error.select_has_not_existing_variant = Achtung dieses Produkt besteht aus Varianten die nicht mehr existieren. Bitte kontrolliere die Daten und speichere das Produkt ab
 error.cannot_delete_category = Die Kategorie "{{name}}" kann nicht gelöscht werden da folgende Produkte noch verlinkt sind
