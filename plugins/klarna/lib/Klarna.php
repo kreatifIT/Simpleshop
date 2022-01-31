@@ -173,11 +173,6 @@ class Klarna extends PaymentAbstract
         $shippingAddr  = $Order->getShippingAddress();
         $country       = $shippingAddr->valueIsset('country') ? Country::get($shippingAddr->getValue('country')) : null;
         $langCode      = $this->getLangCode();
-        $shippingCosts = $Order->getValue('shipping_costs');
-
-        if ($shippingCosts > 0) {
-            $taxes += $shippingCosts / 122 * 22;
-        }
 
         $jsonBody = [
             'purchase_country'  => $country ? $country->getValue('iso2') : 'IT',
