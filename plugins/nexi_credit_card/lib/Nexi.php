@@ -137,6 +137,8 @@ class Nexi extends PaymentAbstract
     {
         $responses = $this->getValue('responses', []);
 
+        Utils::log('Nexi.processIPN.post_data', $post_data, 'INFO');
+
         if (isset($responses['initPayment']['payment_id']) && $responses['initPayment']['payment_id'] == $post_data['paymentid']) {
             $responses['processIPN'] = $post_data;
             $this->setValue('responses', $responses);
