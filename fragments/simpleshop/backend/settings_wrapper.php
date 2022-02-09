@@ -23,7 +23,11 @@ echo \rex_view::title($title);
 
 if ($_FUNC == 'save') {
     unset($_POST['func']);
-    $config = array_merge($config, $_POST);
+    if ('simpleshop.Settings' == $key) {
+        $config = array_merge($config, $_POST);
+    } else {
+        $config = $_POST;
+    }
     \rex::setConfig($key, $config);
     echo \rex_view::info(\rex_i18n::msg('label.data_saved'));
 }
