@@ -365,8 +365,20 @@ class CheckoutController extends Controller
                     $responses['authResponse'] = $jsonData;
                 }
                 $payment->setValue('responses', $responses);
+                $payment->validate();
                 $this->Order->setValue('payment', Order::prepareData($payment));
-            } catch (RuntimeException $ex) {
+            } catch (\Throwable $ex) {
+                $step = CheckoutController::getCurrentStep();
+                $paymentIsMissing = false;
+
+                if ($ex instanceof CartException && $ex->getCode() == 400) {
+                    $paymentIsMissing = true;
+                } else if ($ex instanceof RuntimeException && $step == 'shipping||payment' || $step == 'payment') {
+                    $paymentIsMissing = true;
+                }
+                if ($paymentIsMissing) {
+                    rex_redirect(null, null, array_merge($_GET, ['step' => $step, 'ts' => time(), 'error' => 'missing-payment']));
+                }
             }
 
             Session::setCheckoutData('Order', $this->Order);

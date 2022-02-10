@@ -39,6 +39,14 @@ class Klarna extends PaymentAbstract
         return parent::getName();
     }
 
+    public function validate()
+    {
+        if (!isset($this->getValue('responses')['authResponse'])) {
+            throw new CartException('auth token is missing', 400);
+        }
+        return parent::validate();
+    }
+
     protected function getLangCode(\rex_clang $clang = null)
     {
         if (!$clang) {

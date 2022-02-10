@@ -41,8 +41,11 @@ try {
 ?>
 
     <?php if ($response && count($response['payment_method_categories'])): ?>
+    <?php
+    $paymentCategories = array_values($response['payment_method_categories']);
+    ?>
 
-    <?php foreach ($response['payment_method_categories'] as $index => $paymentMethodCategory): ?>
+    <?php foreach ($paymentCategories as $index => $paymentMethodCategory): ?>
         <div class="cell large-6 xlarge-4">
             <?php
             $isSelected = $is_active && $payment->getValue('extension') == $paymentMethodCategory['identifier'];
@@ -52,7 +55,7 @@ try {
                 container: '#klarna-payments-container-{$paymentMethodCategory['identifier']}',
                 payment_method_category: '{$paymentMethodCategory['identifier']}'
             }, function (res) {
-                klarnaLoaded = " . (int)(($index - 1) == count($response['payment_method_categories'])) . ";
+                klarnaLoaded = " . (int)(($index + 1) == count($response['payment_method_categories'])) . ";
             });
         ";
             ?>
@@ -62,7 +65,8 @@ try {
                     <label>
                         <img src="<?= $paymentMethodCategory['asset_urls']['descriptive'] ?>">
 
-                        <input type="radio" name="payment" value="<?= $self->getPluginName() ?>.<?= $paymentMethodCategory['identifier'] ?>" <?= $isSelected ? 'checked="checked"' : '' ?>/>
+                        <input type="radio" name="payment" value="<?= $self->getPluginName(
+                        ) ?>.<?= $paymentMethodCategory['identifier'] ?>" <?= $isSelected ? 'checked="checked"' : '' ?>/>
                         <span class="radio"></span>
 
                         <div id="klarna-payments-container-<?= $paymentMethodCategory['identifier'] ?>"></div>

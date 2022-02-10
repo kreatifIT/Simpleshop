@@ -30,6 +30,10 @@ abstract class PaymentAbstract extends PluginAbstract
         return $this->name;
     }
 
+    public function validate() {
+        return true;
+    }
+
     public function getPrice($products = null)
     {
         return $this->price;
