@@ -718,6 +718,14 @@ class Order extends Model
         $fragment->setVar('content', $content, false);
         $html = $fragment->parse('simpleshop/pdf/invoice/wrapper.php');
 
+        [$Mpdf, $html] = \rex_extension::registerPoint(
+            new \rex_extension_point(
+                'simpleshop.Order.packingListPDFContent', [$Mpdf, $html], [
+                                                        'order' => $this,
+                                                    ]
+            )
+        );
+
         if ($debug) {
             echo "<div style='background:#666;height:100vh;padding:20px;'><div style='max-width:800px;margin:0px auto;background:#fff;'>{$html}</div></div>";
             exit;
