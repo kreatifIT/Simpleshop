@@ -45,7 +45,7 @@ class rex_yform_value_price_input extends rex_yform_value_number
                     $product = \FriendsOfREDAXO\Simpleshop\Product::get($variant->getValue('product_id'));
                     $product->setValue($this->getName(), $variant->getValue($this->getName()));
                 }
-                $this->setValue($product->getPrice(true));
+                $this->setValue($product->getPrice(true,  $this->getName() == 'reduced_price'));
             }
 
             $this->setValue(number_format((float)str_replace(',', '.', $this->getValue()), 2, '.', ''));
@@ -66,7 +66,7 @@ class rex_yform_value_price_input extends rex_yform_value_number
         $item  = \FriendsOfREDAXO\Simpleshop\Product::get($params['list']->getValue('id'));
         $field = \FriendsOfREDAXO\Simpleshop\Product::getYformFieldByName($params['field']);
 
-        return $item->valueIsset('tax') ? format_price($item->getPrice(true)) . " {$field->getElement('unit')}" : '';
+        return $item->valueIsset('tax') ? format_price($item->getPrice(true, $item->getName() == 'reduced_price')) . " {$field->getElement('unit')}" : '';
     }
 
     public function getDefinitions($values = [])
