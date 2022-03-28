@@ -45,7 +45,11 @@ class rex_yform_value_price_input extends rex_yform_value_number
                     $product = \FriendsOfREDAXO\Simpleshop\Product::get($variant->getValue('product_id'));
                     $product->setValue($this->getName(), $variant->getValue($this->getName()));
                 }
-                $this->setValue($product->getPrice(true,  $this->getName() == 'reduced_price'));
+                if ($this->getName() == 'reduced_price') {
+                    $this->setValue($product->getPrice(true, true, true));
+                } else {
+                    $this->setValue($product->getPrice(true, false));
+                }
             }
 
             $this->setValue(number_format((float)str_replace(',', '.', $this->getValue()), 2, '.', ''));

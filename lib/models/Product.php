@@ -72,7 +72,7 @@ class Product extends Model
         return $this->getValue('reduced_price') > 0;
     }
 
-    public function getPrice($includeTax = true, $use_reduced = true)
+    public function getPrice($includeTax = true, $use_reduced = true, $only_reduced = false)
     {
         $type     = $this->getValue('type');
         $price    = $this->getValue('price');
@@ -85,7 +85,11 @@ class Product extends Model
             $price      = $extras['price'];
         } else if ($use_reduced) {
             $reduced = $this->getValue('reduced_price');
-            $price   = $reduced > 0 ? $reduced : $price;
+            if($only_reduced) {
+                $price   = $reduced;
+            } else {
+                $price   = $reduced > 0 ? $reduced : $price;
+            }
         }
 
         $price = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Product.getPrice', $price, [
