@@ -48,8 +48,7 @@ class Order extends Model
         $products = OrderProduct::getAll(false, [
             'filter'  => [['order_id', $this->getId()]],
             'orderBy' => 'id',
-        ])
-            ->toArray();
+        ])->toArray();
 
 
         if (!$raw) {
@@ -87,9 +86,11 @@ class Order extends Model
             $invoice_num = null;
         }
 
-        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.getInvoiceNum', $invoice_num, [
-            'Order' => $this,
-        ]));
+        return \rex_extension::registerPoint(
+            new \rex_extension_point('simpleshop.Order.getInvoiceNum', $invoice_num, [
+                'Order' => $this,
+            ])
+        );
     }
 
     public function getTaxTotal()
@@ -113,15 +114,19 @@ class Order extends Model
 
         $result = $this->save(false);
 
-        return \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.completeOrder', $result, [
-            'Order' => $this,
-        ]));
+        return \rex_extension::registerPoint(
+            new \rex_extension_point('simpleshop.Order.completeOrder', $result, [
+                'Order' => $this,
+            ])
+        );
     }
 
     public function save($simple_save = true)
     {
         Utils::setCalcLocale();
-        \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.preSave', $this, ['finalize_order' => self::$_finalizeOrder, 'simple_save' => $simple_save]));
+        \rex_extension::registerPoint(
+            new \rex_extension_point('simpleshop.Order.preSave', $this, ['finalize_order' => self::$_finalizeOrder, 'simple_save' => $simple_save])
+        );
 
         $sql      = \rex_sql::factory();
         $date_now = date('Y-m-d H:i:s');
@@ -145,7 +150,6 @@ class Order extends Model
         $result = parent::save(true);
 
         if ($result && !$simple_save) {
-
             $order_id   = $this->getId();
             $promotions = $this->getValue('promotions');
 
@@ -177,8 +181,7 @@ class Order extends Model
                 }
             }
             // clear all products first
-            \rex_sql::factory()
-                ->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$order_id}");
+            \rex_sql::factory()->setQuery("DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$order_id}");
 
             $products = Session::getCartItems(false, false, false);
 
@@ -218,9 +221,11 @@ class Order extends Model
                 $OrderProduct->setValue('data', $product);
                 $OrderProduct->setValue('createdate', $date_now);
 
-                $OrderProduct = \rex_extension::registerPoint(new \rex_extension_point('simpleshop.Order.saveOrderProduct', $OrderProduct, [
-                    'Order' => $this,
-                ]));
+                $OrderProduct = \rex_extension::registerPoint(
+                    new \rex_extension_point('simpleshop.Order.saveOrderProduct', $OrderProduct, [
+                        'Order' => $this,
+                    ])
+                );
 
                 $OrderProduct->save(true);
             }
@@ -256,8 +261,7 @@ class Order extends Model
                 if (!$quantity) {
                     $quantity = $product->getValue('quantity');
                 }
-                $tax_perc = $this->isTaxFree() ? 0 : Tax::get($product->getValue('tax'))
-                    ->getValue('tax');
+                $tax_perc = $this->isTaxFree() ? 0 : Tax::get($product->getValue('tax'))->getValue('tax');
 
                 $net_prices[$tax_perc]   += (float)$product->getPrice(false) * $quantity;
                 $gross_prices[$tax_perc] += (float)$product->getPrice(!$this->isTaxFree()) * $quantity;
@@ -267,8 +271,10 @@ class Order extends Model
         // get shipping costs
         if ($this->getValue('shipping')) {
             try {
-                $this->setValue('shipping_costs', (float)$this->getValue('shipping')
-                    ->getNetPrice($this, $products));
+                $this->setValue(
+                    'shipping_costs',
+                    (float)$this->getValue('shipping')->getNetPrice($this, $products)
+                );
             } catch (\Exception $ex) {
                 $msg = trim($ex->getLabelByCode());
 
@@ -374,13 +380,11 @@ class Order extends Model
 
         // set shipping costs
         if ($this->getValue('shipping_costs') > 0 && !$this->isTaxFree()) {
-            $tax = $this->getValue('shipping')
-                ->getTaxPercentage();
+            $tax = $this->getValue('shipping')->getTaxPercentage();
 
             if ($tax > 0) {
                 $this->setValue('shipping_costs', (float)$this->getValue('shipping_costs') / (100 + $tax) * 100);
-                $taxes[$tax] += $this->getValue('shipping')
-                    ->getTax();
+                $taxes[$tax] += $this->getValue('shipping')->getTax();
             }
         }
         ksort($taxes);
@@ -420,9 +424,7 @@ class Order extends Model
     {
         $result = $params->getSubject();
 
-        if ($result !== false && $params->getParam('table')
-                ->getTableName() == self::TABLE
-        ) {
+        if ($result !== false && $params->getParam('table')->getTableName() == self::TABLE) {
             // remove all related order products
             $obj_id = $params->getParam('data_id');
             $query  = "DELETE FROM " . OrderProduct::TABLE . " WHERE order_id = {$obj_id}";
@@ -507,20 +509,25 @@ class Order extends Model
         $iDate       = date('Y-m-d', $iDateTs);
         $totalnetto  = number_format(abs($this->getValue('total')) / 122 * 100, 2, '.', '');
         $totalbrutto = number_format($totalnetto * 1.22, 2, '.', '');
-        $street      = explode(' ', $Customer->getValue('street', false, 'Via/Str 1'));
-        
-        if (count($street) <= 1) {
-            $number = 1;
+
+        $address    = $Customer->getValue('street', false, 'Via/Str 1');
+        $streetName = explode(' ', $Customer->getValue('street', false, 'Via/Str 1'));
+        preg_match('/^([^\d]*[^\d\s]) *(\d.*)$/', $address, $match);
+
+        if (count($match) <= 2) {
+            $streetName = $address;
+            $streetNr   = 1;
         } else {
-            $number = array_pop($street);
+            $streetName = $match[1];
+            $streetNr   = $match[2];
         }
 
         $xmlData["document_lines"]                  = [];
         $xmlData['document_type']                   = $this->getValue('status') == 'CN' ? 'TD04' : 'TD01';
         $xmlData['receiver_name']                   = trim($Customer->getName());
         $xmlData['receiver_private_vat_number']     = mb_strtoupper($Customer->getValue('fiscal_code'));
-        $xmlData['receiver_head_quarter_street']    = implode(' ', $street);
-        $xmlData['receiver_head_quarter_street_no'] = $number;
+        $xmlData['receiver_head_quarter_street']    = $streetName;
+        $xmlData['receiver_head_quarter_street_no'] = $streetNr;
         $xmlData['receiver_head_quarter_zip']       = $Customer->getValue('postal', false, '00000');
         $xmlData['receiver_head_quarter_city']      = $Customer->getValue('location', false, 'I');
         $xmlData['receiver_head_quarter_province']  = 'BZ';
