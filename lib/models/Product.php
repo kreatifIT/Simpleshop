@@ -292,7 +292,9 @@ class Product extends Model
     {
         list ($product_id, $variant_key) = explode('|', $variant_key);
 
-        $Object = self::get($product_id);
+        // otherwise existing products will be overwritten, even if they are not in the package and exists itself
+        // (f.e. kellerei-kurtatsch -> Caliz, Arenis & Curtis + Arenis  0,357l = Arenis 0,357l gets price from package variant )
+        $Object = clone self::get($product_id);
 
         if ($Object && strlen($variant_key)) {
             $Object = $Object->getVariant($variant_key);
