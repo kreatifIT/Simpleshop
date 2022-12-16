@@ -89,6 +89,15 @@ class CheckoutController extends Controller
                 break;
 
             case 'cancelled':
+                $invoiceAddress = $this->Order->getInvoiceAddress();
+                if (!$invoiceAddress) {
+                    \rex_logger::logError(E_NOTICE, 'Called Order-Cancelled, but not valid order ( address is missing )', __FILE__, __LINE__);
+                    // no invoice address - redirect to shopping cart
+                    \rex_response::sendCacheControl();
+                    \rex_response::setStatus(\rex_response::HTTP_MOVED_TEMPORARILY);
+                    \rex_redirect($this->settings['linklist']['cart'], null, ['ts' => time()]);
+                }
+
                 return $this->cancelPayment();
 
             case 'complete':
