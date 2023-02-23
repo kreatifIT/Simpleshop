@@ -202,7 +202,7 @@ class PayPalExpress extends PaymentAbstract
             Response: " . print_r($__response, true) . "
         ";
 
-        if ($__response['ACK'] != 'Success') {
+        if ($__response['ACK'] != 'Success' && $__response['ACK'] != 'SuccessWithWarning') {
             if ($__response['L_ERRORCODE0'] == 10486) {
                 Utils::log('Paypal.processPayment.response4', $logMsg, 'WARNING', true);
 
@@ -214,6 +214,7 @@ class PayPalExpress extends PaymentAbstract
                 throw new PaypalException($__response['L_LONGMESSAGE0'], $__response['L_ERRORCODE0']);
             }
         }
+
         if ($__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Completed' && $__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Pending' && $__response['PAYMENTINFO_0_PAYMENTSTATUS'] != 'Completed_Funds_Held') {
             $logMsg = "
                 The Payment with Transaction-ID = {$__response['PAYMENTINFO_0_TRANSACTIONID']} " . "has status = '{$__response['PAYMENTINFO_0_PAYMENTSTATUS']}'
