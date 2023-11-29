@@ -82,13 +82,7 @@ class Coupon extends Discount
 
     protected function apply($method, $Order, &$brut_prices)
     {
-		$brut_prices = (array)\rex_extension::registerPoint(
-			new \rex_extension_point('simpleshop.coupon.apply', $brut_prices, [
-				'method' => $method,
-				'Order'  => $Order,
-				'Coupon' => $this,
-			])
-		);
+
         $start   = strtotime($this->getValue('start_time') . ' 00:00:00');
         $end     = $this->getValue('end_time') != '' ? strtotime($this->getValue('end_time') . ' 23:59:59') : null;
         $value   = $this->getValue('discount_value');
