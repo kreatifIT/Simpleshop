@@ -20,3 +20,5 @@ if (is_readable(__DIR__ . '/vendor/autoload.php')) {
 }
 
 Shipping::register(DfiShipping::class, 'dfi_shipping');
+
+\rex_extension::register('simpleshop.Order.completeOrder', [DfiOrderHandler::class, 'ext_completeOrder']);

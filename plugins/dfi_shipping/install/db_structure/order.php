@@ -21,6 +21,8 @@ $maxPrio = (int) $sql->getArray(
     ['table' => $table]
 )[0]['max_prio'];
 
+$prio = $maxPrio + 1;
+
 Yform::ensureValueField(
     $table,
     'shipping_api_response',
@@ -31,7 +33,40 @@ Yform::ensureValueField(
         'label'       => 'DFI Shipping API Response',
     ],
     [
-        'prio'    => $maxPrio + 1,
+        'prio'    => $prio++,
+        'db_type' => 'text',
+    ]
+);
+
+Yform::ensureValueField(
+    $table,
+    'dfi_addorder_sent_at',
+    'datestamp',
+    [
+        'list_hidden' => 1,
+        'search'      => 0,
+        'label'       => 'DFI Addorder übertragen am',
+    ],
+    [
+        'prio'       => $prio++,
+        'db_type'    => 'datetime',
+        'format'     => 'Y-m-d H:i:s',
+        'only_empty' => 0,
+        'show_value' => 1,
+    ]
+);
+
+Yform::ensureValueField(
+    $table,
+    'dfi_addorder_response',
+    'data_output',
+    [
+        'list_hidden' => 1,
+        'search'      => 0,
+        'label'       => 'DFI Addorder API Response',
+    ],
+    [
+        'prio'    => $prio++,
         'db_type' => 'text',
     ]
 );
