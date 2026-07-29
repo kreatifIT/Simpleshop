@@ -415,6 +415,11 @@ class Order extends Model
         if ($shipping && $shipping->hasCosts()) {
             try {
                 $this->setValue('shipping_costs', (float)$shipping->getGrossPrice($this, $products));
+
+                $apiResponse = $shipping->getApiResponse();
+                if ($apiResponse !== null) {
+                    $this->setValue('shipping_api_response', json_encode($apiResponse));
+                }
             } catch (\Exception $ex) {
                 $msg = trim($ex->getLabelByCode());
 

@@ -53,7 +53,6 @@ class Dfi
             'cart_total'      => $cartTotal,
             'products'        => $products,
         ];
-        pr($payload);
 
         return $this->post('/v2/shipping', $payload);
     }

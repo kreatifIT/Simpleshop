@@ -20,6 +20,7 @@ class DfiShipping extends ShippingAbstract
 
     protected $tax_percentage = 22;
     protected $fees           = 0.0;
+    protected $apiResponse    = null;
 
     /**
      * Request-level cache keyed by calculation input. Order::getValue('shipping')
@@ -61,6 +62,15 @@ class DfiShipping extends ShippingAbstract
     }
 
     /**
+     * Raw /v2/shipping response of the last calculatePrice() call (or cache
+     * hit), so the order can record exactly what DFI returned.
+     */
+    public function getApiResponse()
+    {
+        return $this->apiResponse;
+    }
+
+    /**
      * Calculates the shipping price via the DFI API, based on the shipping
      * address' country/postcode. SKU is rex_shop_product_has_feature.code for
      * products with a variant, or rex_shop_product.ax_code for products
@@ -98,23 +108,25 @@ class DfiShipping extends ShippingAbstract
         $cacheKey  = md5(json_encode([$country, $postcode, $dfiProducts, $cartTotal]));
 
         if (isset(self::$cache[$cacheKey])) {
-            $this->fees = self::$cache[$cacheKey]['fees'];
+            $this->fees        = self::$cache[$cacheKey]['fees'];
+            $this->apiResponse = self::$cache[$cacheKey]['response'];
             return self::$cache[$cacheKey]['price'];
         }
 
         try {
             $dfi      = new Dfi();
             $response = $dfi->estimateShipping($country, $postcode, $dfiProducts, false, 0.0, $cartTotal);
-            pr($response, 'blue');
-            $this->fees = (float) ($response->fees ?? 0);
-            $price      = (float) $response->shipping_cost + $this->fees;
+            $this->fees        = (float) ($response->fees ?? 0);
+            $this->apiResponse = (array) $response;
+            $price             = (float) $response->shipping_cost + $this->fees;
 
-            self::$cache[$cacheKey] = ['price' => $price, 'fees' => $this->fees];
+            self::$cache[$cacheKey] = ['price' => $price, 'fees' => $this->fees, 'response' => $this->apiResponse];
 
             return $price;
         } catch (DfiException $e) {
             \rex_logger::logException($e);
-            $this->fees = 0.0;
+            $this->fees        = 0.0;
+            $this->apiResponse = null;
             return (float) $order->getValue('shipping_costs');
         }
     }
