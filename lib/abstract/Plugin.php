@@ -53,7 +53,10 @@ abstract class Plugin
     public static function getByClass($class, $extension = '')
     {
         if (!array_key_exists($class, self::$classes[static::$type])) {
-            throw new RuntimeException("'{$class}' is not as registered " . static::$type . " class");
+            // class exists on disk but its plugin was deactivated after being
+            // referenced by a stale session/order - treat like "not found"
+            // instead of crashing, so callers can fall back gracefully.
+            return null;
         }
         $_this = new $class();
         // check if is extended from abstract

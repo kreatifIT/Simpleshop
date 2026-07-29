@@ -1,0 +1,9 @@
+package: simpleshop/dfi_shipping
+version: '1.0'
+author: Kreatif GmbH
+
+page:
+    title: DFI
+    perm: shop[dfi_shipping]
+    subpages:
+        settings: { title: translate:settings, hidden: true }

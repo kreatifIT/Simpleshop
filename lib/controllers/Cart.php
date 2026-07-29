@@ -156,7 +156,7 @@ class CartController extends Controller
             $this->setVar('totals', $grossTotals);
             $this->setVar('discount', $discount);
             $this->setVar('shipping', $shipping);
-            $this->setVar('shipping_costs', $order->getShippingCosts());
+            $this->setVar('shipping_costs', $order->getValue('shipping_costs'));
             $this->setVar('promotions', $promotions);
             $this->setVar('upselling_promotions', $upsellingPromotions, false);
             $this->fragment_path[] = 'simpleshop/cart/table-wrapper.php';
