@@ -41,7 +41,7 @@ class DfiShipping extends ShippingAbstract
 
     public function getGrossPrice(Order $order, $products = null)
     {
-        $this->price = $this->calculatePrice($order, $products ?: $order->getOrderProducts());
+        $this->price = $this->resolvePrice($order, $products ?: $order->getOrderProducts());
         return $this->price;
     }
 
@@ -68,6 +68,71 @@ class DfiShipping extends ShippingAbstract
     public function getApiResponse()
     {
         return $this->apiResponse;
+    }
+
+    /**
+     * Decides, based on the backend settings (simpleshop.DfiShipping.Settings),
+     * whether the price for this order comes from a manually configured value
+     * or from a live DFI calculation - mirroring DefaultShipping's country/
+     * min-order-tier lookup, but with a per-tier "use_dfi" toggle:
+     *
+     *   - a per-country tier matching the order's subtotal, with use_dfi off
+     *     -> its manually configured cost + DFI's fees
+     *   - a per-country tier matching the order's subtotal, with use_dfi on
+     *     -> live DFI calculation (shipping_cost + fees)
+     *   - no matching country config, but subtotal reaches general_free_shipping
+     *     -> free shipping (0) + DFI's fees
+     *   - no matching country config, general_use_dfi on -> live DFI calculation
+     *   - no matching country config, general_use_dfi off -> general_costs + DFI's fees
+     *
+     * The "fees" (excise duty / Akzise) always come from DFI regardless of the
+     * manual/DFI toggle - it's a tax obligation, not a shipping-price choice,
+     * so calculatePrice() runs on every path to fetch it (its own request-level
+     * cache keeps this to a single live call either way).
+     *
+     * Tiers are evaluated in the order they're configured (like DefaultShipping),
+     * so they must be entered highest-min_order-first in the settings table.
+     */
+    protected function resolvePrice(Order $order, $products)
+    {
+        $Settings  = \rex::getConfig('simpleshop.DfiShipping.Settings', []);
+        $countryId = $this->getValue('country_id');
+
+        if (!$countryId) {
+            $address   = $order->getShippingAddress();
+            $countryId = $address ? $address->getValue('country') : null;
+        }
+
+        $customer = $order->getCustomerData();
+        $total    = $order->getSubtotal(!$customer->isTaxFree());
+
+        if ($countryId && isset($Settings['costs'][$countryId])) {
+            foreach ($Settings['costs'][$countryId] as $minOrder => $tier) {
+                if ($total >= $minOrder) {
+                    $dfiPrice = $this->calculatePrice($order, $products);
+
+                    if (!empty($tier['use_dfi'])) {
+                        return $dfiPrice;
+                    }
+                    return (float) ($tier['cost'] ?? 0) + $this->fees;
+                }
+            }
+        }
+
+        $freeShipping = (float) ($Settings['general_free_shipping'] ?? 0);
+
+        if ($freeShipping > 0 && $total >= $freeShipping) {
+            $this->calculatePrice($order, $products);
+            return 0.0 + $this->fees;
+        }
+
+        $dfiPrice = $this->calculatePrice($order, $products);
+
+        if (!empty($Settings['general_use_dfi'])) {
+            return $dfiPrice;
+        }
+
+        return (float) ($Settings['general_costs'] ?? 0) + $this->fees;
     }
 
     /**

@@ -21,4 +21,8 @@ if (is_readable(__DIR__ . '/vendor/autoload.php')) {
 
 Shipping::register(DfiShipping::class, 'dfi_shipping');
 
-\rex_extension::register('simpleshop.Order.completeOrder', [DfiOrderHandler::class, 'ext_completeOrder']);
+// Vorerst deaktiviert: Bestellungen sollen nicht automatisch bei
+// Bestellabschluss an DFI übertragen werden, sondern nur manuell über den
+// "Bestellung erneut an DFI übertragen"-Button im Backend (order_functions.php).
+// DfiOrderHandler::submit() bleibt dafür unverändert nutzbar.
+// \rex_extension::register('simpleshop.Order.completeOrder', [DfiOrderHandler::class, 'ext_completeOrder']);
