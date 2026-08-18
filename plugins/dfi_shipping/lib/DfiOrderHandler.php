@@ -64,12 +64,23 @@ class DfiOrderHandler
             ];
         }
 
-        // shipping_api_response holds the raw /v2/shipping response recorded
-        // during checkout - read shipping_cost/fees from there rather than
-        // via the (by-then freshly reconstructed) shipping plugin instance.
-        $rawShippingResponse = json_decode((string) $order->getValue('shipping_api_response'), true) ?: [];
-        $shippingCost        = (float) ($rawShippingResponse['shipping_cost'] ?? $order->getValue('shipping_costs'));
-        $fees                = (float) ($rawShippingResponse['fees'] ?? 0);
+        // Recalculate fees (Akzise) live via DFI at submission time rather
+        // than reusing the response stored during checkout - submit() can
+        // run much later via the manual "resend to DFI" backend button, by
+        // which point the checkout-time figures may be stale.
+        $shipping     = $order->getValue('shipping');
+        $shippingCost = (float) $order->getValue('shipping_costs');
+        $fees         = 0.0;
+
+        if ($shipping instanceof DfiShipping) {
+            $shipping->getGrossPrice($order);
+            $fees = $shipping->getExciseFees();
+
+            $apiResponse = $shipping->getApiResponse();
+            if ($apiResponse !== null) {
+                $shippingCost = (float) ($apiResponse['shipping_cost'] ?? $shippingCost);
+            }
+        }
 
         $order->setValue('dfi_addorder_sent_at', date('Y-m-d H:i:s'));
 
