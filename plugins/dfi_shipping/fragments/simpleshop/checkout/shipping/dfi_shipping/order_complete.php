@@ -13,4 +13,3 @@
 namespace FriendsOfREDAXO\Simpleshop;
 
 ?>
-<p class="text-center margin-bottom">###simpleshop.order_complete_dfi_shipping_text###</p>
