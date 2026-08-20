@@ -171,6 +171,8 @@ class DfiShipping extends ShippingAbstract
         $address = $order->getShippingAddress();
 
         if (!$address || count($products) < 1) {
+            // TEMP DEBUG - remove after diagnosing test-system 0-cost issue
+            \rex_logger::factory()->log('debug', 'DFI DEBUG: no-address/no-products branch. address=' . ($address ? 'yes' : 'no') . ' products=' . count($products), [], __FILE__, __LINE__);
             $this->shippingCost = (float) $order->getValue('shipping_costs');
             return $this->shippingCost;
         }
@@ -180,9 +182,14 @@ class DfiShipping extends ShippingAbstract
         $postcode = $address->getValue('postal');
 
         if (!$country || !$postcode) {
+            // TEMP DEBUG - remove after diagnosing test-system 0-cost issue
+            \rex_logger::factory()->log('debug', 'DFI DEBUG: missing country/postcode. address_country_id=' . var_export($address->getValue('country'), true) . ' Country_object=' . ($Country ? 'resolved(id=' . $Country->getId() . ',iso2=' . $Country->getValue('iso2') . ')' : 'NULL') . ' postal=' . var_export($postcode, true), [], __FILE__, __LINE__);
             $this->shippingCost = (float) $order->getValue('shipping_costs');
             return $this->shippingCost;
         }
+
+        // TEMP DEBUG - remove after diagnosing test-system 0-cost issue
+        \rex_logger::factory()->log('debug', 'DFI DEBUG: proceeding to API call. country=' . $country . ' postcode=' . $postcode, [], __FILE__, __LINE__);
 
         $dfiProducts = [];
         foreach ($products as $product) {
