@@ -97,6 +97,12 @@ class Dfi
                 throw new DfiException("DFI API: invalid JSON response for {$path}");
             }
 
+            if (isset($body->status) && false === $body->status) {
+                throw new DfiException(
+                    "DFI API request failed [{$path}]: " . ($body->error ?? 'unknown error')
+                );
+            }
+
             return $body;
         } catch (GuzzleException $e) {
             \rex_logger::logException($e);

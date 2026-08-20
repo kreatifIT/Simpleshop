@@ -12,6 +12,7 @@
 
 namespace FriendsOfREDAXO\Simpleshop;
 
+use Kreatif\Mail;
 use Sprog\Wildcard;
 
 class DfiShipping extends ShippingAbstract
@@ -163,17 +164,18 @@ class DfiShipping extends ShippingAbstract
      * products with a variant, or rex_shop_product.ax_code for products
      * without one (applyVariantData() only sets variant_key when a variant
      * was applied, so its absence marks a variant-less product).
-     * Falls back to the order's previously stored shipping_costs on any error
-     * (missing address, API failure) so checkout is never blocked by the API.
+     * Falls back to the general_costs setting on any error (missing address,
+     * API failure) so checkout is never blocked by the API - the order's
+     * previously stored shipping_costs isn't used here, since for a not-yet
+     * calculated order that's just 0.
      */
     protected function calculatePrice(Order $order, $products)
     {
-        $address = $order->getShippingAddress();
+        $generalCosts = (float) (\rex::getConfig('simpleshop.DfiShipping.Settings', [])['general_costs'] ?? 0);
+        $address      = $order->getShippingAddress();
 
         if (!$address || count($products) < 1) {
-            // TEMP DEBUG - remove after diagnosing test-system 0-cost issue
-            \rex_logger::factory()->log('debug', 'DFI DEBUG: no-address/no-products branch. address=' . ($address ? 'yes' : 'no') . ' products=' . count($products), [], __FILE__, __LINE__);
-            $this->shippingCost = (float) $order->getValue('shipping_costs');
+            $this->shippingCost = $generalCosts;
             return $this->shippingCost;
         }
 
@@ -182,14 +184,9 @@ class DfiShipping extends ShippingAbstract
         $postcode = $address->getValue('postal');
 
         if (!$country || !$postcode) {
-            // TEMP DEBUG - remove after diagnosing test-system 0-cost issue
-            \rex_logger::factory()->log('debug', 'DFI DEBUG: missing country/postcode. address_country_id=' . var_export($address->getValue('country'), true) . ' Country_object=' . ($Country ? 'resolved(id=' . $Country->getId() . ',iso2=' . $Country->getValue('iso2') . ')' : 'NULL') . ' postal=' . var_export($postcode, true), [], __FILE__, __LINE__);
-            $this->shippingCost = (float) $order->getValue('shipping_costs');
+            $this->shippingCost = $generalCosts;
             return $this->shippingCost;
         }
-
-        // TEMP DEBUG - remove after diagnosing test-system 0-cost issue
-        \rex_logger::factory()->log('debug', 'DFI DEBUG: proceeding to API call. country=' . $country . ' postcode=' . $postcode, [], __FILE__, __LINE__);
 
         $dfiProducts = [];
         foreach ($products as $product) {
@@ -230,8 +227,44 @@ class DfiShipping extends ShippingAbstract
             \rex_logger::logException($e);
             $this->fees         = 0.0;
             $this->apiResponse  = null;
-            $this->shippingCost = (float) $order->getValue('shipping_costs');
+            $this->shippingCost = $generalCosts;
+
+            self::notifyApiFailure($order, $e, $this->shippingCost);
+
+            // Cache the failure too - otherwise the still-broken API would
+            // be hit again (and another notification sent) on every one of
+            // the several calculatePrice() calls per request.
+            self::$cache[$cacheKey] = [
+                'price'        => $this->shippingCost,
+                'fees'         => 0.0,
+                'response'     => null,
+                'shippingCost' => $this->shippingCost,
+            ];
+
             return $this->shippingCost;
         }
+    }
+
+    /**
+     * Alerts the project's tablet_mail_recipient whenever the DFI shipping
+     * calculation fails and falls back to the general_costs setting, so a
+     * broken API token/connection doesn't go unnoticed.
+     */
+    protected static function notifyApiFailure(Order $order, DfiException $e, float $fallbackCost): void
+    {
+        $recipient = \Kreatif\Project\Settings::getValue('tablet_mail_recipient');
+
+        if (!$recipient) {
+            return;
+        }
+
+        $mail          = new Mail();
+        $mail->Subject = 'DFI Versandkosten-Berechnung fehlgeschlagen - Bestellung ' . $order->getReferenceId();
+        $mail->setVar('order', $order);
+        $mail->setVar('errorMessage', $e->getMessage());
+        $mail->setVar('fallbackCost', $fallbackCost);
+        $mail->setVar('fragment_path', 'simpleshop/email/dfi_api_failure.php');
+        $mail->addAddress($recipient);
+        $mail->send();
     }
 }
