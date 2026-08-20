@@ -87,6 +87,40 @@ class Dfi
         return $this->post('/v2/addorder', $payload);
     }
 
+    /**
+     * Registers a pre-order ("pre-ordine") with DFI - same payload shape as
+     * addOrder(), sent right at checkout completion rather than after a
+     * manual review.
+     *
+     * @param string $orderId
+     * @param array  $customerData  {customer, address, city, state, postcode, country, phone, email}
+     * @param array  $products      [['qty' => int, 'sku' => string, 'total_without_tax' => float], ...]
+     * @param array  $options       {insurance, order_notes, parcels_info, total, vat, shipping_cost, fees, country}
+     * @return object
+     * @throws DfiException
+     */
+    public function addPreOrder(
+        string $orderId,
+        array $customerData,
+        array $products,
+        array $options = []
+    ): object {
+        $payload = array_merge([
+            'order_id'      => $orderId,
+            'customer_data' => $customerData,
+            'products'      => $products,
+            'insurance'     => false,
+            'order_notes'   => '',
+            'parcels_info'  => ['parcels' => 1, 'details' => []],
+            'total'         => 0.0,
+            'vat'           => 0.0,
+            'shipping_cost' => 0.0,
+            'fees'          => 0.0,
+        ], $options);
+
+        return $this->post('/v2/pad/addorder', $payload);
+    }
+
     private function post(string $path, array $payload): object
     {
         try {

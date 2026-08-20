@@ -71,5 +71,38 @@ Yform::ensureValueField(
     ]
 );
 
+Yform::ensureValueField(
+    $table,
+    'dfi_preorder_sent_at',
+    'datestamp',
+    [
+        'list_hidden' => 1,
+        'search'      => 0,
+        'label'       => 'DFI Pre-Ordine übertragen am',
+    ],
+    [
+        'prio'       => $prio++,
+        'db_type'    => 'datetime',
+        'format'     => 'Y-m-d H:i:s',
+        'only_empty' => 0,
+        'show_value' => 1,
+    ]
+);
+
+Yform::ensureValueField(
+    $table,
+    'dfi_preorder_response',
+    'data_output',
+    [
+        'list_hidden' => 1,
+        'search'      => 0,
+        'label'       => 'DFI Pre-Ordine API Response',
+    ],
+    [
+        'prio'    => $prio++,
+        'db_type' => 'text',
+    ]
+);
+
 $yTable = \rex_yform_manager_table::get($table);
 \rex_yform_manager_table_api::generateTableAndFields($yTable);
