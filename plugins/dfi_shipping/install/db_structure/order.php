@@ -51,7 +51,7 @@ Yform::ensureValueField(
         'prio'       => $prio++,
         'db_type'    => 'datetime',
         'format'     => 'Y-m-d H:i:s',
-        'only_empty' => 0,
+        'only_empty' => 2,
         'show_value' => 1,
     ]
 );
@@ -84,7 +84,7 @@ Yform::ensureValueField(
         'prio'       => $prio++,
         'db_type'    => 'datetime',
         'format'     => 'Y-m-d H:i:s',
-        'only_empty' => 0,
+        'only_empty' => 2,
         'show_value' => 1,
     ]
 );
