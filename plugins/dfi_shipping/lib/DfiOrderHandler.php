@@ -27,9 +27,11 @@ class DfiOrderHandler
 
     /**
      * Transmits the completed order to DFI via /v2/addorder.
-     * Always records the transmission timestamp and the raw response (or
-     * error) on the order, and never lets a failed transmission interrupt
-     * order completion - failures are logged instead.
+     * dfi_addorder_sent_at is only set on a successful transmission, so it
+     * reflects whether the order actually reached DFI, not just that a
+     * submission was attempted; the raw response (or error) is always
+     * recorded regardless, and a failed transmission never interrupts order
+     * completion - failures are logged instead.
      */
     public static function submit(Order $order): void
     {
@@ -64,25 +66,21 @@ class DfiOrderHandler
             ];
         }
 
-        // Recalculate fees (Akzise) live via DFI at submission time rather
-        // than reusing the response stored during checkout - submit() can
-        // run much later via the manual "resend to DFI" backend button, by
-        // which point the checkout-time figures may be stale.
+        // Recalculate live via DFI at submission time rather than reusing
+        // the values stored during checkout - submit() can run much later
+        // via the manual "resend to DFI" backend button, by which point the
+        // checkout-time figures may be stale. shipping_cost reflects what
+        // was actually charged (manual value if the manual/DFI toggle
+        // resolved to manual), while fees always come from DFI itself.
         $shipping     = $order->getValue('shipping');
         $shippingCost = (float) $order->getValue('shipping_costs');
         $fees         = 0.0;
 
         if ($shipping instanceof DfiShipping) {
             $shipping->getGrossPrice($order);
-            $fees = $shipping->getExciseFees();
-
-            $apiResponse = $shipping->getApiResponse();
-            if ($apiResponse !== null) {
-                $shippingCost = (float) ($apiResponse['shipping_cost'] ?? $shippingCost);
-            }
+            $fees         = $shipping->getExciseFees();
+            $shippingCost = $shipping->getShippingCost();
         }
-
-        $order->setValue('dfi_addorder_sent_at', date('Y-m-d H:i:s'));
 
         try {
             $dfi      = new Dfi();
@@ -101,6 +99,7 @@ class DfiOrderHandler
                 ]
             );
             $order->setValue('dfi_addorder_response', json_encode($response));
+            $order->setValue('dfi_addorder_sent_at', date('Y-m-d H:i:s'));
         } catch (DfiException $e) {
             \rex_logger::logException($e);
             $order->setValue('dfi_addorder_response', json_encode(['error' => $e->getMessage()]));

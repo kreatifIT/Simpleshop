@@ -23,6 +23,15 @@ class DfiShipping extends ShippingAbstract
     protected $apiResponse    = null;
 
     /**
+     * The shipping cost portion actually charged (manual value if the
+     * manual/DFI toggle resolved to manual, DFI's own shipping_cost
+     * otherwise) - excluding fees, unlike getGrossPrice()'s combined total.
+     * Used when submitting the order to DFI, so DFI is told what was really
+     * charged rather than always its own calculated figure.
+     */
+    protected $shippingCost = 0.0;
+
+    /**
      * Request-level cache keyed by calculation input. Order::getValue('shipping')
      * reconstructs a fresh ShippingAbstract instance on every call (Kreatif Model's
      * class/data unprepareValue), so per-instance caching of $price/$fees doesn't
@@ -71,6 +80,16 @@ class DfiShipping extends ShippingAbstract
     }
 
     /**
+     * The shipping cost portion of the last resolvePrice() call, excluding
+     * fees - the manually configured value when the manual/DFI toggle
+     * resolved to manual, DFI's own shipping_cost otherwise.
+     */
+    public function getShippingCost(): float
+    {
+        return $this->shippingCost;
+    }
+
+    /**
      * Decides, based on the backend settings (simpleshop.DfiShipping.Settings),
      * whether the price for this order comes from a manually configured value
      * or from a live DFI calculation - mirroring DefaultShipping's country/
@@ -114,7 +133,8 @@ class DfiShipping extends ShippingAbstract
                     if (!empty($tier['use_dfi'])) {
                         return $dfiPrice;
                     }
-                    return (float) ($tier['cost'] ?? 0) + $this->fees;
+                    $this->shippingCost = (float) ($tier['cost'] ?? 0);
+                    return $this->shippingCost + $this->fees;
                 }
             }
         }
@@ -123,6 +143,7 @@ class DfiShipping extends ShippingAbstract
 
         if ($freeShipping > 0 && $total >= $freeShipping) {
             $this->calculatePrice($order, $products);
+            $this->shippingCost = 0.0;
             return 0.0 + $this->fees;
         }
 
@@ -132,7 +153,8 @@ class DfiShipping extends ShippingAbstract
             return $dfiPrice;
         }
 
-        return (float) ($Settings['general_costs'] ?? 0) + $this->fees;
+        $this->shippingCost = (float) ($Settings['general_costs'] ?? 0);
+        return $this->shippingCost + $this->fees;
     }
 
     /**
@@ -149,7 +171,8 @@ class DfiShipping extends ShippingAbstract
         $address = $order->getShippingAddress();
 
         if (!$address || count($products) < 1) {
-            return (float) $order->getValue('shipping_costs');
+            $this->shippingCost = (float) $order->getValue('shipping_costs');
+            return $this->shippingCost;
         }
 
         $Country  = $address->getCountry();
@@ -157,7 +180,8 @@ class DfiShipping extends ShippingAbstract
         $postcode = $address->getValue('postal');
 
         if (!$country || !$postcode) {
-            return (float) $order->getValue('shipping_costs');
+            $this->shippingCost = (float) $order->getValue('shipping_costs');
+            return $this->shippingCost;
         }
 
         $dfiProducts = [];
@@ -173,26 +197,34 @@ class DfiShipping extends ShippingAbstract
         $cacheKey  = md5(json_encode([$country, $postcode, $dfiProducts, $cartTotal]));
 
         if (isset(self::$cache[$cacheKey])) {
-            $this->fees        = self::$cache[$cacheKey]['fees'];
-            $this->apiResponse = self::$cache[$cacheKey]['response'];
+            $this->fees         = self::$cache[$cacheKey]['fees'];
+            $this->apiResponse  = self::$cache[$cacheKey]['response'];
+            $this->shippingCost = self::$cache[$cacheKey]['shippingCost'];
             return self::$cache[$cacheKey]['price'];
         }
 
         try {
             $dfi      = new Dfi();
             $response = $dfi->estimateShipping($country, $postcode, $dfiProducts, false, 0.0, $cartTotal);
-            $this->fees        = (float) ($response->fees ?? 0);
-            $this->apiResponse = (array) $response;
-            $price             = (float) $response->shipping_cost + $this->fees;
+            $this->fees         = (float) ($response->fees ?? 0);
+            $this->apiResponse  = (array) $response;
+            $this->shippingCost = (float) $response->shipping_cost;
+            $price              = $this->shippingCost + $this->fees;
 
-            self::$cache[$cacheKey] = ['price' => $price, 'fees' => $this->fees, 'response' => $this->apiResponse];
+            self::$cache[$cacheKey] = [
+                'price'        => $price,
+                'fees'         => $this->fees,
+                'response'     => $this->apiResponse,
+                'shippingCost' => $this->shippingCost,
+            ];
 
             return $price;
         } catch (DfiException $e) {
             \rex_logger::logException($e);
-            $this->fees        = 0.0;
-            $this->apiResponse = null;
-            return (float) $order->getValue('shipping_costs');
+            $this->fees         = 0.0;
+            $this->apiResponse  = null;
+            $this->shippingCost = (float) $order->getValue('shipping_costs');
+            return $this->shippingCost;
         }
     }
 }
