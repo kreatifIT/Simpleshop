@@ -14,6 +14,13 @@ namespace FriendsOfREDAXO\Simpleshop;
 
 class DfiOrderHandler
 {
+    /**
+     * Fallback VAT rate when the invoice address' country has none configured
+     * (rex_prj_country.vat_rate) - matches the rate all prices in the shop
+     * are assumed to have been entered gross with.
+     */
+    const FALLBACK_VAT_RATE = 22.0;
+
     public static function ext_completeOrder(\rex_extension_point $ep): void
     {
         $order = $ep->getParam('Order');
@@ -117,6 +124,21 @@ class DfiOrderHandler
      * the checkout-time figures may be stale. shipping_cost reflects what
      * was actually charged (manual value if the manual/DFI toggle resolved
      * to manual), while fees always come from DFI itself.
+     *
+     * All shop prices (products + shipping) are stored gross. DFI expects
+     * net-of-VAT figures instead (total_without_tax per product, and net
+     * shipping_cost/fees), using the VAT rate of the invoice address'
+     * country - not each product's own configured tax rate, since all
+     * prices are assumed to have been entered gross at a uniform rate.
+     * `vat` is derived as the remainder (total minus the net figures) rather
+     * than read from the order's own tax bucketing, so total = sum(net) +
+     * vat always holds exactly for DFI's own cross-check.
+     *
+     * All net figures are rounded to 3 decimals rather than 2 - DFI sums the
+     * per-line/-field values back up on their side, and cent-rounding each
+     * one individually before that summation caused their total to drift by
+     * a cent (e.g. 46.00 stored as 45.99). The extra decimal keeps enough
+     * precision for their sum to land on the actual total.
      */
     private static function buildPayload(Order $order): ?array
     {
@@ -139,27 +161,40 @@ class DfiOrderHandler
             'email'    => $customer ? $customer->getValue('email') : '',
         ];
 
-        $products = [];
+        $vatRate = self::resolveVatRate($order);
+
+        $products  = [];
+        $netTotal  = 0.0;
         foreach ($order->getOrderProducts() as $product) {
-            $hasVariant = (string) $product->getValue('variant_key') !== '';
-            $qty        = (int) $product->getValue('cart_quantity');
+            $hasVariant    = (string) $product->getValue('variant_key') !== '';
+            $qty           = (int) $product->getValue('cart_quantity');
+            $grossLineTotal = (float) $product->getPrice(true) * $qty;
+            $netLineTotal   = round($grossLineTotal / (1 + $vatRate / 100), 3);
+            $netTotal      += $netLineTotal;
 
             $products[] = [
                 'qty'               => $qty,
                 'sku'               => (string) ($hasVariant ? $product->getValue('code') : $product->getValue('ax_code')),
-                'total_without_tax' => (float) $product->getPrice(false) * $qty,
+                'total_without_tax' => $netLineTotal,
             ];
         }
 
-        $shipping     = $order->getValue('shipping');
-        $shippingCost = (float) $order->getValue('shipping_costs');
-        $fees         = 0.0;
+        $shipping           = $order->getValue('shipping');
+        $shippingCostGross  = (float) $order->getValue('shipping_costs');
+        $feesGross          = 0.0;
 
         if ($shipping instanceof DfiShipping) {
             $shipping->getGrossPrice($order);
-            $fees         = $shipping->getExciseFees();
-            $shippingCost = $shipping->getShippingCost();
+            $feesGross         = $shipping->getExciseFees();
+            $shippingCostGross = $shipping->getShippingCost();
         }
+
+        $shippingCostNet = round($shippingCostGross / (1 + $vatRate / 100), 3);
+        $feesNet         = round($feesGross / (1 + $vatRate / 100), 3);
+        $netTotal       += $shippingCostNet + $feesNet;
+
+        $total = (float) $order->getTotal();
+        $vat   = round($total - $netTotal, 3);
 
         return [
             'customerData' => $customerData,
@@ -168,11 +203,26 @@ class DfiOrderHandler
                 'country'       => $customerData['country'],
                 'insurance'     => false,
                 'order_notes'   => trim((string) $order->getValue('remarks')),
-                'total'         => (float) $order->getTotal(),
-                'vat'           => array_sum((array) $order->getValue('taxes')),
-                'shipping_cost' => $shippingCost,
-                'fees'          => $fees,
+                'total'         => $total,
+                'vat'           => $vat,
+                'shipping_cost' => $shippingCostNet,
+                'fees'          => $feesNet,
             ],
         ];
+    }
+
+    /**
+     * VAT rate to use for the net-of-tax figures sent to DFI, taken from the
+     * invoice address' country (rex_prj_country.vat_rate). Falls back to
+     * FALLBACK_VAT_RATE if there's no invoice address, no resolvable
+     * country, or the country has no rate configured.
+     */
+    private static function resolveVatRate(Order $order): float
+    {
+        $invoiceAddress = $order->getInvoiceAddress();
+        $Country        = $invoiceAddress ? $invoiceAddress->getCountry() : null;
+        $vatRate        = $Country ? $Country->getValue('vat_rate') : null;
+
+        return $vatRate !== null && $vatRate !== '' ? (float) $vatRate : self::FALLBACK_VAT_RATE;
     }
 }

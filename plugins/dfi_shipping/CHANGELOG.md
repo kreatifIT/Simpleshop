@@ -1,6 +1,49 @@
 Changelog
 =========
 
+Version 1.2.0 – 21.08.2026
+---------------------------
+
+### Neue Features
+
+* Der manuelle "Bestellung an DFI übertragen"-Button im Backend
+  (`order_functions.php`) überträgt jetzt ebenfalls als Pre-Ordine über
+  `/v2/pad/addorder` (`DfiOrderHandler::submitPreOrder()`) statt über
+  `/v2/addorder` - Aktion umbenannt zu `resend_dfi_preorder`
+* `DfiOrderHandler::buildPayload()` berechnet jetzt korrekte Netto-Werte für
+  die DFI-Übermittlung (Produkte + Versandkosten + Fees), da im Shop alle
+  Preise brutto gespeichert sind:
+  * Neues Feld `vat_rate` auf `rex_prj_country` (Backend-Länderliste,
+    editierbar pro Land), per Migration einmalig befüllt mit den
+    EU-27-Standardsätzen, `0%` für alle Nicht-EU-Länder (steuerfreier
+    Export); überschreibt bei einem Reinstall keine bereits gesetzten Werte
+  * MwSt.-Satz wird anhand des Landes der **Rechnungsadresse** ermittelt
+    (`Order::getInvoiceAddress()`), nicht der Versandadresse; Fallback `22%`
+    falls kein Land/keine Rate hinterlegt ist
+  * `total_without_tax` pro Produkt sowie `shipping_cost`/`fees` werden mit
+    diesem Satz aus den (unveränderten) Bruttowerten herausgerechnet -
+    unabhängig vom individuell am Produkt hinterlegten Steuersatz, da alle
+    Preise als einheitlich brutto-22%-basiert angenommen werden
+  * `vat` wird als Restgröße (`total - Summe der Nettobeträge`) berechnet,
+    nicht mehr aus `Order::getValue('taxes')` übernommen - garantiert, dass
+    `total = Summe(netto) + vat` für DFI's eigenen Abgleich exakt aufgeht
+  * Alle Netto-/MwSt.-Werte werden auf 3 statt 2 Nachkommastellen gerundet -
+    verhindert einen Rundungsfehler auf DFI-Seite (z.B. 46,00€ als 45,99€
+    hinterlegt), der entsteht, wenn DFI die auf 2 Nachkommastellen
+    gerundeten Einzelwerte wieder aufsummiert
+
+### Bugfixes
+
+* `dfi_addorder_sent_at`/`dfi_preorder_sent_at` hatten `only_empty => 0`
+  (YForm-Datestamp), wodurch das Feld bei **jedem** Backend-Speichern der
+  Bestellung automatisch auf "jetzt" gesetzt wurde - unabhängig von einer
+  tatsächlichen DFI-Übertragung. Auf `only_empty => 2` geändert, Felder
+  werden jetzt ausschließlich von `DfiOrderHandler` gesteuert.
+
+### Neue Felder auf `rex_prj_country`
+
+* `vat_rate` (decimal(5,2), Default `22`)
+
 Version 1.1.0 – 20.08.2026
 ---------------------------
 
