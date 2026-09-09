@@ -1,0 +1,13 @@
+dfi_shipping.api_settings = Schnittstellen-Einstellungen
+dfi_shipping.api_token = API Token
+dfi_shipping.notification_recipients = Empfänger für Fehlerbenachrichtigungen
+dfi_shipping.notification_recipients_notice = Bei einem Fehler in der DFI-Schnittstelle (z.B. Versandkosten-Berechnung) wird eine Benachrichtigung an diese Adresse(n) verschickt. Mehrere Adressen kommagetrennt eintragen.
+dfi_shipping.general_settings = Allgemeine Versandkosten
+dfi_shipping.general_costs = Versandkosten (manuell, ohne Länder-Zuordnung)
+dfi_shipping.general_free_shipping = Versandkostenfrei ab (Bestellwert)
+dfi_shipping.general_use_dfi_notice = Versandkosten über DFI berechnen (statt manuellem Preis oben), wenn kein Land unten zutrifft
+dfi_shipping.use_dfi = DFI verwenden
+dfi_shipping.costs_per_country = Versandkosten pro Land
+dfi_shipping.costs_per_country_notice = Zeilen nach Mindestbestellwert absteigend sortiert eintragen. Ist "DFI verwenden" bei einer zutreffenden Zeile aktiviert, wird der Preis live über die DFI-Schnittstelle berechnet statt den eingetragenen Preis zu verwenden.
+dfi_shipping.min_order = Mindestbestellwert
+dfi_shipping.shipping_costs = Versandkosten

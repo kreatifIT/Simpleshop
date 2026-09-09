@@ -102,6 +102,16 @@ abstract class ShippingAbstract extends PluginAbstract
         return $this->tax_percentage;
     }
 
+    /**
+     * Raw response data of the last live price calculation, if the plugin's
+     * price comes from an external API (e.g. for auditing/order records).
+     * Null by default; plugins that calculate via an API should override.
+     */
+    public function getApiResponse()
+    {
+        return null;
+    }
+
     public static function get()
     {
         return Shipping::getByClass(get_called_class());

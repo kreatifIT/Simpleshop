@@ -25,6 +25,9 @@ FragmentConfig::$data['cart']['table-wrapper']['has_go_ahead']  = false;
 
 $styles = FragmentConfig::getValue('email_styles');
 
+$dfiResponse = json_decode((string) $Order->getValue('dfi_addorder_response'), true) ?: [];
+$dfiTracking = $dfiResponse['tracking'] ?? '';
+
 ?>
 <div class="order-complete-email">
     <h2>###label.email__order_complete_text###</h2>
@@ -63,6 +66,19 @@ $styles = FragmentConfig::getValue('email_styles');
                 <th>
                     <h3 <?= $styles['h2'] ?>>###label.shipping_method###</h3>
                     <p <?= $styles['p'] ?>><?= $Shipping->getName() ?></p>
+                </th>
+                <th class="expander" style="<?= $styles['th'] ?>"></th>
+            </tr>
+        </table>
+    <?php endif; ?>
+
+    <?php if ($dfiTracking !== ''): ?>
+        <!-- tracking -->
+        <table <?= $styles['table'] ?>>
+            <tr <?= $styles['tr'] ?>>
+                <th>
+                    <h3 <?= $styles['h2'] ?>>###label.tracking_number###</h3>
+                    <p <?= $styles['p'] ?>><?= $dfiTracking ?></p>
                 </th>
                 <th class="expander" style="<?= $styles['th'] ?>"></th>
             </tr>

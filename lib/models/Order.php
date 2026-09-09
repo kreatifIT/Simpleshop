@@ -415,6 +415,11 @@ class Order extends Model
         if ($shipping && $shipping->hasCosts()) {
             try {
                 $this->setValue('shipping_costs', (float)$shipping->getGrossPrice($this, $products));
+
+                $apiResponse = $shipping->getApiResponse();
+                if ($apiResponse !== null) {
+                    $this->setValue('shipping_api_response', json_encode($apiResponse));
+                }
             } catch (\Exception $ex) {
                 $msg = trim($ex->getLabelByCode());
 
@@ -506,7 +511,19 @@ class Order extends Model
             $shipping   = $this->getValue('shipping');
             $taxPercent = $shipping->getTaxPercentage();
 
-            $gross_prices[$taxPercent] += $shipping->getPrice($this);
+            // Use the already-persisted shipping_costs (gross) rather than
+            // $shipping->getPrice(), whose cached $this->price lives on a
+            // ShippingAbstract instance that Model::getValue() reconstructs
+            // fresh on every call (Kreatif Model's class/data unprepareValue)
+            // - so a price cached earlier in recalculateDocument() would be
+            // read back as 0 here on a different object instance.
+            $shippingCosts = (float) $this->getValue('shipping_costs');
+
+            if ($this->isTaxFree()) {
+                $shippingCosts -= $shippingCosts / (100 + $taxPercent) * $taxPercent;
+            }
+
+            $gross_prices[$taxPercent] += $shippingCosts;
         }
 
         foreach ($promotions as $name => $promotion) {

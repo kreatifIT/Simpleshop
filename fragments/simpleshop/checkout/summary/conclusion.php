@@ -37,10 +37,20 @@ $isTaxFree  = $Order->isTaxFree();
         </div>
     <?php endforeach; ?>
 
+    <?php
+    $exciseFees = $shipping instanceof DfiShipping ? $shipping->getExciseFees() : 0.0;
+    ?>
     <?php if ($shipping): ?>
         <div class="shipping">
             <span class="label">+ ###label.shipping_costs###</span>
-            <span class="price">&euro;&nbsp;<?= format_price($Order->getShippingCosts()) ?></span>
+            <span class="price">&euro;&nbsp;<?= format_price($Order->getShippingCosts() - $exciseFees) ?></span>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($exciseFees > 0): ?>
+        <div class="excise-fee">
+            <span class="label">+ ###label.excise_fee###</span>
+            <span class="price">&euro;&nbsp;<?= format_price($exciseFees) ?></span>
         </div>
     <?php endif; ?>
 

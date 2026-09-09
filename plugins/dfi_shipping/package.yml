@@ -1,0 +1,11 @@
+package: simpleshop/dfi_shipping
+version: '1.0'
+author: Kreatif GmbH
+requires:
+    - yform_usability
+
+page:
+    title: DFI
+    perm: shop[dfi_shipping]
+    subpages:
+        settings: { title: translate:settings, hidden: true }
